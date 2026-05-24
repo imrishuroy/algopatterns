@@ -21,6 +21,8 @@ import (
 )
 
 func main() {
+	fmt.Println("Starting AlgoPatterns API server...")
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to load configuration")

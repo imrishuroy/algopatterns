@@ -12,6 +12,9 @@ backend/bin/
 backend/.env
 backend/.env.local
 backend/coverage.*
+
+# Frontend
+frontend/coverage/
 *.crt
 *.pem
 *.key

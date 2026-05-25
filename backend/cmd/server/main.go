@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting AlgoPatterns API server...")
+	fmt.Println("Starting AlgoPatterns API server....")
 
 	cfg, err := config.Load()
 	if err != nil {

@@ -58,7 +58,7 @@ jobs:
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars="GIN_MODE=release,DB_HOST=${{ secrets.DB_HOST }},DB_PORT=26257,DB_USER=${{ secrets.DB_USER }},DB_NAME=${{ secrets.DB_NAME }},DB_SSL_MODE=verify-full,ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }},JUDGE0_URL=${{ secrets.JUDGE0_URL }},RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }},RAZORPAY_GST_RATE=18.0,SMTP_HOST=${{ secrets.SMTP_HOST }},SMTP_PORT=587,SMTP_USER=${{ secrets.SMTP_USER }},EMAIL_FROM=${{ secrets.EMAIL_FROM }},EMAIL_FROM_NAME=AlgoPatterns,EMAIL_ENABLED=true" \
+            --set-env-vars="^@@^GIN_MODE=release@@DB_HOST=${{ secrets.DB_HOST }}@@DB_PORT=26257@@DB_USER=${{ secrets.DB_USER }}@@DB_NAME=${{ secrets.DB_NAME }}@@DB_SSL_MODE=verify-full@@ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}@@JUDGE0_URL=${{ secrets.JUDGE0_URL }}@@RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}@@RAZORPAY_GST_RATE=18.0@@SMTP_HOST=${{ secrets.SMTP_HOST }}@@SMTP_PORT=587@@SMTP_USER=${{ secrets.SMTP_USER }}@@EMAIL_FROM=${{ secrets.EMAIL_FROM }}@@EMAIL_FROM_NAME=AlgoPatterns@@EMAIL_ENABLED=true" \
             --set-secrets="DB_PASSWORD=db-password:latest,JWT_SECRET=jwt-secret:latest,RAZORPAY_KEY_SECRET=razorpay-key-secret:latest,SMTP_PASSWORD=smtp-password:latest" \
             --memory 512Mi \
             --cpu 1 \

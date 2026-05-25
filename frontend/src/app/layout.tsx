@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fredoka } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -19,10 +19,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const fredoka = Fredoka({
+  variable: "--font-fredoka",
+  subsets: ["latin"],
+  weight: ["600"],
+});
+
 export const metadata: Metadata = {
-  title: "AlgoPatterns - Interactive Algorithm Learning",
+  title: "Algo Patterns - Master DSA Patterns",
   description:
-    "Master DSA patterns with interactive visualizers and step-by-step algorithm animations.",
+    "Master Data Structures & Algorithms with pattern-based learning. Interactive visualizers, step-by-step animations, and curated problem sets for FAANG interviews.",
+  keywords: ["DSA", "algorithms", "data structures", "coding patterns", "leetcode", "FAANG interview"],
+  authors: [{ name: "Algo Patterns" }],
+  openGraph: {
+    title: "Algo Patterns - Master DSA Patterns",
+    description: "Master Data Structures & Algorithms with pattern-based learning",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} h-full antialiased dark`}
     >
       <body
         className="min-h-full flex flex-col text-gray-100"

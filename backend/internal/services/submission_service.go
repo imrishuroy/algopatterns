@@ -275,7 +275,7 @@ func (s *SubmissionService) RunCode(ctx context.Context, _ uuid.UUID, req *model
 		return nil, fmt.Errorf("failed to get results: %w", err)
 	}
 
-	return s.buildRunCodeResponse(testCases, results, req.CustomInput), nil
+	return buildRunCodeResponse(testCases, results, req.CustomInput), nil
 }
 
 // getTestCasesForRun gets test cases or creates one from custom input
@@ -313,7 +313,7 @@ func buildJudge0Submissions(fullCode string, languageID int, testCases []models.
 }
 
 // buildRunCodeResponse constructs the response from Judge0 results
-func (s *SubmissionService) buildRunCodeResponse(testCases []models.TestCase, results []models.Judge0Result, customInput *string) *models.RunCodeResponse {
+func buildRunCodeResponse(testCases []models.TestCase, results []models.Judge0Result, customInput *string) *models.RunCodeResponse {
 	response := &models.RunCodeResponse{
 		Results:    make([]models.RunCodeResult, 0, len(results)),
 		TotalTests: len(testCases),
@@ -325,7 +325,7 @@ func (s *SubmissionService) buildRunCodeResponse(testCases []models.TestCase, re
 		if i >= len(testCases) {
 			break
 		}
-		runResult := s.buildRunCodeResult(i, testCases[i], result, isCustom)
+		runResult := buildRunCodeResult(i, testCases[i], result, isCustom)
 		if runResult.Status == models.StatusAccepted {
 			response.TotalPassed++
 		}
@@ -336,7 +336,7 @@ func (s *SubmissionService) buildRunCodeResponse(testCases []models.TestCase, re
 }
 
 // buildRunCodeResult creates a single run result from Judge0 result
-func (s *SubmissionService) buildRunCodeResult(index int, tc models.TestCase, result models.Judge0Result, isCustom bool) models.RunCodeResult {
+func buildRunCodeResult(index int, tc models.TestCase, result models.Judge0Result, isCustom bool) models.RunCodeResult {
 	runResult := models.RunCodeResult{
 		TestCaseIndex:  index,
 		Input:          tc.Input,

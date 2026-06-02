@@ -218,7 +218,7 @@ export default function RecurrenceBuilderVisualizer() {
           <div className="space-y-3">
             {problem.steps.map((step, idx) => (
               <motion.div
-                key={`idx-${idx}`}
+                key={`step-${step.question.slice(0, 20)}-${idx}`}
                 initial={{ opacity: 0.5 }}
                 animate={{ opacity: revealedSteps.has(idx) ? 1 : 0.5 }}
                 className={`rounded-xl border-2 overflow-hidden transition-colors ${

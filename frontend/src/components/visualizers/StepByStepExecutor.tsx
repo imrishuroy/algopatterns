@@ -517,7 +517,7 @@ export default function StepByStepExecutor({
                   const isActive = lineNum === step.lineNumber;
                   return (
                     <div
-                      key={`idx-${idx}`}
+                      key={`line-${lineNum}-${line.slice(0, 20).replace(/\s+/g, '')}`}
                       className={`flex transition-all duration-200 ${
                         isActive ? "bg-yellow-500/20 -mx-4 px-4 rounded" : ""
                       }`}
@@ -641,7 +641,7 @@ export default function StepByStepExecutor({
               <div className="space-y-1">
                 {[...step.callStack].reverse().map((call, idx) => (
                   <div
-                    key={`idx-${idx}`}
+                    key={`${call}-${idx}`}
                     className={`px-3 py-2 rounded font-mono text-sm ${
                       idx === 0
                         ? "bg-indigo-500/20 border border-indigo-500/50 text-indigo-300"
@@ -661,7 +661,7 @@ export default function StepByStepExecutor({
                 </h4>
                 <div className="space-y-1 font-mono text-sm">
                   {outputs.map((output, idx) => (
-                    <div key={`idx-${idx}`} className="text-green-400">
+                    <div key={`${output}-${idx}`} className="text-green-400">
                       {output}
                     </div>
                   ))}

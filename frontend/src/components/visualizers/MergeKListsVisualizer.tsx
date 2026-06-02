@@ -288,7 +288,7 @@ export default function MergeKListsVisualizer() {
               <AnimatePresence>
                 {result.map((num, idx) => (
                   <motion.span
-                    key={`idx-${idx}`}
+                    key={`result-${num}-${idx}`}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="px-3 py-1 bg-violet-500 text-white rounded font-mono font-bold"

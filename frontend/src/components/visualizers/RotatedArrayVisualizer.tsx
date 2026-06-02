@@ -238,7 +238,7 @@ export default function RotatedArrayVisualizer() {
               const inRange = isInSearchRange(idx);
 
               return (
-                <div key={`idx-${idx}`} className="flex flex-col items-center">
+                <div key={`num-${num}-${idx}`} className="flex flex-col items-center">
                   <motion.div
                     animate={{
                       backgroundColor: isFound

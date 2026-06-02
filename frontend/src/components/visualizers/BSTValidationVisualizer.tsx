@@ -313,7 +313,7 @@ export default function BSTValidationVisualizer() {
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {steps.slice(0, stepIndex + 1).map((step, idx) => (
               <div
-                key={`idx-${idx}`}
+                key={`step-${step.node}-${step.min}-${step.max}-${idx}`}
                 className={`text-sm font-mono px-2 py-1 rounded ${
                   step.valid ? "text-green-400" : "text-red-400 bg-red-500/10"
                 }`}

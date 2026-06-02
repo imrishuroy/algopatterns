@@ -189,19 +189,20 @@ export default function FindAnagramsVisualizer() {
         <div className="mb-4">
           <div className="text-sm text-gray-400 mb-2">String: &quot;{s}&quot;</div>
           <div className="flex gap-1">
-            {s.split("").map((char, idx) => {
+            {s.split("").map((char, position) => {
               const inWindow =
-                idx >= winLeft && idx <= winRight && currentIdx >= 0;
+                position >= winLeft && position <= winRight && currentIdx >= 0;
               const isFound = foundIndices.some(
-                (start) => idx >= start && idx < start + p.length
+                (start) => position >= start && position < start + p.length
               );
 
               return (
                 <motion.div
-                  key={`idx-${idx}`}
+                  // eslint-disable-next-line react/no-array-index-key -- character position in string is semantically meaningful
+                  key={`s-pos${position}-${char}`}
                   animate={{
-                    scale: idx === currentIdx ? 1.1 : 1,
-                    y: idx === currentIdx ? -5 : 0,
+                    scale: position === currentIdx ? 1.1 : 1,
+                    y: position === currentIdx ? -5 : 0,
                   }}
                   className={`w-9 h-11 rounded-lg flex flex-col items-center justify-center font-mono ${
                     phase === "done" && isFound
@@ -212,9 +213,10 @@ export default function FindAnagramsVisualizer() {
                           : "bg-pink-500 text-white"
                         : "bg-gray-700 text-gray-300"
                   }`}
+
                 >
                   <span className="text-base font-bold">{char}</span>
-                  <span className="text-xs opacity-70">{idx}</span>
+                  <span className="text-xs opacity-70">{position}</span>
                 </motion.div>
               );
             })}
@@ -298,7 +300,7 @@ export default function FindAnagramsVisualizer() {
             <div className="text-sm text-green-400">
               Anagrams found at indices: [{foundIndices.join(", ")}]
               {foundIndices.map((idx) => (
-                <span key={`idx-${idx}`} className="ml-2 font-mono">
+                <span key={`found-${idx}-${s.slice(idx, idx + p.length)}`} className="ml-2 font-mono">
                   "{s.slice(idx, idx + p.length)}"
                 </span>
               ))}

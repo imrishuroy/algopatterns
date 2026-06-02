@@ -132,7 +132,7 @@ export default function PrefixSumVisualizer() {
           <div className="flex gap-2">
             {arr.map((val, idx) => (
               <motion.div
-                key={`idx-${idx}`}
+                key={`arr-${val}-${idx}`}
                 animate={{
                   scale: idx === currentIdx && phase === "building" ? 1.1 : 1,
                   backgroundColor:
@@ -157,7 +157,7 @@ export default function PrefixSumVisualizer() {
           <div className="flex gap-2">
             {prefix.map((val, idx) => (
               <motion.div
-                key={`idx-${idx}`}
+                key={`prefix-${val}-${idx}`}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className={`w-12 h-12 rounded-lg flex flex-col items-center justify-center font-mono ${

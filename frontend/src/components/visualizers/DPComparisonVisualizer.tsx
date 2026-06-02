@@ -254,7 +254,7 @@ export default function DPComparisonVisualizer() {
               <div className="space-y-0.5">
                 {recursionStack.slice(-5).map((call, i) => (
                   <motion.div
-                    key={`i-${i}`}
+                    key={`call-${call}-${i}`}
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     className="text-xs font-mono text-red-400 bg-red-500/10 px-2 py-0.5 rounded"
@@ -307,7 +307,7 @@ export default function DPComparisonVisualizer() {
               <div className="flex flex-wrap gap-1">
                 {Array.from({ length: n + 1 }).map((_, i) => (
                   <motion.div
-                    key={`i-${i}`}
+                    key={`memo-${i}-${memoCache.get(i) ?? 'empty'}`}
                     animate={{
                       scale: memoCache.has(i) ? 1 : 0.8,
                       opacity: memoCache.has(i) ? 1 : 0.3,
@@ -363,7 +363,7 @@ export default function DPComparisonVisualizer() {
               <div className="flex gap-1">
                 {tabArray.map((val, i) => (
                   <motion.div
-                    key={`i-${i}`}
+                    key={`tab-${i}-${val ?? 'null'}`}
                     animate={{
                       scale: i === tabIndex - 1 ? 1.2 : 1,
                       backgroundColor:

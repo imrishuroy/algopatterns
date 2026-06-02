@@ -218,14 +218,14 @@ export default function ActivitySelectionVisualizer() {
         <div className="mb-6">
           <div className="flex justify-between text-xs text-gray-500 mb-2 px-2">
             {Array.from({ length: timelineMax + 1 }).map((_, i) => (
-              <span key={`i-${i}`}>{i}</span>
+              <span key={`timeline-label-${i}`}>{i}</span>
             ))}
           </div>
           <div className="relative h-64 bg-gray-800/50 rounded-lg overflow-hidden">
             {/* Time grid lines */}
             {Array.from({ length: timelineMax + 1 }).map((_, i) => (
               <div
-                key={`i-${i}`}
+                key={`grid-line-${i}`}
                 className="absolute top-0 bottom-0 border-l border-gray-700/50"
                 style={{ left: `${(i / timelineMax) * 100}%` }}
               />

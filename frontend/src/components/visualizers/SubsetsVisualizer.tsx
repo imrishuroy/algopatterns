@@ -143,7 +143,7 @@ export default function SubsetsVisualizer() {
           <div className="flex gap-2 justify-center">
             {nums.map((num, idx) => (
               <motion.div
-                key={`idx-${idx}`}
+                key={`${num}-${idx}`}
                 animate={{
                   backgroundColor: currentPath.includes(num)
                     ? "#a855f7"
@@ -194,7 +194,7 @@ export default function SubsetsVisualizer() {
             <AnimatePresence>
               {results.map((subset, idx) => (
                 <motion.div
-                  key={`idx-${idx}`}
+                  key={`[${subset.join(',')}]-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 font-mono text-sm"

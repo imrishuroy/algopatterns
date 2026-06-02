@@ -263,7 +263,7 @@ func (s *SubmissionService) RunCode(ctx context.Context, _ uuid.UUID, req *model
 		return nil, err
 	}
 
-	judge0Submissions := s.buildJudge0Submissions(fullCode, req.LanguageID, testCases)
+	judge0Submissions := buildJudge0Submissions(fullCode, req.LanguageID, testCases)
 
 	tokens, err := s.judgeService.SubmitBatch(ctx, judge0Submissions)
 	if err != nil {
@@ -299,7 +299,7 @@ func (s *SubmissionService) getTestCasesForRun(ctx context.Context, req *models.
 }
 
 // buildJudge0Submissions creates Judge0 submission requests
-func (s *SubmissionService) buildJudge0Submissions(fullCode string, languageID int, testCases []models.TestCase) []models.Judge0Submission {
+func buildJudge0Submissions(fullCode string, languageID int, testCases []models.TestCase) []models.Judge0Submission {
 	submissions := make([]models.Judge0Submission, 0, len(testCases))
 	for _, tc := range testCases {
 		submissions = append(submissions, models.Judge0Submission{
@@ -349,8 +349,8 @@ func (s *SubmissionService) buildRunCodeResult(index int, tc models.TestCase, re
 		runResult.Status = models.MapJudge0StatusToSubmissionStatus(result.Status.ID)
 	}
 
-	s.populateRunResultOutput(&runResult, result)
-	s.populateRunResultMetrics(&runResult, result)
+	populateRunResultOutput(&runResult, result)
+	populateRunResultMetrics(&runResult, result)
 
 	if runResult.Status == models.StatusAccepted && tc.ExpectedOutput != "" {
 		if strings.TrimSpace(tc.ExpectedOutput) != runResult.ActualOutput {
@@ -362,7 +362,7 @@ func (s *SubmissionService) buildRunCodeResult(index int, tc models.TestCase, re
 }
 
 // populateRunResultOutput fills output fields from Judge0 result
-func (s *SubmissionService) populateRunResultOutput(runResult *models.RunCodeResult, result models.Judge0Result) {
+func populateRunResultOutput(runResult *models.RunCodeResult, result models.Judge0Result) {
 	if result.Stdout != nil {
 		runResult.ActualOutput = strings.TrimSpace(*result.Stdout)
 		runResult.Stdout = *result.Stdout
@@ -382,7 +382,7 @@ func (s *SubmissionService) populateRunResultOutput(runResult *models.RunCodeRes
 }
 
 // populateRunResultMetrics fills runtime and memory from Judge0 result
-func (s *SubmissionService) populateRunResultMetrics(runResult *models.RunCodeResult, result models.Judge0Result) {
+func populateRunResultMetrics(runResult *models.RunCodeResult, result models.Judge0Result) {
 	if result.Time != nil {
 		if t, err := strconv.ParseFloat(*result.Time, 64); err == nil {
 			runResult.RuntimeMs = int(t * 1000)

@@ -210,7 +210,7 @@ export default function ReorderListVisualizer() {
             </div>
             <div className="flex items-center gap-2">
               {originalList.map((val, idx) => (
-                <React.Fragment key={`idx-${idx}`}>
+                <React.Fragment key={`node-${val}-${idx}`}>
                   <motion.div
                     animate={{
                       scale: idx === slowIdx || idx === fastIdx ? 1.1 : 1,

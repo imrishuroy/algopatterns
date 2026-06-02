@@ -157,7 +157,7 @@ export default function TwoSumHashMapVisualizer() {
           <div className="flex gap-2 justify-center">
             {nums.map((num, idx) => (
               <motion.div
-                key={`idx-${idx}`}
+                key={`num-${num}-${idx}`}
                 animate={{
                   backgroundColor: found?.includes(idx)
                     ? "#22c55e"

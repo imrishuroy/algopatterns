@@ -275,7 +275,7 @@ export default function NQueensVisualizer() {
             <AnimatePresence>
               {solutions.map((sol, idx) => (
                 <motion.div
-                  key={`idx-${idx}`}
+                  key={`solution-${sol.join('')}-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="p-2 bg-green-500/20 border border-green-500/50 rounded-lg"

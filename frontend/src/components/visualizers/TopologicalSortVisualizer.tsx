@@ -301,7 +301,7 @@ export default function TopologicalSortVisualizer() {
 
               return (
                 <motion.line
-                  key={`i-${i}`}
+                  key={`edge-${edge.from}-${edge.to}`}
                   x1={from.x + 35 + offsetX}
                   y1={from.y + 20 + offsetY}
                   x2={to.x + 35 - offsetX}
@@ -352,7 +352,7 @@ export default function TopologicalSortVisualizer() {
             <div className="flex flex-wrap gap-1 min-h-[32px]">
               {queue.map((id, i) => (
                 <span
-                  key={`i-${i}`}
+                  key={`queue-${id}-${i}`}
                   className={`px-2 py-1 rounded text-xs font-medium ${
                     i === 0
                       ? "bg-yellow-500 text-black"
@@ -372,7 +372,7 @@ export default function TopologicalSortVisualizer() {
             <div className="flex flex-wrap gap-1 min-h-[32px]">
               {order.map((id, i) => (
                 <span
-                  key={`i-${i}`}
+                  key={`order-${id}-${i}`}
                   className="px-2 py-1 rounded text-xs font-medium bg-green-500/50 text-green-200"
                 >
                   {i + 1}. {courseNames[id]}

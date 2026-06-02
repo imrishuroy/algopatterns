@@ -219,7 +219,7 @@ export default function KadaneVisualizer() {
 
               return (
                 <motion.div
-                  key={`idx-${idx}`}
+                  key={`num-${num}-${idx}`}
                   animate={{
                     backgroundColor: isCurrent
                       ? "#eab308"
@@ -246,8 +246,8 @@ export default function KadaneVisualizer() {
             })}
           </div>
           <div className="flex gap-1 justify-center mt-1">
-            {nums.map((_, idx) => (
-              <div key={`idx-${idx}`} className="w-10 text-center text-xs text-gray-500">
+            {nums.map((num, idx) => (
+              <div key={`num-${num}-${idx}`} className="w-10 text-center text-xs text-gray-500">
                 {idx}
               </div>
             ))}

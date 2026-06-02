@@ -157,7 +157,7 @@ export default function LongestSubstringVisualizer() {
 
               return (
                 <motion.div
-                  key={`idx-${idx}`}
+                  key={`char-${char}-${idx}`}
                   animate={{
                     scale: isRight || isLeft ? 1.1 : 1,
                     y: isRight ? -8 : isLeft ? -4 : 0,

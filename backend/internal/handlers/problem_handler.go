@@ -25,8 +25,8 @@ func (h *ProblemHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	problems := rg.Group("/problems")
 	{
 		problems.GET("", h.List)
-		problems.GET("/languages", h.GetLanguages)
-		problems.GET("/:slug", h.GetBySlug)
+		problems.GET("/languages", h.ListLanguages)
+		problems.GET("/:slug", h.ShowBySlug)
 
 		admin := problems.Group("")
 		admin.Use(h.authMW.RequireAuth())
@@ -57,7 +57,7 @@ func (h *ProblemHandler) List(c *gin.Context) {
 	response.OK(c, result)
 }
 
-func (h *ProblemHandler) GetBySlug(c *gin.Context) {
+func (h *ProblemHandler) ShowBySlug(c *gin.Context) {
 	slug := c.Param("slug")
 	if slug == "" {
 		response.BadRequest(c, "Problem slug is required", nil)
@@ -223,7 +223,7 @@ func (h *ProblemHandler) CreateTemplate(c *gin.Context) {
 	response.Created(c, tmpl)
 }
 
-func (h *ProblemHandler) GetLanguages(c *gin.Context) {
+func (h *ProblemHandler) ListLanguages(c *gin.Context) {
 	languages, err := h.service.GetLanguages(c.Request.Context())
 	if err != nil {
 		response.InternalError(c)

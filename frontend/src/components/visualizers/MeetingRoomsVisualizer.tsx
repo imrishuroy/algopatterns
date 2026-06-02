@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface Meeting {
   start: number;
@@ -192,7 +192,7 @@ export default function MeetingRoomsVisualizer() {
             <div className="absolute bottom-4 left-4 right-4 h-0.5 bg-gray-600">
               {Array.from({ length: Math.ceil(maxTime / 5) + 1 }, (_, i) => (
                 <div
-                  key={i}
+                  key={`i-${i}`}
                   className="absolute bottom-0 w-0.5 h-2 bg-gray-600"
                   style={{ left: `${((i * 5) / maxTime) * 100}%` }}
                 >
@@ -228,7 +228,7 @@ export default function MeetingRoomsVisualizer() {
           <div className="flex flex-wrap gap-2">
             {events.map((event, idx) => (
               <motion.div
-                key={idx}
+                key={`idx-${idx}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{
                   opacity: 1,
@@ -263,7 +263,7 @@ export default function MeetingRoomsVisualizer() {
             <div className="flex gap-2">
               {Array.from({ length: maxRooms }, (_, i) => (
                 <motion.div
-                  key={i}
+                  key={`i-${i}`}
                   initial={{ scale: 0 }}
                   animate={{ scale: i < activeRooms ? 1 : 0.5 }}
                   className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white ${

@@ -141,7 +141,7 @@ export default function LongestSubstringVisualizer() {
 
         {/* String visualization */}
         <div className="mb-4">
-          <div className="text-sm text-gray-400 mb-2">String: "{str}"</div>
+          <div className="text-sm text-gray-400 mb-2">String: &quot;{str}&quot;</div>
           <div className="flex gap-1">
             {str.split("").map((char, idx) => {
               const inWindow =
@@ -157,7 +157,7 @@ export default function LongestSubstringVisualizer() {
 
               return (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   animate={{
                     scale: isRight || isLeft ? 1.1 : 1,
                     y: isRight ? -8 : isLeft ? -4 : 0,

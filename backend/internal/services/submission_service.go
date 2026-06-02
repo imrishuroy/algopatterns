@@ -101,6 +101,81 @@ func (s *SubmissionService) Submit(ctx context.Context, userID uuid.UUID, req *m
 	return response, nil
 }
 
+// processedResult holds the extracted data from a single Judge0 result
+type processedResult struct {
+	status       models.SubmissionStatus
+	actualOutput *string
+	errorOutput  *string
+	runtimeMs    *int
+	memoryKb     *int
+	runtime      float64
+	memory       float64
+}
+
+// extractResultData extracts and normalizes data from a Judge0 result
+func extractResultData(result models.Judge0Result) processedResult {
+	pr := processedResult{}
+
+	if result.Status != nil {
+		pr.status = models.MapJudge0StatusToSubmissionStatus(result.Status.ID)
+	} else {
+		pr.status = models.StatusInternalError
+	}
+
+	if result.Stdout != nil {
+		trimmed := strings.TrimSpace(*result.Stdout)
+		pr.actualOutput = &trimmed
+	}
+
+	pr.errorOutput = extractErrorOutput(result)
+
+	if result.Time != nil {
+		if t, err := strconv.ParseFloat(*result.Time, 64); err == nil {
+			ms := int(t * 1000)
+			pr.runtimeMs = &ms
+			pr.runtime = t * 1000
+		}
+	}
+
+	if result.Memory != nil {
+		kb := int(*result.Memory)
+		pr.memoryKb = &kb
+		pr.memory = *result.Memory
+	}
+
+	return pr
+}
+
+// extractErrorOutput gets the error message from various Judge0 result fields
+func extractErrorOutput(result models.Judge0Result) *string {
+	if result.Stderr != nil && *result.Stderr != "" {
+		return result.Stderr
+	}
+	if result.CompileOutput != nil && *result.CompileOutput != "" {
+		return result.CompileOutput
+	}
+	if result.Message != nil && *result.Message != "" {
+		return result.Message
+	}
+	return nil
+}
+
+// checkCorrectness verifies if the actual output matches expected
+func checkCorrectness(status models.SubmissionStatus, expected string, actual *string) models.SubmissionStatus {
+	if status != models.StatusAccepted {
+		return status
+	}
+	expectedTrimmed := strings.TrimSpace(expected)
+	actualTrimmed := ""
+	if actual != nil {
+		actualTrimmed = *actual
+	}
+	if expectedTrimmed != actualTrimmed {
+		return models.StatusWrongAnswer
+	}
+	return status
+}
+
 func (s *SubmissionService) processResults(
 	ctx context.Context,
 	submission *models.Submission,
@@ -111,7 +186,6 @@ func (s *SubmissionService) processResults(
 	var totalRuntime, totalMemory float64
 	var firstError *string
 	var resultDetails []models.SubmissionResultDetail
-
 	overallStatus := models.StatusAccepted
 
 	for i, result := range results {
@@ -119,60 +193,18 @@ func (s *SubmissionService) processResults(
 			break
 		}
 		tc := testCases[i]
+		pr := extractResultData(result)
 
-		var status models.SubmissionStatus
-		if result.Status != nil {
-			status = models.MapJudge0StatusToSubmissionStatus(result.Status.ID)
-		} else {
-			status = models.StatusInternalError
-		}
-
-		var actualOutput, errorOutput *string
-		var runtimeMs, memoryKb *int
-
-		if result.Stdout != nil {
-			trimmed := strings.TrimSpace(*result.Stdout)
-			actualOutput = &trimmed
-		}
-
-		if result.Stderr != nil && *result.Stderr != "" {
-			errorOutput = result.Stderr
-		} else if result.CompileOutput != nil && *result.CompileOutput != "" {
-			errorOutput = result.CompileOutput
-		} else if result.Message != nil && *result.Message != "" {
-			errorOutput = result.Message
-		}
-
-		if result.Time != nil {
-			if t, err := strconv.ParseFloat(*result.Time, 64); err == nil {
-				ms := int(t * 1000)
-				runtimeMs = &ms
-				totalRuntime += t * 1000
-			}
-		}
-		if result.Memory != nil {
-			kb := int(*result.Memory)
-			memoryKb = &kb
-			totalMemory += *result.Memory
-		}
-
-		if status == models.StatusAccepted {
-			expectedTrimmed := strings.TrimSpace(tc.ExpectedOutput)
-			actualTrimmed := ""
-			if actualOutput != nil {
-				actualTrimmed = *actualOutput
-			}
-			if expectedTrimmed != actualTrimmed {
-				status = models.StatusWrongAnswer
-			}
-		}
+		status := checkCorrectness(pr.status, tc.ExpectedOutput, pr.actualOutput)
+		totalRuntime += pr.runtime
+		totalMemory += pr.memory
 
 		if status == models.StatusAccepted {
 			passed++
 		} else if overallStatus == models.StatusAccepted {
 			overallStatus = status
-			if errorOutput != nil && firstError == nil {
-				firstError = errorOutput
+			if pr.errorOutput != nil && firstError == nil {
+				firstError = pr.errorOutput
 			}
 		}
 
@@ -180,10 +212,10 @@ func (s *SubmissionService) processResults(
 			SubmissionID: submission.ID,
 			TestCaseID:   tc.ID,
 			Status:       status,
-			ActualOutput: actualOutput,
-			RuntimeMs:    runtimeMs,
-			MemoryKb:     memoryKb,
-			ErrorOutput:  errorOutput,
+			ActualOutput: pr.actualOutput,
+			RuntimeMs:    pr.runtimeMs,
+			MemoryKb:     pr.memoryKb,
+			ErrorOutput:  pr.errorOutput,
 		}
 		if err := s.submissionRepo.CreateResult(ctx, &subResult); err != nil {
 			log.Error().Err(err).Msg("Failed to save submission result")
@@ -218,7 +250,7 @@ func (s *SubmissionService) processResults(
 	}
 }
 
-func (s *SubmissionService) RunCode(ctx context.Context, userID uuid.UUID, req *models.RunCodeRequest) (*models.RunCodeResponse, error) {
+func (s *SubmissionService) RunCode(ctx context.Context, _ uuid.UUID, req *models.RunCodeRequest) (*models.RunCodeResponse, error) {
 	template, err := s.problemRepo.GetTemplate(ctx, req.ProblemID, req.LanguageID)
 	if err != nil {
 		return nil, fmt.Errorf("language not supported for this problem: %w", err)
@@ -226,111 +258,139 @@ func (s *SubmissionService) RunCode(ctx context.Context, userID uuid.UUID, req *
 
 	fullCode := s.wrapCode(req.Code, template.WrapperCode)
 
-	// Get sample test cases
-	testCases, err := s.problemRepo.GetTestCases(ctx, req.ProblemID, true) // only sample test cases
+	testCases, err := s.getTestCasesForRun(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get test cases: %w", err)
+		return nil, err
 	}
 
-	// If custom input provided, use that instead
-	if req.CustomInput != nil && *req.CustomInput != "" {
-		testCases = []models.TestCase{{
-			Input:          *req.CustomInput,
-			ExpectedOutput: "", // No expected output for custom input
-			IsSample:       false,
-		}}
-	}
+	judge0Submissions := s.buildJudge0Submissions(fullCode, req.LanguageID, testCases)
 
-	if len(testCases) == 0 {
-		return nil, fmt.Errorf("no test cases found")
-	}
-
-	// Prepare batch submissions
-	var judge0Submissions []models.Judge0Submission
-	for _, tc := range testCases {
-		judge0Submissions = append(judge0Submissions, models.Judge0Submission{
-			SourceCode:     fullCode,
-			LanguageID:     req.LanguageID,
-			Stdin:          tc.Input,
-			ExpectedOutput: tc.ExpectedOutput,
-		})
-	}
-
-	// Submit batch
 	tokens, err := s.judgeService.SubmitBatch(ctx, judge0Submissions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to submit code: %w", err)
 	}
 
-	// Wait for results
 	results, err := s.judgeService.WaitForBatchResults(ctx, tokens)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get results: %w", err)
 	}
 
-	// Process results
+	return s.buildRunCodeResponse(testCases, results, req.CustomInput), nil
+}
+
+// getTestCasesForRun gets test cases or creates one from custom input
+func (s *SubmissionService) getTestCasesForRun(ctx context.Context, req *models.RunCodeRequest) ([]models.TestCase, error) {
+	if req.CustomInput != nil && *req.CustomInput != "" {
+		return []models.TestCase{{
+			Input:          *req.CustomInput,
+			ExpectedOutput: "",
+			IsSample:       false,
+		}}, nil
+	}
+
+	testCases, err := s.problemRepo.GetTestCases(ctx, req.ProblemID, true)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get test cases: %w", err)
+	}
+	if len(testCases) == 0 {
+		return nil, fmt.Errorf("no test cases found")
+	}
+	return testCases, nil
+}
+
+// buildJudge0Submissions creates Judge0 submission requests
+func (s *SubmissionService) buildJudge0Submissions(fullCode string, languageID int, testCases []models.TestCase) []models.Judge0Submission {
+	submissions := make([]models.Judge0Submission, 0, len(testCases))
+	for _, tc := range testCases {
+		submissions = append(submissions, models.Judge0Submission{
+			SourceCode:     fullCode,
+			LanguageID:     languageID,
+			Stdin:          tc.Input,
+			ExpectedOutput: tc.ExpectedOutput,
+		})
+	}
+	return submissions
+}
+
+// buildRunCodeResponse constructs the response from Judge0 results
+func (s *SubmissionService) buildRunCodeResponse(testCases []models.TestCase, results []models.Judge0Result, customInput *string) *models.RunCodeResponse {
 	response := &models.RunCodeResponse{
 		Results:    make([]models.RunCodeResult, 0, len(results)),
 		TotalTests: len(testCases),
 	}
 
+	isCustom := customInput != nil && *customInput != ""
+
 	for i, result := range results {
 		if i >= len(testCases) {
 			break
 		}
-		tc := testCases[i]
-
-		runResult := models.RunCodeResult{
-			TestCaseIndex:  i,
-			Input:          tc.Input,
-			ExpectedOutput: tc.ExpectedOutput,
-			Status:         models.StatusAccepted,
-			IsCustom:       req.CustomInput != nil && *req.CustomInput != "",
-		}
-
-		if result.Status != nil {
-			runResult.Status = models.MapJudge0StatusToSubmissionStatus(result.Status.ID)
-		}
-		if result.Stdout != nil {
-			runResult.ActualOutput = strings.TrimSpace(*result.Stdout)
-			runResult.Stdout = *result.Stdout
-		}
-		if result.Stderr != nil {
-			runResult.Stderr = *result.Stderr
-			if runResult.ErrorMessage == "" {
-				runResult.ErrorMessage = *result.Stderr
-			}
-		}
-		if result.CompileOutput != nil && *result.CompileOutput != "" {
-			runResult.ErrorMessage = *result.CompileOutput
-		}
-		if result.Message != nil && *result.Message != "" && runResult.ErrorMessage == "" {
-			runResult.ErrorMessage = *result.Message
-		}
-		if result.Time != nil {
-			if t, err := strconv.ParseFloat(*result.Time, 64); err == nil {
-				runResult.RuntimeMs = int(t * 1000)
-			}
-		}
-		if result.Memory != nil {
-			runResult.MemoryKb = int(*result.Memory)
-		}
-
-		// Check correctness for sample tests (not custom input)
-		if runResult.Status == models.StatusAccepted && tc.ExpectedOutput != "" {
-			if strings.TrimSpace(tc.ExpectedOutput) != runResult.ActualOutput {
-				runResult.Status = models.StatusWrongAnswer
-			}
-		}
-
+		runResult := s.buildRunCodeResult(i, testCases[i], result, isCustom)
 		if runResult.Status == models.StatusAccepted {
 			response.TotalPassed++
 		}
-
 		response.Results = append(response.Results, runResult)
 	}
 
-	return response, nil
+	return response
+}
+
+// buildRunCodeResult creates a single run result from Judge0 result
+func (s *SubmissionService) buildRunCodeResult(index int, tc models.TestCase, result models.Judge0Result, isCustom bool) models.RunCodeResult {
+	runResult := models.RunCodeResult{
+		TestCaseIndex:  index,
+		Input:          tc.Input,
+		ExpectedOutput: tc.ExpectedOutput,
+		Status:         models.StatusAccepted,
+		IsCustom:       isCustom,
+	}
+
+	if result.Status != nil {
+		runResult.Status = models.MapJudge0StatusToSubmissionStatus(result.Status.ID)
+	}
+
+	s.populateRunResultOutput(&runResult, result)
+	s.populateRunResultMetrics(&runResult, result)
+
+	if runResult.Status == models.StatusAccepted && tc.ExpectedOutput != "" {
+		if strings.TrimSpace(tc.ExpectedOutput) != runResult.ActualOutput {
+			runResult.Status = models.StatusWrongAnswer
+		}
+	}
+
+	return runResult
+}
+
+// populateRunResultOutput fills output fields from Judge0 result
+func (s *SubmissionService) populateRunResultOutput(runResult *models.RunCodeResult, result models.Judge0Result) {
+	if result.Stdout != nil {
+		runResult.ActualOutput = strings.TrimSpace(*result.Stdout)
+		runResult.Stdout = *result.Stdout
+	}
+	if result.Stderr != nil {
+		runResult.Stderr = *result.Stderr
+		if runResult.ErrorMessage == "" {
+			runResult.ErrorMessage = *result.Stderr
+		}
+	}
+	if result.CompileOutput != nil && *result.CompileOutput != "" {
+		runResult.ErrorMessage = *result.CompileOutput
+	}
+	if result.Message != nil && *result.Message != "" && runResult.ErrorMessage == "" {
+		runResult.ErrorMessage = *result.Message
+	}
+}
+
+// populateRunResultMetrics fills runtime and memory from Judge0 result
+func (s *SubmissionService) populateRunResultMetrics(runResult *models.RunCodeResult, result models.Judge0Result) {
+	if result.Time != nil {
+		if t, err := strconv.ParseFloat(*result.Time, 64); err == nil {
+			runResult.RuntimeMs = int(t * 1000)
+		}
+	}
+	if result.Memory != nil {
+		runResult.MemoryKb = int(*result.Memory)
+	}
 }
 
 func (s *SubmissionService) GetByID(ctx context.Context, userID, submissionID uuid.UUID) (*models.SubmissionResponse, error) {
@@ -375,6 +435,6 @@ func (s *SubmissionService) ListByProblem(ctx context.Context, userID, problemID
 	return s.submissionRepo.ListByProblem(ctx, userID, problemID, 10)
 }
 
-func (s *SubmissionService) wrapCode(userCode, wrapperCode string) string {
+func (*SubmissionService) wrapCode(userCode, wrapperCode string) string {
 	return strings.Replace(wrapperCode, "{{USER_CODE}}", userCode, 1)
 }

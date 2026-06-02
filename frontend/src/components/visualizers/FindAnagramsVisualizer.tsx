@@ -187,7 +187,7 @@ export default function FindAnagramsVisualizer() {
 
         {/* String visualization */}
         <div className="mb-4">
-          <div className="text-sm text-gray-400 mb-2">String: "{s}"</div>
+          <div className="text-sm text-gray-400 mb-2">String: &quot;{s}&quot;</div>
           <div className="flex gap-1">
             {s.split("").map((char, idx) => {
               const inWindow =
@@ -198,7 +198,7 @@ export default function FindAnagramsVisualizer() {
 
               return (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   animate={{
                     scale: idx === currentIdx ? 1.1 : 1,
                     y: idx === currentIdx ? -5 : 0,
@@ -298,7 +298,7 @@ export default function FindAnagramsVisualizer() {
             <div className="text-sm text-green-400">
               Anagrams found at indices: [{foundIndices.join(", ")}]
               {foundIndices.map((idx) => (
-                <span key={idx} className="ml-2 font-mono">
+                <span key={`idx-${idx}`} className="ml-2 font-mono">
                   "{s.slice(idx, idx + p.length)}"
                 </span>
               ))}

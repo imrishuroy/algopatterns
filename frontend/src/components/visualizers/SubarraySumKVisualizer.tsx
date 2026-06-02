@@ -159,7 +159,7 @@ export default function SubarraySumKVisualizer() {
           <div className="flex gap-2">
             {arr.map((val, idx) => (
               <motion.div
-                key={idx}
+                key={`idx-${idx}`}
                 animate={{
                   scale: idx === currentIdx ? 1.1 : 1,
                   y: idx === currentIdx ? -5 : 0,

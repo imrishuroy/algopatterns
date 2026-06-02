@@ -275,17 +275,17 @@ export default function NQueensVisualizer() {
             <AnimatePresence>
               {solutions.map((sol, idx) => (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="p-2 bg-green-500/20 border border-green-500/50 rounded-lg"
                 >
                   <div className="grid grid-cols-4 gap-0.5">
                     {sol.map((row, r) => (
-                      <React.Fragment key={r}>
+                      <React.Fragment key={`r-${r}`}>
                         {row.split("").map((cell, c) => (
                           <div
-                            key={c}
+                            key={`c-${c}`}
                             className={`w-3 h-3 ${
                               cell === "Q" ? "bg-green-500" : "bg-gray-600"
                             }`}

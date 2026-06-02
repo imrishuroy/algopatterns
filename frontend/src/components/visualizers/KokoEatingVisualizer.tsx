@@ -185,7 +185,7 @@ export default function KokoEatingVisualizer() {
           <div className="text-sm text-gray-400 mb-2">Banana Piles:</div>
           <div className="flex gap-3 justify-center">
             {piles.map((pile, idx) => (
-              <div key={idx} className="flex flex-col items-center">
+              <div key={`idx-${idx}`} className="flex flex-col items-center">
                 <div className="text-2xl mb-1">🍌</div>
                 <motion.div
                   animate={{

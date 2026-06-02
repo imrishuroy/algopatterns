@@ -137,7 +137,7 @@ export default function ValidParenthesesVisualizer() {
           <div className="flex gap-1 justify-center">
             {input.split("").map((char, idx) => (
               <motion.div
-                key={idx}
+                key={`idx-${idx}`}
                 animate={{
                   scale: idx === currentIdx ? 1.2 : 1,
                   y: idx === currentIdx ? -8 : 0,

@@ -44,7 +44,7 @@ async function fetchApi<T>(
 }
 
 export const quizService = {
-  async getQuestions(
+  getQuestions(
     patternId: string,
     sectionSlug?: string
   ): Promise<GetQuestionsResponse> {
@@ -57,14 +57,14 @@ export const quizService = {
     return fetchApi<GetQuestionsResponse>(endpoint);
   },
 
-  async startAttempt(req: StartAttemptRequest): Promise<StartAttemptResponse> {
+  startAttempt(req: StartAttemptRequest): Promise<StartAttemptResponse> {
     return fetchApi<StartAttemptResponse>('/api/v1/quiz/attempts', {
       method: 'POST',
       body: JSON.stringify(req),
     });
   },
 
-  async submitResponse(
+  submitResponse(
     attemptId: string,
     req: SubmitResponseRequest
   ): Promise<SubmitResponseResponse> {
@@ -77,7 +77,7 @@ export const quizService = {
     );
   },
 
-  async completeAttempt(
+  completeAttempt(
     attemptId: string,
     req: CompleteAttemptRequest = {}
   ): Promise<CompleteAttemptResponse> {
@@ -90,11 +90,11 @@ export const quizService = {
     );
   },
 
-  async getAttempt(attemptId: string): Promise<QuizAttempt> {
+  getAttempt(attemptId: string): Promise<QuizAttempt> {
     return fetchApi<QuizAttempt>(`/api/v1/quiz/attempts/${attemptId}`);
   },
 
-  async getAttemptHistory(
+  getAttemptHistory(
     patternId?: string,
     sectionSlug?: string,
     limit = 10,

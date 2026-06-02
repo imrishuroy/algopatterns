@@ -184,7 +184,7 @@ export default function ContainerWaterVisualizer() {
 
             {/* Bars */}
             {heights.map((h, idx) => (
-              <g key={idx}>
+              <g key={`idx-${idx}`}>
                 <motion.rect
                   x={idx * (barWidth + gap)}
                   y={svgHeight - 20 - h * 25}

@@ -34,39 +34,39 @@ type stubPatternService struct {
 	searchErr       error
 }
 
-func (s *stubPatternService) Create(ctx context.Context, req *models.CreatePatternRequest) (*models.Pattern, error) {
+func (s *stubPatternService) Create(_ context.Context, _ *models.CreatePatternRequest) (*models.Pattern, error) {
 	return s.createResult, s.createErr
 }
 
-func (s *stubPatternService) GetByID(ctx context.Context, id string) (*models.Pattern, error) {
+func (s *stubPatternService) GetByID(_ context.Context, _ string) (*models.Pattern, error) {
 	return s.getByIDResult, s.getByIDErr
 }
 
-func (s *stubPatternService) List(ctx context.Context, req *models.PatternListRequest) (*models.PatternListResponse, error) {
+func (s *stubPatternService) List(_ context.Context, _ *models.PatternListRequest) (*models.PatternListResponse, error) {
 	return s.listResult, s.listErr
 }
 
-func (s *stubPatternService) Update(ctx context.Context, id string, req *models.UpdatePatternRequest) (*models.Pattern, error) {
+func (s *stubPatternService) Update(_ context.Context, _ string, _ *models.UpdatePatternRequest) (*models.Pattern, error) {
 	return s.updateResult, s.updateErr
 }
 
-func (s *stubPatternService) Delete(ctx context.Context, id string) error {
+func (s *stubPatternService) Delete(_ context.Context, _ string) error {
 	return s.deleteErr
 }
 
-func (s *stubPatternService) GetCategories(ctx context.Context) ([]string, error) {
+func (s *stubPatternService) GetCategories(_ context.Context) ([]string, error) {
 	return s.categoriesResult, s.categoriesErr
 }
 
-func (s *stubPatternService) BulkImport(ctx context.Context, req *models.BulkImportRequest) (*models.BulkImportResponse, error) {
+func (s *stubPatternService) BulkImport(_ context.Context, _ *models.BulkImportRequest) (*models.BulkImportResponse, error) {
 	return s.bulkImportResult, s.bulkImportErr
 }
 
-func (s *stubPatternService) Export(ctx context.Context) ([]byte, error) {
+func (s *stubPatternService) Export(_ context.Context) ([]byte, error) {
 	return s.exportResult, s.exportErr
 }
 
-func (s *stubPatternService) Search(ctx context.Context, query string) ([]models.Pattern, error) {
+func (s *stubPatternService) Search(_ context.Context, _ string) ([]models.Pattern, error) {
 	return s.searchResult, s.searchErr
 }
 
@@ -80,11 +80,11 @@ func setupPatternRouter(stub *stubPatternService) *gin.Engine {
 	{
 		patterns.GET("", handler.List)
 		patterns.POST("", handler.Create)
-		patterns.GET("/categories", handler.GetCategories)
+		patterns.GET("/categories", handler.ListCategories)
 		patterns.GET("/export", handler.Export)
 		patterns.POST("/bulk", handler.BulkImport)
 		patterns.GET("/search", handler.Search)
-		patterns.GET("/:id", handler.GetByID)
+		patterns.GET("/:id", handler.ShowByID)
 		patterns.PUT("/:id", handler.Update)
 		patterns.DELETE("/:id", handler.Delete)
 	}

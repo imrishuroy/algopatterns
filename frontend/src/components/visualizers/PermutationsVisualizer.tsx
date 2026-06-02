@@ -191,7 +191,7 @@ export default function PermutationsVisualizer() {
           <div className="flex gap-2 justify-center">
             {nums.map((num, idx) => (
               <motion.div
-                key={idx}
+                key={`idx-${idx}`}
                 animate={{
                   backgroundColor: used[idx] ? "#ef4444" : "#22c55e",
                   scale: used[idx] ? 0.9 : 1,
@@ -221,7 +221,7 @@ export default function PermutationsVisualizer() {
             ) : (
               currentPath.map((num, idx) => (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center"
@@ -242,7 +242,7 @@ export default function PermutationsVisualizer() {
             <AnimatePresence>
               {results.map((perm, idx) => (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 font-mono text-sm"

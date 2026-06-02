@@ -161,7 +161,7 @@ export default function PrefixSumArrayVisualizer() {
           <div className="flex gap-2 justify-center">
             {nums.map((num, idx) => (
               <motion.div
-                key={idx}
+                key={`idx-${idx}`}
                 animate={{
                   backgroundColor:
                     queryRange && idx >= queryRange[0] && idx <= queryRange[1]
@@ -200,7 +200,7 @@ export default function PrefixSumArrayVisualizer() {
             ) : (
               prefixSum.map((sum, idx) => (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{
                     opacity: 1,
@@ -246,7 +246,7 @@ export default function PrefixSumArrayVisualizer() {
           <div className="flex gap-2">
             {queries.map(([l, r], idx) => (
               <div
-                key={idx}
+                key={`idx-${idx}`}
                 className={`px-3 py-1 rounded-lg text-sm font-mono ${
                   idx < queryIndex
                     ? "bg-green-500/30 text-green-300"

@@ -23,7 +23,7 @@ export default function TopologicalSortVisualizer() {
   const [edges, setEdges] = useState<Edge[]>([]);
   const [queue, setQueue] = useState<number[]>([]);
   const [order, setOrder] = useState<number[]>([]);
-  const [currentCourse, setCurrentCourse] = useState<number | null>(null);
+  const [_currentCourse, setCurrentCourse] = useState<number | null>(null);
   const [message, setMessage] = useState(
     "Click Play to start topological sort (Kahn's Algorithm)"
   );
@@ -174,7 +174,7 @@ export default function TopologicalSortVisualizer() {
     return () => clearTimeout(timer);
   }, [isPlaying, phase, queue, courses, edges, order, speed]);
 
-  const getNodePosition = (id: number, total: number) => {
+  const getNodePosition = (id: number, _total: number) => {
     if (showCycleExample) {
       const positions = [
         { x: 100, y: 50 },
@@ -301,7 +301,7 @@ export default function TopologicalSortVisualizer() {
 
               return (
                 <motion.line
-                  key={i}
+                  key={`i-${i}`}
                   x1={from.x + 35 + offsetX}
                   y1={from.y + 20 + offsetY}
                   x2={to.x + 35 - offsetX}
@@ -352,7 +352,7 @@ export default function TopologicalSortVisualizer() {
             <div className="flex flex-wrap gap-1 min-h-[32px]">
               {queue.map((id, i) => (
                 <span
-                  key={i}
+                  key={`i-${i}`}
                   className={`px-2 py-1 rounded text-xs font-medium ${
                     i === 0
                       ? "bg-yellow-500 text-black"
@@ -372,7 +372,7 @@ export default function TopologicalSortVisualizer() {
             <div className="flex flex-wrap gap-1 min-h-[32px]">
               {order.map((id, i) => (
                 <span
-                  key={i}
+                  key={`i-${i}`}
                   className="px-2 py-1 rounded text-xs font-medium bg-green-500/50 text-green-200"
                 >
                   {i + 1}. {courseNames[id]}

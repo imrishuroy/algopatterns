@@ -272,7 +272,7 @@ export default function DijkstraVisualizer() {
               const midY = (from.y + to.y) / 2 + 20;
 
               return (
-                <g key={i}>
+                <g key={`i-${i}`}>
                   <line
                     x1={from.x + 20}
                     y1={from.y + 20}
@@ -333,7 +333,7 @@ export default function DijkstraVisualizer() {
               .sort((a, b) => a[0] - b[0])
               .map(([dist, nodeId], i) => (
                 <span
-                  key={i}
+                  key={`i-${i}`}
                   className={`px-3 py-1 rounded text-sm font-mono ${
                     i === 0
                       ? "bg-yellow-500 text-black"

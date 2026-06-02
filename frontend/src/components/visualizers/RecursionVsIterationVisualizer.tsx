@@ -242,7 +242,7 @@ export default function RecursionVsIterationVisualizer() {
                 const isActive = lineNum === currentRecursion.highlight;
                 return (
                   <div
-                    key={idx}
+                    key={`idx-${idx}`}
                     className={`flex transition-all duration-200 ${
                       isActive ? "bg-purple-500/20 -mx-4 px-4 rounded" : ""
                     }`}
@@ -309,7 +309,7 @@ export default function RecursionVsIterationVisualizer() {
                 const isActive = lineNum === currentIteration.highlight;
                 return (
                   <div
-                    key={idx}
+                    key={`idx-${idx}`}
                     className={`flex transition-all duration-200 ${
                       isActive ? "bg-blue-500/20 -mx-4 px-4 rounded" : ""
                     }`}

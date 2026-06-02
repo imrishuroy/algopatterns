@@ -58,108 +58,155 @@ func (r *PatternRepository) Create(ctx context.Context, pattern *models.Pattern)
 	return nil
 }
 
-func (r *PatternRepository) insertRelatedData(ctx context.Context, tx pgx.Tx, pattern *models.Pattern) error {
-	for i, useCase := range pattern.WhenToUse {
+func (*PatternRepository) insertRelatedData(ctx context.Context, tx pgx.Tx, pattern *models.Pattern) error {
+	if err := insertWhenToUse(ctx, tx, pattern.ID, pattern.WhenToUse); err != nil {
+		return err
+	}
+	if err := insertCodeTemplates(ctx, tx, pattern.ID, &pattern.CodeTemplates); err != nil {
+		return err
+	}
+	if err := insertInsights(ctx, tx, pattern.ID, pattern.KeyInsights); err != nil {
+		return err
+	}
+	if err := insertMistakes(ctx, tx, pattern.ID, pattern.CommonMistakes); err != nil {
+		return err
+	}
+	if err := insertVariations(ctx, tx, pattern.ID, pattern.Variations); err != nil {
+		return err
+	}
+	if err := insertProblems(ctx, tx, pattern.ID, pattern.CommonProblems); err != nil {
+		return err
+	}
+	return nil
+}
+
+func insertWhenToUse(ctx context.Context, tx pgx.Tx, patternID string, useCases []string) error {
+	for i, useCase := range useCases {
 		_, err := tx.Exec(ctx, `
 			INSERT INTO pattern_when_to_use (id, pattern_id, use_case, order_index)
 			VALUES ($1, $2, $3, $4)
-		`, uuid.New(), pattern.ID, useCase, i)
+		`, uuid.New(), patternID, useCase, i)
 		if err != nil {
 			return fmt.Errorf("failed to insert when_to_use: %w", err)
 		}
 	}
+	return nil
+}
 
-	templates := map[string]string{
-		"javascript": pattern.CodeTemplates.JavaScript,
-		"java":       pattern.CodeTemplates.Java,
-		"python":     pattern.CodeTemplates.Python,
-		"cpp":        pattern.CodeTemplates.Cpp,
-		"go":         pattern.CodeTemplates.Go,
+func insertCodeTemplates(ctx context.Context, tx pgx.Tx, patternID string, templates *models.CodeTemplates) error {
+	templateMap := map[string]string{
+		"javascript": templates.JavaScript,
+		"java":       templates.Java,
+		"python":     templates.Python,
+		"cpp":        templates.Cpp,
+		"go":         templates.Go,
 	}
-	for lang, code := range templates {
+	for lang, code := range templateMap {
 		if code != "" {
 			_, err := tx.Exec(ctx, `
 				INSERT INTO pattern_code_templates (id, pattern_id, language, code)
 				VALUES ($1, $2, $3, $4)
-			`, uuid.New(), pattern.ID, lang, code)
+			`, uuid.New(), patternID, lang, code)
 			if err != nil {
 				return fmt.Errorf("failed to insert code_template: %w", err)
 			}
 		}
 	}
+	return nil
+}
 
-	for i, insight := range pattern.KeyInsights {
+func insertInsights(ctx context.Context, tx pgx.Tx, patternID string, insights []string) error {
+	for i, insight := range insights {
 		_, err := tx.Exec(ctx, `
 			INSERT INTO pattern_insights (id, pattern_id, insight, order_index)
 			VALUES ($1, $2, $3, $4)
-		`, uuid.New(), pattern.ID, insight, i)
+		`, uuid.New(), patternID, insight, i)
 		if err != nil {
 			return fmt.Errorf("failed to insert insight: %w", err)
 		}
 	}
+	return nil
+}
 
-	for i, mistake := range pattern.CommonMistakes {
+func insertMistakes(ctx context.Context, tx pgx.Tx, patternID string, mistakes []string) error {
+	for i, mistake := range mistakes {
 		_, err := tx.Exec(ctx, `
 			INSERT INTO pattern_mistakes (id, pattern_id, mistake, order_index)
 			VALUES ($1, $2, $3, $4)
-		`, uuid.New(), pattern.ID, mistake, i)
+		`, uuid.New(), patternID, mistake, i)
 		if err != nil {
 			return fmt.Errorf("failed to insert mistake: %w", err)
 		}
 	}
+	return nil
+}
 
-	for i, variation := range pattern.Variations {
+func insertVariations(ctx context.Context, tx pgx.Tx, patternID string, variations []models.PatternVariation) error {
+	for i, variation := range variations {
 		variationID := uuid.New()
 		_, err := tx.Exec(ctx, `
 			INSERT INTO pattern_variations (id, pattern_id, name, description, when_to_use, order_index)
 			VALUES ($1, $2, $3, $4, $5, $6)
-		`, variationID, pattern.ID, variation.Name, variation.Desc, variation.When, i)
+		`, variationID, patternID, variation.Name, variation.Desc, variation.When, i)
 		if err != nil {
 			return fmt.Errorf("failed to insert variation: %w", err)
 		}
 
-		if variation.Template != nil {
-			if variation.Template.JavaScript != "" {
-				_, err = tx.Exec(ctx, `
-					INSERT INTO variation_code_templates (id, variation_id, language, code)
-					VALUES ($1, $2, $3, $4)
-				`, uuid.New(), variationID, "javascript", variation.Template.JavaScript)
-				if err != nil {
-					return fmt.Errorf("failed to insert variation template: %w", err)
-				}
-			}
-			if variation.Template.Java != "" {
-				_, err = tx.Exec(ctx, `
-					INSERT INTO variation_code_templates (id, variation_id, language, code)
-					VALUES ($1, $2, $3, $4)
-				`, uuid.New(), variationID, "java", variation.Template.Java)
-				if err != nil {
-					return fmt.Errorf("failed to insert variation template: %w", err)
-				}
-			}
+		if err := insertVariationTemplates(ctx, tx, variationID, variation.Template); err != nil {
+			return err
 		}
+		if err := insertVariationProblems(ctx, tx, variationID, variation.Problems); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
-		for _, problem := range variation.Problems {
-			_, err = tx.Exec(ctx, `
-				INSERT INTO variation_problems (id, variation_id, problem_name)
-				VALUES ($1, $2, $3)
-			`, uuid.New(), variationID, problem)
+func insertVariationTemplates(ctx context.Context, tx pgx.Tx, variationID uuid.UUID, template *models.VariationTemplate) error {
+	if template == nil {
+		return nil
+	}
+	templates := map[string]string{
+		"javascript": template.JavaScript,
+		"java":       template.Java,
+	}
+	for lang, code := range templates {
+		if code != "" {
+			_, err := tx.Exec(ctx, `
+				INSERT INTO variation_code_templates (id, variation_id, language, code)
+				VALUES ($1, $2, $3, $4)
+			`, uuid.New(), variationID, lang, code)
 			if err != nil {
-				return fmt.Errorf("failed to insert variation problem: %w", err)
+				return fmt.Errorf("failed to insert variation template: %w", err)
 			}
 		}
 	}
+	return nil
+}
 
-	for _, problem := range pattern.CommonProblems {
+func insertVariationProblems(ctx context.Context, tx pgx.Tx, variationID uuid.UUID, problems []string) error {
+	for _, problem := range problems {
+		_, err := tx.Exec(ctx, `
+			INSERT INTO variation_problems (id, variation_id, problem_name)
+			VALUES ($1, $2, $3)
+		`, uuid.New(), variationID, problem)
+		if err != nil {
+			return fmt.Errorf("failed to insert variation problem: %w", err)
+		}
+	}
+	return nil
+}
+
+func insertProblems(ctx context.Context, tx pgx.Tx, patternID string, problems []string) error {
+	for _, problem := range problems {
 		_, err := tx.Exec(ctx, `
 			INSERT INTO pattern_problems (id, pattern_id, problem_name)
 			VALUES ($1, $2, $3)
-		`, uuid.New(), pattern.ID, problem)
+		`, uuid.New(), patternID, problem)
 		if err != nil {
 			return fmt.Errorf("failed to insert problem: %w", err)
 		}
 	}
-
 	return nil
 }
 
@@ -186,151 +233,231 @@ func (r *PatternRepository) GetByID(ctx context.Context, id string) (*models.Pat
 }
 
 func (r *PatternRepository) loadRelatedData(ctx context.Context, pattern *models.Pattern) error {
+	var err error
+	if pattern.WhenToUse, err = r.loadWhenToUse(ctx, pattern.ID); err != nil {
+		return err
+	}
+	if err = r.loadCodeTemplates(ctx, pattern); err != nil {
+		return err
+	}
+	if pattern.KeyInsights, err = r.loadInsights(ctx, pattern.ID); err != nil {
+		return err
+	}
+	if pattern.CommonMistakes, err = r.loadMistakes(ctx, pattern.ID); err != nil {
+		return err
+	}
+	if pattern.Variations, err = r.loadVariations(ctx, pattern.ID); err != nil {
+		return err
+	}
+	if pattern.CommonProblems, err = r.loadProblems(ctx, pattern.ID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *PatternRepository) loadWhenToUse(ctx context.Context, patternID string) ([]string, error) {
 	rows, err := r.db.Pool.Query(ctx, `
 		SELECT use_case FROM pattern_when_to_use WHERE pattern_id = $1 ORDER BY order_index
-	`, pattern.ID)
+	`, patternID)
 	if err != nil {
-		return fmt.Errorf("failed to load when_to_use: %w", err)
+		return nil, fmt.Errorf("failed to load when_to_use: %w", err)
 	}
 	defer rows.Close()
+
+	var useCases []string
 	for rows.Next() {
 		var useCase string
 		if err := rows.Scan(&useCase); err != nil {
-			return err
+			return nil, err
 		}
-		pattern.WhenToUse = append(pattern.WhenToUse, useCase)
+		useCases = append(useCases, useCase)
 	}
+	return useCases, nil
+}
 
-	templateRows, err := r.db.Pool.Query(ctx, `
+func (r *PatternRepository) loadCodeTemplates(ctx context.Context, pattern *models.Pattern) error {
+	rows, err := r.db.Pool.Query(ctx, `
 		SELECT language, code FROM pattern_code_templates WHERE pattern_id = $1
 	`, pattern.ID)
 	if err != nil {
 		return fmt.Errorf("failed to load code_templates: %w", err)
 	}
-	defer templateRows.Close()
-	for templateRows.Next() {
+	defer rows.Close()
+
+	for rows.Next() {
 		var lang, code string
-		if err := templateRows.Scan(&lang, &code); err != nil {
+		if err := rows.Scan(&lang, &code); err != nil {
 			return err
+		}
+		assignCodeTemplate(&pattern.CodeTemplates, lang, code)
+	}
+	return nil
+}
+
+func assignCodeTemplate(templates *models.CodeTemplates, lang, code string) {
+	switch lang {
+	case "javascript":
+		templates.JavaScript = code
+	case "java":
+		templates.Java = code
+	case "python":
+		templates.Python = code
+	case "cpp":
+		templates.Cpp = code
+	case "go":
+		templates.Go = code
+	}
+}
+
+func (r *PatternRepository) loadInsights(ctx context.Context, patternID string) ([]string, error) {
+	rows, err := r.db.Pool.Query(ctx, `
+		SELECT insight FROM pattern_insights WHERE pattern_id = $1 ORDER BY order_index
+	`, patternID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load insights: %w", err)
+	}
+	defer rows.Close()
+
+	var insights []string
+	for rows.Next() {
+		var insight string
+		if err := rows.Scan(&insight); err != nil {
+			return nil, err
+		}
+		insights = append(insights, insight)
+	}
+	return insights, nil
+}
+
+func (r *PatternRepository) loadMistakes(ctx context.Context, patternID string) ([]string, error) {
+	rows, err := r.db.Pool.Query(ctx, `
+		SELECT mistake FROM pattern_mistakes WHERE pattern_id = $1 ORDER BY order_index
+	`, patternID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load mistakes: %w", err)
+	}
+	defer rows.Close()
+
+	var mistakes []string
+	for rows.Next() {
+		var mistake string
+		if err := rows.Scan(&mistake); err != nil {
+			return nil, err
+		}
+		mistakes = append(mistakes, mistake)
+	}
+	return mistakes, nil
+}
+
+func (r *PatternRepository) loadVariations(ctx context.Context, patternID string) ([]models.PatternVariation, error) {
+	rows, err := r.db.Pool.Query(ctx, `
+		SELECT id, name, description, when_to_use FROM pattern_variations WHERE pattern_id = $1 ORDER BY order_index
+	`, patternID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load variations: %w", err)
+	}
+	defer rows.Close()
+
+	var variations []models.PatternVariation
+	for rows.Next() {
+		v, err := r.scanVariation(rows)
+		if err != nil {
+			return nil, err
+		}
+		if err := r.loadVariationDetails(ctx, &v); err != nil {
+			return nil, err
+		}
+		variations = append(variations, v)
+	}
+	return variations, nil
+}
+
+func (*PatternRepository) scanVariation(rows pgx.Rows) (models.PatternVariation, error) {
+	var v models.PatternVariation
+	var whenToUse *string
+	if err := rows.Scan(&v.ID, &v.Name, &v.Desc, &whenToUse); err != nil {
+		return v, err
+	}
+	if whenToUse != nil {
+		v.When = *whenToUse
+	}
+	return v, nil
+}
+
+func (r *PatternRepository) loadVariationDetails(ctx context.Context, v *models.PatternVariation) error {
+	var err error
+	if v.Template, err = r.loadVariationTemplates(ctx, v.ID); err != nil {
+		return err
+	}
+	if v.Problems, err = r.loadVariationProblems(ctx, v.ID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *PatternRepository) loadVariationTemplates(ctx context.Context, variationID uuid.UUID) (*models.VariationTemplate, error) {
+	rows, err := r.db.Pool.Query(ctx, `
+		SELECT language, code FROM variation_code_templates WHERE variation_id = $1
+	`, variationID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	template := &models.VariationTemplate{}
+	for rows.Next() {
+		var lang, code string
+		if err := rows.Scan(&lang, &code); err != nil {
+			return nil, err
 		}
 		switch lang {
 		case "javascript":
-			pattern.CodeTemplates.JavaScript = code
+			template.JavaScript = code
 		case "java":
-			pattern.CodeTemplates.Java = code
-		case "python":
-			pattern.CodeTemplates.Python = code
-		case "cpp":
-			pattern.CodeTemplates.Cpp = code
-		case "go":
-			pattern.CodeTemplates.Go = code
+			template.Java = code
 		}
 	}
+	return template, nil
+}
 
-	insightRows, err := r.db.Pool.Query(ctx, `
-		SELECT insight FROM pattern_insights WHERE pattern_id = $1 ORDER BY order_index
-	`, pattern.ID)
+func (r *PatternRepository) loadVariationProblems(ctx context.Context, variationID uuid.UUID) ([]string, error) {
+	rows, err := r.db.Pool.Query(ctx, `
+		SELECT problem_name FROM variation_problems WHERE variation_id = $1
+	`, variationID)
 	if err != nil {
-		return fmt.Errorf("failed to load insights: %w", err)
+		return nil, err
 	}
-	defer insightRows.Close()
-	for insightRows.Next() {
-		var insight string
-		if err := insightRows.Scan(&insight); err != nil {
-			return err
-		}
-		pattern.KeyInsights = append(pattern.KeyInsights, insight)
-	}
+	defer rows.Close()
 
-	mistakeRows, err := r.db.Pool.Query(ctx, `
-		SELECT mistake FROM pattern_mistakes WHERE pattern_id = $1 ORDER BY order_index
-	`, pattern.ID)
-	if err != nil {
-		return fmt.Errorf("failed to load mistakes: %w", err)
-	}
-	defer mistakeRows.Close()
-	for mistakeRows.Next() {
-		var mistake string
-		if err := mistakeRows.Scan(&mistake); err != nil {
-			return err
-		}
-		pattern.CommonMistakes = append(pattern.CommonMistakes, mistake)
-	}
-
-	variationRows, err := r.db.Pool.Query(ctx, `
-		SELECT id, name, description, when_to_use FROM pattern_variations WHERE pattern_id = $1 ORDER BY order_index
-	`, pattern.ID)
-	if err != nil {
-		return fmt.Errorf("failed to load variations: %w", err)
-	}
-	defer variationRows.Close()
-	for variationRows.Next() {
-		var v models.PatternVariation
-		var whenToUse *string
-		if err := variationRows.Scan(&v.ID, &v.Name, &v.Desc, &whenToUse); err != nil {
-			return err
-		}
-		if whenToUse != nil {
-			v.When = *whenToUse
-		}
-
-		vtRows, err := r.db.Pool.Query(ctx, `
-			SELECT language, code FROM variation_code_templates WHERE variation_id = $1
-		`, v.ID)
-		if err != nil {
-			return err
-		}
-		v.Template = &models.VariationTemplate{}
-		for vtRows.Next() {
-			var lang, code string
-			if err := vtRows.Scan(&lang, &code); err != nil {
-				vtRows.Close()
-				return err
-			}
-			switch lang {
-			case "javascript":
-				v.Template.JavaScript = code
-			case "java":
-				v.Template.Java = code
-			}
-		}
-		vtRows.Close()
-
-		vpRows, err := r.db.Pool.Query(ctx, `
-			SELECT problem_name FROM variation_problems WHERE variation_id = $1
-		`, v.ID)
-		if err != nil {
-			return err
-		}
-		for vpRows.Next() {
-			var problem string
-			if err := vpRows.Scan(&problem); err != nil {
-				vpRows.Close()
-				return err
-			}
-			v.Problems = append(v.Problems, problem)
-		}
-		vpRows.Close()
-
-		pattern.Variations = append(pattern.Variations, v)
-	}
-
-	problemRows, err := r.db.Pool.Query(ctx, `
-		SELECT problem_name FROM pattern_problems WHERE pattern_id = $1
-	`, pattern.ID)
-	if err != nil {
-		return fmt.Errorf("failed to load problems: %w", err)
-	}
-	defer problemRows.Close()
-	for problemRows.Next() {
+	var problems []string
+	for rows.Next() {
 		var problem string
-		if err := problemRows.Scan(&problem); err != nil {
-			return err
+		if err := rows.Scan(&problem); err != nil {
+			return nil, err
 		}
-		pattern.CommonProblems = append(pattern.CommonProblems, problem)
+		problems = append(problems, problem)
 	}
+	return problems, nil
+}
 
-	return nil
+func (r *PatternRepository) loadProblems(ctx context.Context, patternID string) ([]string, error) {
+	rows, err := r.db.Pool.Query(ctx, `
+		SELECT problem_name FROM pattern_problems WHERE pattern_id = $1
+	`, patternID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load problems: %w", err)
+	}
+	defer rows.Close()
+
+	var problems []string
+	for rows.Next() {
+		var problem string
+		if err := rows.Scan(&problem); err != nil {
+			return nil, err
+		}
+		problems = append(problems, problem)
+	}
+	return problems, nil
 }
 
 func (r *PatternRepository) List(ctx context.Context, req *models.PatternListRequest) ([]models.Pattern, int64, error) {

@@ -282,7 +282,7 @@ export default function RecursionTypesVisualizer() {
                 <ul className="space-y-1">
                   {type.characteristics.map((char, idx) => (
                     <li
-                      key={idx}
+                      key={`idx-${idx}`}
                       className="flex items-start gap-2 text-sm text-gray-300"
                     >
                       <span className="text-indigo-400 mt-0.5">•</span>
@@ -302,7 +302,7 @@ export default function RecursionTypesVisualizer() {
               <ul className="space-y-2">
                 {type.pros.map((pro, idx) => (
                   <li
-                    key={idx}
+                    key={`idx-${idx}`}
                     className="flex items-start gap-2 text-sm text-gray-300"
                   >
                     <span className="text-green-400 mt-0.5">+</span>
@@ -319,7 +319,7 @@ export default function RecursionTypesVisualizer() {
               <ul className="space-y-2">
                 {type.cons.map((con, idx) => (
                   <li
-                    key={idx}
+                    key={`idx-${idx}`}
                     className="flex items-start gap-2 text-sm text-gray-300"
                   >
                     <span className="text-red-400 mt-0.5">−</span>

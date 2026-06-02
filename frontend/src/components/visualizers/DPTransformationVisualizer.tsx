@@ -273,7 +273,7 @@ export default function DPTransformationVisualizer() {
             <AnimatePresence>
               {currentTrace.slice(-6).map((t, i) => (
                 <motion.div
-                  key={i}
+                  key={`i-${i}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   className={`p-2 rounded font-mono text-sm ${
@@ -303,7 +303,7 @@ export default function DPTransformationVisualizer() {
             <div className="grid grid-cols-5 gap-2">
               {[0, 1, 2, 3, 4].map((i) => (
                 <motion.div
-                  key={i}
+                  key={`i-${i}`}
                   animate={{
                     scale: memo[i] !== undefined ? 1 : 0.9,
                     opacity: memo[i] !== undefined ? 1 : 0.4,
@@ -353,7 +353,7 @@ export default function DPTransformationVisualizer() {
           {/* Index row */}
           <div className="grid grid-cols-5 gap-2 mb-2">
             {nums.map((_, i) => (
-              <div key={i} className="text-center text-xs text-gray-500">
+              <div key={`i-${i}`} className="text-center text-xs text-gray-500">
                 i = {i}
               </div>
             ))}
@@ -362,7 +362,7 @@ export default function DPTransformationVisualizer() {
           {/* Values row */}
           <div className="grid grid-cols-5 gap-2 mb-4">
             {nums.map((num, i) => (
-              <div key={i} className="p-2 bg-gray-700/30 rounded text-center">
+              <div key={`i-${i}`} className="p-2 bg-gray-700/30 rounded text-center">
                 <span className="text-gray-400 text-sm">${num}</span>
               </div>
             ))}
@@ -372,7 +372,7 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2">
             {dp.map((val, i) => (
               <motion.div
-                key={i}
+                key={`i-${i}`}
                 animate={{
                   scale: currentI === i ? 1.1 : 1,
                   borderColor:
@@ -431,7 +431,7 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2 mb-4">
             {nums.map((num, i) => (
               <motion.div
-                key={i}
+                key={`i-${i}`}
                 animate={{
                   scale: lastStep?.i === i ? 1.1 : 1,
                   borderColor: lastStep?.i === i ? "#22c55e" : "#374151",

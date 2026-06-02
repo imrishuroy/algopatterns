@@ -58,7 +58,7 @@ func (h *HealthHandler) Health(c *gin.Context) {
 	})
 }
 
-func (h *HealthHandler) Live(c *gin.Context) {
+func (*HealthHandler) Live(c *gin.Context) {
 	response.OK(c, HealthResponse{
 		Status:    "alive",
 		Timestamp: time.Now().Format(time.RFC3339),

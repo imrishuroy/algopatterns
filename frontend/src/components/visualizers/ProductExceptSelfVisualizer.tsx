@@ -172,7 +172,7 @@ export default function ProductExceptSelfVisualizer() {
           <div className="flex gap-2">
             {arr.map((val, idx) => (
               <motion.div
-                key={idx}
+                key={`idx-${idx}`}
                 animate={{
                   scale:
                     (phase === "left-pass" && idx === leftIdx) ||
@@ -211,7 +211,7 @@ export default function ProductExceptSelfVisualizer() {
             <div className="flex gap-2">
               {leftProducts.map((val, idx) => (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="w-14 h-10 rounded-lg bg-blue-500/30 flex items-center justify-center font-mono text-blue-300"
@@ -242,7 +242,7 @@ export default function ProductExceptSelfVisualizer() {
             {result.length > 0
               ? result.map((val, idx) => (
                   <motion.div
-                    key={idx}
+                    key={`idx-${idx}`}
                     animate={{
                       backgroundColor:
                         (phase === "left-pass" && idx === leftIdx + 1) ||
@@ -258,7 +258,7 @@ export default function ProductExceptSelfVisualizer() {
                 ))
               : arr.map((_, idx) => (
                   <div
-                    key={idx}
+                    key={`idx-${idx}`}
                     className="w-14 h-14 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center text-gray-500"
                   >
                     ?

@@ -227,7 +227,7 @@ export default function JumpGameVisualizer() {
             <div className="flex gap-2 relative z-10">
               {activeNums.map((num, idx) => (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   animate={{
                     scale: idx === currentIndex ? 1.1 : 1,
                     y: idx === currentIndex ? -8 : 0,

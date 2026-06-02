@@ -251,7 +251,7 @@ export default function IntervalIntersectionVisualizer() {
               <AnimatePresence>
                 {result.map((int, idx) => (
                   <motion.span
-                    key={idx}
+                    key={`idx-${idx}`}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="px-3 py-1 bg-cyan-500 text-white rounded font-mono font-bold"

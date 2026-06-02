@@ -3,11 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface HashEntry {
-  value: number;
-  index: number;
-}
-
 export default function TwoSumVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -167,7 +162,7 @@ export default function TwoSumVisualizer() {
           <div className="flex gap-2">
             {nums.map((num, idx) => (
               <motion.div
-                key={idx}
+                key={`idx-${idx}`}
                 animate={{
                   scale: idx === currentIndex ? 1.1 : 1,
                   y: idx === currentIndex ? -5 : 0,

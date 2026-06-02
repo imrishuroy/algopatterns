@@ -24,13 +24,13 @@ func (h *ProgressHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	progress := rg.Group("/progress")
 	progress.Use(h.authMW.RequireAuth())
 	{
-		progress.GET("", h.GetProgress)
+		progress.GET("", h.ShowProgress)
 		progress.POST("/toggle", h.ToggleProgress)
 		progress.POST("/sync", h.SyncProgress)
 	}
 }
 
-func (h *ProgressHandler) GetProgress(c *gin.Context) {
+func (h *ProgressHandler) ShowProgress(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")

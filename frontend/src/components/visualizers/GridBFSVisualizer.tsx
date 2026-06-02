@@ -287,7 +287,7 @@ export default function GridBFSVisualizer() {
         <div className="flex justify-center mb-4">
           <div className="inline-block p-4 bg-gray-800/50 rounded-lg">
             {grid.map((row, r) => (
-              <div key={r} className="flex gap-1 mb-1">
+              <div key={`r-${r}`} className="flex gap-1 mb-1">
                 {row.map((cell, c) => (
                   <motion.div
                     key={`${r}-${c}`}
@@ -327,7 +327,7 @@ export default function GridBFSVisualizer() {
             <div className="flex flex-wrap gap-1 min-h-[32px]">
               {(mode === "bfs" ? queue : stack).map(([r, c], i) => (
                 <span
-                  key={i}
+                  key={`i-${i}`}
                   className={`px-2 py-1 rounded text-xs font-mono ${
                     i === 0 && mode === "bfs"
                       ? "bg-yellow-500 text-black"
@@ -353,7 +353,7 @@ export default function GridBFSVisualizer() {
               <div className="flex gap-1">
                 {Array.from({ length: islandCount }).map((_, i) => (
                   <div
-                    key={i}
+                    key={`i-${i}`}
                     className={`w-4 h-4 rounded ${ISLAND_COLORS[i % ISLAND_COLORS.length]}`}
                   />
                 ))}

@@ -187,7 +187,7 @@ export default function RecurrenceBuilderVisualizer() {
         <div className="flex flex-wrap gap-2 mb-4">
           {(Object.keys(problems) as Problem[]).map((p) => (
             <button
-              key={p}
+              key={`p-${p}`}
               onClick={() => changeProblem(p)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 selectedProblem === p
@@ -218,7 +218,7 @@ export default function RecurrenceBuilderVisualizer() {
           <div className="space-y-3">
             {problem.steps.map((step, idx) => (
               <motion.div
-                key={idx}
+                key={`idx-${idx}`}
                 initial={{ opacity: 0.5 }}
                 animate={{ opacity: revealedSteps.has(idx) ? 1 : 0.5 }}
                 className={`rounded-xl border-2 overflow-hidden transition-colors ${

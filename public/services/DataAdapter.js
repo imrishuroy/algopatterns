@@ -1,3 +1,5 @@
+/* global patternsData */
+
 /**
  * DataAdapter - Unified Data Access Layer
  *
@@ -60,19 +62,19 @@ class DataAdapter {
     /**
      * Initialize the adapter
      */
-    async init() {
-        if (this._initialized) return this;
+    init() {
+        if (this._initialized) return Promise.resolve(this);
 
         // Validate data source is available
         if (this.config.dataSource === 'memory') {
             if (typeof patternsData === 'undefined') {
-                throw new Error('patternsData not found. Ensure patterns.js is loaded.');
+                return Promise.reject(new Error('patternsData not found. Ensure patterns.js is loaded.'));
             }
         }
 
         this._initialized = true;
         this._emit('initialized');
-        return this;
+        return Promise.resolve(this);
     }
 
     // ==================== Pattern Operations ====================
@@ -437,13 +439,13 @@ class DataAdapter {
         return result.patterns || result;
     }
 
-    async _fetchFromFirebase(collection, options = {}) {
+    _fetchFromFirebase() {
         // Firebase implementation placeholder
         // Would use Firebase SDK here
         throw new Error('Firebase not configured. Set up Firebase SDK first.');
     }
 
-    async _fetchFromSupabase(table, options = {}) {
+    _fetchFromSupabase() {
         // Supabase implementation placeholder
         // Would use Supabase client here
         throw new Error('Supabase not configured. Set up Supabase client first.');
@@ -456,7 +458,7 @@ class DataAdapter {
 
         // Add auth token if available
         if (this.config.authToken) {
-            headers['Authorization'] = `Bearer ${this.config.authToken}`;
+            headers.Authorization = `Bearer ${this.config.authToken}`;
         }
 
         return headers;

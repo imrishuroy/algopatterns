@@ -44,7 +44,7 @@ func (h *AuthHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	user := rg.Group("/user")
 	user.Use(h.authMW.RequireAuth())
 	{
-		user.GET("/me", h.GetMe)
+		user.GET("/me", h.ShowMe)
 		user.PUT("/profile", h.UpdateProfile)
 		user.PUT("/password", h.ChangePassword)
 		user.DELETE("/account", h.DeleteAccount)
@@ -167,7 +167,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	response.OK(c, gin.H{"message": "Logged out successfully"})
 }
 
-func (h *AuthHandler) GetMe(c *gin.Context) {
+func (h *AuthHandler) ShowMe(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")

@@ -336,7 +336,7 @@ export default function MemoryVisualizer() {
               ) : (
                 [...frames].reverse().map((frame, idx) => (
                   <div
-                    key={idx}
+                    key={`idx-${idx}`}
                     className={`p-3 rounded-lg border transition-all duration-300 ${
                       idx === 0
                         ? "bg-indigo-500/20 border-indigo-500/50 shadow-lg shadow-indigo-500/20"

@@ -295,7 +295,7 @@ export default function LevelOrderVisualizer() {
                 <span className="text-gray-500">[</span>
                 {level.map((val, idx) => (
                   <motion.span
-                    key={idx}
+                    key={`idx-${idx}`}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="px-2 py-1 bg-green-500 rounded text-white font-mono text-sm"
@@ -311,7 +311,7 @@ export default function LevelOrderVisualizer() {
                 <span className="text-yellow-500">[</span>
                 {currentLevel.map((val, idx) => (
                   <span
-                    key={idx}
+                    key={`idx-${idx}`}
                     className="px-2 py-1 bg-yellow-500 rounded text-black font-mono text-sm"
                   >
                     {val}

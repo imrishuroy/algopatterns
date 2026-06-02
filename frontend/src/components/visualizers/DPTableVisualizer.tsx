@@ -291,7 +291,7 @@ export default function DPTableVisualizer({
         <div className="flex flex-wrap gap-2 mb-4">
           {(Object.keys(problems) as Problem[]).map((p) => (
             <button
-              key={p}
+              key={`p-${p}`}
               onClick={() => {
                 setProblem(p);
                 reset();
@@ -314,8 +314,8 @@ export default function DPTableVisualizer({
           </p>
           {problem !== "grid-paths" && (
             <div className="mt-2 flex gap-4 font-mono text-sm">
-              <span className="text-indigo-400">s1 = "{s1}"</span>
-              <span className="text-purple-400">s2 = "{s2}"</span>
+              <span className="text-indigo-400">s1 = &quot;{s1}&quot;</span>
+              <span className="text-purple-400">s2 = &quot;{s2}&quot;</span>
             </div>
           )}
         </div>
@@ -382,7 +382,7 @@ export default function DPTableVisualizer({
                 </div>
                 {s2.split("").map((char, j) => (
                   <div
-                    key={j}
+                    key={`j-${j}`}
                     className="w-12 h-8 flex items-center justify-center text-purple-400 font-mono font-bold"
                   >
                     {char}
@@ -393,7 +393,7 @@ export default function DPTableVisualizer({
 
             {/* Table rows */}
             {Array.from({ length: rows }).map((_, i) => (
-              <div key={i} className="flex">
+              <div key={`i-${i}`} className="flex">
                 {/* Row header */}
                 {problem !== "grid-paths" && (
                   <div className="w-12 h-12 flex items-center justify-center text-indigo-400 font-mono font-bold">

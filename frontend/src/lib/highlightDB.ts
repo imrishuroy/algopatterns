@@ -113,6 +113,7 @@ export async function updateCacheTimestamp(contentType: string, contentId: strin
     });
   } catch (error) {
     console.warn("Failed to update cache timestamp:", error);
+    return;
   }
 }
 
@@ -181,7 +182,7 @@ export async function saveHighlightsToCache(
         }
       };
 
-      tx.oncomplete = async () => {
+      tx.oncomplete = () => {
         // Now add the new highlights
         const tx2 = db.transaction(HIGHLIGHTS_STORE, "readwrite");
         const store2 = tx2.objectStore(HIGHLIGHTS_STORE);
@@ -205,6 +206,7 @@ export async function saveHighlightsToCache(
     });
   } catch (error) {
     console.warn("Failed to save highlights to cache:", error);
+    return;
   }
 }
 
@@ -239,6 +241,7 @@ export async function addHighlightToCache(
     });
   } catch (error) {
     console.warn("Failed to add highlight to cache:", error);
+    return;
   }
 }
 
@@ -273,6 +276,7 @@ export async function updateHighlightInCache(
     });
   } catch (error) {
     console.warn("Failed to update highlight in cache:", error);
+    return;
   }
 }
 
@@ -293,6 +297,7 @@ export async function deleteHighlightFromCache(id: string): Promise<void> {
     });
   } catch (error) {
     console.warn("Failed to delete highlight from cache:", error);
+    return;
   }
 }
 
@@ -322,6 +327,7 @@ export async function markHighlightPendingDelete(id: string): Promise<void> {
     });
   } catch (error) {
     console.warn("Failed to mark highlight pending delete:", error);
+    return;
   }
 }
 
@@ -379,5 +385,6 @@ export async function clearCache(): Promise<void> {
     });
   } catch (error) {
     console.warn("Failed to clear cache:", error);
+    return;
   }
 }

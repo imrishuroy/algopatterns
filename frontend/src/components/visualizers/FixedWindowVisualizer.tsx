@@ -168,7 +168,7 @@ export default function FixedWindowVisualizer() {
 
               return (
                 <motion.div
-                  key={idx}
+                  key={`idx-${idx}`}
                   animate={{
                     scale: inWindow ? 1.05 : 1,
                     y: inWindow ? -5 : 0,
@@ -199,7 +199,7 @@ export default function FixedWindowVisualizer() {
             <div className="flex gap-2 mt-1">
               {arr.map((_, idx) => (
                 <div
-                  key={idx}
+                  key={`idx-${idx}`}
                   className={`w-14 h-1 rounded ${
                     idx >= winLeft && idx <= winRight
                       ? "bg-blue-500"

@@ -87,7 +87,7 @@ func TestRecovery_HandlesPanic(t *testing.T) {
 	router := gin.New()
 	router.Use(RequestID())
 	router.Use(Recovery())
-	router.GET("/test", func(c *gin.Context) {
+	router.GET("/test", func(_ *gin.Context) {
 		panic("test panic")
 	})
 

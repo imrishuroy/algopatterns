@@ -166,16 +166,16 @@ class ApiClient {
     return response;
   }
 
-  async getMe(): Promise<ApiResponse<User>> {
+  getMe(): Promise<ApiResponse<User>> {
     return this.request<User>("/api/v1/user/me");
   }
 
   // Progress endpoints
-  async getProgress(): Promise<ApiResponse<ProgressResponse>> {
+  getProgress(): Promise<ApiResponse<ProgressResponse>> {
     return this.request<ProgressResponse>("/api/v1/progress");
   }
 
-  async toggleProgress(
+  toggleProgress(
     questionId: string,
     completed: boolean
   ): Promise<ApiResponse<ProgressResponse>> {
@@ -185,7 +185,7 @@ class ApiClient {
     });
   }
 
-  async syncProgress(
+  syncProgress(
     questionIds: string[]
   ): Promise<ApiResponse<ProgressResponse>> {
     return this.request<ProgressResponse>("/api/v1/progress/sync", {
@@ -195,7 +195,7 @@ class ApiClient {
   }
 
   // Problem endpoints
-  async getProblems(params?: {
+  getProblems(params?: {
     page?: number;
     limit?: number;
     difficulty?: string;
@@ -214,42 +214,42 @@ class ApiClient {
     );
   }
 
-  async getProblemBySlug(
+  getProblemBySlug(
     slug: string
   ): Promise<ApiResponse<ProblemDetailResponse>> {
     return this.request<ProblemDetailResponse>(`/api/v1/problems/${slug}`);
   }
 
-  async getLanguages(): Promise<ApiResponse<Language[]>> {
+  getLanguages(): Promise<ApiResponse<Language[]>> {
     return this.request<Language[]>("/api/v1/languages");
   }
 
   // Submission endpoints
-  async submitCode(req: SubmitCodeRequest): Promise<ApiResponse<Submission>> {
+  submitCode(req: SubmitCodeRequest): Promise<ApiResponse<Submission>> {
     return this.request<Submission>("/api/v1/submissions", {
       method: "POST",
       body: JSON.stringify(req),
     });
   }
 
-  async runCode(req: RunCodeRequest): Promise<ApiResponse<RunCodeResponse>> {
+  runCode(req: RunCodeRequest): Promise<ApiResponse<RunCodeResponse>> {
     return this.request<RunCodeResponse>("/api/v1/submissions/run", {
       method: "POST",
       body: JSON.stringify(req),
     });
   }
 
-  async getSubmission(id: string): Promise<ApiResponse<Submission>> {
+  getSubmission(id: string): Promise<ApiResponse<Submission>> {
     return this.request<Submission>(`/api/v1/submissions/${id}`);
   }
 
-  async getSubmissions(problemId?: string): Promise<ApiResponse<Submission[]>> {
+  getSubmissions(problemId?: string): Promise<ApiResponse<Submission[]>> {
     const query = problemId ? `?problemId=${problemId}` : "";
     return this.request<Submission[]>(`/api/v1/submissions${query}`);
   }
 
   // Highlight endpoints
-  async createHighlight(
+  createHighlight(
     req: CreateHighlightRequest
   ): Promise<ApiResponse<Highlight>> {
     return this.request<Highlight>("/api/v1/highlights", {
@@ -258,11 +258,11 @@ class ApiClient {
     });
   }
 
-  async getHighlight(id: string): Promise<ApiResponse<Highlight>> {
+  getHighlight(id: string): Promise<ApiResponse<Highlight>> {
     return this.request<Highlight>(`/api/v1/highlights/${id}`);
   }
 
-  async getHighlightsForContent(
+  getHighlightsForContent(
     contentType: string,
     contentId: string
   ): Promise<ApiResponse<ContentHighlightsResponse>> {
@@ -271,7 +271,7 @@ class ApiClient {
     );
   }
 
-  async getHighlights(params?: {
+  getHighlights(params?: {
     limit?: number;
     cursor?: string;
     contentType?: string;
@@ -287,7 +287,7 @@ class ApiClient {
     );
   }
 
-  async updateHighlight(
+  updateHighlight(
     id: string,
     req: UpdateHighlightRequest
   ): Promise<ApiResponse<Highlight>> {
@@ -297,13 +297,13 @@ class ApiClient {
     });
   }
 
-  async deleteHighlight(id: string): Promise<ApiResponse<void>> {
+  deleteHighlight(id: string): Promise<ApiResponse<void>> {
     return this.request<void>(`/api/v1/highlights/${id}`, {
       method: "DELETE",
     });
   }
 
-  async batchSyncHighlights(
+  batchSyncHighlights(
     req: BatchSyncRequest
   ): Promise<ApiResponse<BatchSyncResponse>> {
     return this.request<BatchSyncResponse>("/api/v1/highlights/sync", {

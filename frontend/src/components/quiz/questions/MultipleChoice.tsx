@@ -82,7 +82,7 @@ export default function MultipleChoice({
 
           return (
             <button
-              key={`option-${option}-${index}`}
+              key={option}
               onClick={() => !disabled && onAnswer(index)}
               disabled={disabled}
               className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl border text-left transition-all ${borderClass} ${bgClass} ${

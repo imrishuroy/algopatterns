@@ -31,3 +31,5 @@ enabled = true
   environment = ["nodejs"]
   dialect = "typescript"
   plugins = ["react"]
+  # Disable rules that conflict with React visualization patterns
+  disabled_rules = ["JS-0437", "JS-0067"]

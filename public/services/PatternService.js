@@ -1,3 +1,5 @@
+/* global patternsData */
+
 /**
  * PatternService - Data Access Layer for DSA Patterns
  *
@@ -293,7 +295,7 @@ class PatternService {
         return data;
     }
 
-    async _loadFromIndexedDB() {
+    _loadFromIndexedDB() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open('DSAPatternsDB', 1);
 
@@ -306,27 +308,27 @@ class PatternService {
                 }
             };
 
-            request.onsuccess = async (event) => {
+            request.onsuccess = (event) => {
                 const db = event.target.result;
                 const transaction = db.transaction(['patterns'], 'readonly');
                 const store = transaction.objectStore('patterns');
                 const getAllRequest = store.getAll();
 
-                getAllRequest.onsuccess = async () => {
+                getAllRequest.onsuccess = () => {
                     if (getAllRequest.result.length > 0) {
                         resolve(getAllRequest.result);
                     } else {
                         // Seed from JSON
-                        const data = await this._loadFromJSON();
-                        await this._seedIndexedDB(db, data);
-                        resolve(data);
+                        this._loadFromJSON().then((data) => {
+                            this._seedIndexedDB(db, data).then(() => resolve(data));
+                        });
                     }
                 };
             };
         });
     }
 
-    async _seedIndexedDB(db, data) {
+    _seedIndexedDB(db, data) {
         return new Promise((resolve, reject) => {
             const transaction = db.transaction(['patterns'], 'readwrite');
             const store = transaction.objectStore('patterns');

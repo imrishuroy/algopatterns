@@ -1,3 +1,4 @@
+/* global patternsData, dataAdapter */
 "use strict";
 const STORAGE_KEY = 'dsa-tracker-completed';
 const questions = [

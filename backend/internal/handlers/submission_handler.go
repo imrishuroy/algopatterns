@@ -28,7 +28,7 @@ func (h *SubmissionHandler) RegisterRoutes(rg *gin.RouterGroup) {
 		submissions.POST("", h.Submit)
 		submissions.POST("/run", h.RunCode)
 		submissions.GET("", h.List)
-		submissions.GET("/:id", h.GetByID)
+		submissions.GET("/:id", h.ShowByID)
 	}
 }
 
@@ -84,7 +84,7 @@ func (h *SubmissionHandler) RunCode(c *gin.Context) {
 	response.OK(c, result)
 }
 
-func (h *SubmissionHandler) GetByID(c *gin.Context) {
+func (h *SubmissionHandler) ShowByID(c *gin.Context) {
 	userID, exists := middleware.GetUserID(c)
 	if !exists {
 		response.Unauthorized(c, "Authentication required")

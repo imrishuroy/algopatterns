@@ -304,7 +304,7 @@ export default function TrieSearchVisualizer() {
           <div className="flex gap-2 flex-wrap">
             {queries.map((q) => (
               <button
-                key={q}
+                key={`q-${q}`}
                 onClick={() => setQuery(q)}
                 disabled={isPlaying}
                 className={`px-3 py-1 rounded-lg font-mono text-sm transition ${
@@ -378,7 +378,7 @@ export default function TrieSearchVisualizer() {
                 : "bg-red-500/20 border border-red-500/50 text-red-400"
             }`}
           >
-            {searchMode}("{query}") = {result.toString()}
+            {searchMode}(&quot;{query}&quot;) = {result.toString()}
           </motion.div>
         )}
 
@@ -402,7 +402,7 @@ export default function TrieSearchVisualizer() {
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
             <strong className="text-indigo-400">Key Difference:</strong>{" "}
-            search("appl") = false (not a word), but startsWith("appl") = true
+            search(&quot;appl&quot;) = false (not a word), but startsWith(&quot;appl&quot;) = true
             (prefix exists). * marks isEnd = true.
           </p>
         </div>

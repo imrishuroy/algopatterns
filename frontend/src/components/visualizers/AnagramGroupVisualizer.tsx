@@ -140,7 +140,7 @@ export default function AnagramGroupVisualizer() {
           <div className="flex flex-wrap gap-2">
             {words.map((word, idx) => (
               <motion.div
-                key={idx}
+                key={`${word}-${idx}`}
                 animate={{
                   scale: currentWord === word ? 1.1 : 1,
                   y: currentWord === word ? -5 : 0,
@@ -181,7 +181,7 @@ export default function AnagramGroupVisualizer() {
                 <div className="flex gap-1">
                   {[...currentWord].map((char, i) => (
                     <motion.span
-                      key={i}
+                      key={`${char}-${i}`}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.1 }}
@@ -235,7 +235,7 @@ export default function AnagramGroupVisualizer() {
                         <div className="flex gap-2 flex-wrap">
                           {wordList.map((word, i) => (
                             <motion.span
-                              key={i}
+                              key={`${word}-${i}`}
                               initial={{ opacity: 0, scale: 0 }}
                               animate={{ opacity: 1, scale: 1 }}
                               className="px-2 py-1 bg-gray-700 rounded font-mono text-gray-200"

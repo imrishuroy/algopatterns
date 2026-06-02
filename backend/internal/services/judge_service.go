@@ -254,7 +254,7 @@ func (s *JudgeService) WaitForBatchResults(ctx context.Context, tokens []string)
 	}
 }
 
-func (s *JudgeService) decodeBase64Fields(result *models.Judge0Result) {
+func (*JudgeService) decodeBase64Fields(result *models.Judge0Result) {
 	if result.Stdout != nil {
 		if decoded, err := base64.StdEncoding.DecodeString(*result.Stdout); err == nil {
 			str := string(decoded)

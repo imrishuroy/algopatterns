@@ -87,8 +87,8 @@ func setupTestRouter(mockService *MockHighlightService, userID uuid.UUID) *gin.E
 		highlights.POST("", handler.Create)
 		highlights.POST("/sync", handler.BatchSync)
 		highlights.GET("", handler.List)
-		highlights.GET("/:id", handler.GetByID)
-		highlights.GET("/content/:contentType/:contentId", handler.GetByContent)
+		highlights.GET("/:id", handler.ShowByID)
+		highlights.GET("/content/:contentType/:contentId", handler.ShowByContent)
 		highlights.PATCH("/:id", handler.Update)
 		highlights.DELETE("/:id", handler.Delete)
 	}

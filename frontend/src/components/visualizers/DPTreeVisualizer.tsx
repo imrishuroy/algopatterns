@@ -439,7 +439,7 @@ export default function DPTreeVisualizer({
         <div className="flex flex-wrap gap-2 mb-4">
           {(Object.keys(problemConfigs) as Problem[]).map((p) => (
             <button
-              key={p}
+              key={`p-${p}`}
               onClick={() => {
                 setProblem(p);
                 reset();

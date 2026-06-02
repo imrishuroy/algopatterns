@@ -129,7 +129,7 @@ export default function RemoveDuplicatesVisualizer() {
         {/* Array visualization */}
         <div className="mb-4 flex justify-center gap-1 flex-wrap">
           {nums.map((num, idx) => (
-            <div key={idx} className="flex flex-col items-center">
+            <div key={`num-${num}-${idx}`} className="flex flex-col items-center">
               <motion.div
                 animate={{
                   backgroundColor:
@@ -205,7 +205,7 @@ export default function RemoveDuplicatesVisualizer() {
           <div className="text-sm text-gray-400 mb-1">Steps:</div>
           <div className="space-y-1">
             {history.slice(-5).map((step, idx) => (
-              <div key={idx} className="text-xs font-mono text-gray-500">
+              <div key={`step-${step.slice(0, 15)}-${idx}`} className="text-xs font-mono text-gray-500">
                 {step}
               </div>
             ))}

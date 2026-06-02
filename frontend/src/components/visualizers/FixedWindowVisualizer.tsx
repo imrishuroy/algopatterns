@@ -161,14 +161,15 @@ export default function FixedWindowVisualizer() {
         <div className="mb-4">
           <div className="text-sm text-gray-400 mb-2">Array:</div>
           <div className="flex gap-2">
-            {arr.map((val, idx) => {
-              const inWindow = idx >= winLeft && idx <= winRight;
+            {arr.map((val, position) => {
+              const inWindow = position >= winLeft && position <= winRight;
               const isMaxWindow =
-                maxWindow && idx >= maxWindow[0] && idx <= maxWindow[1];
+                maxWindow && position >= maxWindow[0] && position <= maxWindow[1];
 
               return (
                 <motion.div
-                  key={idx}
+                  // eslint-disable-next-line react/no-array-index-key -- array position is semantically meaningful for visualization
+                  key={`arr-pos${position}-val${val}`}
                   animate={{
                     scale: inWindow ? 1.05 : 1,
                     y: inWindow ? -5 : 0,
@@ -182,11 +183,11 @@ export default function FixedWindowVisualizer() {
                   }`}
                 >
                   <span className="text-lg font-bold">{val}</span>
-                  <span className="text-xs opacity-70">[{idx}]</span>
+                  <span className="text-xs opacity-70">[{position}]</span>
                   {inWindow && (
                     <div className="absolute -top-6 text-xs text-blue-400">
-                      {idx === winLeft && "L"}
-                      {idx === winRight && "R"}
+                      {position === winLeft && "L"}
+                      {position === winRight && "R"}
                     </div>
                   )}
                 </motion.div>
@@ -197,11 +198,12 @@ export default function FixedWindowVisualizer() {
           {/* Window bracket */}
           {phase !== "init" && winLeft >= 0 && (
             <div className="flex gap-2 mt-1">
-              {arr.map((_, idx) => (
+              {arr.map((val, position) => (
                 <div
-                  key={idx}
+                  // eslint-disable-next-line react/no-array-index-key -- array position is semantically meaningful for visualization
+                  key={`bracket-pos${position}-val${val}`}
                   className={`w-14 h-1 rounded ${
-                    idx >= winLeft && idx <= winRight
+                    position >= winLeft && position <= winRight
                       ? "bg-blue-500"
                       : "bg-transparent"
                   }`}

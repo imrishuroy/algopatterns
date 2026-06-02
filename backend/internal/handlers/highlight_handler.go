@@ -34,8 +34,8 @@ func (h *HighlightHandler) RegisterRoutes(rg *gin.RouterGroup) {
 		highlights.POST("", h.Create)
 		highlights.POST("/sync", h.BatchSync)
 		highlights.GET("", h.List)
-		highlights.GET("/:id", h.GetByID)
-		highlights.GET("/content/:contentType/:contentId", h.GetByContent)
+		highlights.GET("/:id", h.ShowByID)
+		highlights.GET("/content/:contentType/:contentId", h.ShowByContent)
 		highlights.PATCH("/:id", h.Update)
 		highlights.DELETE("/:id", h.Delete)
 	}
@@ -72,7 +72,7 @@ func (h *HighlightHandler) Create(c *gin.Context) {
 	response.Created(c, highlight)
 }
 
-func (h *HighlightHandler) GetByID(c *gin.Context) {
+func (h *HighlightHandler) ShowByID(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")
@@ -100,7 +100,7 @@ func (h *HighlightHandler) GetByID(c *gin.Context) {
 	response.OK(c, highlight)
 }
 
-func (h *HighlightHandler) GetByContent(c *gin.Context) {
+func (h *HighlightHandler) ShowByContent(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")

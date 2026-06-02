@@ -199,19 +199,20 @@ export default function DPTransformationVisualizer() {
           <h4 className="text-white font-medium mb-2">Call Stack</h4>
           <div className="bg-gray-800/50 rounded-lg p-4 min-h-[200px]">
             <AnimatePresence>
-              {callStack.map((call, i) => (
+              {callStack.map((call, depth) => (
                 <motion.div
-                  key={`${call}-${i}`}
+                  // eslint-disable-next-line react/no-array-index-key -- depth is part of call stack identity
+                  key={`stack-${call}-depth${depth}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   className={`p-2 mb-2 rounded font-mono text-sm ${
-                    i === callStack.length - 1
+                    depth === callStack.length - 1
                       ? "bg-yellow-500/20 border border-yellow-500 text-yellow-400"
                       : "bg-gray-700/50 text-gray-400"
                   }`}
                 >
-                  {"  ".repeat(i)}
+                  {"  ".repeat(depth)}
                   {call}
                 </motion.div>
               ))}
@@ -226,9 +227,9 @@ export default function DPTransformationVisualizer() {
           <h4 className="text-white font-medium mb-2">Computed Results</h4>
           <div className="bg-gray-800/50 rounded-lg p-4 min-h-[200px]">
             <AnimatePresence>
-              {completed.slice(-5).map((c, i) => (
+              {completed.slice(-5).map((c) => (
                 <motion.div
-                  key={`${c.call}-${i}-result`}
+                  key={`result-${c.call}-${c.result}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={`p-2 mb-2 rounded font-mono text-sm ${
@@ -271,9 +272,9 @@ export default function DPTransformationVisualizer() {
           <h4 className="text-white font-medium mb-2">Execution</h4>
           <div className="bg-gray-800/50 rounded-lg p-4 min-h-[200px] space-y-2">
             <AnimatePresence>
-              {currentTrace.slice(-6).map((t, i) => (
+              {currentTrace.slice(-6).map((t) => (
                 <motion.div
-                  key={i}
+                  key={`trace-${t.call}-${t.action}-${t.result ?? 'pending'}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   className={`p-2 rounded font-mono text-sm ${
@@ -303,7 +304,7 @@ export default function DPTransformationVisualizer() {
             <div className="grid grid-cols-5 gap-2">
               {[0, 1, 2, 3, 4].map((i) => (
                 <motion.div
-                  key={i}
+                  key={`memo-${i}`}
                   animate={{
                     scale: memo[i] !== undefined ? 1 : 0.9,
                     opacity: memo[i] !== undefined ? 1 : 0.4,
@@ -352,17 +353,25 @@ export default function DPTransformationVisualizer() {
         <div className="bg-gray-800/50 rounded-lg p-4">
           {/* Index row */}
           <div className="grid grid-cols-5 gap-2 mb-2">
-            {nums.map((_, i) => (
-              <div key={i} className="text-center text-xs text-gray-500">
-                i = {i}
+            {nums.map((num, position) => (
+              <div
+                // eslint-disable-next-line react/no-array-index-key -- static array with fixed positions
+                key={`tab-idx-pos${position}-val${num}`}
+                className="text-center text-xs text-gray-500"
+              >
+                i = {position}
               </div>
             ))}
           </div>
 
           {/* Values row */}
           <div className="grid grid-cols-5 gap-2 mb-4">
-            {nums.map((num, i) => (
-              <div key={i} className="p-2 bg-gray-700/30 rounded text-center">
+            {nums.map((num, position) => (
+              <div
+                // eslint-disable-next-line react/no-array-index-key -- static array with fixed positions
+                key={`tab-val-pos${position}-$${num}`}
+                className="p-2 bg-gray-700/30 rounded text-center"
+              >
                 <span className="text-gray-400 text-sm">${num}</span>
               </div>
             ))}
@@ -370,13 +379,14 @@ export default function DPTransformationVisualizer() {
 
           {/* DP row */}
           <div className="grid grid-cols-5 gap-2">
-            {dp.map((val, i) => (
+            {dp.map((val, position) => (
               <motion.div
-                key={i}
+                // eslint-disable-next-line react/no-array-index-key -- dp array position is semantically meaningful
+                key={`tab-dp-pos${position}-${val ?? 'null'}`}
                 animate={{
-                  scale: currentI === i ? 1.1 : 1,
+                  scale: currentI === position ? 1.1 : 1,
                   borderColor:
-                    currentI === i
+                    currentI === position
                       ? "#3b82f6"
                       : val !== null
                         ? "#22c55e"
@@ -386,7 +396,7 @@ export default function DPTransformationVisualizer() {
                   val !== null ? "bg-green-500/20" : "bg-gray-700/30"
                 }`}
               >
-                <div className="text-xs text-gray-500 mb-1">dp[{i}]</div>
+                <div className="text-xs text-gray-500 mb-1">dp[{position}]</div>
                 <motion.div
                   key={val}
                   initial={{ scale: 0 }}
@@ -429,16 +439,17 @@ export default function DPTransformationVisualizer() {
         <div className="bg-gray-800/50 rounded-lg p-4">
           {/* Array reference */}
           <div className="grid grid-cols-5 gap-2 mb-4">
-            {nums.map((num, i) => (
+            {nums.map((num, position) => (
               <motion.div
-                key={i}
+                // eslint-disable-next-line react/no-array-index-key -- static array with fixed positions
+                key={`opt-pos${position}-$${num}`}
                 animate={{
-                  scale: lastStep?.i === i ? 1.1 : 1,
-                  borderColor: lastStep?.i === i ? "#22c55e" : "#374151",
+                  scale: lastStep?.i === position ? 1.1 : 1,
+                  borderColor: lastStep?.i === position ? "#22c55e" : "#374151",
                 }}
                 className="p-2 bg-gray-700/30 rounded text-center border-2"
               >
-                <div className="text-xs text-gray-500">nums[{i}]</div>
+                <div className="text-xs text-gray-500">nums[{position}]</div>
                 <span className="text-gray-400 font-mono">${num}</span>
               </motion.div>
             ))}

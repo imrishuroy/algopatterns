@@ -19,7 +19,7 @@ export default function ReorderListVisualizer() {
     | "merging"
     | "done"
   >("init");
-  const [step, setStep] = useState(0);
+  const [_step, setStep] = useState(0);
   const [message, setMessage] = useState("Click Play to reorder the list");
 
   const originalList = [1, 2, 3, 4, 5];
@@ -187,7 +187,7 @@ export default function ReorderListVisualizer() {
 
             return (
               <div
-                key={p}
+                key={`p-${p}`}
                 className={`flex-1 p-2 rounded-lg text-center text-sm font-medium transition-colors ${
                   isCurrent
                     ? "bg-purple-500 text-white"
@@ -210,7 +210,7 @@ export default function ReorderListVisualizer() {
             </div>
             <div className="flex items-center gap-2">
               {originalList.map((val, idx) => (
-                <React.Fragment key={idx}>
+                <React.Fragment key={`node-${val}-${idx}`}>
                   <motion.div
                     animate={{
                       scale: idx === slowIdx || idx === fastIdx ? 1.1 : 1,
@@ -262,7 +262,7 @@ export default function ReorderListVisualizer() {
               <div className="text-sm text-gray-400 mb-2">First Half:</div>
               <div className="flex gap-1 p-3 bg-blue-500/10 rounded-lg min-h-[60px]">
                 <AnimatePresence>
-                  {firstHalf.map((val, idx) => (
+                  {firstHalf.map((val) => (
                     <motion.div
                       key={`first-${val}`}
                       initial={{ opacity: 1 }}
@@ -290,7 +290,7 @@ export default function ReorderListVisualizer() {
               </div>
               <div className="flex gap-1 p-3 bg-green-500/10 rounded-lg min-h-[60px]">
                 <AnimatePresence>
-                  {secondHalf.map((val, idx) => (
+                  {secondHalf.map((val) => (
                     <motion.div
                       key={`second-${val}`}
                       layout

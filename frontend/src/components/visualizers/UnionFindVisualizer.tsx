@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface UFState {
   parent: number[];
@@ -278,7 +278,7 @@ export default function UnionFindVisualizer() {
           <div className="flex gap-2 flex-wrap">
             {operations.map(([op, x, y], idx) => (
               <div
-                key={idx}
+                key={`op-${op}-${x}-${y}-${idx}`}
                 className={`px-2 py-1 rounded text-xs font-mono ${
                   idx < opIndex
                     ? "bg-green-500/30 text-green-300"
@@ -318,7 +318,7 @@ export default function UnionFindVisualizer() {
           <div className="text-sm text-gray-400 mb-2">parent[] array:</div>
           <div className="flex gap-2 justify-center">
             {state.parent.map((p, i) => (
-              <div key={i} className="text-center">
+              <div key={`parent-${p}-${i}`} className="text-center">
                 <div className="text-xs text-gray-500 mb-1">{i}</div>
                 <div
                   className={`w-8 h-8 rounded flex items-center justify-center font-mono text-sm ${

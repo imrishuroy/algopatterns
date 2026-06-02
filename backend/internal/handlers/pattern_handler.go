@@ -21,11 +21,11 @@ func (h *PatternHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	{
 		patterns.GET("", h.List)
 		patterns.POST("", h.Create)
-		patterns.GET("/categories", h.GetCategories)
+		patterns.GET("/categories", h.ListCategories)
 		patterns.GET("/export", h.Export)
 		patterns.POST("/bulk", h.BulkImport)
 		patterns.GET("/search", h.Search)
-		patterns.GET("/:id", h.GetByID)
+		patterns.GET("/:id", h.ShowByID)
 		patterns.PUT("/:id", h.Update)
 		patterns.DELETE("/:id", h.Delete)
 	}
@@ -47,7 +47,7 @@ func (h *PatternHandler) List(c *gin.Context) {
 	response.OK(c, result)
 }
 
-func (h *PatternHandler) GetByID(c *gin.Context) {
+func (h *PatternHandler) ShowByID(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		response.BadRequest(c, "Pattern ID is required", nil)
@@ -132,7 +132,7 @@ func (h *PatternHandler) Delete(c *gin.Context) {
 	response.NoContent(c)
 }
 
-func (h *PatternHandler) GetCategories(c *gin.Context) {
+func (h *PatternHandler) ListCategories(c *gin.Context) {
 	categories, err := h.service.GetCategories(c.Request.Context())
 	if err != nil {
 		response.InternalError(c)

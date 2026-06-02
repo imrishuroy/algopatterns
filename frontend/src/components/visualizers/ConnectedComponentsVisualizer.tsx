@@ -253,7 +253,7 @@ export default function ConnectedComponentsVisualizer() {
           <div className="flex gap-2 flex-wrap">
             {edges.map((edge, idx) => (
               <div
-                key={idx}
+                key={`edge-${edge.from}-${edge.to}-${idx}`}
                 className={`px-2 py-1 rounded text-xs font-mono ${
                   processedEdges.includes(idx)
                     ? "bg-green-500/30 text-green-300"
@@ -273,7 +273,7 @@ export default function ConnectedComponentsVisualizer() {
           <div className="text-sm text-gray-400 mb-2">parent[] array:</div>
           <div className="flex gap-2 justify-center">
             {parent.map((p, i) => (
-              <div key={i} className="text-center">
+              <div key={`parent-${i}-${p}`} className="text-center">
                 <div className="text-xs text-gray-500 mb-1">{i}</div>
                 <motion.div
                   animate={{ backgroundColor: getComponentColor(i, parent) }}

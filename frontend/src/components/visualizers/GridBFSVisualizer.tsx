@@ -286,16 +286,20 @@ export default function GridBFSVisualizer() {
         {/* Grid Visualization */}
         <div className="flex justify-center mb-4">
           <div className="inline-block p-4 bg-gray-800/50 rounded-lg">
-            {grid.map((row, r) => (
-              <div key={r} className="flex gap-1 mb-1">
-                {row.map((cell, c) => (
+            {grid.map((row, rowIndex) => (
+              <div
+                // eslint-disable-next-line react/no-array-index-key -- row index is part of grid identity
+                key={`row${rowIndex}-${row.map(c => c.state).join('')}`}
+                className="flex gap-1 mb-1"
+              >
+                {row.map((cell) => (
                   <motion.div
-                    key={`${r}-${c}`}
+                    key={`cell-r${cell.row}-c${cell.col}`}
                     animate={{
                       scale: cell.state === "visiting" ? 1.1 : 1,
                     }}
                     className={`w-12 h-12 rounded-lg flex items-center justify-center font-mono text-sm transition-colors relative ${getCellColor(cell)} ${
-                      isScanPosition(r, c)
+                      isScanPosition(cell.row, cell.col)
                         ? "ring-2 ring-white ring-offset-2 ring-offset-gray-900"
                         : ""
                     }`}
@@ -325,13 +329,14 @@ export default function GridBFSVisualizer() {
               {mode === "bfs" ? "Queue (FIFO)" : "Stack (LIFO)"}
             </div>
             <div className="flex flex-wrap gap-1 min-h-[32px]">
-              {(mode === "bfs" ? queue : stack).map(([r, c], i) => (
+              {(mode === "bfs" ? queue : stack).map(([r, c], position) => (
                 <span
-                  key={i}
+                  // eslint-disable-next-line react/no-array-index-key -- queue/stack position determines processing order
+                  key={`frontier-r${r}-c${c}-pos${position}`}
                   className={`px-2 py-1 rounded text-xs font-mono ${
-                    i === 0 && mode === "bfs"
+                    position === 0 && mode === "bfs"
                       ? "bg-yellow-500 text-black"
-                      : i === (mode === "dfs" ? stack.length - 1 : -1)
+                      : position === (mode === "dfs" ? stack.length - 1 : -1)
                         ? "bg-yellow-500 text-black"
                         : "bg-gray-700 text-gray-300"
                   }`}
@@ -353,7 +358,7 @@ export default function GridBFSVisualizer() {
               <div className="flex gap-1">
                 {Array.from({ length: islandCount }).map((_, i) => (
                   <div
-                    key={i}
+                    key={`island-${i + 1}`}
                     className={`w-4 h-4 rounded ${ISLAND_COLORS[i % ISLAND_COLORS.length]}`}
                   />
                 ))}

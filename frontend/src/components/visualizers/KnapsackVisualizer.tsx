@@ -211,7 +211,7 @@ export default function KnapsackVisualizer() {
           <div className="flex flex-wrap gap-3">
             {items.map((item, idx) => (
               <motion.div
-                key={idx}
+                key={`item-${item.name}-${idx}`}
                 animate={{
                   scale: selectedItems.has(idx) ? 1.05 : 1,
                   y: selectedItems.has(idx) ? -5 : 0,
@@ -249,7 +249,7 @@ export default function KnapsackVisualizer() {
               <AnimatePresence>
                 {[...selectedItems].map((idx) => (
                   <motion.div
-                    key={idx}
+                    key={`selected-${items[idx].name}-${idx}`}
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
@@ -360,7 +360,7 @@ export default function KnapsackVisualizer() {
               </div>
               {Array.from({ length: capacity + 1 }).map((_, j) => (
                 <div
-                  key={j}
+                  key={`capacity-${j}`}
                   className="w-12 h-10 flex items-center justify-center text-gray-400 font-mono"
                 >
                   {j}kg
@@ -370,7 +370,7 @@ export default function KnapsackVisualizer() {
 
             {/* Rows */}
             {Array.from({ length: items.length + 1 }).map((_, i) => (
-              <div key={i} className="flex">
+              <div key={`row-${i === 0 ? 'empty' : items[i - 1].name}-${i}`} className="flex">
                 <div className="w-20 h-12 flex items-center justify-center text-gray-400 text-sm">
                   {i === 0 ? "∅" : items[i - 1].name}
                 </div>

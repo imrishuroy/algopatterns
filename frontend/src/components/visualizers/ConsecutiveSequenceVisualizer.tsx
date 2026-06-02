@@ -245,7 +245,7 @@ export default function ConsecutiveSequenceVisualizer() {
           <div className="flex flex-wrap gap-2">
             {numbers.map((num, idx) => (
               <motion.div
-                key={idx}
+                key={`num-${num.value}-${idx}`}
                 animate={{
                   scale: num.value === currentNum ? 1.1 : 1,
                 }}
@@ -263,7 +263,7 @@ export default function ConsecutiveSequenceVisualizer() {
             Sorted view (for visualization only):
           </div>
           <div className="flex gap-1 items-end">
-            {sortedDisplay.map((num, idx) => (
+            {sortedDisplay.map((num) => (
               <motion.div
                 key={num.value}
                 layout

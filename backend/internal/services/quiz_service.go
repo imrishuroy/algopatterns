@@ -232,82 +232,100 @@ func (s *QuizService) GetAttemptByID(ctx context.Context, attemptID uuid.UUID, u
 }
 
 // validateAnswer checks if the submitted answer is correct
-func (s *QuizService) validateAnswer(question *models.QuizQuestion, selectedAnswer json.RawMessage) bool {
+func (*QuizService) validateAnswer(question *models.QuizQuestion, selectedAnswer json.RawMessage) bool {
 	switch question.QuestionType {
 	case models.QuestionTypeMultipleChoice, models.QuestionTypeCodeOutput,
 		models.QuestionTypeIdentifyBug, models.QuestionTypeCodeTrace:
-		// Compare as integers (index)
-		var selected, correct int
-		if err := json.Unmarshal(selectedAnswer, &selected); err != nil {
-			return false
-		}
-		if err := json.Unmarshal(question.CorrectAnswer, &correct); err != nil {
-			return false
-		}
-		return selected == correct
-
+		return validateIntAnswer(selectedAnswer, question.CorrectAnswer)
 	case models.QuestionTypeTrueFalse:
-		// Compare as booleans
-		var selected, correct bool
-		if err := json.Unmarshal(selectedAnswer, &selected); err != nil {
-			return false
-		}
-		if err := json.Unmarshal(question.CorrectAnswer, &correct); err != nil {
-			return false
-		}
-		return selected == correct
-
+		return validateBoolAnswer(selectedAnswer, question.CorrectAnswer)
 	case models.QuestionTypeFillBlank:
-		// Compare as strings (case-insensitive, trimmed)
-		var selected, correct string
-		if err := json.Unmarshal(selectedAnswer, &selected); err != nil {
-			return false
-		}
-		if err := json.Unmarshal(question.CorrectAnswer, &correct); err != nil {
-			return false
-		}
-
-		selected = strings.TrimSpace(strings.ToLower(selected))
-		correct = strings.TrimSpace(strings.ToLower(correct))
-
-		if selected == correct {
-			return true
-		}
-
-		// Check acceptable answers
-		if question.AcceptableAnswers != nil {
-			var acceptable []string
-			if err := json.Unmarshal(question.AcceptableAnswers, &acceptable); err == nil {
-				for _, ans := range acceptable {
-					if strings.TrimSpace(strings.ToLower(ans)) == selected {
-						return true
-					}
-				}
-			}
-		}
-		return false
-
+		return validateFillBlankAnswer(selectedAnswer, question.CorrectAnswer, question.AcceptableAnswers)
 	case models.QuestionTypeOrdering:
-		// Compare as arrays of integers
-		var selected, correct []int
-		if err := json.Unmarshal(selectedAnswer, &selected); err != nil {
-			return false
-		}
-		if err := json.Unmarshal(question.CorrectAnswer, &correct); err != nil {
-			return false
-		}
-
-		if len(selected) != len(correct) {
-			return false
-		}
-		for i := range selected {
-			if selected[i] != correct[i] {
-				return false
-			}
-		}
-		return true
-
+		return validateOrderingAnswer(selectedAnswer, question.CorrectAnswer)
 	default:
 		return false
 	}
+}
+
+// validateIntAnswer compares answers as integers (index-based questions)
+func validateIntAnswer(selectedAnswer, correctAnswer json.RawMessage) bool {
+	var selected, correct int
+	if err := json.Unmarshal(selectedAnswer, &selected); err != nil {
+		return false
+	}
+	if err := json.Unmarshal(correctAnswer, &correct); err != nil {
+		return false
+	}
+	return selected == correct
+}
+
+// validateBoolAnswer compares answers as booleans (true/false questions)
+func validateBoolAnswer(selectedAnswer, correctAnswer json.RawMessage) bool {
+	var selected, correct bool
+	if err := json.Unmarshal(selectedAnswer, &selected); err != nil {
+		return false
+	}
+	if err := json.Unmarshal(correctAnswer, &correct); err != nil {
+		return false
+	}
+	return selected == correct
+}
+
+// validateFillBlankAnswer compares string answers case-insensitively with acceptable alternatives
+func validateFillBlankAnswer(selectedAnswer, correctAnswer, acceptableAnswers json.RawMessage) bool {
+	var selected, correct string
+	if err := json.Unmarshal(selectedAnswer, &selected); err != nil {
+		return false
+	}
+	if err := json.Unmarshal(correctAnswer, &correct); err != nil {
+		return false
+	}
+
+	selected = strings.TrimSpace(strings.ToLower(selected))
+	correct = strings.TrimSpace(strings.ToLower(correct))
+
+	if selected == correct {
+		return true
+	}
+
+	return checkAcceptableAnswers(selected, acceptableAnswers)
+}
+
+// checkAcceptableAnswers checks if selected matches any acceptable answer
+func checkAcceptableAnswers(selected string, acceptableAnswers json.RawMessage) bool {
+	if acceptableAnswers == nil {
+		return false
+	}
+	var acceptable []string
+	if err := json.Unmarshal(acceptableAnswers, &acceptable); err != nil {
+		return false
+	}
+	for _, ans := range acceptable {
+		if strings.TrimSpace(strings.ToLower(ans)) == selected {
+			return true
+		}
+	}
+	return false
+}
+
+// validateOrderingAnswer compares answers as integer arrays
+func validateOrderingAnswer(selectedAnswer, correctAnswer json.RawMessage) bool {
+	var selected, correct []int
+	if err := json.Unmarshal(selectedAnswer, &selected); err != nil {
+		return false
+	}
+	if err := json.Unmarshal(correctAnswer, &correct); err != nil {
+		return false
+	}
+
+	if len(selected) != len(correct) {
+		return false
+	}
+	for i := range selected {
+		if selected[i] != correct[i] {
+			return false
+		}
+	}
+	return true
 }

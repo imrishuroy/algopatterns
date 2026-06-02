@@ -189,7 +189,7 @@ export default function MergeIntervalsVisualizer() {
             <div className="absolute bottom-4 left-4 right-4 h-0.5 bg-gray-600">
               {Array.from({ length: maxEnd + 2 }, (_, i) => (
                 <div
-                  key={i}
+                  key={`timeline-${i}`}
                   className="absolute bottom-0 w-0.5 h-2 bg-gray-600"
                   style={{ left: `${(i / (maxEnd + 1)) * 100}%` }}
                 >
@@ -232,7 +232,7 @@ export default function MergeIntervalsVisualizer() {
             <AnimatePresence>
               {result.map((int, idx) => (
                 <motion.div
-                  key={`result-${idx}`}
+                  key={`result-${int.start}-${int.end}-${idx}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className={`absolute h-10 rounded ${getIntervalColor(int.state)} flex items-center justify-center text-white text-sm font-bold shadow-lg ring-2 ring-white/30`}

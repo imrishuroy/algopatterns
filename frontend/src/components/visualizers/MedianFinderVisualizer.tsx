@@ -165,7 +165,7 @@ export default function MedianFinderVisualizer() {
           <div className="flex gap-2">
             {nums.map((num, idx) => (
               <motion.div
-                key={idx}
+                key={`num-${num}-${idx}`}
                 animate={{
                   scale: idx === currentIndex ? 1.1 : 1,
                   y: idx === currentIndex ? -5 : 0,

@@ -17,14 +17,20 @@ import (
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
 
+	if err := run(); err != nil {
+		log.Fatal().Err(err).Msg("Seed failed")
+	}
+}
+
+func run() error {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to load configuration")
+		return fmt.Errorf("failed to load configuration: %w", err)
 	}
 
 	db, err := repository.NewDatabase(&cfg.Database)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to database")
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer db.Close()
 
@@ -37,7 +43,7 @@ func main() {
 
 	data, err := os.ReadFile(dataFile)
 	if err != nil {
-		log.Fatal().Err(err).Str("file", dataFile).Msg("Failed to read patterns data file")
+		return fmt.Errorf("failed to read patterns data file %s: %w", dataFile, err)
 	}
 
 	var patternsData struct {
@@ -46,7 +52,7 @@ func main() {
 	if err := json.Unmarshal(data, &patternsData); err != nil {
 		var patterns []models.Pattern
 		if err := json.Unmarshal(data, &patterns); err != nil {
-			log.Fatal().Err(err).Msg("Failed to parse patterns data")
+			return fmt.Errorf("failed to parse patterns data: %w", err)
 		}
 		patternsData.Patterns = patterns
 	}
@@ -65,4 +71,5 @@ func main() {
 	}
 
 	fmt.Printf("\nSeed completed: %d imported, %d failed\n", imported, failed)
+	return nil
 }

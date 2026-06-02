@@ -161,15 +161,15 @@ export default function IntervalIntersectionVisualizer() {
             {/* Timeline */}
             <div className="absolute bottom-2 left-4 right-4 h-0.5 bg-gray-600" />
 
-            {listA.map((int, idx) => (
+            {listA.map((int, position) => (
               <motion.div
-                key={`a-${idx}`}
+                key={`a-${int.start}-${int.end}`}
                 animate={{
-                  y: idx === ptrA ? -3 : 0,
-                  scale: idx === ptrA ? 1.05 : 1,
+                  y: position === ptrA ? -3 : 0,
+                  scale: position === ptrA ? 1.05 : 1,
                 }}
                 className={`absolute h-8 rounded flex items-center justify-center text-white text-xs font-bold shadow-lg ${
-                  idx === ptrA
+                  position === ptrA
                     ? "bg-blue-500 ring-2 ring-blue-300"
                     : "bg-blue-500/50"
                 }`}
@@ -200,15 +200,15 @@ export default function IntervalIntersectionVisualizer() {
             {/* Timeline */}
             <div className="absolute bottom-2 left-4 right-4 h-0.5 bg-gray-600" />
 
-            {listB.map((int, idx) => (
+            {listB.map((int, position) => (
               <motion.div
-                key={`b-${idx}`}
+                key={`b-${int.start}-${int.end}`}
                 animate={{
-                  y: idx === ptrB ? -3 : 0,
-                  scale: idx === ptrB ? 1.05 : 1,
+                  y: position === ptrB ? -3 : 0,
+                  scale: position === ptrB ? 1.05 : 1,
                 }}
                 className={`absolute h-8 rounded flex items-center justify-center text-white text-xs font-bold shadow-lg ${
-                  idx === ptrB
+                  position === ptrB
                     ? "bg-green-500 ring-2 ring-green-300"
                     : "bg-green-500/50"
                 }`}
@@ -249,9 +249,9 @@ export default function IntervalIntersectionVisualizer() {
           <div className="bg-gray-800/50 rounded-lg p-3 min-h-[50px]">
             <div className="flex flex-wrap gap-2">
               <AnimatePresence>
-                {result.map((int, idx) => (
+                {result.map((int) => (
                   <motion.span
-                    key={idx}
+                    key={`result-${int.start}-${int.end}`}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="px-3 py-1 bg-cyan-500 text-white rounded font-mono font-bold"

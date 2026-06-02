@@ -279,7 +279,7 @@ export default function TreeTraversalVisualizer() {
           <div className="flex gap-2 min-h-[40px] items-center">
             {result.map((val, idx) => (
               <motion.div
-                key={idx}
+                key={`${val}-${idx}`}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center font-mono text-white font-bold"

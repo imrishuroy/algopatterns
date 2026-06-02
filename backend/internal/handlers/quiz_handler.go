@@ -28,23 +28,23 @@ func (h *QuizHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	quiz := rg.Group("/quiz")
 	{
 		// Public endpoints (work for both authenticated and anonymous users)
-		quiz.GET("/questions/:patternId", h.GetQuestions)
+		quiz.GET("/questions/:patternId", h.ListQuestions)
 		quiz.POST("/attempts", h.StartAttempt)
 		quiz.POST("/attempts/:attemptId/responses", h.SubmitResponse)
 		quiz.PATCH("/attempts/:attemptId/complete", h.CompleteAttempt)
-		quiz.GET("/attempts/:attemptId", h.GetAttempt)
+		quiz.GET("/attempts/:attemptId", h.ShowAttempt)
 
 		// Authenticated endpoints
 		authenticated := quiz.Group("")
 		authenticated.Use(h.authMW.RequireAuth())
 		{
-			authenticated.GET("/attempts", h.GetAttemptHistory)
+			authenticated.GET("/attempts", h.ListAttemptHistory)
 		}
 	}
 }
 
-// GetQuestions returns all questions for a pattern (without answers)
-func (h *QuizHandler) GetQuestions(c *gin.Context) {
+// ListQuestions returns all questions for a pattern (without answers)
+func (h *QuizHandler) ListQuestions(c *gin.Context) {
 	patternID := c.Param("patternId")
 	if patternID == "" {
 		response.BadRequest(c, "Pattern ID is required", nil)
@@ -184,8 +184,8 @@ func (h *QuizHandler) CompleteAttempt(c *gin.Context) {
 	response.OK(c, result)
 }
 
-// GetAttempt returns a specific attempt
-func (h *QuizHandler) GetAttempt(c *gin.Context) {
+// ShowAttempt returns a specific attempt
+func (h *QuizHandler) ShowAttempt(c *gin.Context) {
 	attemptIDStr := c.Param("attemptId")
 	attemptID, err := uuid.Parse(attemptIDStr)
 	if err != nil {
@@ -217,8 +217,8 @@ func (h *QuizHandler) GetAttempt(c *gin.Context) {
 	response.OK(c, result)
 }
 
-// GetAttemptHistory returns user's quiz history (requires authentication)
-func (h *QuizHandler) GetAttemptHistory(c *gin.Context) {
+// ListAttemptHistory returns user's quiz history (requires authentication)
+func (h *QuizHandler) ListAttemptHistory(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")

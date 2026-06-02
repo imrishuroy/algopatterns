@@ -122,7 +122,7 @@ export default function NextGreaterVisualizer() {
           <div className="flex gap-2">
             {nums.map((val, idx) => (
               <motion.div
-                key={idx}
+                key={`num-${val}-${idx}`}
                 animate={{
                   scale: idx === currentIdx ? 1.1 : 1,
                   y: idx === currentIdx ? -8 : poppingIdx === idx ? -4 : 0,
@@ -155,7 +155,7 @@ export default function NextGreaterVisualizer() {
             <AnimatePresence>
               {stack.map((idx) => (
                 <motion.div
-                  key={idx}
+                  key={`stack-${nums[idx]}-${idx}`}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -183,7 +183,7 @@ export default function NextGreaterVisualizer() {
           <div className="flex gap-2">
             {result.map((val, idx) => (
               <motion.div
-                key={idx}
+                key={`result-${val}-${idx}`}
                 animate={{
                   backgroundColor: poppingIdx === idx ? "#22c55e" : "#6b7280",
                 }}

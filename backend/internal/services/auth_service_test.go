@@ -83,7 +83,7 @@ func newTestAuthService() (*AuthService, *MockUserRepository) {
 		JWTSecret:            "test-secret-key-for-testing-purposes",
 		AccessTokenDuration:  15 * time.Minute,
 		RefreshTokenDuration: 7 * 24 * time.Hour,
-		BCryptCost:           4, // Low cost for faster tests
+		BCryptCost:           bcrypt.MinCost, // Low cost for faster tests
 	}
 	service := &AuthService{
 		userRepo: nil, // We'll use the mock directly
@@ -98,7 +98,7 @@ func TestRegister_Success(t *testing.T) {
 		JWTSecret:            "test-secret",
 		AccessTokenDuration:  15 * time.Minute,
 		RefreshTokenDuration: 7 * 24 * time.Hour,
-		BCryptCost:           4,
+		BCryptCost:           bcrypt.MinCost,
 	}
 	service := NewAuthService(mockRepo, cfg)
 	ctx := context.Background()
@@ -147,7 +147,7 @@ func TestLogin_Success(t *testing.T) {
 	ctx := context.Background()
 
 	password := "password123"
-	hash, _ := bcrypt.GenerateFromPassword([]byte(password), 4)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
 	existingUser := &models.User{
 		ID:           uuid.New(),
 		Email:        "test@example.com",
@@ -194,7 +194,7 @@ func TestLogin_WrongPassword(t *testing.T) {
 	service := NewAuthService(mockRepo, cfg)
 	ctx := context.Background()
 
-	hash, _ := bcrypt.GenerateFromPassword([]byte("correctpassword"), 4)
+	hash, _ := bcrypt.GenerateFromPassword([]byte("correctpassword"), bcrypt.MinCost)
 	existingUser := &models.User{
 		ID:           uuid.New(),
 		Email:        "test@example.com",
@@ -322,7 +322,7 @@ func TestChangePassword_Success(t *testing.T) {
 	userID := uuid.New()
 
 	currentPassword := "oldpassword"
-	hash, _ := bcrypt.GenerateFromPassword([]byte(currentPassword), 4)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(currentPassword), bcrypt.MinCost)
 	existingUser := &models.User{
 		ID:           userID,
 		PasswordHash: string(hash),
@@ -345,7 +345,7 @@ func TestChangePassword_WrongCurrentPassword(t *testing.T) {
 	ctx := context.Background()
 	userID := uuid.New()
 
-	hash, _ := bcrypt.GenerateFromPassword([]byte("correctpassword"), 4)
+	hash, _ := bcrypt.GenerateFromPassword([]byte("correctpassword"), bcrypt.MinCost)
 	existingUser := &models.User{
 		ID:           userID,
 		PasswordHash: string(hash),

@@ -145,7 +145,7 @@ export default function KthLargestVisualizer() {
           <div className="flex gap-2">
             {nums.map((num, idx) => (
               <motion.div
-                key={idx}
+                key={`num-${num}-${idx}`}
                 animate={{
                   scale: idx === currentIndex ? 1.1 : 1,
                   y: idx === currentIndex ? -5 : 0,
@@ -217,7 +217,7 @@ export default function KthLargestVisualizer() {
               <div className="flex gap-1">
                 {heap.map((num, i) => (
                   <span
-                    key={i}
+                    key={`heap-${num}-${i}`}
                     className={`px-2 py-1 rounded text-sm font-mono ${
                       i === 0
                         ? "bg-amber-500 text-black"

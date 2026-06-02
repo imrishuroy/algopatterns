@@ -165,7 +165,7 @@ export default function LargestRectangleVisualizer() {
 
               return (
                 <motion.div
-                  key={idx}
+                  key={`bar-${h}-${idx}`}
                   className="flex flex-col items-center"
                   animate={{ scale: isCurrent ? 1.05 : 1 }}
                 >
@@ -208,7 +208,7 @@ export default function LargestRectangleVisualizer() {
           <div className="bg-gray-800/50 rounded-lg p-3 min-h-[50px] flex items-center gap-2 flex-wrap">
             {stack.map((idx) => (
               <motion.div
-                key={idx}
+                key={`stack-${heights[idx]}-${idx}`}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="px-3 py-1 bg-blue-500 rounded-lg font-mono text-sm text-white"

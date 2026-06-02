@@ -1,11 +1,15 @@
-name: SonarCloud Analysis
+name: SonarCloud Frontend
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'frontend/**'
   workflow_dispatch:
 
 jobs:
@@ -41,34 +45,4 @@ jobs:
           projectBaseDir: frontend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
-
-  sonarcloud-backend:
-    name: Backend Analysis
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: backend/go.mod
-          cache-dependency-path: backend/go.sum
-
-      - name: Run tests with coverage
-        run: go test -coverprofile=coverage.out ./...
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        with:
-          projectBaseDir: backend
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BE }}
           SONAR_HOST_URL: https://sonarcloud.io

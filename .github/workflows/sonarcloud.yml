@@ -69,5 +69,5 @@ jobs:
         with:
           projectBaseDir: backend
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BE }}
           SONAR_HOST_URL: https://sonarcloud.io

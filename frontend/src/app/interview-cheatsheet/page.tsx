@@ -800,67 +800,59 @@ const MISTAKES = [
   { id: "ms14", pattern: "Trie", mistake: "isEnd flag distinguishes complete words from prefixes" },
 ];
 
-function ConstraintRow({ constraint }: { constraint: typeof CONSTRAINTS[number] }) {
-  return (
-    <tr className="border-b border-gray-800">
-      <td className="py-2.5 px-3 font-mono font-semibold text-indigo-400">{constraint.size}</td>
-      <td className="py-2.5 px-3 font-mono text-green-400">{constraint.complexity}</td>
-      <td className="py-2.5 px-3 text-gray-300">{constraint.what}</td>
-    </tr>
-  );
-}
+const ConstraintRow = ({ constraint }: { constraint: typeof CONSTRAINTS[number] }) => (
+  <tr className="border-b border-gray-800">
+    <td className="py-2.5 px-3 font-mono font-semibold text-indigo-400">{constraint.size}</td>
+    <td className="py-2.5 px-3 font-mono text-green-400">{constraint.complexity}</td>
+    <td className="py-2.5 px-3 text-gray-300">{constraint.what}</td>
+  </tr>
+);
 
-function ConstraintsTable() {
-  return (
-    <table className="w-full text-sm">
-      <thead>
-        <tr className="border-b border-gray-700">
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Input Size</th>
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Complexity</th>
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">What Works</th>
-        </tr>
-      </thead>
-      <tbody>
-        {CONSTRAINTS.map((c) => (
-          <ConstraintRow key={c.id} constraint={c} />
-        ))}
-      </tbody>
-    </table>
-  );
-}
+const ConstraintsTable = () => (
+  <table className="w-full text-sm">
+    <thead>
+      <tr className="border-b border-gray-700">
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Input Size</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Complexity</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">What Works</th>
+      </tr>
+    </thead>
+    <tbody>
+      {CONSTRAINTS.map((c) => (
+        <ConstraintRow key={c.id} constraint={c} />
+      ))}
+    </tbody>
+  </table>
+);
 
-function MappingRow({ mapping }: { mapping: typeof PATTERN_MAPPINGS[number] }) {
-  return (
-    <tr className="border-b border-gray-800 hover:bg-gray-900/50">
-      <td className="py-2 px-3 text-gray-300">{mapping.problem}</td>
-      <td className="py-2 px-3 text-indigo-400 font-medium">{mapping.pattern}</td>
-      <td className="py-2 px-3 text-green-400 font-mono text-xs">{mapping.time}</td>
-      <td className="py-2 px-3 text-blue-400 font-mono text-xs">{mapping.space}</td>
-    </tr>
-  );
-}
+const MappingRow = ({ mapping }: { mapping: typeof PATTERN_MAPPINGS[number] }) => (
+  <tr className="border-b border-gray-800 hover:bg-gray-900/50">
+    <td className="py-2 px-3 text-gray-300">{mapping.problem}</td>
+    <td className="py-2 px-3 text-indigo-400 font-medium">{mapping.pattern}</td>
+    <td className="py-2 px-3 text-green-400 font-mono text-xs">{mapping.time}</td>
+    <td className="py-2 px-3 text-blue-400 font-mono text-xs">{mapping.space}</td>
+  </tr>
+);
 
-function PatternSelectorTable() {
-  return (
-    <table className="w-full text-sm">
-      <thead>
-        <tr className="border-b border-gray-700">
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Problem Type</th>
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Pattern</th>
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Time</th>
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Space</th>
-        </tr>
-      </thead>
-      <tbody>
-        {PATTERN_MAPPINGS.map((m) => (
-          <MappingRow key={m.id} mapping={m} />
-        ))}
-      </tbody>
-    </table>
-  );
-}
+const PatternSelectorTable = () => (
+  <table className="w-full text-sm">
+    <thead>
+      <tr className="border-b border-gray-700">
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Problem Type</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Pattern</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Time</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Space</th>
+      </tr>
+    </thead>
+    <tbody>
+      {PATTERN_MAPPINGS.map((m) => (
+        <MappingRow key={m.id} mapping={m} />
+      ))}
+    </tbody>
+  </table>
+);
 
-function ProblemLink({ problem }: { problem: string }) {
+const ProblemLink = ({ problem }: { problem: string }) => {
   const slug = problem
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -875,18 +867,16 @@ function ProblemLink({ problem }: { problem: string }) {
       {problem}
     </a>
   );
-}
+};
 
-function KeyPointItem({ point }: { point: string }) {
-  return (
-    <li className="text-sm text-gray-300 flex items-start gap-2">
-      <span className="text-indigo-400 mt-1">•</span>
-      {point}
-    </li>
-  );
-}
+const KeyPointItem = ({ point }: { point: string }) => (
+  <li className="text-sm text-gray-300 flex items-start gap-2">
+    <span className="text-indigo-400 mt-1">•</span>
+    {point}
+  </li>
+);
 
-function PatternCard({
+const PatternCard = ({
   pattern,
   isExpanded,
   onToggle,
@@ -894,127 +884,113 @@ function PatternCard({
   pattern: typeof PATTERNS[number];
   isExpanded: boolean;
   onToggle: () => void;
-}) {
-  return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
-      <button
-        onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-800/50 transition"
-      >
-        <div>
-          <h3 className="font-bold text-white">{pattern.name}</h3>
-          <p className="text-sm text-gray-400">{pattern.when}</p>
-        </div>
-        <svg
-          className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {isExpanded && (
-        <div className="p-4 pt-3 border-t border-gray-800">
-          <div className="mb-4">
-            <h4 className="text-sm font-semibold text-gray-400 mb-2">Key Points:</h4>
-            <ul className="space-y-1">
-              {pattern.keyPoints.map((point) => (
-                <KeyPointItem key={point} point={point} />
-              ))}
-            </ul>
-          </div>
-          <div className="mb-4">
-            <h4 className="text-sm font-semibold text-gray-400 mb-2">Template:</h4>
-            <CodeBlock code={pattern.code} language="java" />
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-gray-400 mb-2">Practice:</h4>
-            <div className="flex flex-wrap gap-2">
-              {pattern.problems.map((problem) => (
-                <ProblemLink key={problem} problem={problem} />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function KeywordCard({ item }: { item: typeof KEYWORDS[number] }) {
-  return (
-    <div className="p-3 bg-gray-900 rounded-lg border border-gray-800 hover:border-gray-700 transition">
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-white font-medium">{item.keyword}</span>
-        <span className="text-indigo-400 font-semibold text-sm">{item.algo}</span>
+}) => (
+  <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <button
+      onClick={onToggle}
+      className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-800/50 transition"
+    >
+      <div>
+        <h3 className="font-bold text-white">{pattern.name}</h3>
+        <p className="text-sm text-gray-400">{pattern.when}</p>
       </div>
-      <p className="text-gray-500 text-xs">{item.reason}</p>
+      <svg
+        className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    {isExpanded && (
+      <div className="p-4 pt-3 border-t border-gray-800">
+        <div className="mb-4">
+          <h4 className="text-sm font-semibold text-gray-400 mb-2">Key Points:</h4>
+          <ul className="space-y-1">
+            {pattern.keyPoints.map((point) => (
+              <KeyPointItem key={point} point={point} />
+            ))}
+          </ul>
+        </div>
+        <div className="mb-4">
+          <h4 className="text-sm font-semibold text-gray-400 mb-2">Template:</h4>
+          <CodeBlock code={pattern.code} language="java" />
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-gray-400 mb-2">Practice:</h4>
+          <div className="flex flex-wrap gap-2">
+            {pattern.problems.map((problem) => (
+              <ProblemLink key={problem} problem={problem} />
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+const KeywordCard = ({ item }: { item: typeof KEYWORDS[number] }) => (
+  <div className="p-3 bg-gray-900 rounded-lg border border-gray-800 hover:border-gray-700 transition">
+    <div className="flex items-center justify-between mb-1">
+      <span className="text-white font-medium">{item.keyword}</span>
+      <span className="text-indigo-400 font-semibold text-sm">{item.algo}</span>
     </div>
-  );
-}
+    <p className="text-gray-500 text-xs">{item.reason}</p>
+  </div>
+);
 
-function DecisionOption({ option }: { option: { id: string; text: string } }) {
-  return (
-    <li className="text-sm text-gray-300 flex items-start gap-2">
-      <span className="text-gray-500">├</span>
-      {option.text}
-    </li>
-  );
-}
+const DecisionOption = ({ option }: { option: { id: string; text: string } }) => (
+  <li className="text-sm text-gray-300 flex items-start gap-2">
+    <span className="text-gray-500">├</span>
+    {option.text}
+  </li>
+);
 
-function DecisionCard({ decision }: { decision: typeof DECISIONS[number] }) {
-  return (
-    <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-      <h3 className="font-semibold text-indigo-400 mb-2">{decision.question}</h3>
-      <ul className="space-y-1">
-        {decision.options.map((opt) => (
-          <DecisionOption key={opt.id} option={opt} />
-        ))}
-      </ul>
-    </div>
-  );
-}
+const DecisionCard = ({ decision }: { decision: typeof DECISIONS[number] }) => (
+  <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
+    <h3 className="font-semibold text-indigo-400 mb-2">{decision.question}</h3>
+    <ul className="space-y-1">
+      {decision.options.map((opt) => (
+        <DecisionOption key={opt.id} option={opt} />
+      ))}
+    </ul>
+  </div>
+);
 
-function ComplexityRow({ item }: { item: typeof COMPLEXITIES[number] }) {
-  return (
-    <tr className="border-b border-gray-800">
-      <td className="py-2 px-3 text-gray-300">{item.pattern}</td>
-      <td className="py-2 px-3 text-green-400 font-mono text-xs">{item.time}</td>
-      <td className="py-2 px-3 text-blue-400 font-mono text-xs">{item.space}</td>
-    </tr>
-  );
-}
+const ComplexityRow = ({ item }: { item: typeof COMPLEXITIES[number] }) => (
+  <tr className="border-b border-gray-800">
+    <td className="py-2 px-3 text-gray-300">{item.pattern}</td>
+    <td className="py-2 px-3 text-green-400 font-mono text-xs">{item.time}</td>
+    <td className="py-2 px-3 text-blue-400 font-mono text-xs">{item.space}</td>
+  </tr>
+);
 
-function ComplexityTable() {
-  return (
-    <table className="w-full text-sm">
-      <thead>
-        <tr className="border-b border-gray-700">
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Pattern</th>
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Time</th>
-          <th className="text-left py-2 px-3 text-gray-400 font-medium">Space</th>
-        </tr>
-      </thead>
-      <tbody>
-        {COMPLEXITIES.map((c) => (
-          <ComplexityRow key={c.id} item={c} />
-        ))}
-      </tbody>
-    </table>
-  );
-}
+const ComplexityTable = () => (
+  <table className="w-full text-sm">
+    <thead>
+      <tr className="border-b border-gray-700">
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Pattern</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Time</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">Space</th>
+      </tr>
+    </thead>
+    <tbody>
+      {COMPLEXITIES.map((c) => (
+        <ComplexityRow key={c.id} item={c} />
+      ))}
+    </tbody>
+  </table>
+);
 
-function MistakeCard({ item }: { item: typeof MISTAKES[number] }) {
-  return (
-    <div className="p-3 bg-red-900/20 border border-red-500/30 rounded-lg flex items-start gap-3">
-      <span className="text-red-400 font-medium min-w-[110px]">{item.pattern}</span>
-      <span className="text-gray-300 text-sm">{item.mistake}</span>
-    </div>
-  );
-}
+const MistakeCard = ({ item }: { item: typeof MISTAKES[number] }) => (
+  <div className="p-3 bg-red-900/20 border border-red-500/30 rounded-lg flex items-start gap-3">
+    <span className="text-red-400 font-medium min-w-[110px]">{item.pattern}</span>
+    <span className="text-gray-300 text-sm">{item.mistake}</span>
+  </div>
+);
 
-export default function InterviewCheatsheetPage() {
+const InterviewCheatsheetPage = () => {
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
 
   return (
@@ -1095,4 +1071,6 @@ export default function InterviewCheatsheetPage() {
       </section>
     </div>
   );
-}
+};
+
+export default InterviewCheatsheetPage;

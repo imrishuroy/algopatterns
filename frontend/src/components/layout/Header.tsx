@@ -8,7 +8,7 @@ import { useFilter } from "@/contexts/FilterContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { questions } from "@/lib/questions";
 
-export default function Header() {
+const Header = () => {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { completed } = useProgress();
   const { companyFilter } = useFilter();
@@ -251,4 +251,6 @@ export default function Header() {
       </div>
     </header>
   );
-}
+};
+
+export default Header;

@@ -86,6 +86,15 @@ export default function Header() {
               Pattern Recognition
             </Link>
 
+            {/* Interview Cheatsheet */}
+            <Link
+              href="/interview-cheatsheet"
+              className="text-sm font-medium transition-colors hover:opacity-80"
+              style={{ color: "var(--accent-1)" }}
+            >
+              Interview Cheat Sheet
+            </Link>
+
             {/* Articles */}
             <Link
               href="/articles"

@@ -432,10 +432,10 @@ export function Highlightable({
                 overlay.isStale ? "border-2 border-dashed border-yellow-500/70" : ""
               }`}
               style={{
-                top: rect.top - 3,
-                left: rect.left - 8,
-                width: rect.width + 16,
-                height: rect.height + 6,
+                top: rect.top - 2,
+                left: rect.left - 3,
+                width: rect.width + 6,
+                height: rect.height + 4,
                 backgroundColor: overlay.isStale ? `${overlay.color.replace("0.4", "0.25")}` : overlay.color,
                 borderRadius: "6px",
                 animation: "highlightFadeIn 250ms cubic-bezier(0.4, 0, 0.2, 1)",

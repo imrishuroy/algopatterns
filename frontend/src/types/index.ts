@@ -30,12 +30,43 @@ export interface TutorialSection {
   };
 }
 
+// Fundamentals types for theory sections
+export interface FundamentalTopic {
+  title: string;
+  content: string;
+  diagram?: string;
+}
+
+export interface RepresentationSection {
+  title: string;
+  content: string;
+  diagram?: string;
+  codeJava?: string;
+  codeJavaScript?: string;
+}
+
+export interface PatternFundamentals {
+  introduction?: FundamentalTopic;
+  terminology?: Record<string, FundamentalTopic>;
+  types?: Record<string, FundamentalTopic>;
+  representation?: {
+    title?: string;
+    intro?: string;
+    inputExample?: string;
+    adjacencyMatrix?: RepresentationSection;
+    adjacencyList?: RepresentationSection;
+    weightedList?: RepresentationSection;
+    comparison?: FundamentalTopic;
+  };
+}
+
 export interface Pattern {
   id: string;
   category: string;
   difficulty: "Easy" | "Medium" | "Hard" | "Easy-Medium" | "Medium-Hard";
   description: string;
   whenToUse: string[];
+  fundamentals?: PatternFundamentals;
   codeTemplates: CodeTemplates;
   keyInsights: string[];
   commonMistakes?: string[];

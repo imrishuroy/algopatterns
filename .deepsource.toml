@@ -31,15 +31,3 @@ enabled = true
 environment = ["nodejs"]
 dialect = "typescript"
 plugins = ["react"]
-
-# Exclude specific issue codes
-[[exclude]]
-patterns = ["**"]
-rules = [
-  "RVV-A0006",
-  "JS-0067",
-  "JS-0415",
-  "JS-R1005",
-  "JS-0066",
-  "JS-0437"
-]

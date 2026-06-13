@@ -22,6 +22,8 @@ enabled = true
 
   [analyzers.meta]
   import_root = "github.com/imrishuroy/algopatterns"
+  # Disable false positive for HTTP handlers that write to response instead of returning
+  disabled_rules = ["RVV-A0006"]
 
 [[analyzers]]
 name = "javascript"

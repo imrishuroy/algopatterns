@@ -59,7 +59,6 @@ func (h *PaymentHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	}
 }
 
-// skipcq: RVV-A0006 - HTTP handler writes to response, doesn't return value
 func (h *PaymentHandler) GetPlans(c *gin.Context) {
 	currency := c.DefaultQuery("currency", "INR")
 
@@ -73,7 +72,6 @@ func (h *PaymentHandler) GetPlans(c *gin.Context) {
 	response.OK(c, models.PlansListResponse{Plans: plans})
 }
 
-// skipcq: RVV-A0006 - HTTP handler writes to response, doesn't return value
 func (h *PaymentHandler) GetSubscription(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {

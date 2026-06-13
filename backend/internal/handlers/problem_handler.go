@@ -237,7 +237,6 @@ func (h *ProblemHandler) ListLanguages(c *gin.Context) {
 }
 
 // GetSolution returns the solution/hints for a problem (Pro feature)
-// skipcq: RVV-A0006 - HTTP handler writes to response, doesn't return value
 func (h *ProblemHandler) GetSolution(c *gin.Context) {
 	slug := c.Param("slug")
 	if slug == "" {

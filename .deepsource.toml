@@ -20,32 +20,26 @@ exclude_patterns = [
 name = "go"
 enabled = true
 
-  [analyzers.meta]
-  import_root = "github.com/imrishuroy/algopatterns"
-
-[[analyzers.ignore]]
-code = "RVV-A0006"
+[analyzers.meta]
+import_root = "github.com/imrishuroy/algopatterns"
 
 [[analyzers]]
 name = "javascript"
 enabled = true
 
-  [analyzers.meta]
-  environment = ["nodejs"]
-  dialect = "typescript"
-  plugins = ["react"]
+[analyzers.meta]
+environment = ["nodejs"]
+dialect = "typescript"
+plugins = ["react"]
 
-[[analyzers.ignore]]
-code = "JS-0437"
-
-[[analyzers.ignore]]
-code = "JS-0067"
-
-[[analyzers.ignore]]
-code = "JS-0415"
-
-[[analyzers.ignore]]
-code = "JS-R1005"
-
-[[analyzers.ignore]]
-code = "JS-0066"
+# Exclude specific issue codes
+[[exclude]]
+patterns = ["**"]
+rules = [
+  "RVV-A0006",
+  "JS-0067",
+  "JS-0415",
+  "JS-R1005",
+  "JS-0066",
+  "JS-0437"
+]

@@ -337,3 +337,108 @@ export interface BatchSyncResponse {
   results: SyncOperationResult[];
   serverChanges?: Highlight[];
 }
+
+// Payment types
+export interface PlanFeatures {
+  max_patterns: number;
+  max_visualizers: number;
+  quiz_questions_per_pattern: number;
+  has_quiz_history: boolean;
+  has_code_playground: boolean;
+  has_progress_sync: boolean;
+  has_highlighting: boolean;
+  has_solutions_access: boolean;
+  has_offline_export: boolean;
+}
+
+export interface Plan {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  original_price?: number;
+  currency: string;
+  billing_period: "monthly" | "yearly" | "lifetime";
+  savings_percentage?: number;
+  features: PlanFeatures;
+  is_recommended?: boolean;
+}
+
+export interface PlansListResponse {
+  plans: Plan[];
+}
+
+export interface Subscription {
+  id?: string;
+  plan_id: string;
+  status: string;
+  current_period_start?: string;
+  current_period_end?: string;
+  cancel_at_period_end?: boolean;
+  features: PlanFeatures;
+}
+
+export interface PlanSummary {
+  id: string;
+  name: string;
+  billing_period: string;
+}
+
+export interface PricingBreakdown {
+  subtotal: number;
+  discount_code?: string;
+  discount_amount: number;
+  gst_rate: number;
+  gst_amount: number;
+  total: number;
+  currency: string;
+}
+
+export interface CreateOrderRequest {
+  plan_id: string;
+  discount_code?: string;
+}
+
+export interface CreateOrderResponse {
+  order_id: string;
+  razorpay_order_id: string;
+  razorpay_key_id: string;
+  plan: PlanSummary;
+  pricing: PricingBreakdown;
+}
+
+export interface VerifyPaymentRequest {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
+export interface VerifyPaymentResponse {
+  payment_id: string;
+  subscription: Subscription;
+}
+
+export interface ValidateDiscountRequest {
+  code: string;
+  plan_id: string;
+}
+
+export interface ValidateDiscountResponse {
+  code: string;
+  discount_type: string;
+  discount_value: number;
+  discount_amount: number;
+  message: string;
+}
+
+export interface CancelSubscriptionRequest {
+  reason?: string;
+  feedback?: string;
+}
+
+export interface CancelSubscriptionResponse {
+  id: string;
+  status: string;
+  cancel_at_period_end: boolean;
+  current_period_end?: string;
+}

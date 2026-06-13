@@ -9,10 +9,35 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/imrishuroy/algopatterns/internal/middleware"
 	"github.com/imrishuroy/algopatterns/internal/models"
 	"github.com/imrishuroy/algopatterns/internal/repository"
+	"github.com/imrishuroy/algopatterns/internal/services"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
+
+// MockPatternPaymentRepo mocks the payment repository for pattern handler tests
+type MockPatternPaymentRepo struct {
+	mock.Mock
+}
+
+func (m *MockPatternPaymentRepo) GetActiveSubscriptionByUserID(ctx context.Context, userID string) (*models.Subscription, error) {
+	args := m.Called(ctx, userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Subscription), args.Error(1)
+}
+
+func (m *MockPatternPaymentRepo) GetPlanByID(ctx context.Context, id string) (*models.SubscriptionPlan, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.SubscriptionPlan), args.Error(1)
+}
 
 type stubPatternService struct {
 	createResult    *models.Pattern
@@ -74,9 +99,32 @@ func setupPatternRouter(stub *stubPatternService) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
-	handler := &PatternHandler{service: stub}
+	// Create mock payment repository that grants access to all patterns
+	mockPaymentRepo := new(MockPatternPaymentRepo)
+	mockPaymentRepo.On("GetActiveSubscriptionByUserID", mock.Anything, mock.Anything).Return(&models.Subscription{
+		ID:     "sub-123",
+		UserID: "test-user",
+		PlanID: "pro_monthly",
+		Status: models.SubscriptionStatusActive,
+	}, nil)
+	mockPaymentRepo.On("GetPlanByID", mock.Anything, "pro_monthly").Return(&models.SubscriptionPlan{
+		ID: "pro_monthly",
+		Features: models.PlanFeatures{
+			MaxPatterns:    -1,
+			MaxVisualizers: -1,
+		},
+	}, nil)
+
+	featureAccess := services.NewFeatureAccessWithRepo(mockPaymentRepo)
+	handler := &PatternHandler{service: stub, featureAccess: featureAccess}
 
 	patterns := router.Group("/api/v1/patterns")
+	// Add middleware to set a test user for all requests
+	testUserID := uuid.MustParse("550e8400-e29b-41d4-a716-446655440000")
+	patterns.Use(func(c *gin.Context) {
+		c.Set(middleware.ContextUserID, testUserID)
+		c.Next()
+	})
 	{
 		patterns.GET("", handler.List)
 		patterns.POST("", handler.Create)

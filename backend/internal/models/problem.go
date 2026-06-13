@@ -121,3 +121,11 @@ type ProblemDetailResponse struct {
 	UserSolved  bool                          `json:"userSolved"`
 	Submissions int                           `json:"userSubmissions"`
 }
+
+type ProblemSolutionResponse struct {
+	ProblemID   uuid.UUID `json:"problemId"`
+	Title       string    `json:"title"`
+	Slug        string    `json:"slug"`
+	Hints       string    `json:"hints"`
+	Explanation string    `json:"explanation"`
+}

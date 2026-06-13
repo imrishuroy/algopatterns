@@ -9,13 +9,18 @@ import (
 	"syscall"
 	"time"
 
+	"log/slog"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/imrishuroy/algopatterns/internal/config"
 	"github.com/imrishuroy/algopatterns/internal/handlers"
+	"github.com/imrishuroy/algopatterns/internal/metrics"
 	"github.com/imrishuroy/algopatterns/internal/middleware"
+	"github.com/imrishuroy/algopatterns/internal/razorpay"
 	"github.com/imrishuroy/algopatterns/internal/repository"
 	"github.com/imrishuroy/algopatterns/internal/services"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -31,6 +36,9 @@ func main() {
 	setupLogger(cfg.Logging)
 
 	log.Info().Msg("Starting FANGReady API Server...")
+
+	// Initialize Prometheus metrics
+	metrics.Init()
 
 	db, err := repository.NewDatabase(&cfg.Database)
 	if err != nil {
@@ -57,8 +65,23 @@ func main() {
 	quizRepo := repository.NewQuizRepository(db)
 	quizService := services.NewQuizService(quizRepo)
 
+	paymentRepo := repository.NewPaymentRepository(db)
+	razorpayClient := razorpay.NewClient(cfg.Razorpay.KeyID, cfg.Razorpay.KeySecret, cfg.Razorpay.WebhookSecret)
+	emailService := services.NewEmailService(services.EmailConfig{
+		SMTPHost:     cfg.Email.SMTPHost,
+		SMTPPort:     cfg.Email.SMTPPort,
+		SMTPUser:     cfg.Email.SMTPUser,
+		SMTPPassword: cfg.Email.SMTPPassword,
+		FromEmail:    cfg.Email.FromEmail,
+		FromName:     cfg.Email.FromName,
+		Enabled:      cfg.Email.Enabled,
+	})
+	paymentService := services.NewPaymentService(paymentRepo, userRepo, emailService, razorpayClient, cfg.Razorpay.KeyID, cfg.Razorpay.GSTRate)
+	webhookService := services.NewWebhookService(paymentRepo, razorpayClient, slog.Default())
+	featureAccess := services.NewFeatureAccess(paymentRepo)
+
 	gin.SetMode(cfg.Server.Mode)
-	router := setupRouter(cfg, db, patternService, authService, progressService, problemService, submissionService, highlightService, quizService)
+	router := setupRouter(cfg, db, patternService, authService, progressService, problemService, submissionService, highlightService, quizService, paymentService, webhookService, featureAccess)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port),
@@ -97,7 +120,7 @@ func setupLogger(cfg config.LoggingConfig) {
 	}
 }
 
-func setupRouter(cfg *config.Config, db *repository.Database, patternService *services.PatternService, authService *services.AuthService, progressService *services.ProgressService, problemService *services.ProblemService, submissionService *services.SubmissionService, highlightService *services.HighlightService, quizService *services.QuizService) *gin.Engine {
+func setupRouter(cfg *config.Config, db *repository.Database, patternService *services.PatternService, authService *services.AuthService, progressService *services.ProgressService, problemService *services.ProblemService, submissionService *services.SubmissionService, highlightService *services.HighlightService, quizService *services.QuizService, paymentService *services.PaymentService, webhookService *services.WebhookService, featureAccess *services.FeatureAccess) *gin.Engine {
 	router := gin.New()
 
 	rateLimiter := middleware.NewRateLimiter(cfg.Server.RateLimitRPS, cfg.Server.RateLimitBurst)
@@ -111,7 +134,7 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     cfg.Server.AllowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Request-ID"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Request-ID", "Idempotency-Key"},
 		ExposeHeaders:    []string{"X-Request-ID", "Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -120,12 +143,15 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 	healthHandler := handlers.NewHealthHandler(db)
 	healthHandler.RegisterRoutes(&router.RouterGroup)
 
+	// Prometheus metrics endpoint
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
 	authMW := middleware.NewAuthMiddleware(authService)
 	secureCookie := cfg.Server.Mode == "release"
 
 	v1 := router.Group("/api/v1")
 	{
-		patternHandler := handlers.NewPatternHandler(patternService)
+		patternHandler := handlers.NewPatternHandler(patternService, featureAccess, authMW)
 		patternHandler.RegisterRoutes(v1)
 
 		authHandler := handlers.NewAuthHandler(authService, authMW, secureCookie)
@@ -134,17 +160,20 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 		progressHandler := handlers.NewProgressHandler(progressService, authMW)
 		progressHandler.RegisterRoutes(v1)
 
-		problemHandler := handlers.NewProblemHandler(problemService, authMW)
+		problemHandler := handlers.NewProblemHandler(problemService, featureAccess, authMW)
 		problemHandler.RegisterRoutes(v1)
 
-		submissionHandler := handlers.NewSubmissionHandler(submissionService, authMW)
+		submissionHandler := handlers.NewSubmissionHandler(submissionService, featureAccess, authMW)
 		submissionHandler.RegisterRoutes(v1)
 
-		highlightHandler := handlers.NewHighlightHandler(highlightService, authMW)
+		highlightHandler := handlers.NewHighlightHandler(highlightService, featureAccess, authMW)
 		highlightHandler.RegisterRoutes(v1)
 
-		quizHandler := handlers.NewQuizHandler(quizService, authMW)
+		quizHandler := handlers.NewQuizHandler(quizService, featureAccess, authMW)
 		quizHandler.RegisterRoutes(v1)
+
+		paymentHandler := handlers.NewPaymentHandler(paymentService, webhookService, authMW)
+		paymentHandler.RegisterRoutes(v1)
 	}
 
 	router.NoRoute(func(c *gin.Context) {

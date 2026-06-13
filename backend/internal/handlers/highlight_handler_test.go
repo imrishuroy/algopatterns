@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/imrishuroy/algopatterns/internal/middleware"
 	"github.com/imrishuroy/algopatterns/internal/models"
+	"github.com/imrishuroy/algopatterns/internal/repository"
 	"github.com/imrishuroy/algopatterns/internal/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -20,6 +21,27 @@ import (
 
 type MockHighlightService struct {
 	mock.Mock
+}
+
+// MockPaymentRepository for FeatureAccess tests
+type MockPaymentRepository struct {
+	mock.Mock
+}
+
+func (m *MockPaymentRepository) GetActiveSubscriptionByUserID(ctx context.Context, userID string) (*models.Subscription, error) {
+	args := m.Called(ctx, userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Subscription), args.Error(1)
+}
+
+func (m *MockPaymentRepository) GetPlanByID(ctx context.Context, id string) (*models.SubscriptionPlan, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.SubscriptionPlan), args.Error(1)
 }
 
 func (m *MockHighlightService) Create(ctx context.Context, userID uuid.UUID, req *models.CreateHighlightRequest) (*models.Highlight, error) {
@@ -73,10 +95,37 @@ func (m *MockHighlightService) BatchSync(ctx context.Context, userID uuid.UUID, 
 }
 
 func setupTestRouter(mockService *MockHighlightService, userID uuid.UUID) *gin.Engine {
+	return setupTestRouterWithFeatureAccess(mockService, userID, true)
+}
+
+func setupTestRouterWithFeatureAccess(mockService *MockHighlightService, userID uuid.UUID, hasHighlightingAccess bool) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
-	handler := &HighlightHandler{service: mockService}
+	// Create mock payment repository for feature access
+	mockPaymentRepo := new(MockPaymentRepository)
+
+	if hasHighlightingAccess {
+		// Setup mock to return a pro subscription with highlighting access
+		mockPaymentRepo.On("GetActiveSubscriptionByUserID", mock.Anything, userID.String()).Return(&models.Subscription{
+			ID:     "sub-123",
+			UserID: userID.String(),
+			PlanID: "pro_monthly",
+			Status: models.SubscriptionStatusActive,
+		}, nil)
+		mockPaymentRepo.On("GetPlanByID", mock.Anything, "pro_monthly").Return(&models.SubscriptionPlan{
+			ID: "pro_monthly",
+			Features: models.PlanFeatures{
+				HasHighlighting: true,
+			},
+		}, nil)
+	} else {
+		// No subscription = free user
+		mockPaymentRepo.On("GetActiveSubscriptionByUserID", mock.Anything, userID.String()).Return(nil, repository.ErrSubscriptionNotFound)
+	}
+
+	featureAccess := services.NewFeatureAccessWithRepo(mockPaymentRepo)
+	handler := &HighlightHandler{service: mockService, featureAccess: featureAccess}
 
 	highlights := router.Group("/api/v1/highlights")
 	highlights.Use(func(c *gin.Context) {

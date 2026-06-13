@@ -158,3 +158,19 @@ func (s *ProblemService) GetTemplates(ctx context.Context, problemID uuid.UUID) 
 func (s *ProblemService) GetLanguages(ctx context.Context) ([]models.Language, error) {
 	return s.problemRepo.GetLanguages(ctx)
 }
+
+// GetSolution returns the solution/hints for a problem
+func (s *ProblemService) GetSolution(ctx context.Context, slug string) (*models.ProblemSolutionResponse, error) {
+	problem, err := s.problemRepo.GetBySlug(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.ProblemSolutionResponse{
+		ProblemID:   problem.ID,
+		Title:       problem.Title,
+		Slug:        problem.Slug,
+		Hints:       problem.Hints,
+		Explanation: problem.Examples,
+	}, nil
+}

@@ -10,14 +10,16 @@ import (
 )
 
 type ProblemHandler struct {
-	service *services.ProblemService
-	authMW  *middleware.AuthMiddleware
+	service       *services.ProblemService
+	featureAccess *services.FeatureAccess
+	authMW        *middleware.AuthMiddleware
 }
 
-func NewProblemHandler(service *services.ProblemService, authMW *middleware.AuthMiddleware) *ProblemHandler {
+func NewProblemHandler(service *services.ProblemService, featureAccess *services.FeatureAccess, authMW *middleware.AuthMiddleware) *ProblemHandler {
 	return &ProblemHandler{
-		service: service,
-		authMW:  authMW,
+		service:       service,
+		featureAccess: featureAccess,
+		authMW:        authMW,
 	}
 }
 
@@ -27,6 +29,7 @@ func (h *ProblemHandler) RegisterRoutes(rg *gin.RouterGroup) {
 		problems.GET("", h.List)
 		problems.GET("/languages", h.ListLanguages)
 		problems.GET("/:slug", h.ShowBySlug)
+		problems.GET("/:slug/solution", h.GetSolution)
 
 		admin := problems.Group("")
 		admin.Use(h.authMW.RequireAuth())
@@ -231,4 +234,41 @@ func (h *ProblemHandler) ListLanguages(c *gin.Context) {
 	}
 
 	response.OK(c, gin.H{"languages": languages})
+}
+
+// GetSolution returns the solution/hints for a problem (Pro feature)
+func (h *ProblemHandler) GetSolution(c *gin.Context) {
+	slug := c.Param("slug")
+	if slug == "" {
+		response.BadRequest(c, "Problem slug is required", nil)
+		return
+	}
+
+	// Check if user has access to solutions
+	var userID string
+	if uid, ok := middleware.GetUserID(c); ok {
+		userID = uid.String()
+	}
+
+	canAccess, err := h.featureAccess.CanAccessSolutions(c.Request.Context(), userID)
+	if err != nil {
+		response.InternalError(c)
+		return
+	}
+	if !canAccess {
+		response.Forbidden(c, "Upgrade to Pro to access problem solutions")
+		return
+	}
+
+	solution, err := h.service.GetSolution(c.Request.Context(), slug)
+	if err != nil {
+		if services.IsNotFound(err) {
+			response.NotFound(c, "Problem")
+			return
+		}
+		response.InternalError(c)
+		return
+	}
+
+	response.OK(c, solution)
 }

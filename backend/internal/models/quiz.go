@@ -118,6 +118,8 @@ type GetQuestionsResponse struct {
 	SectionSlug    *string        `json:"sectionSlug,omitempty"`
 	TotalQuestions int            `json:"totalQuestions"`
 	Questions      []QuizQuestion `json:"questions"`
+	IsLimited      bool           `json:"isLimited,omitempty"`
+	LimitReason    string         `json:"limitReason,omitempty"`
 }
 
 type StartAttemptRequest struct {

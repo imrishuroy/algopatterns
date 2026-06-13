@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { ProgressProvider } from "@/contexts/ProgressContext";
 import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -54,15 +55,17 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AuthProvider>
-            <HighlightProvider>
-              <ProgressProvider>
-                <FilterProvider>
-                  <Header />
-                  <main className="flex-1">{children}</main>
-                  <Footer />
-                </FilterProvider>
-              </ProgressProvider>
-            </HighlightProvider>
+            <SubscriptionProvider>
+              <HighlightProvider>
+                <ProgressProvider>
+                  <FilterProvider>
+                    <Header />
+                    <main className="flex-1">{children}</main>
+                    <Footer />
+                  </FilterProvider>
+                </ProgressProvider>
+              </HighlightProvider>
+            </SubscriptionProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

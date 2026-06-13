@@ -7,6 +7,8 @@ interface PatternCardProps {
   pattern: Pattern;
   questionsCount: number;
   completedCount: number;
+  isFree?: boolean;
+  isLocked?: boolean;
 }
 
 const difficultyColors: Record<
@@ -44,6 +46,8 @@ export default function PatternCard({
   pattern,
   questionsCount,
   completedCount,
+  isFree = false,
+  isLocked = false,
 }: PatternCardProps) {
   const progress =
     questionsCount > 0
@@ -100,17 +104,48 @@ export default function PatternCard({
               />
             </svg>
           </div>
-          <span
-            className="inline-block px-2 py-0.5 text-xs font-medium"
-            style={{
-              background: colors.bg,
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
-              borderRadius: "var(--radius-full)",
-            }}
-          >
-            {pattern.difficulty}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className="inline-block px-2 py-0.5 text-xs font-medium"
+              style={{
+                background: colors.bg,
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
+                borderRadius: "var(--radius-full)",
+              }}
+            >
+              {pattern.difficulty}
+            </span>
+            {isFree && (
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium"
+                style={{
+                  background: "rgba(34, 197, 94, 0.15)",
+                  color: "#4ade80",
+                  border: "1px solid rgba(34, 197, 94, 0.3)",
+                  borderRadius: "var(--radius-full)",
+                }}
+              >
+                Free
+              </span>
+            )}
+            {isLocked && (
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium"
+                style={{
+                  background: "rgba(251, 191, 36, 0.15)",
+                  color: "#fbbf24",
+                  border: "1px solid rgba(251, 191, 36, 0.3)",
+                  borderRadius: "var(--radius-full)",
+                }}
+              >
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+                Pro
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Description */}

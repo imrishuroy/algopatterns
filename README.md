@@ -9,10 +9,7 @@ A full-stack algorithm learning platform featuring a **production-ready Go backe
 ![JWT](https://img.shields.io/badge/JWT-Authentication-000000?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
 
-[![Frontend Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=algopatterns-frontend&metric=alert_status&token=814c7aa24c5896498849c06dc3214e66f0381b57)](https://sonarcloud.io/summary/new_code?id=algopatterns-frontend)
-[![Frontend Coverage](https://sonarcloud.io/api/project_badges/measure?project=algopatterns-frontend&metric=coverage&token=814c7aa24c5896498849c06dc3214e66f0381b57)](https://sonarcloud.io/summary/new_code?id=algopatterns-frontend)
-[![Backend Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=algopatterns-backend&metric=alert_status&token=c5353301276bd028bdacf8fe193598b200aa0db3)](https://sonarcloud.io/summary/new_code?id=algopatterns-backend)
-[![Backend Coverage](https://sonarcloud.io/api/project_badges/measure?project=algopatterns-backend&metric=coverage&token=c5353301276bd028bdacf8fe193598b200aa0db3)](https://sonarcloud.io/summary/new_code?id=algopatterns-backend)
+[![DeepSource](https://app.deepsource.com/gh/imrishuroy/algopatterns.svg/?label=code+coverage&show_trend=true&token=baG8jjVOCa_menM6lWMnIZ8a)](https://app.deepsource.com/gh/imrishuroy/algopatterns/)
 
 ## Backend
 

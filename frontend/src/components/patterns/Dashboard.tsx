@@ -7,8 +7,15 @@ import PatternCard from "./PatternCard";
 import patternsData from "@/lib/patterns.json";
 import { useProgress } from "@/contexts/ProgressContext";
 import { useFilter } from "@/contexts/FilterContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import QuoteSection from "@/components/QuoteSection";
 import Dropdown from "@/components/ui/Dropdown";
+
+const FREE_PATTERN_IDS = new Set([
+  "sliding-window",
+  "two-pointers",
+  "binary-search",
+]);
 
 interface DashboardProps {
   questions: Question[];
@@ -46,6 +53,7 @@ export default function Dashboard({ questions }: DashboardProps) {
   const patterns = patternsData as Pattern[];
   const { completed } = useProgress();
   const { companyFilter, setCompanyFilter } = useFilter();
+  const { isPro } = useSubscription();
   const [searchQuery, setSearchQuery] = useState("");
 
   const companies = useMemo(() => {
@@ -240,12 +248,15 @@ export default function Dashboard({ questions }: DashboardProps) {
               total: 0,
               completed: 0,
             };
+            const isFreePattern = FREE_PATTERN_IDS.has(pattern.id);
             return (
               <PatternCard
                 key={pattern.id}
                 pattern={pattern}
                 questionsCount={stats.total}
                 completedCount={stats.completed}
+                isFree={!isPro && isFreePattern}
+                isLocked={!isPro && !isFreePattern}
               />
             );
           })}

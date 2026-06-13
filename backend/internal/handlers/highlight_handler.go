@@ -16,14 +16,16 @@ import (
 )
 
 type HighlightHandler struct {
-	service services.HighlightServiceInterface
-	authMW  *middleware.AuthMiddleware
+	service       services.HighlightServiceInterface
+	featureAccess *services.FeatureAccess
+	authMW        *middleware.AuthMiddleware
 }
 
-func NewHighlightHandler(service services.HighlightServiceInterface, authMW *middleware.AuthMiddleware) *HighlightHandler {
+func NewHighlightHandler(service services.HighlightServiceInterface, featureAccess *services.FeatureAccess, authMW *middleware.AuthMiddleware) *HighlightHandler {
 	return &HighlightHandler{
-		service: service,
-		authMW:  authMW,
+		service:       service,
+		featureAccess: featureAccess,
+		authMW:        authMW,
 	}
 }
 
@@ -45,6 +47,18 @@ func (h *HighlightHandler) Create(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")
+		return
+	}
+
+	// Check if user has access to highlighting feature
+	canAccess, err := h.featureAccess.CanAccessHighlighting(c.Request.Context(), userID.String())
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to check feature access")
+		response.InternalError(c)
+		return
+	}
+	if !canAccess {
+		response.Forbidden(c, "Upgrade to Pro to use highlighting feature")
 		return
 	}
 

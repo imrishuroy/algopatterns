@@ -13,14 +13,16 @@ import (
 )
 
 type QuizHandler struct {
-	service services.QuizServiceInterface
-	authMW  *middleware.AuthMiddleware
+	service       services.QuizServiceInterface
+	featureAccess *services.FeatureAccess
+	authMW        *middleware.AuthMiddleware
 }
 
-func NewQuizHandler(service services.QuizServiceInterface, authMW *middleware.AuthMiddleware) *QuizHandler {
+func NewQuizHandler(service services.QuizServiceInterface, featureAccess *services.FeatureAccess, authMW *middleware.AuthMiddleware) *QuizHandler {
 	return &QuizHandler{
-		service: service,
-		authMW:  authMW,
+		service:       service,
+		featureAccess: featureAccess,
+		authMW:        authMW,
 	}
 }
 
@@ -61,6 +63,27 @@ func (h *QuizHandler) ListQuestions(c *gin.Context) {
 		log.Error().Err(err).Str("patternId", patternID).Msg("Failed to get questions")
 		response.InternalError(c)
 		return
+	}
+
+	// Check subscription status and limit questions for free users
+	var userID string
+	if uid, ok := middleware.GetUserID(c); ok {
+		userID = uid.String()
+	}
+
+	features, isPro, err := h.featureAccess.GetUserFeatures(c.Request.Context(), userID)
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to get user features")
+		response.InternalError(c)
+		return
+	}
+
+	// Limit questions for free users
+	if !isPro && features.QuizQuestionsPerPattern > 0 && len(result.Questions) > features.QuizQuestionsPerPattern {
+		result.Questions = result.Questions[:features.QuizQuestionsPerPattern]
+		result.TotalQuestions = len(result.Questions)
+		result.IsLimited = true
+		result.LimitReason = "Upgrade to Pro to access all quiz questions"
 	}
 
 	response.OK(c, result)
@@ -222,6 +245,18 @@ func (h *QuizHandler) ListAttemptHistory(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")
+		return
+	}
+
+	// Check if user has access to quiz history
+	canAccess, err := h.featureAccess.CanAccessQuizHistory(c.Request.Context(), userID.String())
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to check feature access")
+		response.InternalError(c)
+		return
+	}
+	if !canAccess {
+		response.Forbidden(c, "Upgrade to Pro to access quiz history")
 		return
 	}
 

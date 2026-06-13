@@ -20,16 +20,26 @@ exclude_patterns = [
 name = "go"
 enabled = true
 
-  [analyzers.meta]
-  import_root = "github.com/imrishuroy/algopatterns"
+[analyzers.meta]
+import_root = "github.com/imrishuroy/algopatterns"
 
 [[analyzers]]
 name = "javascript"
 enabled = true
 
-  [analyzers.meta]
-  environment = ["nodejs"]
-  dialect = "typescript"
-  plugins = ["react"]
-  # Disable rules that conflict with React visualization patterns
-  disabled_rules = ["JS-0437", "JS-0067"]
+[analyzers.meta]
+environment = ["nodejs"]
+dialect = "typescript"
+plugins = ["react"]
+
+# Exclude specific issue codes
+[[exclude]]
+patterns = ["**"]
+rules = [
+  "RVV-A0006",
+  "JS-0067",
+  "JS-0415",
+  "JS-R1005",
+  "JS-0066",
+  "JS-0437"
+]

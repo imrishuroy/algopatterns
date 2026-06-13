@@ -10,14 +10,16 @@ import (
 )
 
 type SubmissionHandler struct {
-	service *services.SubmissionService
-	authMW  *middleware.AuthMiddleware
+	service       *services.SubmissionService
+	featureAccess *services.FeatureAccess
+	authMW        *middleware.AuthMiddleware
 }
 
-func NewSubmissionHandler(service *services.SubmissionService, authMW *middleware.AuthMiddleware) *SubmissionHandler {
+func NewSubmissionHandler(service *services.SubmissionService, featureAccess *services.FeatureAccess, authMW *middleware.AuthMiddleware) *SubmissionHandler {
 	return &SubmissionHandler{
-		service: service,
-		authMW:  authMW,
+		service:       service,
+		featureAccess: featureAccess,
+		authMW:        authMW,
 	}
 }
 
@@ -36,6 +38,16 @@ func (h *SubmissionHandler) Submit(c *gin.Context) {
 	userID, exists := middleware.GetUserID(c)
 	if !exists {
 		response.Unauthorized(c, "Authentication required")
+		return
+	}
+
+	canAccess, err := h.featureAccess.CanAccessCodePlayground(c.Request.Context(), userID.String())
+	if err != nil {
+		response.InternalError(c)
+		return
+	}
+	if !canAccess {
+		response.Forbidden(c, "Upgrade to Pro to use the code playground")
 		return
 	}
 
@@ -62,6 +74,16 @@ func (h *SubmissionHandler) RunCode(c *gin.Context) {
 	userID, exists := middleware.GetUserID(c)
 	if !exists {
 		response.Unauthorized(c, "Authentication required")
+		return
+	}
+
+	canAccess, err := h.featureAccess.CanAccessCodePlayground(c.Request.Context(), userID.String())
+	if err != nil {
+		response.InternalError(c)
+		return
+	}
+	if !canAccess {
+		response.Forbidden(c, "Upgrade to Pro to use the code playground")
 		return
 	}
 

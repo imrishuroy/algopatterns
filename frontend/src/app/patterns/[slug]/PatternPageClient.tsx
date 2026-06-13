@@ -5,12 +5,20 @@ import Link from "next/link";
 import { Pattern } from "@/types";
 import { questions, categoryToPatternId } from "@/lib/questions";
 import { useProgress } from "@/contexts/ProgressContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import TutorialTab from "./tabs/TutorialTab";
 import ProblemsTab from "./tabs/ProblemsTab";
 import CheatsheetTab from "./tabs/CheatsheetTab";
 import { Highlightable } from "@/components/ui/Highlightable";
+import { UpgradePrompt } from "@/components/pricing";
 
 type Tab = "tutorial" | "problems" | "cheatsheet";
+
+const FREE_PATTERN_IDS = new Set([
+  "sliding-window",
+  "two-pointers",
+  "binary-search",
+]);
 
 interface PatternPageClientProps {
   pattern: Pattern;
@@ -27,6 +35,9 @@ const difficultyColors: Record<string, string> = {
 export default function PatternPageClient({ pattern }: PatternPageClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>("tutorial");
   const { completed, toggleComplete } = useProgress();
+  const { isPro, isLoading: subscriptionLoading } = useSubscription();
+
+  const isLocked = !isPro && !FREE_PATTERN_IDS.has(pattern.id);
 
   const patternQuestions = useMemo(() => {
     return questions.filter((q) => {
@@ -183,28 +194,42 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
 
       {/* Tab Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {activeTab === "tutorial" && (
-          <Highlightable
-            contentType="pattern_tutorial"
-            contentId={pattern.id}
-          >
-            <TutorialTab pattern={pattern} />
-          </Highlightable>
-        )}
-        {activeTab === "problems" && (
-          <ProblemsTab
-            questions={patternQuestions}
-            completed={completed}
-            onToggleComplete={toggleComplete}
+        {subscriptionLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-gray-400">Loading...</div>
+          </div>
+        ) : isLocked ? (
+          <UpgradePrompt
+            feature={`the ${pattern.category} pattern`}
+            title="Premium Pattern"
+            description={`The ${pattern.category} pattern is available exclusively for Pro members. Upgrade to unlock all patterns, visualizers, and premium features.`}
           />
-        )}
-        {activeTab === "cheatsheet" && (
-          <Highlightable
-            contentType="pattern_cheatsheet"
-            contentId={pattern.id}
-          >
-            <CheatsheetTab pattern={pattern} />
-          </Highlightable>
+        ) : (
+          <>
+            {activeTab === "tutorial" && (
+              <Highlightable
+                contentType="pattern_tutorial"
+                contentId={pattern.id}
+              >
+                <TutorialTab pattern={pattern} />
+              </Highlightable>
+            )}
+            {activeTab === "problems" && (
+              <ProblemsTab
+                questions={patternQuestions}
+                completed={completed}
+                onToggleComplete={toggleComplete}
+              />
+            )}
+            {activeTab === "cheatsheet" && (
+              <Highlightable
+                contentType="pattern_cheatsheet"
+                contentId={pattern.id}
+              >
+                <CheatsheetTab pattern={pattern} />
+              </Highlightable>
+            )}
+          </>
         )}
       </div>
     </div>

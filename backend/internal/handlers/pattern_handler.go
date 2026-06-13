@@ -3,27 +3,34 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/imrishuroy/algopatterns/internal/middleware"
 	"github.com/imrishuroy/algopatterns/internal/models"
 	"github.com/imrishuroy/algopatterns/internal/services"
 	"github.com/imrishuroy/algopatterns/pkg/response"
 )
 
 type PatternHandler struct {
-	service services.PatternServiceInterface
+	service       services.PatternServiceInterface
+	featureAccess *services.FeatureAccess
+	authMW        *middleware.AuthMiddleware
 }
 
-func NewPatternHandler(service services.PatternServiceInterface) *PatternHandler {
-	return &PatternHandler{service: service}
+func NewPatternHandler(service services.PatternServiceInterface, featureAccess *services.FeatureAccess, authMW *middleware.AuthMiddleware) *PatternHandler {
+	return &PatternHandler{
+		service:       service,
+		featureAccess: featureAccess,
+		authMW:        authMW,
+	}
 }
 
 func (h *PatternHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	patterns := rg.Group("/patterns")
+	patterns.Use(h.authMW.OptionalAuth())
 	{
 		patterns.GET("", h.List)
 		patterns.POST("", h.Create)
 		patterns.GET("/categories", h.ListCategories)
 		patterns.GET("/export", h.Export)
-		patterns.POST("/bulk", h.BulkImport)
 		patterns.GET("/search", h.Search)
 		patterns.GET("/:id", h.ShowByID)
 		patterns.PUT("/:id", h.Update)
@@ -44,13 +51,55 @@ func (h *PatternHandler) List(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, result)
+	userID := ""
+	if uid, ok := middleware.GetUserID(c); ok {
+		userID = uid.String()
+	}
+
+	features, isPro, _ := h.featureAccess.GetUserFeatures(c.Request.Context(), userID)
+
+	type PatternWithAccess struct {
+		models.Pattern
+		IsLocked bool `json:"is_locked"`
+	}
+
+	patternsWithAccess := make([]PatternWithAccess, 0, len(result.Patterns))
+	for _, p := range result.Patterns {
+		isLocked := !isPro && !services.IsFreePattern(p.ID) && features.MaxPatterns != -1
+		patternsWithAccess = append(patternsWithAccess, PatternWithAccess{
+			Pattern:  p,
+			IsLocked: isLocked,
+		})
+	}
+
+	response.OK(c, gin.H{
+		"patterns":         patternsWithAccess,
+		"pagination":       result.Pagination,
+		"is_pro":           isPro,
+		"free_visualizers": h.featureAccess.GetFreeVisualizerIDs(),
+	})
 }
 
 func (h *PatternHandler) ShowByID(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		response.BadRequest(c, "Pattern ID is required", nil)
+		return
+	}
+
+	userID := ""
+	if uid, ok := middleware.GetUserID(c); ok {
+		userID = uid.String()
+	}
+
+	canAccess, err := h.featureAccess.CanAccessPattern(c.Request.Context(), userID, id)
+	if err != nil {
+		response.InternalError(c)
+		return
+	}
+
+	if !canAccess {
+		response.Forbidden(c, "Upgrade to Pro to access this pattern")
 		return
 	}
 
@@ -64,7 +113,14 @@ func (h *PatternHandler) ShowByID(c *gin.Context) {
 		return
 	}
 
-	response.OK(c, pattern)
+	// Get user features to include visualizer access info
+	_, isPro, _ := h.featureAccess.GetUserFeatures(c.Request.Context(), userID)
+
+	response.OK(c, gin.H{
+		"pattern":          pattern,
+		"is_pro":           isPro,
+		"free_visualizers": h.featureAccess.GetFreeVisualizerIDs(),
+	})
 }
 
 func (h *PatternHandler) Create(c *gin.Context) {

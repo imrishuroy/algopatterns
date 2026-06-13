@@ -20,6 +20,16 @@ import type {
   ContentHighlightsResponse,
   BatchSyncRequest,
   BatchSyncResponse,
+  PlansListResponse,
+  Subscription,
+  CreateOrderRequest,
+  CreateOrderResponse,
+  VerifyPaymentRequest,
+  VerifyPaymentResponse,
+  ValidateDiscountRequest,
+  ValidateDiscountResponse,
+  CancelSubscriptionRequest,
+  CancelSubscriptionResponse,
 } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -307,6 +317,61 @@ class ApiClient {
     req: BatchSyncRequest
   ): Promise<ApiResponse<BatchSyncResponse>> {
     return this.request<BatchSyncResponse>("/api/v1/highlights/sync", {
+      method: "POST",
+      body: JSON.stringify(req),
+    });
+  }
+
+  // Payment endpoints
+  async getPlans(currency?: string): Promise<ApiResponse<PlansListResponse>> {
+    const query = currency ? `?currency=${currency}` : "";
+    return this.request<PlansListResponse>(`/api/v1/payments/plans${query}`);
+  }
+
+  async getSubscription(): Promise<ApiResponse<Subscription>> {
+    return this.request<Subscription>("/api/v1/payments/subscription");
+  }
+
+  async createOrder(
+    req: CreateOrderRequest,
+    idempotencyKey?: string
+  ): Promise<ApiResponse<CreateOrderResponse>> {
+    const headers: Record<string, string> = {};
+    if (idempotencyKey) {
+      headers["Idempotency-Key"] = idempotencyKey;
+    }
+    return this.request<CreateOrderResponse>("/api/v1/payments/orders", {
+      method: "POST",
+      body: JSON.stringify(req),
+      headers,
+    });
+  }
+
+  async verifyPayment(
+    req: VerifyPaymentRequest
+  ): Promise<ApiResponse<VerifyPaymentResponse>> {
+    return this.request<VerifyPaymentResponse>("/api/v1/payments/verify", {
+      method: "POST",
+      body: JSON.stringify(req),
+    });
+  }
+
+  async validateDiscount(
+    req: ValidateDiscountRequest
+  ): Promise<ApiResponse<ValidateDiscountResponse>> {
+    return this.request<ValidateDiscountResponse>(
+      "/api/v1/payments/validate-discount",
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+      }
+    );
+  }
+
+  async cancelSubscription(
+    req: CancelSubscriptionRequest
+  ): Promise<ApiResponse<CancelSubscriptionResponse>> {
+    return this.request<CancelSubscriptionResponse>("/api/v1/payments/cancel", {
       method: "POST",
       body: JSON.stringify(req),
     });

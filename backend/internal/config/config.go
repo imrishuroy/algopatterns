@@ -15,6 +15,25 @@ type Config struct {
 	Logging  LoggingConfig
 	Auth     AuthConfig
 	Judge0   Judge0Config
+	Razorpay RazorpayConfig
+	Email    EmailConfig
+}
+
+type EmailConfig struct {
+	SMTPHost     string
+	SMTPPort     string
+	SMTPUser     string
+	SMTPPassword string
+	FromEmail    string
+	FromName     string
+	Enabled      bool
+}
+
+type RazorpayConfig struct {
+	KeyID         string
+	KeySecret     string
+	WebhookSecret string
+	GSTRate       float64
 }
 
 type Judge0Config struct {
@@ -118,6 +137,21 @@ func Load() (*Config, error) {
 			PollInterval:  getDurationEnv("JUDGE0_POLL_INTERVAL", 500*time.Millisecond),
 			MaxPollTime:   getDurationEnv("JUDGE0_MAX_POLL_TIME", 30*time.Second),
 		},
+		Razorpay: RazorpayConfig{
+			KeyID:         getEnv("RAZORPAY_KEY_ID", ""),
+			KeySecret:     getEnv("RAZORPAY_KEY_SECRET", ""),
+			WebhookSecret: getEnv("RAZORPAY_WEBHOOK_SECRET", ""),
+			GSTRate:       getFloatEnv("RAZORPAY_GST_RATE", 18.0),
+		},
+		Email: EmailConfig{
+			SMTPHost:     getEnv("SMTP_HOST", "smtp.gmail.com"),
+			SMTPPort:     getEnv("SMTP_PORT", "587"),
+			SMTPUser:     getEnv("SMTP_USER", ""),
+			SMTPPassword: getEnv("SMTP_PASSWORD", ""),
+			FromEmail:    getEnv("EMAIL_FROM", "hello@algopatterns.in"),
+			FromName:     getEnv("EMAIL_FROM_NAME", "AlgoPatterns"),
+			Enabled:      getBoolEnv("EMAIL_ENABLED", false),
+		},
 	}
 
 	if cfg.Auth.JWTSecret == "" {
@@ -158,6 +192,15 @@ func getFloatEnv(key string, defaultValue float64) float64 {
 	if value := os.Getenv(key); value != "" {
 		if floatVal, err := strconv.ParseFloat(value, 64); err == nil {
 			return floatVal
+		}
+	}
+	return defaultValue
+}
+
+func getBoolEnv(key string, defaultValue bool) bool {
+	if value := os.Getenv(key); value != "" {
+		if boolVal, err := strconv.ParseBool(value); err == nil {
+			return boolVal
 		}
 	}
 	return defaultValue

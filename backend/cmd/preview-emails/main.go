@@ -11,7 +11,7 @@ import (
 
 func main() {
 	outputDir := "/tmp/email-previews"
-	os.MkdirAll(outputDir, 0755)
+	os.MkdirAll(outputDir, 0750)
 
 	// Welcome email
 	welcomeData := map[string]string{

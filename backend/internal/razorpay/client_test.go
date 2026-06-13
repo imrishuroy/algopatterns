@@ -500,7 +500,7 @@ func TestVerifyWebhookSignature_RealWorldPayload(t *testing.T) {
 // Timing Attack Resistance Tests
 // ====================
 
-func TestVerifySignature_ConstantTimeComparison(t *testing.T) {
+func TestVerifySignature_ConstantTimeComparison(_ *testing.T) {
 	keySecret := "test_secret_key_12345"
 	client := NewClient("test_key_id", keySecret, "webhook_secret")
 

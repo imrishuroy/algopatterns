@@ -1544,9 +1544,9 @@ func (c *RazorpayClient) VerifyPaymentSignature(orderID, paymentID, signature st
 
 ## Secrets Management
 
-- Razorpay Key ID: Environment variable (can be public)
-- Razorpay Key Secret: Environment variable (never exposed to frontend)
-- Webhook Secret: Environment variable (separate from Key Secret)
+- Razorpay Key ID: Stored in env vars (can be public)
+- Razorpay Key Secret: Stored in env vars (never exposed to frontend)
+- Webhook Secret: Stored in env vars (separate from Key Secret)
 
 # Error Handling
 

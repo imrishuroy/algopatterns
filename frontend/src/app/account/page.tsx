@@ -281,7 +281,7 @@ export default function AccountPage() {
               Cancel Subscription
             </h2>
             <p className="text-gray-400 mb-4">
-              We're sorry to see you go. Your access will continue until{" "}
+              We&apos;re sorry to see you go. Your access will continue until{" "}
               {formatDate(subscription?.current_period_end)}.
             </p>
 

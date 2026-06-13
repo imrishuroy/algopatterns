@@ -41,7 +41,7 @@ func (s *EmailService) loadTemplates() {
 	s.templates["expiring"] = template.Must(template.New("expiring").Parse(expiringEmailTemplate))
 }
 
-func (s *EmailService) SendWelcomeEmail(ctx context.Context, email, name, planName string) error {
+func (s *EmailService) SendWelcomeEmail(_ context.Context, email, name, planName string) error {
 	if !s.config.Enabled {
 		return nil
 	}
@@ -55,7 +55,7 @@ func (s *EmailService) SendWelcomeEmail(ctx context.Context, email, name, planNa
 	return s.sendEmail(email, "Welcome to AlgoPatterns Pro! 🎉", "welcome", data)
 }
 
-func (s *EmailService) SendReceiptEmail(ctx context.Context, email, name string, payment *models.Payment, plan *models.SubscriptionPlan) error {
+func (s *EmailService) SendReceiptEmail(_ context.Context, email, name string, payment *models.Payment, plan *models.SubscriptionPlan) error {
 	if !s.config.Enabled {
 		return nil
 	}
@@ -72,7 +72,7 @@ func (s *EmailService) SendReceiptEmail(ctx context.Context, email, name string,
 	return s.sendEmail(email, "Payment Receipt - AlgoPatterns", "receipt", data)
 }
 
-func (s *EmailService) SendExpiringEmail(ctx context.Context, email, name string, expiresAt time.Time, planName string) error {
+func (s *EmailService) SendExpiringEmail(_ context.Context, email, name string, expiresAt time.Time, planName string) error {
 	if !s.config.Enabled {
 		return nil
 	}

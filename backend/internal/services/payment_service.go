@@ -450,7 +450,7 @@ func (s *PaymentService) ValidateDiscount(ctx context.Context, userID, code, pla
 	}, nil
 }
 
-func (s *PaymentService) CancelSubscription(ctx context.Context, userID, reason, feedback string) (*models.CancelSubscriptionResponse, error) {
+func (s *PaymentService) CancelSubscription(ctx context.Context, userID, reason, _ string) (*models.CancelSubscriptionResponse, error) {
 	sub, err := s.repo.GetActiveSubscriptionByUserID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, repository.ErrSubscriptionNotFound) {

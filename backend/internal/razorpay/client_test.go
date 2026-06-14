@@ -9,9 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// ====================
 // Payment Signature Verification Tests
-// ====================
 
 func TestVerifyPaymentSignature_Valid(t *testing.T) {
 	keySecret := "test_secret_key_12345"
@@ -140,9 +138,7 @@ func TestVerifyPaymentSignature_DifferentSecretKey(t *testing.T) {
 	assert.False(t, result2, "Signature should fail with different secret")
 }
 
-// ====================
 // Webhook Signature Verification Tests
-// ====================
 
 func TestVerifyWebhookSignature_Valid(t *testing.T) {
 	keySecret := "test_secret_key_12345"
@@ -241,9 +237,7 @@ func TestVerifyWebhookSignature_DifferentWebhookSecret(t *testing.T) {
 	assert.False(t, result2, "Webhook signature should fail with different secret")
 }
 
-// ====================
 // Client Initialization Tests
-// ====================
 
 func TestNewClient(t *testing.T) {
 	keyID := "rzp_test_123"
@@ -268,9 +262,7 @@ func TestNewClient_EmptyCredentials(t *testing.T) {
 	assert.Empty(t, client.webhookSecret)
 }
 
-// ====================
 // Internal Signature Verification Tests
-// ====================
 
 func TestVerifySignature_ConsistentResults(t *testing.T) {
 	keySecret := "test_secret_key_12345"
@@ -306,9 +298,7 @@ func TestVerifySignature_CaseSensitive(t *testing.T) {
 	assert.False(t, result, "Signature verification should be case-sensitive")
 }
 
-// ====================
 // RazorpayError Tests
-// ====================
 
 func TestRazorpayError_Error(t *testing.T) {
 	err := &RazorpayError{
@@ -367,9 +357,7 @@ func TestRazorpayError_IsUnauthorized(t *testing.T) {
 	assert.False(t, otherErr.IsUnauthorized())
 }
 
-// ====================
 // Signature Format Tests
-// ====================
 
 func TestSignatureFormat_HexEncoding(t *testing.T) {
 	keySecret := "test_secret"
@@ -405,9 +393,7 @@ func TestSignatureFormat_Deterministic(t *testing.T) {
 	assert.Equal(t, sig1, sig2, "Same input should always produce same signature")
 }
 
-// ====================
 // Edge Cases Tests
-// ====================
 
 func TestVerifySignature_SpecialCharacters(t *testing.T) {
 	keySecret := "test_secret_key_12345"
@@ -496,9 +482,7 @@ func TestVerifyWebhookSignature_RealWorldPayload(t *testing.T) {
 	assert.True(t, result, "Should verify real-world webhook payload")
 }
 
-// ====================
 // Timing Attack Resistance Tests
-// ====================
 
 func TestVerifySignature_ConstantTimeComparison(_ *testing.T) {
 	keySecret := "test_secret_key_12345"

@@ -57,12 +57,6 @@ func (m *MockPatternRepository) ExportAll(ctx context.Context) ([]byte, error) {
 	return args.Get(0).([]byte), args.Error(1)
 }
 
-func newTestPatternService() (*PatternService, *MockPatternRepository) {
-	mockRepo := new(MockPatternRepository)
-	service := &PatternService{repo: nil}
-	return service, mockRepo
-}
-
 func TestPatternCreate_Success(t *testing.T) {
 	mockRepo := new(MockPatternRepository)
 	service := &PatternService{repo: mockRepo}

@@ -2,9 +2,18 @@
 
 import type { Plan } from "@/types";
 
+// Plan hierarchy for upgrade logic (higher = better)
+const PLAN_RANK: Record<string, number> = {
+  free: 0,
+  pro_monthly: 1,
+  pro_yearly: 2,
+  pro_lifetime: 3,
+};
+
 interface PricingCardProps {
   plan: Plan;
   isCurrentPlan?: boolean;
+  currentPlanId?: string;
   onSelect: (plan: Plan) => void;
   isLoading?: boolean;
 }
@@ -12,9 +21,14 @@ interface PricingCardProps {
 export function PricingCard({
   plan,
   isCurrentPlan,
+  currentPlanId,
   onSelect,
   isLoading,
 }: PricingCardProps) {
+  const currentRank = PLAN_RANK[currentPlanId || "free"] ?? 0;
+  const planRank = PLAN_RANK[plan.id] ?? 0;
+  const canUpgrade = planRank > currentRank;
+  const isDowngrade = planRank < currentRank && planRank > 0;
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -131,22 +145,28 @@ export function PricingCard({
 
         <button
         onClick={() => onSelect(plan)}
-        disabled={isCurrentPlan || isLoading}
+        disabled={isCurrentPlan || isLoading || isDowngrade}
         className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
           isCurrentPlan
             ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-            : plan.is_recommended
-              ? "bg-emerald-500 hover:bg-emerald-600 text-white"
-              : "bg-gray-700 hover:bg-gray-600 text-white"
+            : isDowngrade
+              ? "bg-gray-800 text-gray-500 cursor-not-allowed"
+              : plan.is_recommended
+                ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                : "bg-gray-700 hover:bg-gray-600 text-white"
         }`}
       >
         {isCurrentPlan
           ? "Current Plan"
           : isLoading
             ? "Loading..."
-            : plan.id === "free"
-              ? "Get Started"
-              : "Upgrade Now"}
+            : isDowngrade
+              ? "Current plan is better"
+              : plan.id === "free"
+                ? "Get Started"
+                : canUpgrade
+                  ? "Upgrade Now"
+                  : "Get Started"}
         </button>
       </div>
     </div>

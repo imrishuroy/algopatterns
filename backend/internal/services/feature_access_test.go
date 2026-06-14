@@ -62,9 +62,7 @@ func createFreeFeatures() models.PlanFeatures {
 	}
 }
 
-// =============================
 // CanAccessPattern Tests
-// =============================
 
 func TestCanAccessPattern_FreePattern_NoUser(t *testing.T) {
 	// Free patterns should always be accessible, even without a user
@@ -106,8 +104,6 @@ func TestCanAccessPattern_FreePattern_ProUser(t *testing.T) {
 	freePatterns := []string{"sliding-window", "two-pointers", "binary-search"}
 
 	proSub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: userID,
 		PlanID: "pro_yearly",
 		Status: models.SubscriptionStatusActive,
 	}
@@ -159,8 +155,6 @@ func TestCanAccessPattern_PremiumPattern_ProUser(t *testing.T) {
 	premiumPatterns := []string{"dynamic-programming", "graph-traversal", "backtracking"}
 
 	proSub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: userID,
 		PlanID: "pro_yearly",
 		Status: models.SubscriptionStatusActive,
 	}
@@ -193,9 +187,7 @@ func TestCanAccessPattern_PremiumPattern_ProUser(t *testing.T) {
 	}
 }
 
-// =============================
 // CanAccessVisualizer Tests
-// =============================
 
 func TestCanAccessVisualizer_FreeVisualizer(t *testing.T) {
 	freeVisualizers := []string{
@@ -244,8 +236,6 @@ func TestCanAccessVisualizer_PremiumVisualizer_ProUser(t *testing.T) {
 	premiumVisualizers := []string{"dp-knapsack", "graph-dfs", "tree-traversal"}
 
 	proSub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: userID,
 		PlanID: "pro_yearly",
 		Status: models.SubscriptionStatusActive,
 	}
@@ -276,9 +266,7 @@ func TestCanAccessVisualizer_PremiumVisualizer_ProUser(t *testing.T) {
 	}
 }
 
-// =============================
 // CanAccessCodePlayground Tests
-// =============================
 
 func TestCanAccessCodePlayground_FreeUser(t *testing.T) {
 	features := createFreeFeatures()
@@ -290,9 +278,7 @@ func TestCanAccessCodePlayground_ProUser(t *testing.T) {
 	assert.True(t, features.HasCodePlayground, "Pro user should have code playground access")
 }
 
-// =============================
 // CanAccessSolutions Tests
-// =============================
 
 func TestCanAccessSolutions_FreeUser(t *testing.T) {
 	features := createFreeFeatures()
@@ -304,9 +290,7 @@ func TestCanAccessSolutions_ProUser(t *testing.T) {
 	assert.True(t, features.HasSolutionsAccess, "Pro user should have solutions access")
 }
 
-// =============================
 // CanAccessHighlighting Tests
-// =============================
 
 func TestCanAccessHighlighting_FreeUser(t *testing.T) {
 	features := createFreeFeatures()
@@ -318,14 +302,10 @@ func TestCanAccessHighlighting_ProUser(t *testing.T) {
 	assert.True(t, features.HasHighlighting, "Pro user should have highlighting access")
 }
 
-// =============================
 // Grace Period (past_due) Tests
-// =============================
 
 func TestGracePeriod_ActiveStatus(t *testing.T) {
 	sub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: "user-123",
 		PlanID: "pro_yearly",
 		Status: models.SubscriptionStatusActive,
 	}
@@ -340,8 +320,6 @@ func TestGracePeriod_ActiveStatus(t *testing.T) {
 
 func TestGracePeriod_PastDueStatus(t *testing.T) {
 	sub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: "user-123",
 		PlanID: "pro_yearly",
 		Status: models.SubscriptionStatusPastDue,
 	}
@@ -356,8 +334,6 @@ func TestGracePeriod_PastDueStatus(t *testing.T) {
 
 func TestGracePeriod_CancelledStatus(t *testing.T) {
 	sub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: "user-123",
 		PlanID: "pro_yearly",
 		Status: models.SubscriptionStatusCancelled,
 	}
@@ -372,8 +348,6 @@ func TestGracePeriod_CancelledStatus(t *testing.T) {
 
 func TestGracePeriod_ExpiredStatus(t *testing.T) {
 	sub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: "user-123",
 		PlanID: "pro_yearly",
 		Status: models.SubscriptionStatusExpired,
 	}
@@ -394,8 +368,6 @@ func TestGracePeriod_WithFeatureAccessService(t *testing.T) {
 
 	// Test past_due status - should still have access
 	pastDueSub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: userID,
 		PlanID: "pro_yearly",
 		Status: models.SubscriptionStatusPastDue,
 	}
@@ -426,9 +398,7 @@ func TestGracePeriod_WithFeatureAccessService(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-// =============================
 // Edge Cases Tests
-// =============================
 
 func TestCanAccessPattern_EmptyUserID(t *testing.T) {
 	// Empty user ID should return free features
@@ -446,8 +416,6 @@ func TestCanAccessPattern_EmptyUserID(t *testing.T) {
 func TestCanAccessPattern_FreePlanSubscription(t *testing.T) {
 	// User has a subscription but it's the free plan
 	sub := &models.Subscription{
-		ID:     "sub-123",
-		UserID: "user-123",
 		PlanID: "free",
 		Status: models.SubscriptionStatusActive,
 	}
@@ -510,9 +478,7 @@ func TestGetFreeVisualizerIDs(t *testing.T) {
 	assert.False(t, IsFreeVisualizer("tree-traversal"))
 }
 
-// =============================
 // Quiz History Tests
-// =============================
 
 func TestCanAccessQuizHistory_FreeUser(t *testing.T) {
 	features := createFreeFeatures()
@@ -524,9 +490,7 @@ func TestCanAccessQuizHistory_ProUser(t *testing.T) {
 	assert.True(t, features.HasQuizHistory, "Pro user should have quiz history access")
 }
 
-// =============================
 // Progress Sync Tests
-// =============================
 
 func TestCanAccessProgressSync_FreeUser(t *testing.T) {
 	features := createFreeFeatures()
@@ -538,9 +502,7 @@ func TestCanAccessProgressSync_ProUser(t *testing.T) {
 	assert.True(t, features.HasProgressSync, "Pro user should have progress sync")
 }
 
-// =============================
 // Offline Export Tests
-// =============================
 
 func TestCanAccessOfflineExport_FreeUser(t *testing.T) {
 	features := createFreeFeatures()
@@ -552,9 +514,7 @@ func TestCanAccessOfflineExport_ProUser(t *testing.T) {
 	assert.True(t, features.HasOfflineExport, "Pro user should have offline export")
 }
 
-// =============================
 // Quiz Questions Per Pattern Tests
-// =============================
 
 func TestQuizQuestionsPerPattern_FreeUser(t *testing.T) {
 	features := createFreeFeatures()
@@ -566,17 +526,13 @@ func TestQuizQuestionsPerPattern_ProUser(t *testing.T) {
 	assert.Equal(t, -1, features.QuizQuestionsPerPattern, "Pro user should have unlimited quiz questions")
 }
 
-// =============================
 // Subscription Period Tests
-// =============================
 
 func TestSubscription_IsActive(t *testing.T) {
 	now := time.Now()
 	futureEnd := now.Add(24 * time.Hour)
 
 	sub := &models.Subscription{
-		ID:               "sub-123",
-		UserID:           "user-123",
 		PlanID:           "pro_yearly",
 		Status:           models.SubscriptionStatusActive,
 		CurrentPeriodEnd: &futureEnd,
@@ -590,8 +546,6 @@ func TestSubscription_IsActive_ExpiredPeriod(t *testing.T) {
 	pastEnd := now.Add(-24 * time.Hour)
 
 	sub := &models.Subscription{
-		ID:               "sub-123",
-		UserID:           "user-123",
 		PlanID:           "pro_yearly",
 		Status:           models.SubscriptionStatusActive,
 		CurrentPeriodEnd: &pastEnd,
@@ -605,16 +559,12 @@ func TestSubscription_IsPro(t *testing.T) {
 	futureEnd := now.Add(24 * time.Hour)
 
 	proSub := &models.Subscription{
-		ID:               "sub-123",
-		UserID:           "user-123",
 		PlanID:           "pro_yearly",
 		Status:           models.SubscriptionStatusActive,
 		CurrentPeriodEnd: &futureEnd,
 	}
 
 	freeSub := &models.Subscription{
-		ID:               "sub-456",
-		UserID:           "user-456",
 		PlanID:           "free",
 		Status:           models.SubscriptionStatusActive,
 		CurrentPeriodEnd: &futureEnd,

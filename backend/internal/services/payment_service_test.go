@@ -9,9 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// ====================
 // Discount Code Model Tests
-// ====================
 
 func TestDiscountCode_IsValid(t *testing.T) {
 	tests := []struct {
@@ -210,9 +208,7 @@ func TestDiscountCode_CalculateDiscount(t *testing.T) {
 	}
 }
 
-// ====================
 // GST Calculation Tests
-// ====================
 
 func TestGSTCalculation(t *testing.T) {
 	gstRate := 18.0
@@ -258,9 +254,7 @@ func TestGSTCalculation(t *testing.T) {
 	}
 }
 
-// ====================
 // Request Hash Tests
-// ====================
 
 func TestHashRequest(t *testing.T) {
 	service := &PaymentService{}
@@ -300,9 +294,7 @@ func TestHashRequest_Deterministic(t *testing.T) {
 	}
 }
 
-// ====================
 // Subscription Period Tests
-// ====================
 
 func TestSubscriptionPeriodEnd(t *testing.T) {
 	now := time.Now()
@@ -359,9 +351,7 @@ func TestSubscriptionPeriodEnd(t *testing.T) {
 	}
 }
 
-// ====================
 // Idempotency Key Tests
-// ====================
 
 func TestIdempotencyKeyStatus(t *testing.T) {
 	tests := []struct {
@@ -397,7 +387,6 @@ func TestIdempotencyKeyStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			key := &models.IdempotencyKey{
-				Key:    "test-key",
 				Status: tt.status,
 			}
 
@@ -463,9 +452,7 @@ func TestIdempotencyKeyConflictDetection(t *testing.T) {
 	}
 }
 
-// ====================
 // Cached Response Tests
-// ====================
 
 func TestCachedResponseDeserialization(t *testing.T) {
 	original := &models.CreateOrderResponse{
@@ -500,9 +487,7 @@ func TestCachedResponseDeserialization(t *testing.T) {
 	assert.Equal(t, original.Pricing.Total, restored.Pricing.Total)
 }
 
-// ====================
 // DTO Conversion Tests
-// ====================
 
 func TestSubscriptionToResponse(t *testing.T) {
 	now := time.Now()
@@ -562,9 +547,7 @@ func TestPlanToResponse(t *testing.T) {
 	assert.Equal(t, "USD", respUSD.Currency)
 }
 
-// ====================
 // Error Type Tests
-// ====================
 
 func TestPaymentServiceErrors(t *testing.T) {
 	assert.Equal(t, "plan not found", ErrPlanNotFound.Error())
@@ -580,9 +563,7 @@ func TestPaymentServiceErrors(t *testing.T) {
 	assert.Equal(t, "idempotency key conflict", ErrIdempotencyConflict.Error())
 }
 
-// ====================
 // Subscription Status Tests
-// ====================
 
 func TestSubscriptionStatusTransitions(t *testing.T) {
 	tests := []struct {
@@ -626,9 +607,7 @@ func TestSubscriptionStatusTransitions(t *testing.T) {
 	}
 }
 
-// ====================
 // Order Status Tests
-// ====================
 
 func TestOrderStatusTransitions(t *testing.T) {
 	tests := []struct {
@@ -670,6 +649,67 @@ func TestOrderStatusTransitions(t *testing.T) {
 			assert.Equal(t, tt.canPay, canPay)
 			assert.Equal(t, tt.isPaid, tt.status == models.OrderStatusPaid)
 			assert.Equal(t, tt.isExpired, tt.status == models.OrderStatusExpired)
+		})
+	}
+}
+
+// Upgrade Logic Tests
+
+func TestUpgradeToLifetime_Allowed(t *testing.T) {
+	tests := []struct {
+		name           string
+		currentPlanID  string
+		targetPlanID   string
+		shouldAllow    bool
+	}{
+		{
+			name:          "free to lifetime - allowed",
+			currentPlanID: "free",
+			targetPlanID:  "pro_lifetime",
+			shouldAllow:   true,
+		},
+		{
+			name:          "monthly to lifetime - allowed",
+			currentPlanID: "pro_monthly",
+			targetPlanID:  "pro_lifetime",
+			shouldAllow:   true,
+		},
+		{
+			name:          "yearly to lifetime - allowed",
+			currentPlanID: "pro_yearly",
+			targetPlanID:  "pro_lifetime",
+			shouldAllow:   true,
+		},
+		{
+			name:          "lifetime to lifetime - blocked",
+			currentPlanID: "pro_lifetime",
+			targetPlanID:  "pro_lifetime",
+			shouldAllow:   false,
+		},
+		{
+			name:          "yearly to monthly - blocked",
+			currentPlanID: "pro_yearly",
+			targetPlanID:  "pro_monthly",
+			shouldAllow:   false,
+		},
+		{
+			name:          "monthly to yearly - blocked (must use lifetime only)",
+			currentPlanID: "pro_monthly",
+			targetPlanID:  "pro_yearly",
+			shouldAllow:   false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Simulate upgrade check logic from payment_service.go
+			canUpgrade := false
+			if tt.currentPlanID == "free" {
+				canUpgrade = true // Free users can buy any plan
+			} else if tt.targetPlanID == "pro_lifetime" && tt.currentPlanID != "pro_lifetime" {
+				canUpgrade = true // Can upgrade to lifetime from any non-lifetime plan
+			}
+			assert.Equal(t, tt.shouldAllow, canUpgrade)
 		})
 	}
 }

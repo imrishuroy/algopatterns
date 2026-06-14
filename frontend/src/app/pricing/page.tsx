@@ -72,6 +72,7 @@ export default function PricingPage() {
               key={plan.id}
               plan={plan}
               isCurrentPlan={subscription?.plan_id === plan.id}
+              currentPlanId={subscription?.plan_id}
               onSelect={handleSelectPlan}
             />
           ))}

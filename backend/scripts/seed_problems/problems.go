@@ -27,9 +27,7 @@ type TemplateDef struct {
 }
 
 var Problems = []ProblemDef{
-	// =====================
 	// Contains Duplicate
-	// =====================
 	{
 		Title:      "Contains Duplicate",
 		Slug:       "contains-duplicate",
@@ -151,9 +149,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Valid Anagram
-	// =====================
 	{
 		Title:      "Valid Anagram",
 		Slug:       "valid-anagram",
@@ -266,9 +262,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Maximum Subarray
-	// =====================
 	{
 		Title:      "Maximum Subarray",
 		Slug:       "maximum-subarray",
@@ -388,9 +382,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Product of Array Except Self
-	// =====================
 	{
 		Title:      "Product of Array Except Self",
 		Slug:       "product-of-array-except-self",
@@ -510,9 +502,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Group Anagrams
-	// =====================
 	{
 		Title:      "Group Anagrams",
 		Slug:       "group-anagrams",
@@ -699,9 +689,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Longest Common Prefix
-	// =====================
 	{
 		Title:      "Longest Common Prefix",
 		Slug:       "longest-common-prefix",
@@ -830,9 +818,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Add Strings
-	// =====================
 	{
 		Title:      "Add Strings",
 		Slug:       "add-strings",
@@ -943,9 +929,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Sort Colors
-	// =====================
 	{
 		Title:      "Sort Colors",
 		Slug:       "sort-colors",
@@ -1064,9 +1048,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Rotate Image
-	// =====================
 	{
 		Title:      "Rotate Image",
 		Slug:       "rotate-image",
@@ -1202,9 +1184,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Increasing Triplet Subsequence
-	// =====================
 	{
 		Title:      "Increasing Triplet Subsequence",
 		Slug:       "increasing-triplet-subsequence",
@@ -1326,9 +1306,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Find the Difference
-	// =====================
 	{
 		Title:      "Find the Difference",
 		Slug:       "find-the-difference",
@@ -1439,9 +1417,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Can Place Flowers
-	// =====================
 	{
 		Title:      "Can Place Flowers",
 		Slug:       "can-place-flowers",
@@ -1565,9 +1541,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Add Binary
-	// =====================
 	{
 		Title:      "Add Binary",
 		Slug:       "add-binary",
@@ -1669,9 +1643,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Greatest Common Divisor of Strings
-	// =====================
 	{
 		Title:      "Greatest Common Divisor of Strings",
 		Slug:       "greatest-common-divisor-of-strings",
@@ -1780,9 +1752,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Kids With the Greatest Number of Candies
-	// =====================
 	{
 		Title:      "Kids With the Greatest Number of Candies",
 		Slug:       "kids-with-the-greatest-number-of-candies",
@@ -1916,9 +1886,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Find All Numbers Disappeared in an Array
-	// =====================
 	{
 		Title:      "Find All Numbers Disappeared in an Array",
 		Slug:       "find-all-numbers-disappeared-in-an-array",
@@ -2034,9 +2002,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Ransom Note
-	// =====================
 	{
 		Title:      "Ransom Note",
 		Slug:       "ransom-note",
@@ -2147,9 +2113,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// First Unique Character in a String
-	// =====================
 	{
 		Title:      "First Unique Character in a String",
 		Slug:       "first-unique-character-in-a-string",
@@ -2252,9 +2216,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Repeated Substring Pattern
-	// =====================
 	{
 		Title:      "Repeated Substring Pattern",
 		Slug:       "repeated-substring-pattern",
@@ -2361,9 +2323,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Reverse Words in a String
-	// =====================
 	{
 		Title:      "Reverse Words in a String",
 		Slug:       "reverse-words-in-a-string",
@@ -2472,9 +2432,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Custom Sort String
-	// =====================
 	{
 		Title:      "Custom Sort String",
 		Slug:       "custom-sort-string",
@@ -2582,9 +2540,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Maximum Swap
-	// =====================
 	{
 		Title:      "Maximum Swap",
 		Slug:       "maximum-swap",
@@ -2685,9 +2641,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Reverse Integer
-	// =====================
 	{
 		Title:      "Reverse Integer",
 		Slug:       "reverse-integer",
@@ -2790,9 +2744,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Rotate Array
-	// =====================
 	{
 		Title:      "Rotate Array",
 		Slug:       "rotate-array",
@@ -2909,9 +2861,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Zigzag Conversion
-	// =====================
 	{
 		Title:      "Zigzag Conversion",
 		Slug:       "zigzag-conversion",
@@ -3026,9 +2976,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Maximum Sum Circular Subarray
-	// =====================
 	{
 		Title:      "Maximum Sum Circular Subarray",
 		Slug:       "maximum-sum-circular-subarray",
@@ -3146,9 +3094,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Encode and Decode Strings
-	// =====================
 	{
 		Title:      "Encode and Decode Strings",
 		Slug:       "encode-and-decode-strings",
@@ -3303,9 +3249,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// First Missing Positive (Hard)
-	// =====================
 	{
 		Title:      "First Missing Positive",
 		Slug:       "first-missing-positive",
@@ -3421,9 +3365,7 @@ func main() {
 		},
 	},
 
-	// =====================
 	// Integer to English Words (Hard)
-	// =====================
 	{
 		Title:      "Integer to English Words",
 		Slug:       "integer-to-english-words",

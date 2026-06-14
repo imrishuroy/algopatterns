@@ -167,8 +167,15 @@ func (s *PaymentService) createOrderInternal(ctx context.Context, userID, planID
 	if err != nil && !errors.Is(err, repository.ErrSubscriptionNotFound) {
 		return nil, fmt.Errorf("failed to check existing subscription: %w", err)
 	}
+	// Allow upgrade to lifetime from any plan, block other duplicate subscriptions
 	if existingSub != nil && existingSub.PlanID != "free" {
-		return nil, ErrAlreadySubscribed
+		if planID != "pro_lifetime" {
+			return nil, ErrAlreadySubscribed
+		}
+		// Already has lifetime - no need to buy again
+		if existingSub.PlanID == "pro_lifetime" {
+			return nil, ErrAlreadySubscribed
+		}
 	}
 
 	subtotal := plan.AmountINR

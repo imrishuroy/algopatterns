@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { FAQJsonLd } from "@/components/seo/JsonLd";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 
 export const metadata: Metadata = {
   title: "Coding Interview Cheatsheet - DSA Patterns & Complexity Guide",

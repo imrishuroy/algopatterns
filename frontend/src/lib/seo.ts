@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export const siteConfig = {
   name: "AlgoPatterns",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.com",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in",
   description:
     "Master Data Structures & Algorithms with pattern-based learning. Interactive visualizers, step-by-step animations, and curated problem sets for FAANG interviews.",
   keywords: [

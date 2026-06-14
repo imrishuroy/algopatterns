@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 
 export const metadata: Metadata = {
   title: "Pricing - AlgoPatterns Pro Plans",

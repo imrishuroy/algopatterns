@@ -7,7 +7,7 @@ import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import PatternPageClient from "./PatternPageClient";
 
 const patterns = patternsData as Pattern[];
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 
 export function generateStaticParams() {
   return patterns.map((pattern) => ({

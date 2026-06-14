@@ -5,7 +5,7 @@ import { Pattern } from "@/types";
 const patterns = patternsData as Pattern[];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 
   const staticPages: MetadataRoute.Sitemap = [
     {

@@ -9,4 +9,4 @@ Disallow: /test-payment/
 Disallow: /account/
 
 # Sitemap
-Sitemap: https://algopatterns.com/sitemap.xml
+Sitemap: https://algopatterns.in/sitemap.xml

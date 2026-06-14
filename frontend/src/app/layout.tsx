@@ -40,7 +40,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} h-full antialiased dark`}
     >
       <head>
-        <meta name="google-site-verification" content="wstl1GX10C1H2MWRAY1LQj1aoexL8IiE2FrF2Nnn9Uc" />
+        <meta name="google-site-verification" content="GN9sKyZeBRDfjzlfvY8mPl0NB0zbnt2gHnPbmWpK3ng" />
         <WebsiteJsonLd />
       </head>
       <body

@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { Geist, Geist_Mono, Fredoka } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
@@ -41,6 +42,18 @@ export default function RootLayout({
     >
       <head>
         <meta name="google-site-verification" content="GN9sKyZeBRDfjzlfvY8mPl0NB0zbnt2gHnPbmWpK3ng" />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-64T0261KB3"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-64T0261KB3');
+          `}
+        </Script>
         <WebsiteJsonLd />
       </head>
       <body

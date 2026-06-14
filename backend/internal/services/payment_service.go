@@ -282,7 +282,19 @@ func (s *PaymentService) VerifyPayment(ctx context.Context, userID, razorpayPaym
 		return nil, ErrOrderNotFound
 	}
 	if order.Status == models.OrderStatusPaid {
-		return nil, ErrOrderAlreadyPaid
+		// Order already paid - return existing subscription instead of error
+		subscription, err := s.repo.GetActiveSubscriptionByUserID(ctx, userID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get subscription: %w", err)
+		}
+		plan, err := s.repo.GetPlanByID(ctx, order.PlanID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get plan: %w", err)
+		}
+		return &models.VerifyPaymentResponse{
+			PaymentID:    "", // Already processed
+			Subscription: subscription.ToResponse(plan.Features),
+		}, nil
 	}
 	if time.Now().After(order.ExpiresAt) {
 		return nil, ErrOrderExpired

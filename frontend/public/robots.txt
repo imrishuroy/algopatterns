@@ -1,0 +1,12 @@
+# AlgoPatterns robots.txt
+
+User-agent: *
+Allow: /
+
+# Block internal/admin routes
+Disallow: /api/
+Disallow: /test-payment/
+Disallow: /account/
+
+# Sitemap
+Sitemap: https://algopatterns.com/sitemap.xml

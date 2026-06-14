@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fredoka } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
@@ -9,6 +8,8 @@ import { ProgressProvider } from "@/contexts/ProgressContext";
 import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { HighlightProvider } from "@/contexts/HighlightContext";
+import { defaultMetadata } from "@/lib/seo";
+import { WebsiteJsonLd } from "@/components/seo/JsonLd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,18 +27,7 @@ const fredoka = Fredoka({
   weight: ["600"],
 });
 
-export const metadata: Metadata = {
-  title: "Algo Patterns - Master DSA Patterns",
-  description:
-    "Master Data Structures & Algorithms with pattern-based learning. Interactive visualizers, step-by-step animations, and curated problem sets for FAANG interviews.",
-  keywords: ["DSA", "algorithms", "data structures", "coding patterns", "leetcode", "FAANG interview"],
-  authors: [{ name: "Algo Patterns" }],
-  openGraph: {
-    title: "Algo Patterns - Master DSA Patterns",
-    description: "Master Data Structures & Algorithms with pattern-based learning",
-    type: "website",
-  },
-};
+export const metadata = defaultMetadata;
 
 export default function RootLayout({
   children,
@@ -49,6 +39,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} h-full antialiased dark`}
     >
+      <head>
+        <WebsiteJsonLd />
+      </head>
       <body
         className="min-h-full flex flex-col text-gray-100"
         suppressHydrationWarning

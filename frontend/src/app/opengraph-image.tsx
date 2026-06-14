@@ -5,7 +5,7 @@ export const alt = "AlgoPatterns - Master DSA Patterns for FAANG Interviews";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function Image() {
+export default function OpenGraphImage() {
   return new ImageResponse(
     (
       <div

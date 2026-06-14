@@ -1,6 +1,22 @@
 import { siteConfig } from "@/lib/seo";
 import { Pattern } from "@/types";
 
+/**
+ * Renders JSON-LD structured data as a script tag.
+ * Safe to use dangerouslySetInnerHTML here because:
+ * 1. Data is from controlled internal sources (not user input)
+ * 2. JSON.stringify escapes any special characters
+ * 3. This is the standard pattern for JSON-LD in React/Next.js
+ */
+function JsonLdScript({ data }: { data: object }) {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
 export function WebsiteJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -18,12 +34,7 @@ export function WebsiteJsonLd() {
     },
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLdScript data={jsonLd} />;
 }
 
 export function OrganizationJsonLd() {
@@ -39,12 +50,7 @@ export function OrganizationJsonLd() {
     ],
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLdScript data={jsonLd} />;
 }
 
 export function CourseJsonLd({ pattern }: { pattern: Pattern }) {
@@ -69,12 +75,7 @@ export function CourseJsonLd({ pattern }: { pattern: Pattern }) {
     inLanguage: "en",
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLdScript data={jsonLd} />;
 }
 
 type FAQ = {
@@ -96,12 +97,7 @@ export function FAQJsonLd({ faqs }: { faqs: FAQ[] }) {
     })),
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLdScript data={jsonLd} />;
 }
 
 export function BreadcrumbJsonLd({
@@ -120,12 +116,7 @@ export function BreadcrumbJsonLd({
     })),
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLdScript data={jsonLd} />;
 }
 
 export function ArticleJsonLd({
@@ -169,10 +160,5 @@ export function ArticleJsonLd({
     },
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLdScript data={jsonLd} />;
 }

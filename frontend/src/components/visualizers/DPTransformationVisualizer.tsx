@@ -182,13 +182,13 @@ export default function DPTransformationVisualizer() {
     const callStack: string[] = [];
     const completed: { call: string; result: number; stepIdx: number }[] = [];
 
-    for (let i = 0; i < currentTrace.length; i++) {
-      const t = currentTrace[i];
-      if (t.action === "enter") {
-        callStack.push(t.call);
-      } else if (t.action === "exit") {
+    for (let idx = 0; idx < currentTrace.length; idx++) {
+      const traceItem = currentTrace[idx];
+      if (traceItem.action === "enter") {
+        callStack.push(traceItem.call);
+      } else if (traceItem.action === "exit") {
         callStack.pop();
-        completed.push({ call: t.call, result: t.result!, stepIdx: i });
+        completed.push({ call: traceItem.call, result: traceItem.result!, stepIdx: idx });
       }
     }
 

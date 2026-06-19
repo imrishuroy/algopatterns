@@ -362,6 +362,46 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
               )}
 
             {pattern.category === "Dynamic Programming" &&
+              section.title.includes("1D DP") && (
+                <div className="mt-8 space-y-8">
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <span className="text-green-400">▶</span> Interactive DP
+                      Transformation
+                    </h4>
+                    <DPTransformationVisualizer />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <span className="text-pink-400">▶</span> Side-by-Side
+                      Comparison
+                    </h4>
+                    <DPComparisonVisualizer />
+                  </div>
+                </div>
+              )}
+
+            {pattern.category === "Dynamic Programming" &&
+              section.title.includes("Decision DP") && (
+                <div className="mt-8 space-y-8">
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <span className="text-green-400">▶</span> Interactive House
+                      Robber
+                    </h4>
+                    <DPTransformationVisualizer />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <span className="text-pink-400">▶</span> Side-by-Side
+                      Comparison
+                    </h4>
+                    <DPComparisonVisualizer />
+                  </div>
+                </div>
+              )}
+
+            {pattern.category === "Dynamic Programming" &&
               section.title.includes("2D DP") && (
                 <div className="mt-8">
                   <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">

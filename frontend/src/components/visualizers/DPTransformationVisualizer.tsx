@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Stage = "recursion" | "memoization" | "tabulation" | "optimized";
@@ -180,14 +180,15 @@ export default function DPTransformationVisualizer() {
   const renderRecursion = () => {
     const currentTrace = trace.slice(0, step) as typeof recursionTrace;
     const callStack: string[] = [];
-    const completed: { call: string; result: number }[] = [];
+    const completed: { call: string; result: number; stepIdx: number }[] = [];
 
-    for (const t of currentTrace) {
-      if (t.action === "enter") {
-        callStack.push(t.call);
-      } else if (t.action === "exit") {
+    for (let idx = 0; idx < currentTrace.length; idx++) {
+      const traceItem = currentTrace[idx];
+      if (traceItem.action === "enter") {
+        callStack.push(traceItem.call);
+      } else if (traceItem.action === "exit") {
         callStack.pop();
-        completed.push({ call: t.call, result: t.result! });
+        completed.push({ call: traceItem.call, result: traceItem.result!, stepIdx: idx });
       }
     }
 
@@ -229,7 +230,7 @@ export default function DPTransformationVisualizer() {
             <AnimatePresence>
               {completed.slice(-5).map((c) => (
                 <motion.div
-                  key={`result-${c.call}-${c.result}`}
+                  key={`result-${c.call}-${c.stepIdx}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={`p-2 mb-2 rounded font-mono text-sm ${

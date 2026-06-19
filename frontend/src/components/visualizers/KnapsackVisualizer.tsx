@@ -88,10 +88,15 @@ export default function KnapsackVisualizer() {
 
   const { steps, dp: finalDp } = generateSteps();
 
+  const [completed, setCompleted] = useState(false);
+
   useEffect(() => {
-    if (!isPlaying || step >= steps.length) {
-      if (step >= steps.length) {
-        setIsPlaying(false);
+    if (!isPlaying) return;
+
+    if (step >= steps.length) {
+      setIsPlaying(false);
+      if (!completed) {
+        setCompleted(true);
         backtrackSolution();
       }
       return;
@@ -113,7 +118,7 @@ export default function KnapsackVisualizer() {
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [isPlaying, step, steps, speed]);
+  }, [isPlaying, step, steps.length, speed, completed]);
 
   const backtrackSolution = () => {
     const selected = new Set<number>();
@@ -133,6 +138,7 @@ export default function KnapsackVisualizer() {
   const reset = () => {
     setStep(0);
     setIsPlaying(false);
+    setCompleted(false);
     setDpTable(
       Array(items.length + 1)
         .fill(null)

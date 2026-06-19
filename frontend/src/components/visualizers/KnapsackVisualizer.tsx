@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Item {
@@ -15,7 +15,6 @@ export default function KnapsackVisualizer() {
   const [step, setStep] = useState(0);
   const [speed, setSpeed] = useState(600);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
-  const [currentCapacity, setCurrentCapacity] = useState(7);
   const [dpTable, setDpTable] = useState<number[][]>([]);
   const [currentCell, setCurrentCell] = useState<{
     i: number;

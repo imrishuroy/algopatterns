@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { apiClient } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 import type {
   Problem,
   TestCase,
@@ -108,6 +109,10 @@ export default function ProblemPageClient({ params }: PageProps) {
   const [consoleOutput, setConsoleOutput] = useState<string>("");
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const langDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Mobile state
+  const isMobile = useIsMobile();
+  const [mobileView, setMobileView] = useState<"problem" | "code" | "results">("problem");
 
   // Timer state
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -635,6 +640,456 @@ export default function ProblemPageClient({ params }: PageProps) {
     );
   }
 
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-64px)]">
+        {/* Mobile Tab Bar */}
+        <div className="flex border-b border-gray-800 bg-gray-900">
+          <button
+            onClick={() => setMobileView("problem")}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition ${
+              mobileView === "problem"
+                ? "text-white border-b-2 border-indigo-500"
+                : "text-gray-400"
+            }`}
+          >
+            Problem
+          </button>
+          <button
+            onClick={() => setMobileView("code")}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition ${
+              mobileView === "code"
+                ? "text-white border-b-2 border-indigo-500"
+                : "text-gray-400"
+            }`}
+          >
+            Code
+          </button>
+          <button
+            onClick={() => setMobileView("results")}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition ${
+              mobileView === "results"
+                ? "text-white border-b-2 border-indigo-500"
+                : "text-gray-400"
+            }`}
+          >
+            Results
+          </button>
+        </div>
+
+        {/* Mobile Content */}
+        <div className="flex-1 overflow-hidden">
+          {mobileView === "problem" && (
+            <div className="h-full overflow-y-auto">
+              {/* Problem Tabs */}
+              <div className="flex border-b border-gray-800 bg-gray-900/50 overflow-x-auto">
+                <button
+                  onClick={() => setActiveTab("description")}
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                    activeTab === "description"
+                      ? "text-white border-b-2 border-indigo-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  Description
+                </button>
+                <button
+                  onClick={() => setActiveTab("submissions")}
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                    activeTab === "submissions"
+                      ? "text-white border-b-2 border-indigo-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  Submissions
+                </button>
+                <button
+                  onClick={() => setActiveTab("hints")}
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                    activeTab === "hints"
+                      ? "text-white border-b-2 border-indigo-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  Hints
+                </button>
+                <button
+                  onClick={() => setActiveTab("solution")}
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                    activeTab === "solution"
+                      ? "text-white border-b-2 border-indigo-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  Solution
+                </button>
+              </div>
+
+              {/* Problem Content */}
+              <div className="p-4">
+                {activeTab === "description" ? (
+                  <div className="space-y-4">
+                    <div>
+                      <h1 className="text-xl font-bold text-white mb-1">
+                        {problem.title}
+                      </h1>
+                      <span className={`text-sm font-medium ${difficultyColors[problem.difficulty]}`}>
+                        {problem.difficulty}
+                      </span>
+                    </div>
+                    <div className="text-gray-300 text-sm whitespace-pre-wrap">
+                      {problem.description}
+                    </div>
+                    {testCases.length > 0 && (
+                      <div>
+                        <h3 className="text-base font-semibold text-white mb-2">Examples</h3>
+                        <div className="space-y-3">
+                          {testCases.map((tc, i) => (
+                            <div key={tc.id} className="bg-gray-900 rounded-lg p-3 border border-gray-800 text-sm">
+                              <div className="text-gray-400 mb-1">Example {i + 1}</div>
+                              <div className="space-y-1">
+                                <div>
+                                  <span className="text-gray-400">Input: </span>
+                                  <code className="text-white font-mono bg-gray-800 px-1.5 py-0.5 rounded text-xs">
+                                    {tc.input.replace(/\n/g, ", ")}
+                                  </code>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Output: </span>
+                                  <code className="text-white font-mono bg-gray-800 px-1.5 py-0.5 rounded text-xs">
+                                    {tc.expectedOutput}
+                                  </code>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {problem.constraints && (
+                      <div>
+                        <h3 className="text-base font-semibold text-white mb-2">Constraints</h3>
+                        <div className="text-gray-300 whitespace-pre-wrap font-mono text-xs bg-gray-900 rounded-lg p-3 border border-gray-800">
+                          {problem.constraints}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : activeTab === "submissions" ? (
+                  <div className="space-y-3">
+                    {!isAuthenticated ? (
+                      <div className="text-center py-8 text-gray-400">
+                        <p>Sign in to view your submissions</p>
+                        <button
+                          onClick={() => router.push("/login")}
+                          className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm"
+                        >
+                          Sign in
+                        </button>
+                      </div>
+                    ) : loadingSubmissions ? (
+                      <div className="text-center py-8 text-gray-400">Loading...</div>
+                    ) : submissions.length === 0 ? (
+                      <div className="text-center py-8 text-gray-400">No submissions yet</div>
+                    ) : (
+                      submissions.map((sub) => (
+                        <div
+                          key={sub.id}
+                          className={`p-3 rounded-lg border text-sm ${
+                            sub.status === "accepted"
+                              ? "bg-emerald-500/10 border-emerald-500/30"
+                              : "bg-gray-900 border-gray-800"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className={`font-medium ${statusColors[sub.status]}`}>
+                              {statusLabels[sub.status]}
+                            </span>
+                            <span className="text-gray-500 text-xs">
+                              {sub.testCasesPassed}/{sub.testCasesTotal}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                ) : activeTab === "hints" ? (
+                  <div className="space-y-3">
+                    {hints.length === 0 ? (
+                      <div className="text-gray-500">No hints available.</div>
+                    ) : (
+                      hints.map((hint, i) => (
+                        <div key={i} className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
+                          <button
+                            onClick={() => toggleHint(i)}
+                            className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-800/50 transition"
+                          >
+                            <span className="text-white font-medium text-sm">Hint {i + 1}</span>
+                            <svg
+                              className={`w-4 h-4 text-gray-400 transition-transform ${revealedHints.has(i) ? "rotate-180" : ""}`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          {revealedHints.has(i) && (
+                            <div className="px-3 pb-3 text-gray-300 text-sm border-t border-gray-800 pt-2">
+                              {hint}
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {!solutions[slug] ? (
+                      <div className="text-center py-8 text-gray-400">Solution coming soon!</div>
+                    ) : !problemSolved && !showSolution ? (
+                      <div className="text-center py-8">
+                        <div className="text-gray-400 mb-4 text-sm">Solve the problem to unlock the solution</div>
+                        <button
+                          onClick={() => setShowSolution(true)}
+                          className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm"
+                        >
+                          Reveal Solution
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="bg-gray-900 rounded-lg border border-gray-800 p-3">
+                          <h4 className="text-white font-medium text-sm mb-2">Approach</h4>
+                          <p className="text-gray-300 text-sm">{solutions[slug].approach}</p>
+                        </div>
+                        <div className="bg-gray-900 rounded-lg border border-gray-800 p-3">
+                          <h4 className="text-white font-medium text-sm mb-2">Complexity</h4>
+                          <p className="text-gray-400 text-xs">Time: {solutions[slug].timeComplexity}</p>
+                          <p className="text-gray-400 text-xs">Space: {solutions[slug].spaceComplexity}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {mobileView === "code" && (
+            <div className="h-full flex flex-col">
+              {/* Mobile Code Toolbar */}
+              <div className="flex items-center justify-between px-3 py-2 border-b border-gray-800 bg-gray-900">
+                <div className="relative" ref={langDropdownRef}>
+                  <button
+                    onClick={() => setShowLangDropdown(!showLangDropdown)}
+                    className="flex items-center gap-1 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-xs"
+                  >
+                    <span>{selectedLanguage?.name || "Language"}</span>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {showLangDropdown && (
+                    <div className="absolute top-full left-0 mt-1 w-32 bg-gray-800 border border-gray-700 rounded shadow-xl z-50">
+                      {templates.map((t) => (
+                        <button
+                          key={t.languageId}
+                          onClick={() => {
+                            handleLanguageChange(t.languageId);
+                            setShowLangDropdown(false);
+                          }}
+                          className={`w-full px-3 py-2 text-xs text-left hover:bg-gray-700 ${
+                            selectedLanguageId === t.languageId ? "text-indigo-400" : "text-white"
+                          }`}
+                        >
+                          {t.languageName}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-mono ${problemSolved ? "text-emerald-400" : "text-white"}`}>
+                    {formatTime(timerSeconds)}
+                  </span>
+                  <button
+                    onClick={handleReset}
+                    className="px-2 py-1 text-gray-400 hover:text-white text-xs"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Editor */}
+              <div className="flex-1 min-h-0">
+                <MonacoEditor
+                  height="100%"
+                  language={monacoLanguage}
+                  value={code}
+                  onChange={(value) => setCode(value || "")}
+                  theme="vs-dark"
+                  options={{
+                    fontSize: 12,
+                    fontFamily: "JetBrains Mono, monospace",
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    padding: { top: 8 },
+                    lineNumbers: "on",
+                    automaticLayout: true,
+                    wordWrap: "on",
+                  }}
+                />
+              </div>
+
+              {/* Mobile Action Buttons */}
+              <div className="flex gap-2 p-3 border-t border-gray-800 bg-gray-900">
+                <button
+                  onClick={handleRun}
+                  disabled={isRunning}
+                  className={`flex-1 py-2 rounded-lg font-medium text-sm ${
+                    isRunning
+                      ? "bg-gray-700 text-gray-400"
+                      : "bg-gray-700 hover:bg-gray-600 text-white"
+                  }`}
+                >
+                  {isRunning ? "Running..." : "Run"}
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className={`flex-1 py-2 rounded-lg font-medium text-sm ${
+                    isSubmitting
+                      ? "bg-gray-700 text-gray-400"
+                      : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                  }`}
+                >
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {mobileView === "results" && (
+            <div className="h-full overflow-y-auto p-4">
+              {/* Result Tabs */}
+              <div className="flex mb-3 border-b border-gray-800">
+                <button
+                  onClick={() => setResultTab("testcases")}
+                  className={`px-3 py-2 text-sm font-medium ${
+                    resultTab === "testcases"
+                      ? "text-white border-b-2 border-indigo-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  Test Cases
+                </button>
+                <button
+                  onClick={() => setResultTab("console")}
+                  className={`px-3 py-2 text-sm font-medium ${
+                    resultTab === "console"
+                      ? "text-white border-b-2 border-indigo-500"
+                      : "text-gray-400"
+                  }`}
+                >
+                  Console
+                </button>
+              </div>
+
+              {resultTab === "testcases" ? (
+                <div className="space-y-2">
+                  {submission && (
+                    <div className="flex items-center justify-between mb-3 p-2 rounded-lg bg-gray-900">
+                      <span className={`font-semibold text-sm ${statusColors[submission.status]}`}>
+                        {statusLabels[submission.status]}
+                      </span>
+                      <span className="text-gray-400 text-xs">
+                        {submission.testCasesPassed}/{submission.testCasesTotal} passed
+                      </span>
+                    </div>
+                  )}
+
+                  {runResults && (
+                    <div className="flex items-center justify-between mb-3 p-2 rounded-lg bg-gray-900">
+                      <span className="font-semibold text-sm text-blue-400">Run Results</span>
+                      <span className="text-gray-400 text-xs">
+                        {runResults.filter((r) => r.status === "accepted").length}/{runResults.length} passed
+                      </span>
+                    </div>
+                  )}
+
+                  {submission?.results?.map((result: SubmissionResult, i: number) => (
+                    <div
+                      key={result.id}
+                      className={`p-2 rounded-lg border text-sm ${
+                        result.status === "accepted"
+                          ? "bg-emerald-500/10 border-emerald-500/30"
+                          : "bg-red-500/10 border-red-500/30"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-white text-xs">Test {i + 1}</span>
+                        <span className={`text-xs ${statusColors[result.status]}`}>
+                          {statusLabels[result.status]}
+                        </span>
+                      </div>
+                      {result.status !== "accepted" && (
+                        <div className="text-xs space-y-0.5">
+                          <div><span className="text-gray-400">Expected:</span> <code className="text-emerald-400">{result.expectedOutput}</code></div>
+                          <div><span className="text-gray-400">Got:</span> <code className="text-red-400">{result.actualOutput || "No output"}</code></div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {runResults?.map((result: RunCodeResult, i: number) => (
+                    <div
+                      key={i}
+                      className={`p-2 rounded-lg border text-sm ${
+                        result.status === "accepted"
+                          ? "bg-emerald-500/10 border-emerald-500/30"
+                          : "bg-red-500/10 border-red-500/30"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-white text-xs">Test {i + 1}</span>
+                        <span className={`text-xs ${statusColors[result.status]}`}>
+                          {statusLabels[result.status]}
+                        </span>
+                      </div>
+                      <div className="text-xs space-y-0.5">
+                        <div><span className="text-gray-400">Expected:</span> <code className="text-emerald-400">{result.expectedOutput}</code></div>
+                        <div><span className="text-gray-400">Output:</span> <code className={result.status === "accepted" ? "text-emerald-400" : "text-red-400"}>{result.actualOutput || "No output"}</code></div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {!submission && !runResults && testCases.map((tc, i) => (
+                    <div key={tc.id} className="p-2 rounded-lg border bg-gray-800/50 border-gray-700 text-sm">
+                      <div className="font-medium text-white text-xs mb-1">Case {i + 1}</div>
+                      <div className="text-xs space-y-0.5">
+                        <div><span className="text-gray-400">Input:</span> <code className="text-white">{tc.input.replace(/\n/g, ", ")}</code></div>
+                        <div><span className="text-gray-400">Expected:</span> <code className="text-emerald-400">{tc.expectedOutput}</code></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+                  {consoleOutput || "No console output"}
+                </pre>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Layout
   return (
     <div ref={panelRef} className="flex h-[calc(100vh-64px)]">
       {/* Left Panel - Problem Description */}

@@ -54,10 +54,10 @@ export default function PricingPage() {
   });
 
   return (
-    <div className="min-h-screen py-16 px-4">
+    <div className="min-h-screen py-8 md:py-16 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Choose Your Plan
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -79,30 +79,30 @@ export default function PricingPage() {
         </div>
 
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">
             Why Upgrade to Pro?
           </h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
             <FeatureHighlight
-              icon="📚"
+              icon="patterns"
               title="All Patterns"
               description="Access every DSA pattern with detailed explanations and code"
             />
             <FeatureHighlight
-              icon="🎯"
+              icon="visualizers"
               title="Interactive Visualizers"
               description="Understand algorithms with step-by-step animations"
             />
             <FeatureHighlight
-              icon="💡"
+              icon="solutions"
               title="Complete Solutions"
               description="Learn from expert solutions with multiple approaches"
             />
           </div>
         </div>
 
-        <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-8 max-w-2xl mx-auto">
+        <div className="mt-10 md:mt-16 text-center">
+          <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-6 md:p-8 max-w-2xl mx-auto">
             <h3 className="text-xl font-bold text-white mb-2">
               Lifetime Access Promise
             </h3>
@@ -156,13 +156,34 @@ function FeatureHighlight({
   title,
   description,
 }: {
-  icon: string;
+  icon: "patterns" | "visualizers" | "solutions";
   title: string;
   description: string;
 }) {
+  const icons = {
+    patterns: (
+      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    ),
+    visualizers: (
+      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    solutions: (
+      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+      </svg>
+    ),
+  };
+
   return (
     <div className="text-center">
-      <div className="text-4xl mb-3">{icon}</div>
+      <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-400 mb-4">
+        {icons[icon]}
+      </div>
       <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
       <p className="text-gray-400 text-sm">{description}</p>
     </div>

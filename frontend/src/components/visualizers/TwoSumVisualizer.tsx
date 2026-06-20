@@ -124,11 +124,11 @@ export default function TwoSumVisualizer() {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "found" || phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-3 md:px-4 py-2 rounded-lg font-medium text-sm md:text-base transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -136,12 +136,12 @@ export default function TwoSumVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-3 md:px-4 py-2 bg-gray-700 text-white rounded-lg font-medium text-sm md:text-base hover:bg-gray-600"
           >
             Reset
           </button>
-          <div className="flex items-center gap-2 ml-4">
-            <span className="text-gray-400 text-sm">Speed:</span>
+          <div className="flex items-center gap-2 ml-auto md:ml-4">
+            <span className="text-gray-400 text-xs md:text-sm">Speed:</span>
             <input
               type="range"
               min="400"
@@ -149,17 +149,17 @@ export default function TwoSumVisualizer() {
               step="100"
               value={1900 - speed}
               onChange={(e) => setSpeed(1900 - Number(e.target.value))}
-              className="w-20 accent-pink-500"
+              className="w-16 md:w-20 accent-pink-500"
             />
           </div>
         </div>
 
         {/* Array Visualization */}
-        <div className="mb-6">
+        <div className="mb-6 overflow-x-auto">
           <div className="text-sm text-gray-400 mb-2">
             nums = [{nums.join(", ")}]
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 md:gap-2 min-w-max">
             {nums.map((num, idx) => (
               <motion.div
                 key={`num-${num}-${idx}`}
@@ -167,10 +167,10 @@ export default function TwoSumVisualizer() {
                   scale: idx === currentIndex ? 1.1 : 1,
                   y: idx === currentIndex ? -5 : 0,
                 }}
-                className={`w-14 h-14 rounded-lg border-2 flex flex-col items-center justify-center transition-colors ${getArrayCellStyle(idx)}`}
+                className={`w-10 h-10 md:w-14 md:h-14 rounded-lg border-2 flex flex-col items-center justify-center transition-colors ${getArrayCellStyle(idx)}`}
               >
-                <span className="text-xs text-gray-400">i={idx}</span>
-                <span className="text-lg font-bold">{num}</span>
+                <span className="text-[10px] md:text-xs text-gray-400">i={idx}</span>
+                <span className="text-sm md:text-lg font-bold">{num}</span>
               </motion.div>
             ))}
           </div>

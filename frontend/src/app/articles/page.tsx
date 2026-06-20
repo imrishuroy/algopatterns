@@ -19,8 +19,8 @@ export default function ArticlesPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <header className="mb-12">
+      <div className="max-w-6xl mx-auto px-4 py-6 md:py-12">
+        <header className="mb-8 md:mb-12">
           <Link
             href="/"
             className="text-indigo-400 hover:text-indigo-300 text-sm mb-4 inline-block"
@@ -64,7 +64,7 @@ export default function ArticlesPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-gray-800">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-medium">
                         {article.authorAvatar}
@@ -80,8 +80,8 @@ export default function ArticlesPage() {
                     </div>
 
                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>{article.sections.length} sections</span>
-                      <div className="flex gap-2">
+                      <span className="hidden sm:inline">{article.sections.length} sections</span>
+                      <div className="flex gap-2 flex-wrap">
                         {article.tags.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
@@ -99,7 +99,7 @@ export default function ArticlesPage() {
                     <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
                       Sections
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                       {article.sections.slice(0, 6).map((section, idx) => (
                         <div
                           key={section.slug}

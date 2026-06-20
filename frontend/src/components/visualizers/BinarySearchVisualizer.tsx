@@ -156,11 +156,11 @@ export default function BinarySearchVisualizer() {
 
       <div className="p-4">
         {/* Controls */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-3 md:px-4 py-2 rounded-lg font-medium text-sm md:text-base transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -168,12 +168,12 @@ export default function BinarySearchVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-3 md:px-4 py-2 bg-gray-700 text-white rounded-lg font-medium text-sm md:text-base hover:bg-gray-600"
           >
             Reset
           </button>
-          <div className="flex items-center gap-2 ml-4">
-            <span className="text-gray-400 text-sm">Speed:</span>
+          <div className="flex items-center gap-2 ml-auto md:ml-4">
+            <span className="text-gray-400 text-xs md:text-sm">Speed:</span>
             <input
               type="range"
               min="400"
@@ -181,7 +181,7 @@ export default function BinarySearchVisualizer() {
               step="100"
               value={1600 - speed}
               onChange={(e) => setSpeed(1600 - Number(e.target.value))}
-              className="w-20 accent-blue-500"
+              className="w-16 md:w-20 accent-blue-500"
             />
           </div>
         </div>

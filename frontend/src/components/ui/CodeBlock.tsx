@@ -86,7 +86,7 @@ export default function CodeBlock({
       : normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1);
 
   return (
-    <div className="relative group rounded-xl overflow-hidden border border-gray-800 bg-[#011627]">
+    <div className="relative group rounded-xl overflow-hidden border border-gray-800 bg-[#011627] theme-dark">
       {/* Header bar */}
       <div className="flex items-center justify-between px-4 py-2 bg-[#0d1b2a] border-b border-gray-800">
         <div className="flex items-center gap-2">

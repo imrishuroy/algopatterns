@@ -13,13 +13,13 @@ export default function PatternRecognitionPage() {
   const [currentLang, setCurrentLang] = useState<Language>("java");
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-4 md:py-8">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
+      <div className="text-center mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
           Pattern Recognition Guide
         </h1>
-        <p className="text-gray-400">
+        <p className="text-gray-400 text-sm md:text-base">
           Learn to identify the right approach for any coding problem
         </p>
       </div>

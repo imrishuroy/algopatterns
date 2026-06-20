@@ -7,6 +7,7 @@ import { useProgress } from "@/contexts/ProgressContext";
 import { useFilter } from "@/contexts/FilterContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { questions } from "@/lib/questions";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 const SunIcon = () => (
   <svg
@@ -168,13 +169,27 @@ const AuthSection = ({
   );
 };
 
+const MenuIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
 const Header = () => {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { completed } = useProgress();
   const { companyFilter } = useFilter();
   const { theme, toggleTheme } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const filteredQuestions = useMemo(() => {
     if (!companyFilter) return questions;
@@ -205,6 +220,12 @@ const Header = () => {
     await logout();
   };
 
+  const navLinks = [
+    { href: "/pattern-recognition", label: "Pattern Recognition" },
+    { href: "/interview-cheatsheet", label: "Interview Cheat Sheet" },
+    { href: "/articles", label: "Articles" },
+  ];
+
   return (
     <header
       className="sticky top-0 z-50 backdrop-blur-md border-b transition-all"
@@ -213,7 +234,7 @@ const Header = () => {
         borderColor: "var(--border-1)",
       }}
     >
-      <div className="w-full px-6 py-3">
+      <div className="w-full px-4 md:px-6 py-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <img
@@ -234,30 +255,18 @@ const Header = () => {
             </span>
           </Link>
 
-          <div className="flex items-center gap-6">
-            <Link
-              href="/pattern-recognition"
-              className="text-sm font-medium transition-colors hover:opacity-80"
-              style={{ color: "var(--accent-1)" }}
-            >
-              Pattern Recognition
-            </Link>
-
-            <Link
-              href="/interview-cheatsheet"
-              className="text-sm font-medium transition-colors hover:opacity-80"
-              style={{ color: "var(--accent-1)" }}
-            >
-              Interview Cheat Sheet
-            </Link>
-
-            <Link
-              href="/articles"
-              className="text-sm font-medium transition-colors hover:opacity-80"
-              style={{ color: "var(--accent-1)" }}
-            >
-              Articles
-            </Link>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium transition-colors hover:opacity-80"
+                style={{ color: "var(--accent-1)" }}
+              >
+                {link.label}
+              </Link>
+            ))}
 
             <div className="flex items-center gap-2">
               {companyFilter && (
@@ -301,8 +310,96 @@ const Header = () => {
               dropdownRef={dropdownRef}
             />
           </div>
+
+          {/* Mobile: Progress + Menu Button */}
+          <div className="flex md:hidden items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-16 h-1.5 overflow-hidden"
+                style={{
+                  background: "var(--bg-elevated)",
+                  borderRadius: "var(--radius-full)",
+                }}
+              >
+                <div
+                  className="h-full transition-all duration-500"
+                  style={{
+                    width: `${percent}%`,
+                    background: "var(--accent-gradient)",
+                    borderRadius: "var(--radius-full)",
+                  }}
+                />
+              </div>
+              <span className="text-xs" style={{ color: "var(--text-3)" }}>
+                {completedCount}/{total}
+              </span>
+            </div>
+
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              style={{ color: "var(--text-1)" }}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {isMobile && mobileMenuOpen && (
+        <div
+          className="md:hidden border-t animate-fade-in"
+          style={{
+            background: "var(--bg-surface)",
+            borderColor: "var(--border-1)",
+          }}
+        >
+          <nav className="px-4 py-4 space-y-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-white/5"
+                style={{ color: "var(--accent-1)" }}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            <div
+              className="my-3 border-t"
+              style={{ borderColor: "var(--border-1)" }}
+            />
+
+            <div className="flex items-center justify-between px-4 py-2">
+              <span className="text-sm" style={{ color: "var(--text-2)" }}>
+                Theme
+              </span>
+              <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            </div>
+
+            <div
+              className="my-3 border-t"
+              style={{ borderColor: "var(--border-1)" }}
+            />
+
+            <div className="px-4 py-2">
+              <AuthSection
+                isLoading={isLoading}
+                isAuthenticated={isAuthenticated}
+                user={user}
+                showDropdown={showDropdown}
+                onToggleDropdown={() => setShowDropdown(!showDropdown)}
+                onLogout={handleLogout}
+                dropdownRef={dropdownRef}
+              />
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

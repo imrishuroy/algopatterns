@@ -169,12 +169,12 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-1 mt-6 -mb-px">
+          <div className="flex gap-1 mt-4 md:mt-6 -mb-px overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-t-lg transition-colors ${
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? "bg-gray-950 text-white border-t border-l border-r border-gray-800"
                     : "text-gray-400 hover:text-white hover:bg-gray-800/50"
@@ -193,7 +193,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-4 md:py-8">
         {subscriptionLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="text-gray-400">Loading...</div>

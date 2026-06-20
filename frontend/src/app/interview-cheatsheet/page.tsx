@@ -994,15 +994,15 @@ const InterviewCheatsheetPage = () => {
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Interview Cheat Sheet</h1>
-        <p className="text-gray-400">Quick revision guide - scan this before your interview</p>
+    <div className="max-w-6xl mx-auto px-4 py-4 md:py-8">
+      <div className="text-center mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Interview Cheat Sheet</h1>
+        <p className="text-gray-400 text-sm md:text-base">Quick revision guide - scan this before your interview</p>
       </div>
 
-      <section className="mb-10">
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
-          <h2 className="text-xl font-bold text-white mb-2">The Golden Rule: Check Constraints First</h2>
+      <section className="mb-8 md:mb-10">
+        <div className="p-4 md:p-6 bg-gray-900 rounded-xl border border-gray-800">
+          <h2 className="text-lg md:text-xl font-bold text-white mb-2">The Golden Rule: Check Constraints First</h2>
           <p className="text-gray-400 mb-5">
             Before anything else, look at the input size. This tells you which algorithms are even possible.
           </p>

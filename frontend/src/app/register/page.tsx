@@ -97,13 +97,8 @@ export default function RegisterPage() {
             text="Sign up with Google"
           />
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600 dark:border-gray-600" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-800/50 text-gray-400">or continue with email</span>
-            </div>
+          <div className="my-6 flex justify-center">
+            <span className="text-sm text-gray-400">or continue with email</span>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

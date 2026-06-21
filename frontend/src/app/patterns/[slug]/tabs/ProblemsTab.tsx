@@ -2,13 +2,15 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Question, Problem } from "@/types";
-import { apiClient } from "@/lib/api";
+import { Question } from "@/types";
+
+const SCROLL_STORAGE_KEY = "problems_scroll_position";
 
 interface ProblemsTabProps {
   questions: Question[];
   completed: Set<string>;
   onToggleComplete: (id: string) => void;
+  patternId: string;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -33,6 +35,7 @@ export default function ProblemsTab({
   questions,
   completed,
   onToggleComplete,
+  patternId,
 }: ProblemsTabProps) {
   const [search, setSearch] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("");
@@ -40,27 +43,23 @@ export default function ProblemsTab({
     "all" | "completed" | "todo"
   >("all");
   const [sortBy, setSortBy] = useState<SortOption>("difficulty");
-  const [availableProblems, setAvailableProblems] = useState<Set<string>>(
-    new Set()
-  );
-
-  // Fetch problems available in our database
+  // Restore scroll position when returning from problem page
   useEffect(() => {
-    const fetchProblems = async () => {
-      try {
-        const response = await apiClient.getProblems({ limit: 100 });
-        if (response.success && response.data.problems) {
-          const slugs = new Set(
-            response.data.problems.map((p: Problem) => p.slug)
-          );
-          setAvailableProblems(slugs);
-        }
-      } catch {
-        // Silently fail - problems just won't show solve button
-      }
-    };
-    fetchProblems();
-  }, []);
+    const savedScroll = sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`);
+    if (savedScroll) {
+      const scrollTop = parseInt(savedScroll, 10);
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollTop);
+      });
+      sessionStorage.removeItem(`${SCROLL_STORAGE_KEY}_${patternId}`);
+    }
+  }, [patternId]);
+
+  // Save scroll position before navigating to problem
+  const saveScrollPosition = () => {
+    sessionStorage.setItem(`${SCROLL_STORAGE_KEY}_${patternId}`, window.scrollY.toString());
+  };
 
   const filteredAndSorted = useMemo(() => {
     let result = [...questions];
@@ -313,14 +312,13 @@ export default function ProblemsTab({
               <span className="text-sm" title="Frequency">
                 {q.frequency}
               </span>
-              {availableProblems.has(nameToSlug(q.name)) && (
-                <Link
-                  href={`/problems/${nameToSlug(q.name)}`}
-                  className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium rounded-lg transition"
-                >
-                  Solve
-                </Link>
-              )}
+              <Link
+                href={`/problems/${nameToSlug(q.name)}?from=${patternId}`}
+                onClick={saveScrollPosition}
+                className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium rounded-lg transition"
+              >
+                Solve
+              </Link>
             </div>
           </div>
         ))}

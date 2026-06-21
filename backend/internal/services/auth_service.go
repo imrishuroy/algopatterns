@@ -2,9 +2,6 @@ package services
 
 import (
 	"context"
-	"crypto/rand"
-	"crypto/sha256"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"time"
@@ -27,8 +24,9 @@ var (
 )
 
 type AuthService struct {
-	userRepo repository.UserRepositoryInterface
-	config   *config.AuthConfig
+	userRepo       repository.UserRepositoryInterface
+	sessionService *SessionService
+	config         *config.AuthConfig
 }
 
 type JWTClaims struct {
@@ -37,10 +35,11 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 
-func NewAuthService(userRepo repository.UserRepositoryInterface, cfg *config.AuthConfig) *AuthService {
+func NewAuthService(userRepo repository.UserRepositoryInterface, sessionService *SessionService, cfg *config.AuthConfig) *AuthService {
 	return &AuthService{
-		userRepo: userRepo,
-		config:   cfg,
+		userRepo:       userRepo,
+		sessionService: sessionService,
+		config:         cfg,
 	}
 }
 
@@ -50,11 +49,13 @@ func (s *AuthService) Register(ctx context.Context, req *models.RegisterRequest)
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
+	hashStr := string(passwordHash)
 	user := &models.User{
 		ID:           uuid.New(),
 		Email:        req.Email,
-		PasswordHash: string(passwordHash),
+		PasswordHash: &hashStr,
 		Name:         req.Name,
+		HasPassword:  true,
 	}
 
 	if err := s.userRepo.Create(ctx, user); err != nil {
@@ -76,7 +77,11 @@ func (s *AuthService) Login(ctx context.Context, req *models.LoginRequest) (*mod
 		return nil, err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+	if !user.HasPassword || user.PasswordHash == nil {
+		return nil, ErrInvalidCredentials
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(*user.PasswordHash), []byte(req.Password)); err != nil {
 		return nil, ErrInvalidCredentials
 	}
 
@@ -104,26 +109,11 @@ func (s *AuthService) GenerateAccessToken(user *models.User) (string, int64, err
 	return tokenString, int64(s.config.AccessTokenDuration.Seconds()), nil
 }
 
-func (s *AuthService) GenerateRefreshToken(ctx context.Context, userID uuid.UUID) (string, error) {
-	tokenBytes := make([]byte, 32)
-	if _, err := rand.Read(tokenBytes); err != nil {
-		return "", fmt.Errorf("failed to generate random token: %w", err)
-	}
-	rawToken := base64.URLEncoding.EncodeToString(tokenBytes)
-
-	hash := sha256.Sum256([]byte(rawToken))
-	tokenHash := base64.URLEncoding.EncodeToString(hash[:])
-
-	refreshToken := &models.RefreshToken{
-		UserID:    userID,
-		TokenHash: tokenHash,
-		ExpiresAt: time.Now().Add(s.config.RefreshTokenDuration),
-	}
-
-	if err := s.userRepo.CreateRefreshToken(ctx, refreshToken); err != nil {
+func (s *AuthService) GenerateRefreshToken(ctx context.Context, userID uuid.UUID, deviceInfo *models.DeviceInfo) (string, error) {
+	_, rawToken, err := s.sessionService.CreateSession(ctx, userID, deviceInfo)
+	if err != nil {
 		return "", err
 	}
-
 	return rawToken, nil
 }
 
@@ -150,28 +140,18 @@ func (s *AuthService) ValidateAccessToken(tokenString string) (*JWTClaims, error
 }
 
 func (s *AuthService) RefreshAccessToken(ctx context.Context, rawRefreshToken string) (*models.User, string, int64, error) {
-	hash := sha256.Sum256([]byte(rawRefreshToken))
-	tokenHash := base64.URLEncoding.EncodeToString(hash[:])
-
-	refreshToken, err := s.userRepo.GetRefreshToken(ctx, tokenHash)
+	_, user, err := s.sessionService.ValidateRefreshToken(ctx, rawRefreshToken)
 	if err != nil {
-		if errors.Is(err, repository.ErrNotFound) {
+		switch err {
+		case ErrSessionNotFound:
 			return nil, "", 0, ErrTokenInvalid
+		case ErrSessionRevoked:
+			return nil, "", 0, ErrTokenRevoked
+		case ErrSessionExpired:
+			return nil, "", 0, ErrTokenExpired
+		default:
+			return nil, "", 0, err
 		}
-		return nil, "", 0, err
-	}
-
-	if refreshToken.RevokedAt != nil {
-		return nil, "", 0, ErrTokenRevoked
-	}
-
-	if time.Now().After(refreshToken.ExpiresAt) {
-		return nil, "", 0, ErrTokenExpired
-	}
-
-	user, err := s.userRepo.GetByID(ctx, refreshToken.UserID)
-	if err != nil {
-		return nil, "", 0, err
 	}
 
 	accessToken, expiresIn, err := s.GenerateAccessToken(user)
@@ -183,13 +163,12 @@ func (s *AuthService) RefreshAccessToken(ctx context.Context, rawRefreshToken st
 }
 
 func (s *AuthService) Logout(ctx context.Context, rawRefreshToken string) error {
-	hash := sha256.Sum256([]byte(rawRefreshToken))
-	tokenHash := base64.URLEncoding.EncodeToString(hash[:])
-	return s.userRepo.RevokeRefreshToken(ctx, tokenHash)
+	return s.sessionService.RevokeSessionByRawToken(ctx, rawRefreshToken, "logout")
 }
 
 func (s *AuthService) LogoutAll(ctx context.Context, userID uuid.UUID) error {
-	return s.userRepo.RevokeAllUserTokens(ctx, userID)
+	_, err := s.sessionService.RevokeAllUserSessions(ctx, userID, "logout_all")
+	return err
 }
 
 func (s *AuthService) GetUser(ctx context.Context, userID uuid.UUID) (*models.User, error) {
@@ -209,7 +188,11 @@ func (s *AuthService) ChangePassword(ctx context.Context, userID uuid.UUID, curr
 		return err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(currentPassword)); err != nil {
+	if !user.HasPassword || user.PasswordHash == nil {
+		return ErrInvalidCredentials
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(*user.PasswordHash), []byte(currentPassword)); err != nil {
 		return ErrInvalidCredentials
 	}
 
@@ -222,7 +205,8 @@ func (s *AuthService) ChangePassword(ctx context.Context, userID uuid.UUID, curr
 		return err
 	}
 
-	return s.userRepo.RevokeAllUserTokens(ctx, userID)
+	_, err = s.sessionService.RevokeAllUserSessions(ctx, userID, "password_change")
+	return err
 }
 
 func (s *AuthService) UpdateProfile(ctx context.Context, userID uuid.UUID, req *models.UpdateProfileRequest) (*models.User, error) {
@@ -244,6 +228,29 @@ func (s *AuthService) UpdateProfile(ctx context.Context, userID uuid.UUID, req *
 
 func (s *AuthService) DeleteAccount(ctx context.Context, userID uuid.UUID) error {
 	return s.userRepo.Delete(ctx, userID)
+}
+
+func (s *AuthService) AddPassword(ctx context.Context, userID uuid.UUID, password string) error {
+	user, err := s.userRepo.GetByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if user.HasPassword {
+		return ErrPasswordAlreadySet
+	}
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), s.config.BCryptCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	if err := s.userRepo.UpdatePassword(ctx, userID, string(passwordHash)); err != nil {
+		return err
+	}
+
+	user.HasPassword = true
+	return s.userRepo.Update(ctx, user)
 }
 
 func UserToResponse(user *models.User) models.UserResponse {

@@ -123,6 +123,17 @@ export interface LoginRequest {
   password: string;
 }
 
+// Google OAuth types
+export interface GoogleAuthURLResponse {
+  url: string;
+  state: string;
+}
+
+export interface GoogleCallbackRequest {
+  code: string;
+  state: string;
+}
+
 // Problem types
 export interface Problem {
   id: string;

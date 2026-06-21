@@ -39,13 +39,16 @@ export function PricingCard({
   };
 
   const getBillingLabel = () => {
+    if (plan.id === "free") {
+      return "";
+    }
     switch (plan.billing_period) {
       case "monthly":
         return "/month";
       case "yearly":
         return "/year";
       case "lifetime":
-        return " one-time";
+        return "one-time";
       default:
         return "";
     }

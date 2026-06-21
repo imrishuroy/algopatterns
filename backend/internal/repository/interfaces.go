@@ -35,3 +35,27 @@ type QuizRepositoryInterface interface {
 	GetResponsesByAttempt(ctx context.Context, attemptID uuid.UUID) ([]models.QuizResponse, error)
 	CountCorrectResponses(ctx context.Context, attemptID uuid.UUID) (int, error)
 }
+
+type OAuthRepositoryInterface interface {
+	CreateProvider(ctx context.Context, provider *models.OAuthProvider) error
+	GetByProviderID(ctx context.Context, provider string, providerUserID string) (*models.OAuthProvider, error)
+	GetUserProviders(ctx context.Context, userID uuid.UUID) ([]*models.OAuthProvider, error)
+	GetUserProvider(ctx context.Context, userID uuid.UUID, provider string) (*models.OAuthProvider, error)
+	DeleteProvider(ctx context.Context, userID uuid.UUID, provider string) error
+	CreateState(ctx context.Context, state *models.OAuthState) error
+	GetState(ctx context.Context, state string) (*models.OAuthState, error)
+	DeleteState(ctx context.Context, state string) error
+	CleanupExpiredStates(ctx context.Context) (int64, error)
+}
+
+type SessionRepositoryInterface interface {
+	Create(ctx context.Context, session *models.Session) error
+	GetByTokenHash(ctx context.Context, tokenHash string) (*models.Session, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*models.Session, error)
+	GetUserSessions(ctx context.Context, userID uuid.UUID) ([]*models.Session, error)
+	UpdateLastUsed(ctx context.Context, id uuid.UUID) error
+	Revoke(ctx context.Context, id uuid.UUID, reason string) error
+	RevokeByTokenHash(ctx context.Context, tokenHash string, reason string) error
+	RevokeAllUserSessions(ctx context.Context, userID uuid.UUID, reason string) (int64, error)
+	CleanupExpired(ctx context.Context) (int64, error)
+}

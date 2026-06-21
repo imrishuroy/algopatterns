@@ -31,9 +31,9 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 	}
 
 	_, err := r.db.Pool.Exec(ctx, `
-		INSERT INTO users (id, email, password_hash, name, email_verified, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
-	`, user.ID, user.Email, user.PasswordHash, user.Name, user.EmailVerified, user.CreatedAt, user.UpdatedAt)
+		INSERT INTO users (id, email, password_hash, name, email_verified, has_password, avatar_url, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	`, user.ID, user.Email, user.PasswordHash, user.Name, user.EmailVerified, user.HasPassword, user.AvatarURL, user.CreatedAt, user.UpdatedAt)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key") || strings.Contains(err.Error(), "unique constraint") {
 			return ErrEmailExists
@@ -47,9 +47,9 @@ func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 func (r *UserRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.User, error) {
 	user := &models.User{}
 	err := r.db.Pool.QueryRow(ctx, `
-		SELECT id, email, password_hash, name, email_verified, email_verified_at, created_at, updated_at
+		SELECT id, email, password_hash, name, email_verified, email_verified_at, has_password, avatar_url, created_at, updated_at
 		FROM users WHERE id = $1
-	`, id).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Name, &user.EmailVerified, &user.EmailVerifiedAt, &user.CreatedAt, &user.UpdatedAt)
+	`, id).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Name, &user.EmailVerified, &user.EmailVerifiedAt, &user.HasPassword, &user.AvatarURL, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNotFound
@@ -62,9 +62,9 @@ func (r *UserRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.Use
 func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
 	user := &models.User{}
 	err := r.db.Pool.QueryRow(ctx, `
-		SELECT id, email, password_hash, name, email_verified, email_verified_at, created_at, updated_at
+		SELECT id, email, password_hash, name, email_verified, email_verified_at, has_password, avatar_url, created_at, updated_at
 		FROM users WHERE email = $1
-	`, email).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Name, &user.EmailVerified, &user.EmailVerifiedAt, &user.CreatedAt, &user.UpdatedAt)
+	`, email).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Name, &user.EmailVerified, &user.EmailVerifiedAt, &user.HasPassword, &user.AvatarURL, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNotFound
@@ -77,9 +77,9 @@ func (r *UserRepository) GetByEmail(ctx context.Context, email string) (*models.
 func (r *UserRepository) Update(ctx context.Context, user *models.User) error {
 	user.UpdatedAt = time.Now()
 	result, err := r.db.Pool.Exec(ctx, `
-		UPDATE users SET name = $1, email_verified = $2, email_verified_at = $3, updated_at = $4
-		WHERE id = $5
-	`, user.Name, user.EmailVerified, user.EmailVerifiedAt, user.UpdatedAt, user.ID)
+		UPDATE users SET name = $1, email_verified = $2, email_verified_at = $3, has_password = $4, avatar_url = $5, updated_at = $6
+		WHERE id = $7
+	`, user.Name, user.EmailVerified, user.EmailVerifiedAt, user.HasPassword, user.AvatarURL, user.UpdatedAt, user.ID)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}

@@ -10,13 +10,14 @@ import (
 )
 
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	Logging  LoggingConfig
-	Auth     AuthConfig
-	Judge0   Judge0Config
-	Razorpay RazorpayConfig
-	Email    EmailConfig
+	Server      ServerConfig
+	Database    DatabaseConfig
+	Logging     LoggingConfig
+	Auth        AuthConfig
+	GoogleOAuth GoogleOAuthConfig
+	Judge0      Judge0Config
+	Razorpay    RazorpayConfig
+	Email       EmailConfig
 }
 
 type EmailConfig struct {
@@ -48,10 +49,17 @@ type Judge0Config struct {
 }
 
 type AuthConfig struct {
-	JWTSecret             string
-	AccessTokenDuration   time.Duration
-	RefreshTokenDuration  time.Duration
-	BCryptCost            int
+	JWTSecret            string
+	AccessTokenDuration  time.Duration
+	RefreshTokenDuration time.Duration
+	BCryptCost           int
+	SingleSessionEnabled bool
+}
+
+type GoogleOAuthConfig struct {
+	ClientID     string
+	ClientSecret string
+	RedirectURI  string
 }
 
 type ServerConfig struct {
@@ -126,6 +134,12 @@ func Load() (*Config, error) {
 			AccessTokenDuration:  getDurationEnv("ACCESS_TOKEN_DURATION", 15*time.Minute),
 			RefreshTokenDuration: getDurationEnv("REFRESH_TOKEN_DURATION", 7*24*time.Hour),
 			BCryptCost:           getIntEnv("BCRYPT_COST", 12),
+			SingleSessionEnabled: getBoolEnv("SINGLE_SESSION_ENABLED", true),
+		},
+		GoogleOAuth: GoogleOAuthConfig{
+			ClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
+			ClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
+			RedirectURI:  getEnv("GOOGLE_REDIRECT_URI", "http://localhost:8080/api/v1/auth/google/callback"),
 		},
 		Judge0: Judge0Config{
 			BaseURL:       getEnv("JUDGE0_URL", "http://localhost:2358"),

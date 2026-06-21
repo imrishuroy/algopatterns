@@ -19,15 +19,15 @@ const (
 )
 
 type AuthHandler struct {
-	authService *services.AuthService
-	authMW      *middleware.AuthMiddleware
+	authService  *services.AuthService
+	authMW       *middleware.AuthMiddleware
 	secureCookie bool
 }
 
 func NewAuthHandler(authService *services.AuthService, authMW *middleware.AuthMiddleware, secureCookie bool) *AuthHandler {
 	return &AuthHandler{
-		authService: authService,
-		authMW:      authMW,
+		authService:  authService,
+		authMW:       authMW,
 		secureCookie: secureCookie,
 	}
 }
@@ -77,7 +77,8 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	refreshToken, err := h.authService.GenerateRefreshToken(c.Request.Context(), user.ID)
+	deviceInfo := services.ParseDeviceInfo(c.GetHeader("User-Agent"), c.ClientIP())
+	refreshToken, err := h.authService.GenerateRefreshToken(c.Request.Context(), user.ID, deviceInfo)
 	if err != nil {
 		response.InternalError(c)
 		return
@@ -115,7 +116,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	refreshToken, err := h.authService.GenerateRefreshToken(c.Request.Context(), user.ID)
+	deviceInfo := services.ParseDeviceInfo(c.GetHeader("User-Agent"), c.ClientIP())
+	refreshToken, err := h.authService.GenerateRefreshToken(c.Request.Context(), user.ID, deviceInfo)
 	if err != nil {
 		response.InternalError(c)
 		return

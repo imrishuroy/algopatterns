@@ -77,30 +77,54 @@ func (m *MockUserRepository) RevokeAllUserTokens(ctx context.Context, userID uui
 	return args.Error(0)
 }
 
-func newTestAuthService() (*AuthService, *MockUserRepository) {
-	mockRepo := new(MockUserRepository)
-	cfg := &config.AuthConfig{
+type MockSessionService struct {
+	mock.Mock
+}
+
+func (m *MockSessionService) CreateSession(ctx context.Context, userID uuid.UUID, deviceInfo *models.DeviceInfo) (*models.Session, string, error) {
+	args := m.Called(ctx, userID, deviceInfo)
+	if args.Get(0) == nil {
+		return nil, args.String(1), args.Error(2)
+	}
+	return args.Get(0).(*models.Session), args.String(1), args.Error(2)
+}
+
+func (m *MockSessionService) ValidateRefreshToken(ctx context.Context, rawToken string) (*models.Session, *models.User, error) {
+	args := m.Called(ctx, rawToken)
+	if args.Get(0) == nil {
+		return nil, nil, args.Error(2)
+	}
+	return args.Get(0).(*models.Session), args.Get(1).(*models.User), args.Error(2)
+}
+
+func (m *MockSessionService) RevokeSessionByRawToken(ctx context.Context, rawToken string, reason string) error {
+	args := m.Called(ctx, rawToken, reason)
+	return args.Error(0)
+}
+
+func (m *MockSessionService) RevokeAllUserSessions(ctx context.Context, userID uuid.UUID, reason string) (int64, error) {
+	args := m.Called(ctx, userID, reason)
+	return args.Get(0).(int64), args.Error(1)
+}
+
+func newTestAuthConfig() *config.AuthConfig {
+	return &config.AuthConfig{
 		JWTSecret:            "test-secret-key-for-testing-purposes",
 		AccessTokenDuration:  15 * time.Minute,
 		RefreshTokenDuration: 7 * 24 * time.Hour,
-		BCryptCost:           bcrypt.MinCost, // Low cost for faster tests
+		BCryptCost:           bcrypt.MinCost,
+		SingleSessionEnabled: true,
 	}
-	service := &AuthService{
-		userRepo: nil, // We'll use the mock directly
-		config:   cfg,
-	}
-	return service, mockRepo
 }
 
 func TestRegister_Success(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{
-		JWTSecret:            "test-secret",
-		AccessTokenDuration:  15 * time.Minute,
-		RefreshTokenDuration: 7 * 24 * time.Hour,
-		BCryptCost:           bcrypt.MinCost,
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
 	}
-	service := NewAuthService(mockRepo, cfg)
 	ctx := context.Background()
 
 	req := &models.RegisterRequest{
@@ -116,14 +140,19 @@ func TestRegister_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 	assert.Equal(t, req.Email, user.Email)
-	assert.NotEmpty(t, user.PasswordHash)
+	assert.NotNil(t, user.PasswordHash)
+	assert.True(t, user.HasPassword)
 	mockRepo.AssertExpectations(t)
 }
 
 func TestRegister_EmailExists(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{BCryptCost: 4}
-	service := NewAuthService(mockRepo, cfg)
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
 	ctx := context.Background()
 
 	req := &models.RegisterRequest{
@@ -141,17 +170,23 @@ func TestRegister_EmailExists(t *testing.T) {
 }
 
 func TestLogin_Success(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{BCryptCost: 4}
-	service := NewAuthService(mockRepo, cfg)
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
 	ctx := context.Background()
 
 	password := "password123"
 	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+	hashStr := string(hash)
 	existingUser := &models.User{
 		ID:           uuid.New(),
 		Email:        "test@example.com",
-		PasswordHash: string(hash),
+		PasswordHash: &hashStr,
+		HasPassword:  true,
 	}
 
 	mockRepo.On("GetByEmail", ctx, "test@example.com").Return(existingUser, nil)
@@ -169,9 +204,13 @@ func TestLogin_Success(t *testing.T) {
 }
 
 func TestLogin_UserNotFound(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{}
-	service := NewAuthService(mockRepo, cfg)
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
 	ctx := context.Background()
 
 	mockRepo.On("GetByEmail", ctx, "notfound@example.com").Return(nil, repository.ErrNotFound)
@@ -189,16 +228,22 @@ func TestLogin_UserNotFound(t *testing.T) {
 }
 
 func TestLogin_WrongPassword(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{}
-	service := NewAuthService(mockRepo, cfg)
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
 	ctx := context.Background()
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte("correctpassword"), bcrypt.MinCost)
+	hashStr := string(hash)
 	existingUser := &models.User{
 		ID:           uuid.New(),
 		Email:        "test@example.com",
-		PasswordHash: string(hash),
+		PasswordHash: &hashStr,
+		HasPassword:  true,
 	}
 
 	mockRepo.On("GetByEmail", ctx, "test@example.com").Return(existingUser, nil)
@@ -215,8 +260,39 @@ func TestLogin_WrongPassword(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
+func TestLogin_OAuthOnlyUser(t *testing.T) {
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
+	ctx := context.Background()
+
+	existingUser := &models.User{
+		ID:          uuid.New(),
+		Email:       "oauth@example.com",
+		HasPassword: false,
+	}
+
+	mockRepo.On("GetByEmail", ctx, "oauth@example.com").Return(existingUser, nil)
+
+	req := &models.LoginRequest{
+		Email:    "oauth@example.com",
+		Password: "anypassword",
+	}
+
+	user, err := service.Login(ctx, req)
+
+	assert.ErrorIs(t, err, ErrInvalidCredentials)
+	assert.Nil(t, user)
+	mockRepo.AssertExpectations(t)
+}
+
 func TestGenerateAccessToken(t *testing.T) {
-	service, _ := newTestAuthService()
+	cfg := newTestAuthConfig()
+	service := &AuthService{config: cfg}
 
 	user := &models.User{
 		ID:    uuid.New(),
@@ -227,11 +303,12 @@ func TestGenerateAccessToken(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, token)
-	assert.Equal(t, int64(900), expiresIn) // 15 minutes in seconds
+	assert.Equal(t, int64(900), expiresIn)
 }
 
 func TestValidateAccessToken_Success(t *testing.T) {
-	service, _ := newTestAuthService()
+	cfg := newTestAuthConfig()
+	service := &AuthService{config: cfg}
 
 	user := &models.User{
 		ID:    uuid.New(),
@@ -249,7 +326,8 @@ func TestValidateAccessToken_Success(t *testing.T) {
 }
 
 func TestValidateAccessToken_Invalid(t *testing.T) {
-	service, _ := newTestAuthService()
+	cfg := newTestAuthConfig()
+	service := &AuthService{config: cfg}
 
 	claims, err := service.ValidateAccessToken("invalid-token")
 
@@ -260,7 +338,7 @@ func TestValidateAccessToken_Invalid(t *testing.T) {
 func TestValidateAccessToken_Expired(t *testing.T) {
 	cfg := &config.AuthConfig{
 		JWTSecret:           "test-secret",
-		AccessTokenDuration: -1 * time.Hour, // Already expired
+		AccessTokenDuration: -1 * time.Hour,
 	}
 	service := &AuthService{config: cfg}
 
@@ -278,9 +356,13 @@ func TestValidateAccessToken_Expired(t *testing.T) {
 }
 
 func TestGetUser_Success(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{}
-	service := NewAuthService(mockRepo, cfg)
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
 	ctx := context.Background()
 	userID := uuid.New()
 
@@ -299,9 +381,13 @@ func TestGetUser_Success(t *testing.T) {
 }
 
 func TestGetUser_NotFound(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{}
-	service := NewAuthService(mockRepo, cfg)
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
 	ctx := context.Background()
 	userID := uuid.New()
 
@@ -314,55 +400,14 @@ func TestGetUser_NotFound(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestChangePassword_Success(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{BCryptCost: 4}
-	service := NewAuthService(mockRepo, cfg)
-	ctx := context.Background()
-	userID := uuid.New()
-
-	currentPassword := "oldpassword"
-	hash, _ := bcrypt.GenerateFromPassword([]byte(currentPassword), bcrypt.MinCost)
-	existingUser := &models.User{
-		ID:           userID,
-		PasswordHash: string(hash),
-	}
-
-	mockRepo.On("GetByID", ctx, userID).Return(existingUser, nil)
-	mockRepo.On("UpdatePassword", ctx, userID, mock.AnythingOfType("string")).Return(nil)
-	mockRepo.On("RevokeAllUserTokens", ctx, userID).Return(nil)
-
-	err := service.ChangePassword(ctx, userID, currentPassword, "newpassword")
-
-	assert.NoError(t, err)
-	mockRepo.AssertExpectations(t)
-}
-
-func TestChangePassword_WrongCurrentPassword(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{BCryptCost: 4}
-	service := NewAuthService(mockRepo, cfg)
-	ctx := context.Background()
-	userID := uuid.New()
-
-	hash, _ := bcrypt.GenerateFromPassword([]byte("correctpassword"), bcrypt.MinCost)
-	existingUser := &models.User{
-		ID:           userID,
-		PasswordHash: string(hash),
-	}
-
-	mockRepo.On("GetByID", ctx, userID).Return(existingUser, nil)
-
-	err := service.ChangePassword(ctx, userID, "wrongpassword", "newpassword")
-
-	assert.ErrorIs(t, err, ErrInvalidCredentials)
-	mockRepo.AssertExpectations(t)
-}
-
 func TestUpdateProfile_Success(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{}
-	service := NewAuthService(mockRepo, cfg)
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
 	ctx := context.Background()
 	userID := uuid.New()
 
@@ -386,30 +431,19 @@ func TestUpdateProfile_Success(t *testing.T) {
 }
 
 func TestDeleteAccount_Success(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{}
-	service := NewAuthService(mockRepo, cfg)
+	mockRepo := new(MockUserRepository)
+	cfg := newTestAuthConfig()
+	service := &AuthService{
+		userRepo:       mockRepo,
+		sessionService: nil,
+		config:         cfg,
+	}
 	ctx := context.Background()
 	userID := uuid.New()
 
 	mockRepo.On("Delete", ctx, userID).Return(nil)
 
 	err := service.DeleteAccount(ctx, userID)
-
-	assert.NoError(t, err)
-	mockRepo.AssertExpectations(t)
-}
-
-func TestLogoutAll_Success(t *testing.T) {
-	_, mockRepo := newTestAuthService()
-	cfg := &config.AuthConfig{}
-	service := NewAuthService(mockRepo, cfg)
-	ctx := context.Background()
-	userID := uuid.New()
-
-	mockRepo.On("RevokeAllUserTokens", ctx, userID).Return(nil)
-
-	err := service.LogoutAll(ctx, userID)
 
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)

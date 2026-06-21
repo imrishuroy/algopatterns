@@ -98,14 +98,35 @@ export default function PatternSection({
             </button>
 
             <div className="flex-1 min-w-0">
-              <a
-                href={q.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-indigo-400 font-medium transition"
-              >
-                {q.name}
-              </a>
+              <div className="flex items-center gap-2">
+                <a
+                  href={`/problems/${q.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                  className="text-white hover:text-indigo-400 font-medium transition"
+                >
+                  {q.name}
+                </a>
+                <a
+                  href={q.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-500 hover:text-gray-300 transition"
+                  title="Open on LeetCode"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </div>
               <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
                 <span className="text-gray-500">{q.pattern}</span>
                 {q.companies.length > 0 && (

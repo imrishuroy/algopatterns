@@ -411,15 +411,38 @@ function VariationInline({
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/(^-|-$)/g, "");
               return (
-                <a
+                <span
                   key={i}
-                  href={`https://leetcode.com/problems/${slug}/`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 rounded transition"
+                  className="inline-flex items-center bg-gray-800 rounded overflow-hidden"
                 >
-                  {problem}
-                </a>
+                  <a
+                    href={`/problems/${slug}`}
+                    className="px-2 py-1 hover:bg-gray-700 text-xs text-gray-300 transition"
+                  >
+                    {problem}
+                  </a>
+                  <a
+                    href={`https://leetcode.com/problems/${slug}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-1.5 py-1 hover:bg-gray-700 text-gray-500 hover:text-gray-300 transition border-l border-gray-700"
+                    title="Open on LeetCode"
+                  >
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </a>
+                </span>
               );
             })}
           </div>

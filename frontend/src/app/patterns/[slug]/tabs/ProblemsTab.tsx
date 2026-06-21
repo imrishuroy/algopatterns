@@ -260,23 +260,35 @@ export default function ProblemsTab({
 
             {/* Problem Info */}
             <div className="flex-1 min-w-0">
-              {availableProblems.has(nameToSlug(q.name)) ? (
+              <div className="flex items-center gap-2">
                 <Link
                   href={`/problems/${nameToSlug(q.name)}`}
-                  className="text-white hover:text-indigo-400 font-medium transition block truncate"
+                  className="text-white hover:text-indigo-400 font-medium transition truncate"
                 >
                   {q.name}
                 </Link>
-              ) : (
                 <a
                   href={q.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-white hover:text-indigo-400 font-medium transition block truncate"
+                  className="text-gray-500 hover:text-gray-300 transition flex-shrink-0"
+                  title="Open on LeetCode"
                 >
-                  {q.name}
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
                 </a>
-              )}
+              </div>
               <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
                 <span className="text-gray-500">{q.pattern}</span>
                 {q.companies.length > 0 && (
@@ -301,35 +313,13 @@ export default function ProblemsTab({
               <span className="text-sm" title="Frequency">
                 {q.frequency}
               </span>
-              {availableProblems.has(nameToSlug(q.name)) ? (
+              {availableProblems.has(nameToSlug(q.name)) && (
                 <Link
                   href={`/problems/${nameToSlug(q.name)}`}
                   className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium rounded-lg transition"
                 >
                   Solve
                 </Link>
-              ) : (
-                <a
-                  href={q.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 text-gray-500 hover:text-indigo-400 transition"
-                  title="Open on LeetCode"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
               )}
             </div>
           </div>

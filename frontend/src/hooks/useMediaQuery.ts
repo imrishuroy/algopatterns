@@ -18,7 +18,7 @@ export function useMediaQuery(query: string): boolean {
 }
 
 export function useIsMobile(): boolean {
-  return !useMediaQuery("(min-width: 768px)");
+  return !useMediaQuery("(min-width: 1280px)");
 }
 
 export function useIsTablet(): boolean {

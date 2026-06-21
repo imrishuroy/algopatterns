@@ -17,10 +17,150 @@ import type {
   RunCodeResult,
 } from "@/types";
 import { solutions } from "@/lib/solutions";
+import type { Monaco } from "@monaco-editor/react";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
 });
+
+// Configure Monaco with better Java highlighting
+function handleEditorWillMount(monaco: Monaco) {
+  // Define custom theme with better Java type highlighting
+  monaco.editor.defineTheme("algopatterns-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "type.identifier.java", foreground: "4EC9B0" },
+      { token: "identifier.java", foreground: "9CDCFE" },
+    ],
+    colors: {},
+  });
+
+  // Enhance Java language configuration
+  monaco.languages.setMonarchTokensProvider("java", {
+    defaultToken: "",
+    tokenPostfix: ".java",
+
+    keywords: [
+      "abstract", "continue", "for", "new", "switch", "assert", "default",
+      "goto", "package", "synchronized", "boolean", "do", "if", "private",
+      "this", "break", "double", "implements", "protected", "throw", "byte",
+      "else", "import", "public", "throws", "case", "enum", "instanceof",
+      "return", "transient", "catch", "extends", "int", "short", "try",
+      "char", "final", "interface", "static", "void", "class", "finally",
+      "long", "strictfp", "volatile", "const", "float", "native", "super",
+      "while", "true", "false", "null",
+    ],
+
+    typeKeywords: [
+      "boolean", "byte", "char", "double", "float", "int", "long", "short", "void",
+    ],
+
+    // Common Java types that should be highlighted
+    builtinTypes: [
+      "String", "Integer", "Long", "Double", "Float", "Boolean", "Character",
+      "Object", "Class", "System", "Math", "StringBuilder", "StringBuffer",
+      "List", "ArrayList", "LinkedList", "Map", "HashMap", "TreeMap", "LinkedHashMap",
+      "Set", "HashSet", "TreeSet", "LinkedHashSet", "Queue", "Deque", "Stack",
+      "ArrayDeque", "PriorityQueue", "Vector", "Arrays", "Collections", "Optional",
+      "Stream", "Collectors", "Iterator", "Comparable", "Comparator", "Exception",
+      "RuntimeException", "Scanner", "Random", "Pattern", "Matcher",
+    ],
+
+    operators: [
+      "=", ">", "<", "!", "~", "?", ":", "==", "<=", ">=", "!=", "&&", "||",
+      "++", "--", "+", "-", "*", "/", "&", "|", "^", "%", "<<", ">>", ">>>",
+      "+=", "-=", "*=", "/=", "&=", "|=", "^=", "%=", "<<=", ">>=", ">>>=",
+    ],
+
+    symbols: /[=><!~?:&|+\-*\/\^%]+/,
+    escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+    digits: /\d+(_+\d+)*/,
+
+    tokenizer: {
+      root: [
+        // Type identifiers (capitalized words)
+        [/[A-Z][\w$]*/, {
+          cases: {
+            "@builtinTypes": "type.identifier",
+            "@default": "type.identifier",
+          },
+        }],
+
+        // Identifiers and keywords
+        [/[a-z_$][\w$]*/, {
+          cases: {
+            "@keywords": "keyword",
+            "@default": "identifier",
+          },
+        }],
+
+        // Whitespace
+        { include: "@whitespace" },
+
+        // Delimiters and operators
+        [/[{}()\[\]]/, "@brackets"],
+        [/[<>](?!@symbols)/, "@brackets"],
+        [/@symbols/, {
+          cases: {
+            "@operators": "operator",
+            "@default": "",
+          },
+        }],
+
+        // Annotations
+        [/@\s*[a-zA-Z_$][\w$]*/, "annotation"],
+
+        // Numbers
+        [/(@digits)[eE]([\-+]?(@digits))?[fFdD]?/, "number.float"],
+        [/(@digits)\.(@digits)([eE][\-+]?(@digits))?[fFdD]?/, "number.float"],
+        [/0[xX][0-9a-fA-F_]*[0-9a-fA-F][Ll]?/, "number.hex"],
+        [/0[0-7_]*[0-7][Ll]?/, "number.octal"],
+        [/0[bB][0-1_]*[0-1][Ll]?/, "number.binary"],
+        [/(@digits)[fFdD]/, "number.float"],
+        [/(@digits)[lL]?/, "number"],
+
+        // Delimiter: after number because of .\d floats
+        [/[;,.]/, "delimiter"],
+
+        // Strings
+        [/"([^"\\]|\\.)*$/, "string.invalid"],
+        [/"/, "string", "@string"],
+
+        // Characters
+        [/'[^\\']'/, "string"],
+        [/(')(@escapes)(')/, ["string", "string.escape", "string"]],
+        [/'/, "string.invalid"],
+      ],
+
+      whitespace: [
+        [/[ \t\r\n]+/, ""],
+        [/\/\*\*(?!\/)/, "comment.doc", "@javadoc"],
+        [/\/\*/, "comment", "@comment"],
+        [/\/\/.*$/, "comment"],
+      ],
+
+      comment: [
+        [/[^\/*]+/, "comment"],
+        [/\*\//, "comment", "@pop"],
+        [/[\/*]/, "comment"],
+      ],
+
+      javadoc: [
+        [/[^\/*]+/, "comment.doc"],
+        [/\*\//, "comment.doc", "@pop"],
+        [/[\/*]/, "comment.doc"],
+      ],
+
+      string: [
+        [/[^\\"]+/, "string"],
+        [/@escapes/, "string.escape"],
+        [/\\./, "string.escape.invalid"],
+        [/"/, "string", "@pop"],
+      ],
+    },
+  });
+}
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -596,9 +736,22 @@ export default function ProblemPageClient({ params }: PageProps) {
             </div>
             <button
               onClick={handleReset}
-              className="px-3 py-1.5 text-gray-400 hover:text-white text-sm"
+              className="p-1.5 text-gray-400 hover:text-white"
+              title="Reset to template"
             >
-              Reset
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
             </button>
             <button
               onClick={handleRun}
@@ -623,7 +776,8 @@ export default function ProblemPageClient({ params }: PageProps) {
             language={monacoLanguage}
             value={code}
             onChange={(value) => setCode(value || "")}
-            theme="vs-dark"
+            theme="algopatterns-dark"
+            beforeMount={handleEditorWillMount}
             options={{
               fontSize,
               fontFamily: "JetBrains Mono, monospace",
@@ -917,9 +1071,22 @@ export default function ProblemPageClient({ params }: PageProps) {
                   </span>
                   <button
                     onClick={handleReset}
-                    className="px-2 py-1 text-gray-400 hover:text-white text-xs"
+                    className="p-1 text-gray-400 hover:text-white"
+                    title="Reset to template"
                   >
-                    Reset
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -931,7 +1098,8 @@ export default function ProblemPageClient({ params }: PageProps) {
                   language={monacoLanguage}
                   value={code}
                   onChange={(value) => setCode(value || "")}
-                  theme="vs-dark"
+                  theme="algopatterns-dark"
+            beforeMount={handleEditorWillMount}
                   options={{
                     fontSize: 12,
                     fontFamily: "JetBrains Mono, monospace",
@@ -1383,7 +1551,8 @@ export default function ProblemPageClient({ params }: PageProps) {
                         height="100%"
                         language={solutions[slug].language}
                         value={solutions[slug].code}
-                        theme="vs-dark"
+                        theme="algopatterns-dark"
+            beforeMount={handleEditorWillMount}
                         options={{
                           readOnly: true,
                           minimap: { enabled: false },
@@ -1560,19 +1729,43 @@ export default function ProblemPageClient({ params }: PageProps) {
             {/* Reset button */}
             <button
               onClick={handleReset}
-              className="px-3 py-1.5 text-gray-400 hover:text-white text-sm transition"
+              className="p-1.5 text-gray-400 hover:text-white transition"
               title="Reset to template"
             >
-              Reset
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
             </button>
 
             {/* Format button */}
             <button
               onClick={formatCode}
-              className="px-3 py-1.5 text-gray-400 hover:text-white text-sm transition"
+              className="p-1.5 text-gray-400 hover:text-white transition"
               title="Format code"
             >
-              Format
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16m-7 6h7"
+                />
+              </svg>
             </button>
           </div>
 
@@ -1670,7 +1863,8 @@ export default function ProblemPageClient({ params }: PageProps) {
             language={monacoLanguage}
             value={code}
             onChange={(value) => setCode(value || "")}
-            theme="vs-dark"
+            theme="algopatterns-dark"
+            beforeMount={handleEditorWillMount}
             options={{
               fontSize,
               fontFamily: "JetBrains Mono, monospace",

@@ -43875,8 +43875,8 @@ func main() {
 
 	// Find First and Last Position of Element in Sorted Array
 	{
-		Title:      "Find First and Last Position of Element in Sorted Array",
-		Slug:       "find-first-and-last-position-of-element-in-sorted-array",
+		Title:      "Find First and Last Position of Element",
+		Slug:       "find-first-and-last-position-of-element",
 		Difficulty: "Medium",
 		Description: `Given an array of integers nums sorted in non-decreasing order, find the starting and ending position of a given target value.
 
@@ -45777,8 +45777,8 @@ func main() {
 
 	// Smallest Divisor Given a Threshold
 	{
-		Title:      "Find the Smallest Divisor Given a Threshold",
-		Slug:       "find-the-smallest-divisor-given-a-threshold",
+		Title:      "Smallest Divisor Given Threshold",
+		Slug:       "smallest-divisor-given-threshold",
 		Difficulty: "Medium",
 		Description: `Given an array of integers nums and an integer threshold, we will choose a positive integer divisor, divide all the array by it, and sum the division's result. Find the smallest divisor such that the result mentioned above is less than or equal to threshold.
 

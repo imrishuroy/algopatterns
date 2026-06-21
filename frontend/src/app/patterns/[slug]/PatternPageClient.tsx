@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Pattern } from "@/types";
 import { questions, categoryToPatternId } from "@/lib/questions";
 import { useProgress } from "@/contexts/ProgressContext";
@@ -33,7 +34,17 @@ const difficultyColors: Record<string, string> = {
 };
 
 export default function PatternPageClient({ pattern }: PatternPageClientProps) {
-  const [activeTab, setActiveTab] = useState<Tab>("tutorial");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<Tab>(
+    tabParam === "problems" || tabParam === "cheatsheet" ? tabParam : "tutorial"
+  );
+
+  useEffect(() => {
+    if (tabParam === "problems" || tabParam === "cheatsheet" || tabParam === "tutorial") {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
   const { completed, toggleComplete } = useProgress();
   const { isPro, isLoading: subscriptionLoading } = useSubscription();
 
@@ -219,6 +230,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
                 questions={patternQuestions}
                 completed={completed}
                 onToggleComplete={toggleComplete}
+                patternId={pattern.id}
               />
             )}
             {activeTab === "cheatsheet" && (

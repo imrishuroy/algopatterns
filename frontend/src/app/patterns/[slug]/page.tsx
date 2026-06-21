@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import patternsData from "@/lib/patterns.json";
 import { Pattern } from "@/types";
 import { getPatternMetadata } from "@/lib/seo";
@@ -55,7 +56,9 @@ export default async function PatternPage({ params }: PageProps) {
     <>
       <CourseJsonLd pattern={pattern} />
       <BreadcrumbJsonLd items={breadcrumbs} />
-      <PatternPageClient pattern={pattern} />
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-gray-400">Loading...</div></div>}>
+        <PatternPageClient pattern={pattern} />
+      </Suspense>
     </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { apiClient } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -210,9 +210,19 @@ function getStorageKey(slug: string, languageId: number) {
 export default function ProblemPageClient({ params }: PageProps) {
   const { slug } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromPattern = searchParams.get("from");
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const panelRef = useRef<HTMLDivElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
+
+  const handleBack = () => {
+    if (fromPattern) {
+      router.push(`/patterns/${fromPattern}?tab=problems`);
+    } else {
+      router.back();
+    }
+  };
 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
@@ -801,6 +811,25 @@ export default function ProblemPageClient({ params }: PageProps) {
         {/* Mobile Tab Bar */}
         <div className="flex border-b border-gray-800 bg-gray-900">
           <button
+            onClick={handleBack}
+            className="px-2 py-3 text-gray-500 hover:text-white transition"
+            title="Back to problems"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <button
             onClick={() => setMobileView("problem")}
             className={`flex-1 px-4 py-3 text-sm font-medium transition ${
               mobileView === "problem"
@@ -1266,7 +1295,26 @@ export default function ProblemPageClient({ params }: PageProps) {
         style={{ width: `${panelWidth}%` }}
       >
         {/* Tabs */}
-        <div className="flex border-b border-gray-800">
+        <div className="flex items-center border-b border-gray-800">
+          <button
+            onClick={handleBack}
+            className="px-3 py-3 text-gray-500 hover:text-white transition"
+            title="Back to problems"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
           <button
             onClick={() => setActiveTab("description")}
             className={`px-6 py-3 font-medium transition ${

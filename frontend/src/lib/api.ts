@@ -179,7 +179,7 @@ class ApiClient {
   }
 
   // Google OAuth
-  async getGoogleAuthURL(): Promise<ApiResponse<GoogleAuthURLResponse>> {
+  getGoogleAuthURL(): Promise<ApiResponse<GoogleAuthURLResponse>> {
     return this.request<GoogleAuthURLResponse>("/api/v1/auth/google/url");
   }
 

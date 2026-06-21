@@ -106,7 +106,7 @@ func (s *OAuthService) GenerateGoogleAuthURL(ctx context.Context) (*models.Googl
 	}, nil
 }
 
-func (s *OAuthService) ProcessGoogleCallback(ctx context.Context, code, state string, deviceInfo *models.DeviceInfo) (*models.User, string, int64, error) {
+func (s *OAuthService) ProcessGoogleCallback(ctx context.Context, code, state string) (*models.User, string, int64, error) {
 	oauthState, err := s.oauthRepo.GetState(ctx, state)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {

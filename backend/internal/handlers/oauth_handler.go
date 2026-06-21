@@ -71,14 +71,13 @@ func (h *OAuthHandler) GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	deviceInfo := services.ParseDeviceInfo(c.GetHeader("User-Agent"), c.ClientIP())
-
-	user, accessToken, expiresIn, err := h.oauthService.ProcessGoogleCallback(c.Request.Context(), req.Code, req.State, deviceInfo)
+	user, accessToken, expiresIn, err := h.oauthService.ProcessGoogleCallback(c.Request.Context(), req.Code, req.State)
 	if err != nil {
 		h.handleOAuthError(c, err)
 		return
 	}
 
+	deviceInfo := services.ParseDeviceInfo(c.GetHeader("User-Agent"), c.ClientIP())
 	refreshToken, err := h.authService.GenerateRefreshToken(c.Request.Context(), user.ID, deviceInfo)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to generate refresh token")

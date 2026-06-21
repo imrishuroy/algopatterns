@@ -388,7 +388,7 @@ func TestOAuthState_Expired(t *testing.T) {
 	mockOAuthRepo.On("GetState", ctx, "expired-state").Return(expiredState, nil)
 	mockOAuthRepo.On("DeleteState", ctx, "expired-state").Return(nil)
 
-	_, _, _, err := service.ProcessGoogleCallback(ctx, "code", "expired-state", nil)
+	_, _, _, err := service.ProcessGoogleCallback(ctx, "code", "expired-state")
 
 	assert.ErrorIs(t, err, ErrOAuthStateExpired)
 }
@@ -414,7 +414,7 @@ func TestOAuthState_Invalid(t *testing.T) {
 
 	mockOAuthRepo.On("GetState", ctx, "invalid-state").Return(nil, repository.ErrNotFound)
 
-	_, _, _, err := service.ProcessGoogleCallback(ctx, "code", "invalid-state", nil)
+	_, _, _, err := service.ProcessGoogleCallback(ctx, "code", "invalid-state")
 
 	assert.ErrorIs(t, err, ErrInvalidOAuthState)
 }

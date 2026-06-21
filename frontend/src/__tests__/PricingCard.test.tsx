@@ -197,11 +197,11 @@ describe("PricingCard", () => {
       expect(screen.getByText("All future updates included")).toBeInTheDocument();
     });
 
-    it("should not display future updates message for other plans", () => {
+    it("should display future updates message for all paid plans", () => {
       render(
         <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
       );
-      expect(screen.queryByText("All future updates included")).not.toBeInTheDocument();
+      expect(screen.getByText("All future updates included")).toBeInTheDocument();
     });
   });
 

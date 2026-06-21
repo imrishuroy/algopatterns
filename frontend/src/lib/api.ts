@@ -30,6 +30,8 @@ import type {
   ValidateDiscountResponse,
   CancelSubscriptionRequest,
   CancelSubscriptionResponse,
+  GoogleAuthURLResponse,
+  GoogleCallbackRequest,
 } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -173,6 +175,22 @@ class ApiClient {
       }
     );
     this.accessToken = null;
+    return response;
+  }
+
+  // Google OAuth
+  async getGoogleAuthURL(): Promise<ApiResponse<GoogleAuthURLResponse>> {
+    return this.request<GoogleAuthURLResponse>("/api/v1/auth/google/url");
+  }
+
+  async googleCallback(req: GoogleCallbackRequest): Promise<ApiResponse<AuthResponse>> {
+    const response = await this.request<AuthResponse>("/api/v1/auth/google/callback", {
+      method: "POST",
+      body: JSON.stringify(req),
+    });
+    if (response.success && response.data.accessToken) {
+      this.accessToken = response.data.accessToken;
+    }
     return response;
   }
 

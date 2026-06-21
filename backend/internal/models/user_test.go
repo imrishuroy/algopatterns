@@ -10,22 +10,25 @@ import (
 
 func TestUser_Structure(t *testing.T) {
 	name := "Test User"
+	passwordHash := "hashed_password"
 	now := time.Now()
 
 	user := User{
 		Email:         "test@example.com",
-		PasswordHash:  "hashed_password",
+		PasswordHash:  &passwordHash,
 		Name:          &name,
 		EmailVerified: true,
+		HasPassword:   true,
 		CreatedAt:     now,
 		UpdatedAt:     now,
 	}
 
 	assert.Equal(t, "test@example.com", user.Email)
-	assert.Equal(t, "hashed_password", user.PasswordHash)
+	assert.Equal(t, "hashed_password", *user.PasswordHash)
 	assert.NotNil(t, user.Name)
 	assert.Equal(t, "Test User", *user.Name)
 	assert.True(t, user.EmailVerified)
+	assert.True(t, user.HasPassword)
 	assert.Equal(t, now, user.CreatedAt)
 	assert.Equal(t, now, user.UpdatedAt)
 }

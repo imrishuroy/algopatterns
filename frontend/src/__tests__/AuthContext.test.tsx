@@ -97,7 +97,7 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let loginResult: Awaited<ReturnType<typeof result.current.login>>;
+      let loginResult: Awaited<ReturnType<typeof result.current.login>> = { success: false };
       await act(async () => {
         loginResult = await result.current.login({
           email: "test@test.com",
@@ -105,7 +105,7 @@ describe("AuthContext", () => {
         });
       });
 
-      expect(loginResult!.success).toBe(true);
+      expect(loginResult.success).toBe(true);
       expect(result.current.user).toEqual(mockUser);
       expect(result.current.isAuthenticated).toBe(true);
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
@@ -126,7 +126,7 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let loginResult: Awaited<ReturnType<typeof result.current.login>>;
+      let loginResult: Awaited<ReturnType<typeof result.current.login>> = { success: false };
       await act(async () => {
         loginResult = await result.current.login({
           email: "test@test.com",
@@ -134,8 +134,8 @@ describe("AuthContext", () => {
         });
       });
 
-      expect(loginResult!.success).toBe(false);
-      expect(loginResult!.error).toBe("Invalid credentials");
+      expect(loginResult.success).toBe(false);
+      expect(loginResult.error).toBe("Invalid credentials");
       expect(result.current.user).toBeNull();
     });
   });
@@ -157,7 +157,7 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let registerResult: Awaited<ReturnType<typeof result.current.register>>;
+      let registerResult: Awaited<ReturnType<typeof result.current.register>> = { success: false };
       await act(async () => {
         registerResult = await result.current.register({
           email: "test@test.com",
@@ -166,7 +166,7 @@ describe("AuthContext", () => {
         });
       });
 
-      expect(registerResult!.success).toBe(true);
+      expect(registerResult.success).toBe(true);
       expect(result.current.user).toEqual(mockUser);
     });
 
@@ -182,7 +182,7 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let registerResult: Awaited<ReturnType<typeof result.current.register>>;
+      let registerResult: Awaited<ReturnType<typeof result.current.register>> = { success: false };
       await act(async () => {
         registerResult = await result.current.register({
           email: "existing@test.com",
@@ -191,8 +191,8 @@ describe("AuthContext", () => {
         });
       });
 
-      expect(registerResult!.success).toBe(false);
-      expect(registerResult!.error).toBe("Email already exists");
+      expect(registerResult.success).toBe(false);
+      expect(registerResult.error).toBe("Email already exists");
     });
   });
 
@@ -322,7 +322,7 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>>;
+      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>> = { success: false };
       await act(async () => {
         callbackResult = await result.current.handleGoogleCallback(
           mockCode,
@@ -330,7 +330,7 @@ describe("AuthContext", () => {
         );
       });
 
-      expect(callbackResult!.success).toBe(true);
+      expect(callbackResult.success).toBe(true);
       expect(result.current.user).toEqual(mockUser);
       expect(result.current.isAuthenticated).toBe(true);
       expect(mockLocalStorage.removeItem).toHaveBeenCalledWith(
@@ -351,7 +351,7 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>>;
+      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>> = { success: false };
       await act(async () => {
         callbackResult = await result.current.handleGoogleCallback(
           mockCode,
@@ -359,8 +359,8 @@ describe("AuthContext", () => {
         );
       });
 
-      expect(callbackResult!.success).toBe(false);
-      expect(callbackResult!.error).toBe(
+      expect(callbackResult.success).toBe(false);
+      expect(callbackResult.error).toBe(
         "Invalid OAuth state. Please try again."
       );
       expect(apiClient.googleCallback).not.toHaveBeenCalled();
@@ -386,7 +386,7 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>>;
+      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>> = { success: false };
       await act(async () => {
         callbackResult = await result.current.handleGoogleCallback(
           mockCode,
@@ -394,8 +394,8 @@ describe("AuthContext", () => {
         );
       });
 
-      expect(callbackResult!.success).toBe(false);
-      expect(callbackResult!.error).toBe("Failed to exchange token");
+      expect(callbackResult.success).toBe(false);
+      expect(callbackResult.error).toBe("Failed to exchange token");
       expect(result.current.user).toBeNull();
     });
 
@@ -415,7 +415,7 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>>;
+      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>> = { success: false };
       await act(async () => {
         callbackResult = await result.current.handleGoogleCallback(
           mockCode,
@@ -423,8 +423,8 @@ describe("AuthContext", () => {
         );
       });
 
-      expect(callbackResult!.success).toBe(false);
-      expect(callbackResult!.error).toBe(
+      expect(callbackResult.success).toBe(false);
+      expect(callbackResult.error).toBe(
         "An error occurred during Google login"
       );
     });

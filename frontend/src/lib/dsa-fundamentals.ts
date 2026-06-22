@@ -1633,7 +1633,7 @@ function merge(intervals) {
     ],
     commonMistakes: [
       "Comparator overflow: a - b fails for Integer.MIN_VALUE",
-      "JavaScript: forgetting comparator (lexicographic sort)",
+      "JS - forgetting comparator (lexicographic sort)",
       "Sorting primitive int[] with Collections.reverseOrder() (need Integer[])",
       "Modifying array while sorting",
     ],
@@ -2089,7 +2089,7 @@ void inorder(TreeNode* node, int* k, int* result) {
 
     inorder(node->right, k, result);
 }`,
-      javascript: `// JavaScript: Use object or array (closure also works)
+      javascript: `// JS - Use object or array (closure also works)
 
 // Method 1: Use object
 function kthSmallest(root, k) {
@@ -3532,7 +3532,7 @@ function buildKey(s) {
       "StringBuilder is mutable, String is immutable",
       "Use toString() to get final String",
       "Python: use list + join() instead of string concatenation",
-      "JavaScript: use array + join() for performance",
+      "JS - use array + join() for performance",
     ],
     commonMistakes: [
       "Using string concatenation in loops",
@@ -4001,7 +4001,7 @@ intervals.sort((a, b) => {
     commonMistakes: [
       "Using a - b with potentially large integers",
       "Forgetting that Integer.MAX_VALUE - negative = overflow",
-      "JavaScript: forgetting comparator for numeric sort",
+      "JS - forgetting comparator for numeric sort",
       "Not considering Long overflow when sorting longs",
     ],
     relatedProblems: ["Merge Intervals", "Meeting Rooms", "Top K Frequent Elements"],
@@ -13589,7 +13589,7 @@ function decodeString(s) {
   let current = '', count = 0;
 
   for (const c of s) {
-    if (/\d/.test(c)) {
+    if (/[0-9]/.test(c)) {
       count = count * 10 + parseInt(c);
     } else if (c === '[') {
       countStack.push(count);
@@ -17349,10 +17349,8 @@ export const conceptCategories: string[] = [
   "Algorithm Idioms",
 ];
 
-export function getConceptBySlug(slug: string): Concept | undefined {
-  return concepts.find((c) => c.slug === slug);
-}
+export const getConceptBySlug = (slug: string): Concept | undefined =>
+  concepts.find((c) => c.slug === slug);
 
-export function getConceptsByCategory(category: string): Concept[] {
-  return concepts.filter((c) => c.category === category);
-}
+export const getConceptsByCategory = (category: string): Concept[] =>
+  concepts.filter((c) => c.category === category);

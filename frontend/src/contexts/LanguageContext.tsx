@@ -28,7 +28,7 @@ const VALID_LANGUAGES: SupportedLanguage[] = [
 ];
 const DEFAULT_LANGUAGE: SupportedLanguage = "java";
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] =
     useState<SupportedLanguage>(DEFAULT_LANGUAGE);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -63,12 +63,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       {children}
     </LanguageContext.Provider>
   );
-}
+};
 
-export function useLanguage() {
+export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (context === undefined) {
     throw new Error("useLanguage must be used within a LanguageProvider");
   }
   return context;
-}
+};

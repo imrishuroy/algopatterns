@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import CodeBlock from "@/components/ui/CodeBlock";
+import dynamic from "next/dynamic";
+
+const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
+  loading: () => (
+    <div className="h-32 rounded-xl animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+  ),
+  ssr: false,
+});
 
 const CONSTRAINTS = [
   { id: "c1", size: "n ≤ 15", complexity: "O(n!) or O(2^n)", what: "Brute force, backtracking, all permutations" },

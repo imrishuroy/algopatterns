@@ -26,7 +26,7 @@ export const generateMetadata = async ({
     };
   }
 
-  const title = `${concept.name} - DSA Fundamentals | AlgoPatterns`;
+  const title = `${concept.name} - DSA Fundamentals`;
   const description = `${concept.description} Learn with code examples in Java, Python, C++, and JavaScript.`;
 
   return {

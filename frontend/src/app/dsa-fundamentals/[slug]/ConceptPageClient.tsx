@@ -1,9 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Concept, ConceptCategory, SupportedLanguage } from "@/types";
 import { useLanguage } from "@/contexts/LanguageContext";
-import CodeBlock from "@/components/ui/CodeBlock";
+
+const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
+  loading: () => (
+    <div className="h-64 rounded-xl animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+  ),
+  ssr: false,
+});
 
 interface ConceptPageClientProps {
   concept: Concept;

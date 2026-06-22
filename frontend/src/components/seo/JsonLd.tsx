@@ -1,5 +1,5 @@
 import { siteConfig } from "@/lib/seo";
-import { Pattern } from "@/types";
+import { Pattern, Concept } from "@/types";
 
 /**
  * Renders JSON-LD structured data as a script tag.
@@ -114,6 +114,41 @@ export function BreadcrumbJsonLd({
       name: item.name,
       item: item.url,
     })),
+  };
+
+  return <JsonLdScript data={jsonLd} />;
+}
+
+export function ConceptJsonLd({ concept }: { concept: Concept }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: concept.name,
+    description: concept.description,
+    author: {
+      "@type": "Organization",
+      name: siteConfig.name,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteConfig.url}/logo.png`,
+      },
+    },
+    datePublished: concept.createdAt,
+    dateModified: concept.updatedAt,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteConfig.url}/dsa-fundamentals/${concept.slug}`,
+    },
+    about: {
+      "@type": "Thing",
+      name: concept.category,
+    },
+    proficiencyLevel: "Beginner to Advanced",
+    dependencies: concept.timeComplexity,
   };
 
   return <JsonLdScript data={jsonLd} />;

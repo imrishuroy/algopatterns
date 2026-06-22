@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import patternsData from "@/lib/patterns.json";
 import { Pattern } from "@/types";
+import { concepts } from "@/lib/dsa-fundamentals";
 
 const patterns = patternsData as Pattern[];
 
@@ -16,6 +17,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/patterns`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/dsa-fundamentals`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.9,
@@ -65,5 +72,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  return [...staticPages, ...patternPages];
+  const conceptPages: MetadataRoute.Sitemap = concepts.map((concept) => ({
+    url: `${baseUrl}/dsa-fundamentals/${concept.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.85,
+  }));
+
+  return [...staticPages, ...patternPages, ...conceptPages];
 }

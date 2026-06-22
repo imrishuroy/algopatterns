@@ -9,6 +9,7 @@ import { ProgressProvider } from "@/contexts/ProgressContext";
 import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { HighlightProvider } from "@/contexts/HighlightContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { defaultMetadata } from "@/lib/seo";
 import { WebsiteJsonLd } from "@/components/seo/JsonLd";
 
@@ -61,19 +62,21 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider>
-          <AuthProvider>
-            <SubscriptionProvider>
-              <HighlightProvider>
-                <ProgressProvider>
-                  <FilterProvider>
-                    <Header />
-                    <main className="flex-1">{children}</main>
-                    <Footer />
-                  </FilterProvider>
-                </ProgressProvider>
-              </HighlightProvider>
-            </SubscriptionProvider>
-          </AuthProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <SubscriptionProvider>
+                <HighlightProvider>
+                  <ProgressProvider>
+                    <FilterProvider>
+                      <Header />
+                      <main className="flex-1">{children}</main>
+                      <Footer />
+                    </FilterProvider>
+                  </ProgressProvider>
+                </HighlightProvider>
+              </SubscriptionProvider>
+            </AuthProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

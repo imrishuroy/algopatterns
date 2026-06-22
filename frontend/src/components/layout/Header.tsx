@@ -221,9 +221,10 @@ const Header = () => {
   };
 
   const navLinks = [
-    { href: "/pattern-recognition", label: "Pattern Recognition" },
-    { href: "/interview-cheatsheet", label: "Interview Cheat Sheet" },
-    { href: "/articles", label: "Articles" },
+    { href: "/dsa-fundamentals", label: "Fundamentals", free: true },
+    { href: "/pattern-recognition", label: "Pattern Recognition", free: true },
+    { href: "/interview-cheatsheet", label: "Interview Cheat Sheet", free: true },
+    { href: "/articles", label: "Articles", free: true },
   ];
 
   return (
@@ -261,9 +262,48 @@ const Header = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium transition-colors hover:opacity-80"
+                className="relative text-sm font-medium transition-colors hover:opacity-80"
                 style={{ color: "var(--accent-1)" }}
               >
+                {/* Free tag - temporarily disabled
+                {link.free && (
+                  <span className="absolute -top-2 left-full -ml-1">
+                    <svg
+                      className="w-6 h-6 drop-shadow-sm -rotate-12"
+                      viewBox="0 0 64 64"
+                      fill="none"
+                    >
+                      <path
+                        d="M52 12H36c-2 0-4 1-5 2L10 35c-3 3-3 7 0 10l9 9c3 3 7 3 10 0l21-21c1-1 2-3 2-5V14c0-1-1-2-2-2z"
+                        fill="#fcd34d"
+                        stroke="#1f2937"
+                        strokeWidth="2.5"
+                      />
+                      <circle cx="46" cy="20" r="4" fill="#1f2937" />
+                      <path
+                        d="M46 8c0 0 4-2 6 0s-4 8-4 8"
+                        stroke="#374151"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        fill="none"
+                      />
+                      <text
+                        x="32"
+                        y="36"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize="9"
+                        fontWeight="bold"
+                        fill="#1f2937"
+                        fontFamily="Arial, sans-serif"
+                        transform="rotate(-45 32 36)"
+                      >
+                        FREE
+                      </text>
+                    </svg>
+                  </span>
+                )}
+                */}
                 {link.label}
               </Link>
             ))}
@@ -362,10 +402,47 @@ const Header = () => {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-white/5"
+                className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-white/5"
                 style={{ color: "var(--accent-1)" }}
               >
                 {link.label}
+                {/* Free tag - temporarily disabled
+                {link.free && (
+                  <svg
+                    className="w-6 h-6 ml-1 drop-shadow-sm"
+                    viewBox="0 0 64 64"
+                    fill="none"
+                  >
+                    <path
+                      d="M52 12H36c-2 0-4 1-5 2L10 35c-3 3-3 7 0 10l9 9c3 3 7 3 10 0l21-21c1-1 2-3 2-5V14c0-1-1-2-2-2z"
+                      fill="#fcd34d"
+                      stroke="#1f2937"
+                      strokeWidth="2.5"
+                    />
+                    <circle cx="46" cy="20" r="4" fill="#1f2937" />
+                    <path
+                      d="M46 8c0 0 4-2 6 0s-4 8-4 8"
+                      stroke="#374151"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      fill="none"
+                    />
+                    <text
+                      x="32"
+                      y="36"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize="9"
+                      fontWeight="bold"
+                      fill="#1f2937"
+                      fontFamily="Arial, sans-serif"
+                      transform="rotate(-45 32 36)"
+                    >
+                      FREE
+                    </text>
+                  </svg>
+                )}
+                */}
               </Link>
             ))}
 

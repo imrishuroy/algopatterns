@@ -31,28 +31,28 @@ describe("LanguageContext", () => {
     expect(screen.getByTestId("current-language")).toHaveTextContent("java");
   });
 
-  it("changes language when setLanguage is called", async () => {
+  it("changes language when setLanguage is called", () => {
     render(
       <LanguageProvider>
         <TestComponent />
       </LanguageProvider>
     );
 
-    await act(async () => {
+    act(() => {
       fireEvent.click(screen.getByText("Set Python"));
     });
 
     expect(screen.getByTestId("current-language")).toHaveTextContent("python");
   });
 
-  it("persists language choice to localStorage", async () => {
+  it("persists language choice to localStorage", () => {
     render(
       <LanguageProvider>
         <TestComponent />
       </LanguageProvider>
     );
 
-    await act(async () => {
+    act(() => {
       fireEvent.click(screen.getByText("Set C++"));
     });
 
@@ -80,7 +80,7 @@ describe("LanguageContext", () => {
   it("throws error when useLanguage is used outside provider", () => {
     const consoleError = vi
       .spyOn(console, "error")
-      .mockImplementation(() => {});
+      .mockImplementation(vi.fn());
 
     expect(() => render(<TestComponent />)).toThrow(
       "useLanguage must be used within a LanguageProvider"
@@ -105,29 +105,29 @@ describe("LanguageContext", () => {
     expect(screen.getByTestId("current-language")).toHaveTextContent("java");
   });
 
-  it("supports all valid languages", async () => {
+  it("supports all valid languages", () => {
     render(
       <LanguageProvider>
         <TestComponent />
       </LanguageProvider>
     );
 
-    await act(async () => {
+    act(() => {
       fireEvent.click(screen.getByText("Set Python"));
     });
     expect(screen.getByTestId("current-language")).toHaveTextContent("python");
 
-    await act(async () => {
+    act(() => {
       fireEvent.click(screen.getByText("Set C++"));
     });
     expect(screen.getByTestId("current-language")).toHaveTextContent("cpp");
 
-    await act(async () => {
+    act(() => {
       fireEvent.click(screen.getByText("Set JavaScript"));
     });
     expect(screen.getByTestId("current-language")).toHaveTextContent("javascript");
 
-    await act(async () => {
+    act(() => {
       fireEvent.click(screen.getByText("Set Java"));
     });
     expect(screen.getByTestId("current-language")).toHaveTextContent("java");

@@ -14,7 +14,7 @@ vi.mock("next/link", () => ({
 }));
 
 vi.mock("next/dynamic", () => ({
-  default: (importFn: () => Promise<{ default: React.ComponentType }>) => {
+  default: () => {
     const Component = ({ code, language }: { code: string; language: string }) => (
       <div data-testid="code-block">
         <span data-testid="code-language">{language}</span>

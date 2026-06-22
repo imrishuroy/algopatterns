@@ -1,5 +1,5 @@
 import { siteConfig } from "@/lib/seo";
-import { Pattern } from "@/types";
+import { Pattern, Concept } from "@/types";
 
 /**
  * Renders JSON-LD structured data as a script tag.
@@ -119,7 +119,42 @@ export function BreadcrumbJsonLd({
   return <JsonLdScript data={jsonLd} />;
 }
 
-export function ArticleJsonLd({
+export const ConceptJsonLd = ({ concept }: { concept: Concept }) => {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: concept.name,
+    description: concept.description,
+    author: {
+      "@type": "Organization",
+      name: siteConfig.name,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteConfig.url}/logo.png`,
+      },
+    },
+    datePublished: concept.createdAt,
+    dateModified: concept.updatedAt,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteConfig.url}/dsa-fundamentals/${concept.slug}`,
+    },
+    about: {
+      "@type": "Thing",
+      name: concept.category,
+    },
+    proficiencyLevel: "Beginner to Advanced",
+    dependencies: concept.timeComplexity,
+  };
+
+  return <JsonLdScript data={jsonLd} />;
+};
+
+export const ArticleJsonLd = ({
   title,
   description,
   url,
@@ -133,7 +168,7 @@ export function ArticleJsonLd({
   datePublished: string;
   dateModified?: string;
   author?: string;
-}) {
+}) => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -161,4 +196,4 @@ export function ArticleJsonLd({
   };
 
   return <JsonLdScript data={jsonLd} />;
-}
+};

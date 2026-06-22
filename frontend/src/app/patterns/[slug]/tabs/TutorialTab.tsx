@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Pattern } from "@/types";
+import { Pattern, SupportedLanguage } from "@/types";
 import CodeBlock from "@/components/ui/CodeBlock";
 import LanguageToggle from "@/components/ui/LanguageToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 import DPTreeVisualizer from "@/components/visualizers/DPTreeVisualizer";
 import DPTransformationVisualizer from "@/components/visualizers/DPTransformationVisualizer";
 import DPTableVisualizer from "@/components/visualizers/DPTableVisualizer";
@@ -64,7 +64,7 @@ interface TutorialTabProps {
 }
 
 export default function TutorialTab({ pattern }: TutorialTabProps) {
-  const [currentLang, setCurrentLang] = useState<string>("java");
+  const { language: currentLang, setLanguage: setCurrentLang } = useLanguage();
   const hasTutorial = pattern.tutorial && pattern.tutorial.length > 0;
 
   if (!hasTutorial) {
@@ -296,7 +296,7 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
                   </span>
                   <LanguageToggle
                     currentLang={currentLang}
-                    onChange={setCurrentLang}
+                    onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
                     languages={Object.keys(section.code).filter(
                       (k) => section.code?.[k as keyof typeof section.code]
                     )}

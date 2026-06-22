@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Pattern } from "@/types";
+import { Pattern, SupportedLanguage } from "@/types";
 import CodeBlock from "@/components/ui/CodeBlock";
 import LanguageToggle from "@/components/ui/LanguageToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CheatsheetTabProps {
   pattern: Pattern;
 }
 
 export default function CheatsheetTab({ pattern }: CheatsheetTabProps) {
-  const [currentLang, setCurrentLang] = useState<string>("java");
+  const { language: currentLang, setLanguage: setCurrentLang } = useLanguage();
 
   const languageOrder = ["java", "javascript", "python", "cpp", "go"];
   const availableLanguages = languageOrder.filter((lang) =>
@@ -93,7 +93,7 @@ export default function CheatsheetTab({ pattern }: CheatsheetTabProps) {
           </h3>
           <LanguageToggle
             currentLang={currentLang}
-            onChange={setCurrentLang}
+            onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
             languages={availableLanguages}
             size="sm"
           />

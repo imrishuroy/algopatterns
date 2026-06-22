@@ -6,6 +6,46 @@ export interface CodeTemplates {
   go?: string;
 }
 
+// Language types for global language preference
+export type SupportedLanguage = "java" | "python" | "cpp" | "javascript";
+
+// DSA Fundamentals types
+export type ConceptCategory =
+  | "Data Structures"
+  | "Collections & Maps"
+  | "Arrays & Sorting"
+  | "String & Character"
+  | "Type Conversions & Math"
+  | "Arithmetic Patterns"
+  | "Java Fundamentals"
+  | "Algorithm Idioms";
+
+export interface ConceptCodeSnippets {
+  java: string;
+  python: string;
+  cpp: string;
+  javascript: string;
+}
+
+export interface Concept {
+  id: string;
+  name: string;
+  slug: string;
+  category: ConceptCategory;
+  description: string;
+  explanation?: string;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+  whenToUse: string[];
+  codeSnippets: ConceptCodeSnippets;
+  keyPoints?: string[];
+  commonMistakes?: string[];
+  relatedProblems?: string[];
+  relatedPatterns?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface VariationTemplate {
   javascript?: string;
   java?: string;

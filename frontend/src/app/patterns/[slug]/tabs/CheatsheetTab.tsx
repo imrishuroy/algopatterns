@@ -1,9 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Pattern, SupportedLanguage } from "@/types";
-import CodeBlock from "@/components/ui/CodeBlock";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
+
+const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
+  loading: () => (
+    <div className="h-64 rounded-xl animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+  ),
+  ssr: false,
+});
 
 interface CheatsheetTabProps {
   pattern: Pattern;

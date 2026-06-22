@@ -3,7 +3,7 @@ import { concepts, conceptCategories } from "@/lib/dsa-fundamentals";
 import DSAFundamentalsClient from "./DSAFundamentalsClient";
 
 export const metadata: Metadata = {
-  title: "DSA Fundamentals - Essential Concepts for Coding Interviews | AlgoPatterns",
+  title: "DSA Fundamentals - Essential Concepts for Coding Interviews",
   description:
     "Master essential data structures and algorithms concepts for coding interviews. Learn Java, Python, C++, and JavaScript implementations with code examples.",
   keywords: [

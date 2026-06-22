@@ -1,63 +1,73 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Pattern, SupportedLanguage } from "@/types";
-import CodeBlock from "@/components/ui/CodeBlock";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
-import DPTreeVisualizer from "@/components/visualizers/DPTreeVisualizer";
-import DPTransformationVisualizer from "@/components/visualizers/DPTransformationVisualizer";
-import DPTableVisualizer from "@/components/visualizers/DPTableVisualizer";
-import KnapsackVisualizer from "@/components/visualizers/KnapsackVisualizer";
-import DPComparisonVisualizer from "@/components/visualizers/DPComparisonVisualizer";
-import RecurrenceBuilderVisualizer from "@/components/visualizers/RecurrenceBuilderVisualizer";
-import ActivitySelectionVisualizer from "@/components/visualizers/ActivitySelectionVisualizer";
-import JumpGameVisualizer from "@/components/visualizers/JumpGameVisualizer";
-import GridBFSVisualizer from "@/components/visualizers/GridBFSVisualizer";
-import TopologicalSortVisualizer from "@/components/visualizers/TopologicalSortVisualizer";
-import DijkstraVisualizer from "@/components/visualizers/DijkstraVisualizer";
-import TwoSumVisualizer from "@/components/visualizers/TwoSumVisualizer";
-import AnagramGroupVisualizer from "@/components/visualizers/AnagramGroupVisualizer";
-import ConsecutiveSequenceVisualizer from "@/components/visualizers/ConsecutiveSequenceVisualizer";
-import KthLargestVisualizer from "@/components/visualizers/KthLargestVisualizer";
-import MedianFinderVisualizer from "@/components/visualizers/MedianFinderVisualizer";
-import MergeKListsVisualizer from "@/components/visualizers/MergeKListsVisualizer";
-import MergeIntervalsVisualizer from "@/components/visualizers/MergeIntervalsVisualizer";
-import MeetingRoomsVisualizer from "@/components/visualizers/MeetingRoomsVisualizer";
-import IntervalIntersectionVisualizer from "@/components/visualizers/IntervalIntersectionVisualizer";
-import LinkedListReversalVisualizer from "@/components/visualizers/LinkedListReversalVisualizer";
-import CycleDetectionVisualizer from "@/components/visualizers/CycleDetectionVisualizer";
-import ReorderListVisualizer from "@/components/visualizers/ReorderListVisualizer";
-import PrefixSumVisualizer from "@/components/visualizers/PrefixSumVisualizer";
-import SubarraySumKVisualizer from "@/components/visualizers/SubarraySumKVisualizer";
-import ProductExceptSelfVisualizer from "@/components/visualizers/ProductExceptSelfVisualizer";
-import FixedWindowVisualizer from "@/components/visualizers/FixedWindowVisualizer";
-import LongestSubstringVisualizer from "@/components/visualizers/LongestSubstringVisualizer";
-import FindAnagramsVisualizer from "@/components/visualizers/FindAnagramsVisualizer";
-import ValidParenthesesVisualizer from "@/components/visualizers/ValidParenthesesVisualizer";
-import NextGreaterVisualizer from "@/components/visualizers/NextGreaterVisualizer";
-import LargestRectangleVisualizer from "@/components/visualizers/LargestRectangleVisualizer";
-import TreeTraversalVisualizer from "@/components/visualizers/TreeTraversalVisualizer";
-import LevelOrderVisualizer from "@/components/visualizers/LevelOrderVisualizer";
-import BSTValidationVisualizer from "@/components/visualizers/BSTValidationVisualizer";
-import TrieInsertVisualizer from "@/components/visualizers/TrieInsertVisualizer";
-import TrieSearchVisualizer from "@/components/visualizers/TrieSearchVisualizer";
-import TwoSumSortedVisualizer from "@/components/visualizers/TwoSumSortedVisualizer";
-import ContainerWaterVisualizer from "@/components/visualizers/ContainerWaterVisualizer";
-import RemoveDuplicatesVisualizer from "@/components/visualizers/RemoveDuplicatesVisualizer";
-import UnionFindVisualizer from "@/components/visualizers/UnionFindVisualizer";
-import ConnectedComponentsVisualizer from "@/components/visualizers/ConnectedComponentsVisualizer";
 import { QuizCard } from "@/components/quiz";
-import TwoSumHashMapVisualizer from "@/components/visualizers/TwoSumHashMapVisualizer";
-import KadaneVisualizer from "@/components/visualizers/KadaneVisualizer";
-import PrefixSumArrayVisualizer from "@/components/visualizers/PrefixSumArrayVisualizer";
-import SubsetsVisualizer from "@/components/visualizers/SubsetsVisualizer";
-import PermutationsVisualizer from "@/components/visualizers/PermutationsVisualizer";
-import NQueensVisualizer from "@/components/visualizers/NQueensVisualizer";
-import BinarySearchVisualizer from "@/components/visualizers/BinarySearchVisualizer";
-import RotatedArrayVisualizer from "@/components/visualizers/RotatedArrayVisualizer";
-import KokoEatingVisualizer from "@/components/visualizers/KokoEatingVisualizer";
+
+const VisualizerLoading = () => (
+  <div className="h-64 rounded-xl animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+);
+
+const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
+  loading: VisualizerLoading,
+  ssr: false,
+});
+
+const DPTreeVisualizer = dynamic(() => import("@/components/visualizers/DPTreeVisualizer"), { loading: VisualizerLoading, ssr: false });
+const DPTransformationVisualizer = dynamic(() => import("@/components/visualizers/DPTransformationVisualizer"), { loading: VisualizerLoading, ssr: false });
+const DPTableVisualizer = dynamic(() => import("@/components/visualizers/DPTableVisualizer"), { loading: VisualizerLoading, ssr: false });
+const KnapsackVisualizer = dynamic(() => import("@/components/visualizers/KnapsackVisualizer"), { loading: VisualizerLoading, ssr: false });
+const DPComparisonVisualizer = dynamic(() => import("@/components/visualizers/DPComparisonVisualizer"), { loading: VisualizerLoading, ssr: false });
+const RecurrenceBuilderVisualizer = dynamic(() => import("@/components/visualizers/RecurrenceBuilderVisualizer"), { loading: VisualizerLoading, ssr: false });
+const ActivitySelectionVisualizer = dynamic(() => import("@/components/visualizers/ActivitySelectionVisualizer"), { loading: VisualizerLoading, ssr: false });
+const JumpGameVisualizer = dynamic(() => import("@/components/visualizers/JumpGameVisualizer"), { loading: VisualizerLoading, ssr: false });
+const GridBFSVisualizer = dynamic(() => import("@/components/visualizers/GridBFSVisualizer"), { loading: VisualizerLoading, ssr: false });
+const TopologicalSortVisualizer = dynamic(() => import("@/components/visualizers/TopologicalSortVisualizer"), { loading: VisualizerLoading, ssr: false });
+const DijkstraVisualizer = dynamic(() => import("@/components/visualizers/DijkstraVisualizer"), { loading: VisualizerLoading, ssr: false });
+const TwoSumVisualizer = dynamic(() => import("@/components/visualizers/TwoSumVisualizer"), { loading: VisualizerLoading, ssr: false });
+const AnagramGroupVisualizer = dynamic(() => import("@/components/visualizers/AnagramGroupVisualizer"), { loading: VisualizerLoading, ssr: false });
+const ConsecutiveSequenceVisualizer = dynamic(() => import("@/components/visualizers/ConsecutiveSequenceVisualizer"), { loading: VisualizerLoading, ssr: false });
+const KthLargestVisualizer = dynamic(() => import("@/components/visualizers/KthLargestVisualizer"), { loading: VisualizerLoading, ssr: false });
+const MedianFinderVisualizer = dynamic(() => import("@/components/visualizers/MedianFinderVisualizer"), { loading: VisualizerLoading, ssr: false });
+const MergeKListsVisualizer = dynamic(() => import("@/components/visualizers/MergeKListsVisualizer"), { loading: VisualizerLoading, ssr: false });
+const MergeIntervalsVisualizer = dynamic(() => import("@/components/visualizers/MergeIntervalsVisualizer"), { loading: VisualizerLoading, ssr: false });
+const MeetingRoomsVisualizer = dynamic(() => import("@/components/visualizers/MeetingRoomsVisualizer"), { loading: VisualizerLoading, ssr: false });
+const IntervalIntersectionVisualizer = dynamic(() => import("@/components/visualizers/IntervalIntersectionVisualizer"), { loading: VisualizerLoading, ssr: false });
+const LinkedListReversalVisualizer = dynamic(() => import("@/components/visualizers/LinkedListReversalVisualizer"), { loading: VisualizerLoading, ssr: false });
+const CycleDetectionVisualizer = dynamic(() => import("@/components/visualizers/CycleDetectionVisualizer"), { loading: VisualizerLoading, ssr: false });
+const ReorderListVisualizer = dynamic(() => import("@/components/visualizers/ReorderListVisualizer"), { loading: VisualizerLoading, ssr: false });
+const PrefixSumVisualizer = dynamic(() => import("@/components/visualizers/PrefixSumVisualizer"), { loading: VisualizerLoading, ssr: false });
+const SubarraySumKVisualizer = dynamic(() => import("@/components/visualizers/SubarraySumKVisualizer"), { loading: VisualizerLoading, ssr: false });
+const ProductExceptSelfVisualizer = dynamic(() => import("@/components/visualizers/ProductExceptSelfVisualizer"), { loading: VisualizerLoading, ssr: false });
+const FixedWindowVisualizer = dynamic(() => import("@/components/visualizers/FixedWindowVisualizer"), { loading: VisualizerLoading, ssr: false });
+const LongestSubstringVisualizer = dynamic(() => import("@/components/visualizers/LongestSubstringVisualizer"), { loading: VisualizerLoading, ssr: false });
+const FindAnagramsVisualizer = dynamic(() => import("@/components/visualizers/FindAnagramsVisualizer"), { loading: VisualizerLoading, ssr: false });
+const ValidParenthesesVisualizer = dynamic(() => import("@/components/visualizers/ValidParenthesesVisualizer"), { loading: VisualizerLoading, ssr: false });
+const NextGreaterVisualizer = dynamic(() => import("@/components/visualizers/NextGreaterVisualizer"), { loading: VisualizerLoading, ssr: false });
+const LargestRectangleVisualizer = dynamic(() => import("@/components/visualizers/LargestRectangleVisualizer"), { loading: VisualizerLoading, ssr: false });
+const TreeTraversalVisualizer = dynamic(() => import("@/components/visualizers/TreeTraversalVisualizer"), { loading: VisualizerLoading, ssr: false });
+const LevelOrderVisualizer = dynamic(() => import("@/components/visualizers/LevelOrderVisualizer"), { loading: VisualizerLoading, ssr: false });
+const BSTValidationVisualizer = dynamic(() => import("@/components/visualizers/BSTValidationVisualizer"), { loading: VisualizerLoading, ssr: false });
+const TrieInsertVisualizer = dynamic(() => import("@/components/visualizers/TrieInsertVisualizer"), { loading: VisualizerLoading, ssr: false });
+const TrieSearchVisualizer = dynamic(() => import("@/components/visualizers/TrieSearchVisualizer"), { loading: VisualizerLoading, ssr: false });
+const TwoSumSortedVisualizer = dynamic(() => import("@/components/visualizers/TwoSumSortedVisualizer"), { loading: VisualizerLoading, ssr: false });
+const ContainerWaterVisualizer = dynamic(() => import("@/components/visualizers/ContainerWaterVisualizer"), { loading: VisualizerLoading, ssr: false });
+const RemoveDuplicatesVisualizer = dynamic(() => import("@/components/visualizers/RemoveDuplicatesVisualizer"), { loading: VisualizerLoading, ssr: false });
+const UnionFindVisualizer = dynamic(() => import("@/components/visualizers/UnionFindVisualizer"), { loading: VisualizerLoading, ssr: false });
+const ConnectedComponentsVisualizer = dynamic(() => import("@/components/visualizers/ConnectedComponentsVisualizer"), { loading: VisualizerLoading, ssr: false });
+const TwoSumHashMapVisualizer = dynamic(() => import("@/components/visualizers/TwoSumHashMapVisualizer"), { loading: VisualizerLoading, ssr: false });
+const KadaneVisualizer = dynamic(() => import("@/components/visualizers/KadaneVisualizer"), { loading: VisualizerLoading, ssr: false });
+const PrefixSumArrayVisualizer = dynamic(() => import("@/components/visualizers/PrefixSumArrayVisualizer"), { loading: VisualizerLoading, ssr: false });
+const SubsetsVisualizer = dynamic(() => import("@/components/visualizers/SubsetsVisualizer"), { loading: VisualizerLoading, ssr: false });
+const PermutationsVisualizer = dynamic(() => import("@/components/visualizers/PermutationsVisualizer"), { loading: VisualizerLoading, ssr: false });
+const NQueensVisualizer = dynamic(() => import("@/components/visualizers/NQueensVisualizer"), { loading: VisualizerLoading, ssr: false });
+const BinarySearchVisualizer = dynamic(() => import("@/components/visualizers/BinarySearchVisualizer"), { loading: VisualizerLoading, ssr: false });
+const RotatedArrayVisualizer = dynamic(() => import("@/components/visualizers/RotatedArrayVisualizer"), { loading: VisualizerLoading, ssr: false });
+const KokoEatingVisualizer = dynamic(() => import("@/components/visualizers/KokoEatingVisualizer"), { loading: VisualizerLoading, ssr: false });
 
 interface TutorialTabProps {
   pattern: Pattern;

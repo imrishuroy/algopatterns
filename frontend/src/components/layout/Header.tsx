@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProgress } from "@/contexts/ProgressContext";
 import { useFilter } from "@/contexts/FilterContext";
@@ -238,10 +239,13 @@ const Header = () => {
       <div className="w-full px-4 md:px-6 py-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <img
+            <Image
               src="/logo.png"
               alt="Algo Patterns"
-              className="w-7 h-7 transition-all group-hover:scale-105"
+              width={28}
+              height={28}
+              className="transition-all group-hover:scale-105"
+              priority
             />
             <span
               className="text-lg bg-clip-text text-transparent"

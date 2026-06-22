@@ -2,7 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
+  },
+  experimental: {
+    optimizePackageImports: [
+      "react-syntax-highlighter",
+      "react-markdown",
+      "remark-gfm",
+      "@monaco-editor/react",
+    ],
   },
 };
 

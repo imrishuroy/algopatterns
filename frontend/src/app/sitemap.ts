@@ -5,7 +5,7 @@ import { concepts } from "@/lib/dsa-fundamentals";
 
 const patterns = patternsData as Pattern[];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+const sitemap = (): MetadataRoute.Sitemap => {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -80,4 +80,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   return [...staticPages, ...patternPages, ...conceptPages];
-}
+};
+
+export default sitemap;

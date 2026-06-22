@@ -6,17 +6,16 @@ import { ConceptJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 
-export function generateStaticParams() {
-  return concepts.map((concept) => ({
+export const generateStaticParams = () =>
+  concepts.map((concept) => ({
     slug: concept.slug,
   }));
-}
 
-export async function generateMetadata({
+export const generateMetadata = async ({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+}): Promise<Metadata> => {
   const { slug } = await params;
   const concept = getConceptBySlug(slug);
 
@@ -57,7 +56,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export default async function ConceptPage({ params }: PageProps) {
+const ConceptPage = async ({ params }: PageProps) => {
   const { slug } = await params;
   const concept = getConceptBySlug(slug);
 
@@ -78,4 +77,6 @@ export default async function ConceptPage({ params }: PageProps) {
       <ConceptPageClient concept={concept} />
     </>
   );
-}
+};
+
+export default ConceptPage;

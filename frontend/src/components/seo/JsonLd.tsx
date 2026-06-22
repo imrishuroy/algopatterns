@@ -119,7 +119,7 @@ export function BreadcrumbJsonLd({
   return <JsonLdScript data={jsonLd} />;
 }
 
-export function ConceptJsonLd({ concept }: { concept: Concept }) {
+export const ConceptJsonLd = ({ concept }: { concept: Concept }) => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
@@ -152,9 +152,9 @@ export function ConceptJsonLd({ concept }: { concept: Concept }) {
   };
 
   return <JsonLdScript data={jsonLd} />;
-}
+};
 
-export function ArticleJsonLd({
+export const ArticleJsonLd = ({
   title,
   description,
   url,
@@ -168,7 +168,7 @@ export function ArticleJsonLd({
   datePublished: string;
   dateModified?: string;
   author?: string;
-}) {
+}) => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -196,4 +196,4 @@ export function ArticleJsonLd({
   };
 
   return <JsonLdScript data={jsonLd} />;
-}
+};

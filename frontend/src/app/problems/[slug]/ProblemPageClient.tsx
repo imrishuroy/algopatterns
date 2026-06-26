@@ -18,6 +18,9 @@ import type {
 } from "@/types";
 import { solutions } from "@/lib/solutions";
 import type { Monaco } from "@monaco-editor/react";
+import { AIChatPanel, InlineAI } from "@/components/ai";
+import { useInlineAI } from "@/hooks/useInlineAI";
+import type { OnMount } from "@monaco-editor/react";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -246,11 +249,13 @@ export default function ProblemPageClient({ params }: PageProps) {
     "testcases"
   );
 
-  // UI state
-  const [panelWidth, setPanelWidth] = useState(50);
-  const [editorHeight, setEditorHeight] = useState(60); // percentage of right panel for editor
+  // UI state - three panel widths as percentages
+  const [leftPanelWidth, setLeftPanelWidth] = useState(35); // Description panel
+  const [rightPanelWidth, setRightPanelWidth] = useState(20); // AI panel (0 when closed)
+  const [editorHeight, setEditorHeight] = useState(60); // percentage of middle panel for editor
   const [fontSize, setFontSize] = useState(14);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const aiDividerRef = useRef<HTMLDivElement>(null);
   const [customInput, setCustomInput] = useState("");
   const [useCustomInput, setUseCustomInput] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -269,6 +274,14 @@ export default function ProblemPageClient({ params }: PageProps) {
   const [timerRunning, setTimerRunning] = useState(true);
   const [problemSolved, setProblemSolved] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+
+  // AI Tutor state
+  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+  const [errorForAI, setErrorForAI] = useState<string | undefined>();
+
+  // Editor instance for inline AI
+  const [editorInstance, setEditorInstance] = useState<Parameters<OnMount>[0] | null>(null);
+  const inlineAI = useInlineAI(editorInstance);
 
   // Timer effect
   useEffect(() => {
@@ -467,14 +480,30 @@ export default function ProblemPageClient({ params }: PageProps) {
         setConsoleOutput(
           stdout + (stderr ? "\n--- Errors ---\n" + stderr : "")
         );
+        // Build detailed error context for AI tutor
+        const failedTests = response.data.results.filter(r => r.status !== "accepted");
+        if (failedTests.length > 0) {
+          const errorContext = failedTests.map((t, i) =>
+            `Test ${t.testCaseIndex + 1}: ${t.status.replace(/_/g, " ")}\n` +
+            `  Input: ${t.input}\n` +
+            `  Expected: ${t.expectedOutput}\n` +
+            `  Got: ${t.actualOutput || "(no output)"}\n` +
+            (t.errorMessage ? `  Error: ${t.errorMessage}` : "")
+          ).join("\n\n");
+          setErrorForAI(stderr ? `${stderr}\n\nFailed Tests:\n${errorContext}` : `Failed Tests:\n${errorContext}`);
+        } else {
+          setErrorForAI(undefined);
+        }
       } else {
         const errMsg = response.error?.message || "Run failed";
         setConsoleOutput(`Error: ${errMsg}`);
+        setErrorForAI(errMsg);
         setResultTab("console");
       }
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : "Failed to run code";
       setConsoleOutput(`Error: ${errMsg}`);
+      setErrorForAI(errMsg);
       setResultTab("console");
     } finally {
       setIsRunning(false);
@@ -509,6 +538,7 @@ export default function ProblemPageClient({ params }: PageProps) {
         if (response.data.status === "accepted") {
           setProblemSolved(true);
           setTimerRunning(false);
+          setErrorForAI(undefined);
         }
         // Reload submissions list
         loadSubmissions();
@@ -525,16 +555,30 @@ export default function ProblemPageClient({ params }: PageProps) {
           setConsoleOutput(
             stdout + (stderr ? "\n--- Errors ---\n" + stderr : "")
           );
+          // Build detailed error context for AI tutor
+          const failedTests = response.data.results.filter(r => r.status !== "accepted");
+          if (failedTests.length > 0 && response.data.status !== "accepted") {
+            const errorContext = failedTests.slice(0, 3).map((t, i) =>
+              `Test ${i + 1}: ${t.status.replace(/_/g, " ")}\n` +
+              `  Input: ${t.input}\n` +
+              `  Expected: ${t.expectedOutput}\n` +
+              `  Got: ${t.actualOutput || "(no output)"}\n` +
+              (t.errorMessage ? `  Error: ${t.errorMessage}` : "")
+            ).join("\n\n");
+            setErrorForAI(stderr ? `${stderr}\n\nFailed Tests:\n${errorContext}` : `Failed Tests:\n${errorContext}`);
+          }
         }
       } else {
         const errMsg = response.error?.message || "Submission failed";
         setConsoleOutput(`Error: ${errMsg}`);
+        setErrorForAI(errMsg);
         setResultTab("console");
       }
     } catch (err) {
       const errMsg =
         err instanceof Error ? err.message : "Failed to submit code";
       setConsoleOutput(`Error: ${errMsg}`);
+      setErrorForAI(errMsg);
       setResultTab("console");
     } finally {
       setIsSubmitting(false);
@@ -568,12 +612,12 @@ export default function ProblemPageClient({ params }: PageProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Resizable panel
-  const handleMouseDown = useCallback(
+  // Resizable left panel (Description)
+  const handleLeftResize = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       const startX = e.clientX;
-      const startWidth = panelWidth;
+      const startWidth = leftPanelWidth;
 
       const handleMouseMove = (e: MouseEvent) => {
         const container = panelRef.current;
@@ -581,18 +625,55 @@ export default function ProblemPageClient({ params }: PageProps) {
         const containerWidth = container.offsetWidth;
         const delta = e.clientX - startX;
         const newWidth = startWidth + (delta / containerWidth) * 100;
-        setPanelWidth(Math.min(Math.max(newWidth, 20), 80));
+        // Min 20%, max depends on AI panel
+        const maxWidth = isAIChatOpen ? 60 : 70;
+        setLeftPanelWidth(Math.min(Math.max(newWidth, 20), maxWidth));
       };
 
       const handleMouseUp = () => {
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
       };
 
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [panelWidth]
+    [leftPanelWidth, isAIChatOpen]
+  );
+
+  // Resizable right panel (AI Chat)
+  const handleRightResize = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const startX = e.clientX;
+      const startWidth = rightPanelWidth;
+
+      const handleMouseMove = (e: MouseEvent) => {
+        const container = panelRef.current;
+        if (!container) return;
+        const containerWidth = container.offsetWidth;
+        const delta = startX - e.clientX; // Reversed because dragging left increases width
+        const newWidth = startWidth + (delta / containerWidth) * 100;
+        setRightPanelWidth(Math.min(Math.max(newWidth, 15), 40));
+      };
+
+      const handleMouseUp = () => {
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      };
+
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    },
+    [rightPanelWidth]
   );
 
   // Vertical resizer for editor/results split
@@ -1282,17 +1363,53 @@ export default function ProblemPageClient({ params }: PageProps) {
             </div>
           )}
         </div>
+
+        {/* AI Toggle Button for Mobile */}
+        {!isAIChatOpen && (
+          <button
+            onClick={() => setIsAIChatOpen(true)}
+            className="fixed bottom-4 right-4 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-lg transition-colors z-40"
+            title="Open AI Assistant"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </button>
+        )}
+        {/* AI Panel Overlay for Mobile */}
+        {isAIChatOpen && problem && (
+          <div className="fixed inset-0 z-50 bg-gray-900">
+            <AIChatPanel
+              problemSlug={slug}
+              problemTitle={problem.title}
+              problemDescription={problem.description}
+              code={code}
+              language={languages.find((l) => l.id === selectedLanguageId)?.slug || "java"}
+              errorMessage={errorForAI}
+              isOpen={isAIChatOpen}
+              onClose={() => setIsAIChatOpen(false)}
+            />
+          </div>
+        )}
       </div>
     );
   }
+
+  // Get current language name for AI
+  const currentLanguageName = languages.find((l) => l.id === selectedLanguageId)?.slug || "java";
+
+  // Calculate middle panel width
+  const middlePanelWidth = isAIChatOpen
+    ? 100 - leftPanelWidth - rightPanelWidth
+    : 100 - leftPanelWidth;
 
   // Desktop Layout
   return (
     <div ref={panelRef} className="flex h-[calc(100vh-64px)]">
       {/* Left Panel - Problem Description */}
       <div
-        className="flex flex-col h-full border-r border-gray-800"
-        style={{ width: `${panelWidth}%` }}
+        className="flex flex-col h-full overflow-hidden"
+        style={{ width: `${leftPanelWidth}%` }}
       >
         {/* Tabs */}
         <div className="flex items-center border-b border-gray-800">
@@ -1638,15 +1755,15 @@ export default function ProblemPageClient({ params }: PageProps) {
       {/* Resizer */}
       <div
         ref={dividerRef}
-        onMouseDown={handleMouseDown}
-        className="w-1 bg-gray-800 hover:bg-indigo-500 cursor-col-resize transition-colors"
+        onMouseDown={handleLeftResize}
+        className="w-1 bg-gray-800 hover:bg-indigo-500 cursor-col-resize transition-colors flex-shrink-0"
       />
 
-      {/* Right Panel - Code Editor */}
+      {/* Middle Panel - Code Editor */}
       <div
         ref={editorPanelRef}
-        className="flex flex-col h-full"
-        style={{ width: `${100 - panelWidth}%` }}
+        className="flex flex-col h-full overflow-hidden"
+        style={{ width: `${middlePanelWidth}%` }}
       >
         {/* Toolbar */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
@@ -1913,6 +2030,7 @@ export default function ProblemPageClient({ params }: PageProps) {
             onChange={(value) => setCode(value || "")}
             theme="algopatterns-dark"
             beforeMount={handleEditorWillMount}
+            onMount={(editor) => setEditorInstance(editor)}
             options={{
               fontSize,
               fontFamily: "JetBrains Mono, monospace",
@@ -1925,6 +2043,21 @@ export default function ProblemPageClient({ params }: PageProps) {
             }}
           />
         </div>
+
+        {/* Inline AI (Cmd+K) */}
+        {problem && (
+          <InlineAI
+            isOpen={inlineAI.isOpen}
+            onClose={inlineAI.close}
+            position={inlineAI.position}
+            selectedCode={inlineAI.selectedCode}
+            fullCode={code}
+            language={currentLanguageName}
+            problemSlug={slug}
+            problemTitle={problem.title}
+            onApply={inlineAI.applyCode}
+          />
+        )}
 
         {/* Vertical Resizer */}
         {hasResults && (
@@ -2185,6 +2318,47 @@ export default function ProblemPageClient({ params }: PageProps) {
           </div>
         )}
       </div>
+
+      {/* AI Panel Resizer */}
+      {isAIChatOpen && (
+        <div
+          ref={aiDividerRef}
+          onMouseDown={handleRightResize}
+          className="w-1 bg-gray-800 hover:bg-indigo-500 cursor-col-resize transition-colors flex-shrink-0"
+        />
+      )}
+
+      {/* Right Panel - AI Assistant */}
+      {isAIChatOpen && problem && (
+        <div
+          className="flex flex-col h-full overflow-hidden"
+          style={{ width: `${rightPanelWidth}%` }}
+        >
+          <AIChatPanel
+            problemSlug={slug}
+            problemTitle={problem.title}
+            problemDescription={problem.description}
+            code={code}
+            language={currentLanguageName}
+            errorMessage={errorForAI}
+            isOpen={isAIChatOpen}
+            onClose={() => setIsAIChatOpen(false)}
+          />
+        </div>
+      )}
+
+      {/* AI Toggle Button */}
+      {!isAIChatOpen && (
+        <button
+          onClick={() => setIsAIChatOpen(true)}
+          className="fixed bottom-4 right-4 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-lg transition-colors z-40"
+          title="Open AI Assistant (Ctrl+Shift+A)"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }

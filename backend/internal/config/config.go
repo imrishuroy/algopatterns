@@ -18,6 +18,28 @@ type Config struct {
 	Judge0      Judge0Config
 	Razorpay    RazorpayConfig
 	Email       EmailConfig
+	AI          AIConfig
+}
+
+type AIConfig struct {
+	Enabled           bool
+	DefaultProvider   string
+	FallbackProviders []string
+
+	ClaudeAPIKey string
+	ClaudeModel  string
+	ClaudeBaseURL string
+
+	DeepSeekAPIKey string
+	DeepSeekModel  string
+
+	OpenAIAPIKey string
+	OpenAIModel  string
+
+	EmbeddingModel string
+
+	FreeRequestsPerDay int
+	MaxCodeLength      int
 }
 
 type EmailConfig struct {
@@ -165,6 +187,21 @@ func Load() (*Config, error) {
 			FromEmail:    getEnv("EMAIL_FROM", "hello@algopatterns.in"),
 			FromName:     getEnv("EMAIL_FROM_NAME", "AlgoPatterns"),
 			Enabled:      getBoolEnv("EMAIL_ENABLED", false),
+		},
+		AI: AIConfig{
+			Enabled:            getBoolEnv("AI_ENABLED", false),
+			DefaultProvider:    getEnv("AI_DEFAULT_PROVIDER", "claude"),
+			FallbackProviders:  getEnvSlice("AI_FALLBACK_PROVIDERS", []string{"deepseek", "openai"}),
+			ClaudeAPIKey:       getEnv("CLAUDE_API_KEY", ""),
+			ClaudeModel:        getEnv("CLAUDE_MODEL", "claude-sonnet-4-20250514"),
+			ClaudeBaseURL:      getEnv("CLAUDE_BASE_URL", "https://api.anthropic.com/v1"),
+			DeepSeekAPIKey:     getEnv("DEEPSEEK_API_KEY", ""),
+			DeepSeekModel:      getEnv("DEEPSEEK_MODEL", "deepseek-chat"),
+			OpenAIAPIKey:       getEnv("OPENAI_API_KEY", ""),
+			OpenAIModel:        getEnv("OPENAI_MODEL", "gpt-4o-mini"),
+			EmbeddingModel:     getEnv("EMBEDDING_MODEL", "text-embedding-3-small"),
+			FreeRequestsPerDay: getIntEnv("AI_FREE_REQUESTS_PER_DAY", 30),
+			MaxCodeLength:      getIntEnv("AI_MAX_CODE_LENGTH", 50000),
 		},
 	}
 

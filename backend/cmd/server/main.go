@@ -13,6 +13,10 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/imrishuroy/algopatterns/internal/ai"
+	aihandlers "github.com/imrishuroy/algopatterns/internal/ai/handlers"
+	"github.com/imrishuroy/algopatterns/internal/ai/llm"
+	"github.com/imrishuroy/algopatterns/internal/ai/rag"
 	"github.com/imrishuroy/algopatterns/internal/config"
 	"github.com/imrishuroy/algopatterns/internal/handlers"
 	"github.com/imrishuroy/algopatterns/internal/metrics"
@@ -85,8 +89,74 @@ func main() {
 	webhookService := services.NewWebhookService(paymentRepo, razorpayClient, slog.Default())
 	featureAccess := services.NewFeatureAccess(paymentRepo)
 
+	// Initialize AI service
+	var aiService *ai.Service
+	if cfg.AI.Enabled {
+		llmManager := llm.NewManager(llm.ManagerConfig{
+			DefaultProvider: cfg.AI.DefaultProvider,
+			FallbackChain:   cfg.AI.FallbackProviders,
+		})
+
+		if cfg.AI.ClaudeAPIKey != "" {
+			llmManager.RegisterProvider("claude", llm.NewClaudeProvider(llm.ClaudeConfig{
+				APIKey:  cfg.AI.ClaudeAPIKey,
+				BaseURL: cfg.AI.ClaudeBaseURL,
+				Model:   cfg.AI.ClaudeModel,
+			}))
+		}
+
+		if cfg.AI.DeepSeekAPIKey != "" {
+			llmManager.RegisterProvider("deepseek", llm.NewDeepSeekProvider(llm.DeepSeekConfig{
+				APIKey: cfg.AI.DeepSeekAPIKey,
+				Model:  cfg.AI.DeepSeekModel,
+			}))
+		}
+
+		if cfg.AI.OpenAIAPIKey != "" {
+			llmManager.RegisterProvider("openai", llm.NewOpenAIProvider(llm.OpenAIConfig{
+				APIKey: cfg.AI.OpenAIAPIKey,
+				Model:  cfg.AI.OpenAIModel,
+			}))
+		}
+
+		aiConfig := ai.Config{
+			Enabled:         true,
+			DefaultProvider: cfg.AI.DefaultProvider,
+			FallbackChain:   cfg.AI.FallbackProviders,
+			RateLimit: ai.RateLimitConfig{
+				FreeRequestsPerDay: cfg.AI.FreeRequestsPerDay,
+				MaxCodeLength:      cfg.AI.MaxCodeLength,
+			},
+			Features: ai.FeaturesConfig{
+				EnableChat:      true,
+				EnableHints:     true,
+				EnableReview:    true,
+				EnableExplain:   true,
+				EnableStreaming: true,
+				EnableRAG:       cfg.AI.OpenAIAPIKey != "",
+			},
+		}
+
+		// Initialize RAG service if OpenAI API key is available for embeddings
+		if cfg.AI.OpenAIAPIKey != "" {
+			embeddingProvider := rag.NewOpenAIEmbedding(rag.OpenAIEmbeddingConfig{
+				APIKey:     cfg.AI.OpenAIAPIKey,
+				Model:      "text-embedding-3-small",
+				Dimensions: 1536,
+			})
+			ragService := rag.NewService(db.Pool, embeddingProvider)
+			aiService = ai.NewServiceWithRAG(llmManager, ragService, aiConfig)
+			log.Info().Msg("AI service initialized with RAG support")
+		} else {
+			aiService = ai.NewService(llmManager, aiConfig)
+			log.Info().Msg("AI service initialized without RAG (no OpenAI API key)")
+		}
+	} else {
+		log.Info().Msg("AI service disabled")
+	}
+
 	gin.SetMode(cfg.Server.Mode)
-	router := setupRouter(cfg, db, patternService, authService, oauthService, sessionService, progressService, problemService, submissionService, highlightService, quizService, paymentService, webhookService, featureAccess)
+	router := setupRouter(cfg, db, patternService, authService, oauthService, sessionService, progressService, problemService, submissionService, highlightService, quizService, paymentService, webhookService, featureAccess, aiService)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port),
@@ -125,7 +195,7 @@ func setupLogger(cfg config.LoggingConfig) {
 	}
 }
 
-func setupRouter(cfg *config.Config, db *repository.Database, patternService *services.PatternService, authService *services.AuthService, oauthService *services.OAuthService, sessionService *services.SessionService, progressService *services.ProgressService, problemService *services.ProblemService, submissionService *services.SubmissionService, highlightService *services.HighlightService, quizService *services.QuizService, paymentService *services.PaymentService, webhookService *services.WebhookService, featureAccess *services.FeatureAccess) *gin.Engine {
+func setupRouter(cfg *config.Config, db *repository.Database, patternService *services.PatternService, authService *services.AuthService, oauthService *services.OAuthService, sessionService *services.SessionService, progressService *services.ProgressService, problemService *services.ProblemService, submissionService *services.SubmissionService, highlightService *services.HighlightService, quizService *services.QuizService, paymentService *services.PaymentService, webhookService *services.WebhookService, featureAccess *services.FeatureAccess, aiService *ai.Service) *gin.Engine {
 	router := gin.New()
 
 	rateLimiter := middleware.NewRateLimiter(cfg.Server.RateLimitRPS, cfg.Server.RateLimitBurst)
@@ -182,6 +252,13 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 
 		paymentHandler := handlers.NewPaymentHandler(paymentService, webhookService, authMW)
 		paymentHandler.RegisterRoutes(v1)
+
+		// AI routes (only if service is enabled)
+		if aiService != nil {
+			aiChatRepo := repository.NewAIChatRepository(db)
+			aiHandler := aihandlers.NewHandler(aiService, authMW, aiChatRepo)
+			aiHandler.RegisterRoutes(v1)
+		}
 	}
 
 	router.NoRoute(func(c *gin.Context) {

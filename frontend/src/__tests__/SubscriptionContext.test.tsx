@@ -8,8 +8,14 @@ import type { Subscription, Plan, PlanFeatures } from "@/types";
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: vi.fn(() => ({
     isAuthenticated: true,
-    user: { id: "user-123", email: "test@test.com" },
+    user: { id: "user-123", email: "test@test.com", name: "Test", emailVerified: true },
     isLoading: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+    refreshUser: vi.fn(),
+    loginWithGoogle: vi.fn(),
+    handleGoogleCallback: vi.fn(),
   })),
 }));
 
@@ -100,12 +106,14 @@ describe("SubscriptionContext", () => {
     vi.clearAllMocks();
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
-      user: { id: "user-123", email: "test@test.com" },
+      user: { id: "user-123", email: "test@test.com", name: "Test", emailVerified: true },
       isLoading: false,
       login: vi.fn(),
       logout: vi.fn(),
       register: vi.fn(),
       refreshUser: vi.fn(),
+      loginWithGoogle: vi.fn(),
+      handleGoogleCallback: vi.fn(),
     });
     vi.mocked(apiClient.getPlans).mockResolvedValue({
       success: true,
@@ -153,6 +161,8 @@ describe("SubscriptionContext", () => {
         logout: vi.fn(),
         register: vi.fn(),
         refreshUser: vi.fn(),
+        loginWithGoogle: vi.fn(),
+        handleGoogleCallback: vi.fn(),
       });
 
       const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
@@ -285,13 +295,13 @@ describe("SubscriptionContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let orderResult;
+      let orderResult: { success: boolean; error?: string; data?: { razorpay_order_id: string } } | undefined;
       await act(async () => {
         orderResult = await result.current.createOrder("pro_yearly");
       });
 
-      expect(orderResult.success).toBe(true);
-      expect(orderResult.data?.razorpay_order_id).toBe("rzp_order_123");
+      expect(orderResult!.success).toBe(true);
+      expect(orderResult!.data?.razorpay_order_id).toBe("rzp_order_123");
     });
 
     it("should handle order creation failure", async () => {
@@ -301,6 +311,7 @@ describe("SubscriptionContext", () => {
       });
       vi.mocked(apiClient.createOrder).mockResolvedValue({
         success: false,
+        data: { order_id: "", razorpay_order_id: "", razorpay_key_id: "", plan: { id: "", name: "", billing_period: "" }, pricing: { subtotal: 0, discount_amount: 0, gst_rate: 0, gst_amount: 0, total: 0, currency: "INR" } },
         error: { code: "ERROR", message: "Plan not found" },
       });
 
@@ -310,13 +321,13 @@ describe("SubscriptionContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let orderResult;
+      let orderResult: { success: boolean; error?: string; data?: { razorpay_order_id: string } } | undefined;
       await act(async () => {
         orderResult = await result.current.createOrder("invalid_plan");
       });
 
-      expect(orderResult.success).toBe(false);
-      expect(orderResult.error).toBe("Plan not found");
+      expect(orderResult!.success).toBe(false);
+      expect(orderResult!.error).toBe("Plan not found");
     });
   });
 
@@ -343,13 +354,13 @@ describe("SubscriptionContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let discountResult;
+      let discountResult: { success: boolean; error?: string; data?: { discount_amount: number } } | undefined;
       await act(async () => {
         discountResult = await result.current.validateDiscount("SAVE50", "pro_yearly");
       });
 
-      expect(discountResult.success).toBe(true);
-      expect(discountResult.data?.discount_amount).toBe(60000);
+      expect(discountResult!.success).toBe(true);
+      expect(discountResult!.data?.discount_amount).toBe(60000);
     });
 
     it("should handle invalid discount code", async () => {
@@ -359,6 +370,7 @@ describe("SubscriptionContext", () => {
       });
       vi.mocked(apiClient.validateDiscount).mockResolvedValue({
         success: false,
+        data: { code: "", discount_type: "", discount_value: 0, discount_amount: 0, message: "" },
         error: { code: "INVALID", message: "Invalid discount code" },
       });
 
@@ -368,13 +380,13 @@ describe("SubscriptionContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let discountResult;
+      let discountResult: { success: boolean; error?: string; data?: { discount_amount: number } } | undefined;
       await act(async () => {
         discountResult = await result.current.validateDiscount("INVALID", "pro_yearly");
       });
 
-      expect(discountResult.success).toBe(false);
-      expect(discountResult.error).toBe("Invalid discount code");
+      expect(discountResult!.success).toBe(false);
+      expect(discountResult!.error).toBe("Invalid discount code");
     });
   });
 
@@ -398,12 +410,12 @@ describe("SubscriptionContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let verifyResult;
+      let verifyResult: { success: boolean; error?: string; data?: { payment_id: string; subscription: Subscription } } | undefined;
       await act(async () => {
         verifyResult = await result.current.verifyPayment("pay_123", "order_123", "sig_123");
       });
 
-      expect(verifyResult.success).toBe(true);
+      expect(verifyResult!.success).toBe(true);
       expect(result.current.subscription).toEqual(mockProSubscription);
       expect(result.current.isPro).toBe(true);
     });
@@ -429,12 +441,12 @@ describe("SubscriptionContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let cancelResult;
+      let cancelResult: { success: boolean; error?: string } | undefined;
       await act(async () => {
         cancelResult = await result.current.cancelSubscription("too_expensive", "Just testing");
       });
 
-      expect(cancelResult.success).toBe(true);
+      expect(cancelResult!.success).toBe(true);
     });
   });
 

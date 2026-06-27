@@ -12,6 +12,8 @@ type Config struct {
 
 	Claude    ClaudeConfig
 	DeepSeek  DeepSeekConfig
+	Groq      GroqConfig
+	NVIDIA    NVIDIAConfig
 	OpenAI    OpenAIConfig
 	Embedding EmbeddingConfig
 
@@ -31,6 +33,26 @@ type ClaudeConfig struct {
 
 // DeepSeekConfig holds DeepSeek provider configuration
 type DeepSeekConfig struct {
+	Enabled  bool
+	BaseURL  string
+	APIKey   string
+	Model    string
+	Timeout  time.Duration
+	MaxRetry int
+}
+
+// GroqConfig holds Groq provider configuration
+type GroqConfig struct {
+	Enabled  bool
+	BaseURL  string
+	APIKey   string
+	Model    string
+	Timeout  time.Duration
+	MaxRetry int
+}
+
+// NVIDIAConfig holds NVIDIA provider configuration
+type NVIDIAConfig struct {
 	Enabled  bool
 	BaseURL  string
 	APIKey   string
@@ -66,12 +88,12 @@ type RateLimitConfig struct {
 
 // FeaturesConfig holds feature flags
 type FeaturesConfig struct {
-	EnableChat       bool
-	EnableHints      bool
-	EnableReview     bool
-	EnableExplain    bool
-	EnableRAG        bool
-	EnableStreaming  bool
+	EnableChat      bool
+	EnableHints     bool
+	EnableReview    bool
+	EnableExplain   bool
+	EnableRAG       bool
+	EnableStreaming bool
 }
 
 // DefaultConfig returns a default AI configuration
@@ -93,6 +115,22 @@ func DefaultConfig() Config {
 			Enabled:  false,
 			BaseURL:  "https://api.deepseek.com/v1",
 			Model:    "deepseek-chat",
+			Timeout:  60 * time.Second,
+			MaxRetry: 2,
+		},
+
+		Groq: GroqConfig{
+			Enabled:  false,
+			BaseURL:  "https://api.groq.com/openai/v1",
+			Model:    "openai/gpt-oss-120b",
+			Timeout:  60 * time.Second,
+			MaxRetry: 2,
+		},
+
+		NVIDIA: NVIDIAConfig{
+			Enabled:  false,
+			BaseURL:  "https://integrate.api.nvidia.com/v1",
+			Model:    "deepseek-ai/deepseek-v4-flash",
 			Timeout:  60 * time.Second,
 			MaxRetry: 2,
 		},

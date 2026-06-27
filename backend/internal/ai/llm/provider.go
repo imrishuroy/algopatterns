@@ -2,6 +2,7 @@ package llm
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 )
 
@@ -33,35 +34,63 @@ type ChatRequest struct {
 	Messages    []Message
 	Model       string
 	Temperature float64
+	TopP        float64
 	MaxTokens   int
 	Stream      bool
+	ExtraBody   json.RawMessage // Additional body fields merged into request (e.g. reasoning settings)
 }
 
 // Message is a single message in the conversation
 type Message struct {
-	Role    string `json:"role"`    // "system", "user", "assistant"
+	Role    string `json:"role"` // "system", "user", "assistant"
 	Content string `json:"content"`
 }
 
 // ChatResponse is the provider-agnostic response format
 type ChatResponse struct {
-	Content      string
-	Model        string
-	TokensInput  int
-	TokensOutput int
-	FinishReason string
+	Content          string
+	ReasoningContent string
+	Model            string
+	TokensInput      int
+	TokensOutput     int
+	FinishReason     string
 }
 
 // StreamChunk is a single chunk in a streamed response
 type StreamChunk struct {
-	Content string
-	Done    bool
-	Error   error
+	Content          string
+	ReasoningContent string
+	Done             bool
+	Error            error
 }
 
 // NewMessage creates a new message with the given role and content
 func NewMessage(role, content string) Message {
 	return Message{Role: role, Content: content}
+}
+
+// MarshalWithExtra marshals v to JSON and merges extra fields into the output.
+// extra is merged at the top level, overriding any fields in v with the same key.
+func MarshalWithExtra(v interface{}, extra json.RawMessage) ([]byte, error) {
+	base, err := json.Marshal(v)
+	if err != nil {
+		return nil, err
+	}
+	if len(extra) == 0 || string(extra) == "null" {
+		return base, nil
+	}
+	var baseMap map[string]interface{}
+	if err := json.Unmarshal(base, &baseMap); err != nil {
+		return nil, err
+	}
+	var extraMap map[string]interface{}
+	if err := json.Unmarshal(extra, &extraMap); err != nil {
+		return nil, err
+	}
+	for k, val := range extraMap {
+		baseMap[k] = val
+	}
+	return json.Marshal(baseMap)
 }
 
 // SystemMessage creates a system message

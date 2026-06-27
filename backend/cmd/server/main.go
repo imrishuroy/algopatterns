@@ -112,6 +112,20 @@ func main() {
 			}))
 		}
 
+		if cfg.AI.GroqAPIKey != "" {
+			llmManager.RegisterProvider("groq", llm.NewGroqProvider(llm.GroqConfig{
+				APIKey: cfg.AI.GroqAPIKey,
+				Model:  cfg.AI.GroqModel,
+			}))
+		}
+
+		if cfg.AI.NVIDIAAPIKey != "" {
+			llmManager.RegisterProvider("nvidia", llm.NewNVIDIAProvider(llm.NVIDIAConfig{
+				APIKey: cfg.AI.NVIDIAAPIKey,
+				Model:  cfg.AI.NVIDIAModel,
+			}))
+		}
+
 		if cfg.AI.OpenAIAPIKey != "" {
 			llmManager.RegisterProvider("openai", llm.NewOpenAIProvider(llm.OpenAIConfig{
 				APIKey: cfg.AI.OpenAIAPIKey,

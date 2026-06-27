@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	ErrQuestionNotFound      = errors.New("question not found")
-	ErrAttemptNotFound       = errors.New("attempt not found")
-	ErrResponseAlreadyExists = errors.New("response already exists for this question")
+	ErrQuestionNotFound        = errors.New("question not found")
+	ErrAttemptNotFound         = errors.New("attempt not found")
+	ErrResponseAlreadyExists   = errors.New("response already exists for this question")
 	ErrAttemptAlreadyCompleted = errors.New("attempt is already completed")
 )
 

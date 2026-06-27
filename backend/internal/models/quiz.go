@@ -54,21 +54,21 @@ const (
 
 // QuizQuestion represents a quiz question in the database
 type QuizQuestion struct {
-	ID                uuid.UUID        `json:"id" db:"id"`
-	PatternID         string           `json:"patternId" db:"pattern_id"`
-	SectionSlug       *string          `json:"sectionSlug,omitempty" db:"section_slug"`
-	QuestionType      QuestionType     `json:"type" db:"question_type"`
+	ID                uuid.UUID          `json:"id" db:"id"`
+	PatternID         string             `json:"patternId" db:"pattern_id"`
+	SectionSlug       *string            `json:"sectionSlug,omitempty" db:"section_slug"`
+	QuestionType      QuestionType       `json:"type" db:"question_type"`
 	Difficulty        QuestionDifficulty `json:"difficulty" db:"difficulty"`
-	QuestionText      string           `json:"questionText" db:"question_text"`
-	CodeSnippet       *string          `json:"codeSnippet,omitempty" db:"code_snippet"`
-	Options           json.RawMessage  `json:"options,omitempty" db:"options"`
-	CorrectAnswer     json.RawMessage  `json:"-" db:"correct_answer"`
-	AcceptableAnswers json.RawMessage  `json:"-" db:"acceptable_answers"`
-	Explanation       string           `json:"-" db:"explanation"`
-	DisplayOrder      int              `json:"displayOrder" db:"display_order"`
-	IsActive          bool             `json:"-" db:"is_active"`
-	CreatedAt         time.Time        `json:"-" db:"created_at"`
-	UpdatedAt         time.Time        `json:"-" db:"updated_at"`
+	QuestionText      string             `json:"questionText" db:"question_text"`
+	CodeSnippet       *string            `json:"codeSnippet,omitempty" db:"code_snippet"`
+	Options           json.RawMessage    `json:"options,omitempty" db:"options"`
+	CorrectAnswer     json.RawMessage    `json:"-" db:"correct_answer"`
+	AcceptableAnswers json.RawMessage    `json:"-" db:"acceptable_answers"`
+	Explanation       string             `json:"-" db:"explanation"`
+	DisplayOrder      int                `json:"displayOrder" db:"display_order"`
+	IsActive          bool               `json:"-" db:"is_active"`
+	CreatedAt         time.Time          `json:"-" db:"created_at"`
+	UpdatedAt         time.Time          `json:"-" db:"updated_at"`
 }
 
 // QuizQuestionWithAnswer includes the answer fields (for response after submission)
@@ -81,18 +81,18 @@ type QuizQuestionWithAnswer struct {
 
 // QuizAttempt represents a quiz session
 type QuizAttempt struct {
-	ID              uuid.UUID     `json:"id" db:"id"`
-	UserID          *uuid.UUID    `json:"userId,omitempty" db:"user_id"`
-	PatternID       string        `json:"patternId" db:"pattern_id"`
-	SectionSlug     *string       `json:"sectionSlug,omitempty" db:"section_slug"`
-	TotalQuestions  int           `json:"totalQuestions" db:"total_questions"`
-	CorrectCount    int           `json:"correctCount" db:"correct_count"`
-	ScorePercentage *float64      `json:"scorePercentage,omitempty" db:"score_percentage"`
-	StartedAt       time.Time     `json:"startedAt" db:"started_at"`
-	CompletedAt     *time.Time    `json:"completedAt,omitempty" db:"completed_at"`
-	TimeTakenSeconds *int         `json:"timeTakenSeconds,omitempty" db:"time_taken_seconds"`
-	Status          AttemptStatus `json:"status" db:"status"`
-	CreatedAt       time.Time     `json:"-" db:"created_at"`
+	ID               uuid.UUID     `json:"id" db:"id"`
+	UserID           *uuid.UUID    `json:"userId,omitempty" db:"user_id"`
+	PatternID        string        `json:"patternId" db:"pattern_id"`
+	SectionSlug      *string       `json:"sectionSlug,omitempty" db:"section_slug"`
+	TotalQuestions   int           `json:"totalQuestions" db:"total_questions"`
+	CorrectCount     int           `json:"correctCount" db:"correct_count"`
+	ScorePercentage  *float64      `json:"scorePercentage,omitempty" db:"score_percentage"`
+	StartedAt        time.Time     `json:"startedAt" db:"started_at"`
+	CompletedAt      *time.Time    `json:"completedAt,omitempty" db:"completed_at"`
+	TimeTakenSeconds *int          `json:"timeTakenSeconds,omitempty" db:"time_taken_seconds"`
+	Status           AttemptStatus `json:"status" db:"status"`
+	CreatedAt        time.Time     `json:"-" db:"created_at"`
 }
 
 // QuizResponse represents a user's answer to a single question
@@ -151,12 +151,12 @@ type CompleteAttemptRequest struct {
 }
 
 type CompleteAttemptResponse struct {
-	AttemptID        uuid.UUID  `json:"attemptId"`
-	TotalQuestions   int        `json:"totalQuestions"`
-	CorrectCount     int        `json:"correctCount"`
-	ScorePercentage  float64    `json:"scorePercentage"`
-	TimeTakenSeconds *int       `json:"timeTakenSeconds,omitempty"`
-	CompletedAt      time.Time  `json:"completedAt"`
+	AttemptID        uuid.UUID `json:"attemptId"`
+	TotalQuestions   int       `json:"totalQuestions"`
+	CorrectCount     int       `json:"correctCount"`
+	ScorePercentage  float64   `json:"scorePercentage"`
+	TimeTakenSeconds *int      `json:"timeTakenSeconds,omitempty"`
+	CompletedAt      time.Time `json:"completedAt"`
 }
 
 type AttemptHistoryRequest struct {
@@ -175,9 +175,9 @@ type AttemptHistoryResponse struct {
 
 // QuestionAnalytics for admin dashboard
 type QuestionAnalytics struct {
-	QuestionID       uuid.UUID `json:"questionId"`
-	TotalAttempts    int       `json:"totalAttempts"`
-	CorrectCount     int       `json:"correctCount"`
-	CorrectRate      float64   `json:"correctRate"`
-	AvgTimeTakenMs   *int      `json:"avgTimeTakenMs,omitempty"`
+	QuestionID     uuid.UUID `json:"questionId"`
+	TotalAttempts  int       `json:"totalAttempts"`
+	CorrectCount   int       `json:"correctCount"`
+	CorrectRate    float64   `json:"correctRate"`
+	AvgTimeTakenMs *int      `json:"avgTimeTakenMs,omitempty"`
 }

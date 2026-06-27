@@ -50,6 +50,21 @@ type ConversationMessage struct {
 	Content string
 }
 
+// mapHistory converts internal ai messages to the prompts package format
+func mapHistory(history []ConversationMessage) []prompts.ConversationTurn {
+	if len(history) == 0 {
+		return nil
+	}
+	turns := make([]prompts.ConversationTurn, len(history))
+	for i, h := range history {
+		turns[i] = prompts.ConversationTurn{
+			Role:    h.Role,
+			Content: h.Content,
+		}
+	}
+	return turns
+}
+
 // ChatRequest represents a chat request
 type ChatRequest struct {
 	SessionID          string
@@ -82,6 +97,7 @@ type HintRequest struct {
 	Language           string
 	HintLevel          int
 	PreviousHints      int
+	History            []ConversationMessage // Added for contextual awareness
 }
 
 // HintResponse represents a hint response
@@ -100,6 +116,7 @@ type ReviewRequest struct {
 	Code               string
 	Language           string
 	FocusAreas         []string
+	History            []ConversationMessage // Added for contextual awareness
 }
 
 // ReviewResponse represents a code review response
@@ -115,6 +132,7 @@ type ExplainRequest struct {
 	ErrorType    string
 	ErrorMessage string
 	LineNumber   int
+	History      []ConversationMessage // Added for contextual awareness
 }
 
 // ExplainResponse represents an error explanation response
@@ -138,42 +156,30 @@ func (s *Service) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, err
 		return nil, err
 	}
 
-	// Get RAG context
+	// Get RAG context and map history
 	ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Message+" "+req.ProblemTitle, req.Language)
-
-	systemPrompt := prompts.BuildChatPrompt(req.ProblemTitle, req.Language, ragContext)
+	turns := mapHistory(req.History)
+	systemPrompt := prompts.BuildChatPrompt(req.ProblemTitle, req.Language, turns, ragContext)
 
 	messages := []llm.Message{
 		llm.SystemMessage(systemPrompt),
 	}
 
-	// Always include problem context if available
+	// Build a comprehensive user message.
+	// (Note: History is already baked into the System Prompt via the prompts package)
+	var userContent strings.Builder
 	if req.ProblemDescription != "" {
-		messages = append(messages, llm.UserMessage(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s", req.ProblemDescription)))
+		userContent.WriteString(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s\n\n", req.ProblemDescription))
 	}
-
-	// Always include current code so AI knows user's progress
 	if req.Code != "" {
-		messages = append(messages, llm.UserMessage(fmt.Sprintf("MY CURRENT CODE:\n```%s\n%s\n```", req.Language, req.Code)))
+		userContent.WriteString(fmt.Sprintf("MY CURRENT CODE:\n```%s\n%s\n```\n\n", req.Language, req.Code))
 	}
-
-	// Include error message if user's code failed
 	if req.ErrorMessage != "" {
-		messages = append(messages, llm.UserMessage(fmt.Sprintf("ERROR FROM RUNNING MY CODE:\n```\n%s\n```", req.ErrorMessage)))
+		userContent.WriteString(fmt.Sprintf("ERROR FROM RUNNING MY CODE:\n```\n%s\n```\n\n", req.ErrorMessage))
 	}
+	userContent.WriteString(req.Message)
 
-	// Add conversation history for context continuity
-	for _, msg := range req.History {
-		switch msg.Role {
-		case "user":
-			messages = append(messages, llm.UserMessage(msg.Content))
-		case "assistant":
-			messages = append(messages, llm.AssistantMessage(msg.Content))
-		}
-	}
-
-	// Add the current message
-	messages = append(messages, llm.UserMessage(req.Message))
+	messages = append(messages, llm.UserMessage(userContent.String()))
 
 	llmReq := llm.ChatRequest{
 		Messages:    messages,
@@ -209,42 +215,28 @@ func (s *Service) ChatStream(ctx context.Context, req ChatRequest) (<-chan llm.S
 		return nil, err
 	}
 
-	// Get RAG context
+	// Get RAG context and map history
 	ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Message+" "+req.ProblemTitle, req.Language)
-
-	systemPrompt := prompts.BuildChatPrompt(req.ProblemTitle, req.Language, ragContext)
+	turns := mapHistory(req.History)
+	systemPrompt := prompts.BuildChatPrompt(req.ProblemTitle, req.Language, turns, ragContext)
 
 	messages := []llm.Message{
 		llm.SystemMessage(systemPrompt),
 	}
 
-	// Always include problem context if available
+	var userContent strings.Builder
 	if req.ProblemDescription != "" {
-		messages = append(messages, llm.UserMessage(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s", req.ProblemDescription)))
+		userContent.WriteString(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s\n\n", req.ProblemDescription))
 	}
-
-	// Always include current code so AI knows user's progress
 	if req.Code != "" {
-		messages = append(messages, llm.UserMessage(fmt.Sprintf("MY CURRENT CODE:\n```%s\n%s\n```", req.Language, req.Code)))
+		userContent.WriteString(fmt.Sprintf("MY CURRENT CODE:\n```%s\n%s\n```\n\n", req.Language, req.Code))
 	}
-
-	// Include error message if user's code failed
 	if req.ErrorMessage != "" {
-		messages = append(messages, llm.UserMessage(fmt.Sprintf("ERROR FROM RUNNING MY CODE:\n```\n%s\n```", req.ErrorMessage)))
+		userContent.WriteString(fmt.Sprintf("ERROR FROM RUNNING MY CODE:\n```\n%s\n```\n\n", req.ErrorMessage))
 	}
+	userContent.WriteString(req.Message)
 
-	// Add conversation history for context continuity
-	for _, msg := range req.History {
-		switch msg.Role {
-		case "user":
-			messages = append(messages, llm.UserMessage(msg.Content))
-		case "assistant":
-			messages = append(messages, llm.AssistantMessage(msg.Content))
-		}
-	}
-
-	// Add the current message
-	messages = append(messages, llm.UserMessage(req.Message))
+	messages = append(messages, llm.UserMessage(userContent.String()))
 
 	llmReq := llm.ChatRequest{
 		Messages:    messages,
@@ -276,13 +268,14 @@ func (s *Service) GetHint(ctx context.Context, req HintRequest) (*HintResponse, 
 	}
 
 	ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Code+" "+req.ProblemTitle, req.Language)
+	turns := mapHistory(req.History)
 
 	systemPrompt := prompts.BuildHintPrompt(
 		level,
-		req.PreviousHints,
 		req.ProblemTitle,
 		req.Code,
 		req.Language,
+		turns,
 		ragContext,
 	)
 
@@ -290,12 +283,13 @@ func (s *Service) GetHint(ctx context.Context, req HintRequest) (*HintResponse, 
 		llm.SystemMessage(systemPrompt),
 	}
 
-	// Include problem description for full context
+	var userMsg strings.Builder
 	if req.ProblemDescription != "" {
-		messages = append(messages, llm.UserMessage(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s", req.ProblemDescription)))
+		userMsg.WriteString(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s\n\n", req.ProblemDescription))
 	}
+	userMsg.WriteString("Please give me a hint for this problem.")
 
-	messages = append(messages, llm.UserMessage("Please give me a hint for this problem."))
+	messages = append(messages, llm.UserMessage(userMsg.String()))
 
 	llmReq := llm.ChatRequest{
 		Messages:    messages,
@@ -335,12 +329,14 @@ func (s *Service) ReviewCode(ctx context.Context, req ReviewRequest) (*ReviewRes
 	}
 
 	ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Code+" "+req.ProblemTitle, req.Language)
+	turns := mapHistory(req.History)
 
 	systemPrompt := prompts.BuildReviewPrompt(
 		req.ProblemTitle,
 		req.Code,
 		req.Language,
 		req.FocusAreas,
+		turns,
 		ragContext,
 	)
 
@@ -348,12 +344,13 @@ func (s *Service) ReviewCode(ctx context.Context, req ReviewRequest) (*ReviewRes
 		llm.SystemMessage(systemPrompt),
 	}
 
-	// Include problem description for full context
+	var userMsg strings.Builder
 	if req.ProblemDescription != "" {
-		messages = append(messages, llm.UserMessage(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s", req.ProblemDescription)))
+		userMsg.WriteString(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s\n\n", req.ProblemDescription))
 	}
+	userMsg.WriteString("Please review my code.")
 
-	messages = append(messages, llm.UserMessage("Please review my code."))
+	messages = append(messages, llm.UserMessage(userMsg.String()))
 
 	llmReq := llm.ChatRequest{
 		Messages:    messages,
@@ -392,6 +389,7 @@ func (s *Service) ExplainError(ctx context.Context, req ExplainRequest) (*Explai
 	}
 
 	ragContext := s.getRAGContext(ctx, "", req.ErrorType+" "+req.ErrorMessage, req.Language)
+	turns := mapHistory(req.History)
 
 	systemPrompt := prompts.BuildExplainErrorPrompt(
 		req.ErrorType,
@@ -399,6 +397,7 @@ func (s *Service) ExplainError(ctx context.Context, req ExplainRequest) (*Explai
 		req.LineNumber,
 		req.Code,
 		req.Language,
+		turns,
 		ragContext,
 	)
 

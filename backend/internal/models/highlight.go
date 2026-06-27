@@ -25,21 +25,21 @@ func (c HighlightColor) IsValid() bool {
 }
 
 type Highlight struct {
-	ID           uuid.UUID  `json:"id" db:"id"`
-	UserID       uuid.UUID  `json:"userId" db:"user_id"`
-	ContentType  string     `json:"contentType" db:"content_type"`
-	ContentID    string     `json:"contentId" db:"content_id"`
-	StartOffset  int        `json:"startOffset" db:"start_offset"`
-	EndOffset    int        `json:"endOffset" db:"end_offset"`
-	StartLine    *int       `json:"startLine,omitempty" db:"start_line"`
-	EndLine      *int       `json:"endLine,omitempty" db:"end_line"`
-	SelectedText string     `json:"selectedText" db:"selected_text"`
-	ContentHash  *string    `json:"contentHash,omitempty" db:"content_hash"`
-	Color        string     `json:"color" db:"color"`
-	Note         *string    `json:"note,omitempty" db:"note"`
-	CreatedAt    time.Time  `json:"createdAt" db:"created_at"`
-	UpdatedAt    time.Time  `json:"updatedAt" db:"updated_at"`
-	Version      int        `json:"version" db:"version"`
+	ID           uuid.UUID `json:"id" db:"id"`
+	UserID       uuid.UUID `json:"userId" db:"user_id"`
+	ContentType  string    `json:"contentType" db:"content_type"`
+	ContentID    string    `json:"contentId" db:"content_id"`
+	StartOffset  int       `json:"startOffset" db:"start_offset"`
+	EndOffset    int       `json:"endOffset" db:"end_offset"`
+	StartLine    *int      `json:"startLine,omitempty" db:"start_line"`
+	EndLine      *int      `json:"endLine,omitempty" db:"end_line"`
+	SelectedText string    `json:"selectedText" db:"selected_text"`
+	ContentHash  *string   `json:"contentHash,omitempty" db:"content_hash"`
+	Color        string    `json:"color" db:"color"`
+	Note         *string   `json:"note,omitempty" db:"note"`
+	CreatedAt    time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt    time.Time `json:"updatedAt" db:"updated_at"`
+	Version      int       `json:"version" db:"version"`
 }
 
 type CreateHighlightRequest struct {
@@ -62,9 +62,9 @@ type UpdateHighlightRequest struct {
 }
 
 type HighlightListResponse struct {
-	Highlights  []Highlight `json:"highlights"`
-	NextCursor  *string     `json:"nextCursor,omitempty"`
-	TotalCount  int         `json:"totalCount"`
+	Highlights []Highlight `json:"highlights"`
+	NextCursor *string     `json:"nextCursor,omitempty"`
+	TotalCount int         `json:"totalCount"`
 }
 
 type ContentHighlightsResponse struct {
@@ -83,11 +83,11 @@ const (
 )
 
 type SyncOperation struct {
-	Op       SyncOperationType        `json:"op" binding:"required,oneof=create update delete"`
-	ClientID string                   `json:"clientId,omitempty"`
-	ID       *uuid.UUID               `json:"id,omitempty"`
-	Data     *CreateHighlightRequest  `json:"data,omitempty"`
-	Update   *UpdateHighlightRequest  `json:"update,omitempty"`
+	Op       SyncOperationType       `json:"op" binding:"required,oneof=create update delete"`
+	ClientID string                  `json:"clientId,omitempty"`
+	ID       *uuid.UUID              `json:"id,omitempty"`
+	Data     *CreateHighlightRequest `json:"data,omitempty"`
+	Update   *UpdateHighlightRequest `json:"update,omitempty"`
 }
 
 type BatchSyncRequest struct {

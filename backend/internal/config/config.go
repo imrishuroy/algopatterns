@@ -25,19 +25,18 @@ type AIConfig struct {
 	Enabled           bool
 	DefaultProvider   string
 	FallbackProviders []string
-
-	ClaudeAPIKey string
-	ClaudeModel  string
+	ClaudeAPIKey  string
+	ClaudeModel   string
 	ClaudeBaseURL string
-
 	DeepSeekAPIKey string
 	DeepSeekModel  string
-
+	GroqAPIKey string
+	GroqModel  string
+	NVIDIAAPIKey string
+	NVIDIAModel  string
 	OpenAIAPIKey string
 	OpenAIModel  string
-
 	EmbeddingModel string
-
 	FreeRequestsPerDay int
 	MaxCodeLength      int
 }
@@ -190,13 +189,17 @@ func Load() (*Config, error) {
 		},
 		AI: AIConfig{
 			Enabled:            getBoolEnv("AI_ENABLED", false),
-			DefaultProvider:    getEnv("AI_DEFAULT_PROVIDER", "claude"),
+			DefaultProvider:    getEnv("AI_DEFAULT_PROVIDER", "groq"),
 			FallbackProviders:  getEnvSlice("AI_FALLBACK_PROVIDERS", []string{"deepseek", "openai"}),
 			ClaudeAPIKey:       getEnv("CLAUDE_API_KEY", ""),
 			ClaudeModel:        getEnv("CLAUDE_MODEL", "claude-sonnet-4-20250514"),
 			ClaudeBaseURL:      getEnv("CLAUDE_BASE_URL", "https://api.anthropic.com/v1"),
 			DeepSeekAPIKey:     getEnv("DEEPSEEK_API_KEY", ""),
 			DeepSeekModel:      getEnv("DEEPSEEK_MODEL", "deepseek-chat"),
+			GroqAPIKey:         getEnv("GROQ_API_KEY", ""),
+			GroqModel:          getEnv("GROQ_MODEL", "openai/gpt-oss-120b"),
+			NVIDIAAPIKey:       getEnv("NVIDIA_API_KEY", ""),
+			NVIDIAModel:        getEnv("NVIDIA_MODEL", "deepseek-ai/deepseek-v4-flash"),
 			OpenAIAPIKey:       getEnv("OPENAI_API_KEY", ""),
 			OpenAIModel:        getEnv("OPENAI_MODEL", "gpt-4o-mini"),
 			EmbeddingModel:     getEnv("EMBEDDING_MODEL", "text-embedding-3-small"),

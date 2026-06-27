@@ -217,4 +217,3 @@ func TestGetUserEmail_NotExists(t *testing.T) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 }
-

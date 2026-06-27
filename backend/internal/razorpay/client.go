@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	baseURL           = "https://api.razorpay.com/v1"
-	defaultTimeout    = 30 * time.Second
-	maxRetries        = 3
-	retryBackoffBase  = 100 * time.Millisecond
+	baseURL          = "https://api.razorpay.com/v1"
+	defaultTimeout   = 30 * time.Second
+	maxRetries       = 3
+	retryBackoffBase = 100 * time.Millisecond
 )
 
 type Client struct {
@@ -35,40 +35,40 @@ type OrderRequest struct {
 }
 
 type OrderResponse struct {
-	ID            string            `json:"id"`
-	Entity        string            `json:"entity"`
-	Amount        int               `json:"amount"`
-	AmountPaid    int               `json:"amount_paid"`
-	AmountDue     int               `json:"amount_due"`
-	Currency      string            `json:"currency"`
-	Receipt       string            `json:"receipt"`
-	Status        string            `json:"status"`
-	Attempts      int               `json:"attempts"`
-	Notes         map[string]string `json:"notes"`
-	CreatedAt     int64             `json:"created_at"`
+	ID         string            `json:"id"`
+	Entity     string            `json:"entity"`
+	Amount     int               `json:"amount"`
+	AmountPaid int               `json:"amount_paid"`
+	AmountDue  int               `json:"amount_due"`
+	Currency   string            `json:"currency"`
+	Receipt    string            `json:"receipt"`
+	Status     string            `json:"status"`
+	Attempts   int               `json:"attempts"`
+	Notes      map[string]string `json:"notes"`
+	CreatedAt  int64             `json:"created_at"`
 }
 
 type PaymentResponse struct {
-	ID              string            `json:"id"`
-	Entity          string            `json:"entity"`
-	Amount          int               `json:"amount"`
-	Currency        string            `json:"currency"`
-	Status          string            `json:"status"`
-	OrderID         string            `json:"order_id"`
-	Method          string            `json:"method"`
-	Description     string            `json:"description"`
-	Email           string            `json:"email"`
-	Contact         string            `json:"contact"`
-	Fee             int               `json:"fee"`
-	Tax             int               `json:"tax"`
-	ErrorCode       string            `json:"error_code,omitempty"`
-	ErrorDescription string           `json:"error_description,omitempty"`
-	ErrorSource     string            `json:"error_source,omitempty"`
-	ErrorStep       string            `json:"error_step,omitempty"`
-	ErrorReason     string            `json:"error_reason,omitempty"`
-	Notes           map[string]string `json:"notes"`
-	CreatedAt       int64             `json:"created_at"`
-	CapturedAt      int64             `json:"captured_at,omitempty"`
+	ID               string            `json:"id"`
+	Entity           string            `json:"entity"`
+	Amount           int               `json:"amount"`
+	Currency         string            `json:"currency"`
+	Status           string            `json:"status"`
+	OrderID          string            `json:"order_id"`
+	Method           string            `json:"method"`
+	Description      string            `json:"description"`
+	Email            string            `json:"email"`
+	Contact          string            `json:"contact"`
+	Fee              int               `json:"fee"`
+	Tax              int               `json:"tax"`
+	ErrorCode        string            `json:"error_code,omitempty"`
+	ErrorDescription string            `json:"error_description,omitempty"`
+	ErrorSource      string            `json:"error_source,omitempty"`
+	ErrorStep        string            `json:"error_step,omitempty"`
+	ErrorReason      string            `json:"error_reason,omitempty"`
+	Notes            map[string]string `json:"notes"`
+	CreatedAt        int64             `json:"created_at"`
+	CapturedAt       int64             `json:"captured_at,omitempty"`
 }
 
 type APIError struct {
@@ -92,28 +92,28 @@ type SubscriptionRequest struct {
 }
 
 type SubscriptionResponse struct {
-	ID                 string            `json:"id"`
-	Entity             string            `json:"entity"`
-	PlanID             string            `json:"plan_id"`
-	Status             string            `json:"status"`
-	CurrentStart       int64             `json:"current_start,omitempty"`
-	CurrentEnd         int64             `json:"current_end,omitempty"`
-	EndedAt            int64             `json:"ended_at,omitempty"`
-	Quantity           int               `json:"quantity"`
-	Notes              map[string]string `json:"notes"`
-	ChargeAt           int64             `json:"charge_at,omitempty"`
-	StartAt            int64             `json:"start_at,omitempty"`
-	EndAt              int64             `json:"end_at,omitempty"`
-	AuthAttempts       int               `json:"auth_attempts"`
-	TotalCount         int               `json:"total_count"`
-	PaidCount          int               `json:"paid_count"`
-	CustomerNotify     int               `json:"customer_notify"`
-	CreatedAt          int64             `json:"created_at"`
-	ExpireBy           int64             `json:"expire_by,omitempty"`
-	ShortURL           string            `json:"short_url,omitempty"`
-	HasScheduledChanges bool             `json:"has_scheduled_changes"`
-	ChangeScheduledAt  int64             `json:"change_scheduled_at,omitempty"`
-	PaymentMethod      string            `json:"payment_method,omitempty"`
+	ID                  string            `json:"id"`
+	Entity              string            `json:"entity"`
+	PlanID              string            `json:"plan_id"`
+	Status              string            `json:"status"`
+	CurrentStart        int64             `json:"current_start,omitempty"`
+	CurrentEnd          int64             `json:"current_end,omitempty"`
+	EndedAt             int64             `json:"ended_at,omitempty"`
+	Quantity            int               `json:"quantity"`
+	Notes               map[string]string `json:"notes"`
+	ChargeAt            int64             `json:"charge_at,omitempty"`
+	StartAt             int64             `json:"start_at,omitempty"`
+	EndAt               int64             `json:"end_at,omitempty"`
+	AuthAttempts        int               `json:"auth_attempts"`
+	TotalCount          int               `json:"total_count"`
+	PaidCount           int               `json:"paid_count"`
+	CustomerNotify      int               `json:"customer_notify"`
+	CreatedAt           int64             `json:"created_at"`
+	ExpireBy            int64             `json:"expire_by,omitempty"`
+	ShortURL            string            `json:"short_url,omitempty"`
+	HasScheduledChanges bool              `json:"has_scheduled_changes"`
+	ChangeScheduledAt   int64             `json:"change_scheduled_at,omitempty"`
+	PaymentMethod       string            `json:"payment_method,omitempty"`
 }
 
 type PlanRequest struct {

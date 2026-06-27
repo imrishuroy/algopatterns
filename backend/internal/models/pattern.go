@@ -56,14 +56,14 @@ type Pattern struct {
 }
 
 type PatternDB struct {
-	ID              string     `db:"id"`
-	Category        string     `db:"category"`
-	Difficulty      string     `db:"difficulty"`
-	Description     string     `db:"description"`
-	TimeComplexity  string     `db:"time_complexity"`
-	SpaceComplexity string     `db:"space_complexity"`
-	CreatedAt       time.Time  `db:"created_at"`
-	UpdatedAt       time.Time  `db:"updated_at"`
+	ID              string    `db:"id"`
+	Category        string    `db:"category"`
+	Difficulty      string    `db:"difficulty"`
+	Description     string    `db:"description"`
+	TimeComplexity  string    `db:"time_complexity"`
+	SpaceComplexity string    `db:"space_complexity"`
+	CreatedAt       time.Time `db:"created_at"`
+	UpdatedAt       time.Time `db:"updated_at"`
 }
 
 type PatternWhenToUse struct {

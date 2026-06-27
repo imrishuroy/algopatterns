@@ -29,9 +29,9 @@ type TemplateDef struct {
 var Problems = []ProblemDef{
 	// Contains Duplicate
 	{
-		Title:      "Contains Duplicate",
-		Slug:       "contains-duplicate",
-		Difficulty: "Easy",
+		Title:       "Contains Duplicate",
+		Slug:        "contains-duplicate",
+		Difficulty:  "Easy",
 		Description: `Given an integer array nums, return true if any value appears at least twice in the array, and return false if every element is distinct.`,
 		Constraints: `- 1 <= nums.length <= 10^5
 - -10^9 <= nums[i] <= 10^9`,
@@ -1186,9 +1186,9 @@ func main() {
 
 	// Increasing Triplet Subsequence
 	{
-		Title:      "Increasing Triplet Subsequence",
-		Slug:       "increasing-triplet-subsequence",
-		Difficulty: "Medium",
+		Title:       "Increasing Triplet Subsequence",
+		Slug:        "increasing-triplet-subsequence",
+		Difficulty:  "Medium",
 		Description: `Given an integer array nums, return true if there exists a triple of indices (i, j, k) such that i < j < k and nums[i] < nums[j] < nums[k]. If no such indices exists, return false.`,
 		Constraints: `- 1 <= nums.length <= 5 * 10^5
 - -2^31 <= nums[i] <= 2^31 - 1`,
@@ -1543,9 +1543,9 @@ func main() {
 
 	// Add Binary
 	{
-		Title:      "Add Binary",
-		Slug:       "add-binary",
-		Difficulty: "Easy",
+		Title:       "Add Binary",
+		Slug:        "add-binary",
+		Difficulty:  "Easy",
 		Description: `Given two binary strings a and b, return their sum as a binary string.`,
 		Constraints: `- 1 <= a.length, b.length <= 10^4
 - a and b consist only of '0' or '1' characters.
@@ -1888,9 +1888,9 @@ func main() {
 
 	// Find All Numbers Disappeared in an Array
 	{
-		Title:      "Find All Numbers Disappeared in an Array",
-		Slug:       "find-all-numbers-disappeared-in-an-array",
-		Difficulty: "Easy",
+		Title:       "Find All Numbers Disappeared in an Array",
+		Slug:        "find-all-numbers-disappeared-in-an-array",
+		Difficulty:  "Easy",
 		Description: `Given an array nums of n integers where nums[i] is in the range [1, n], return an array of all the integers in the range [1, n] that do not appear in nums.`,
 		Constraints: `- n == nums.length
 - 1 <= n <= 10^5
@@ -2115,9 +2115,9 @@ func main() {
 
 	// First Unique Character in a String
 	{
-		Title:      "First Unique Character in a String",
-		Slug:       "first-unique-character-in-a-string",
-		Difficulty: "Easy",
+		Title:       "First Unique Character in a String",
+		Slug:        "first-unique-character-in-a-string",
+		Difficulty:  "Easy",
 		Description: `Given a string s, find the first non-repeating character in it and return its index. If it does not exist, return -1.`,
 		Constraints: `- 1 <= s.length <= 10^5
 - s consists of only lowercase English letters.`,
@@ -2218,9 +2218,9 @@ func main() {
 
 	// Repeated Substring Pattern
 	{
-		Title:      "Repeated Substring Pattern",
-		Slug:       "repeated-substring-pattern",
-		Difficulty: "Easy",
+		Title:       "Repeated Substring Pattern",
+		Slug:        "repeated-substring-pattern",
+		Difficulty:  "Easy",
 		Description: `Given a string s, check if it can be constructed by taking a substring of it and appending multiple copies of the substring together.`,
 		Constraints: `- 1 <= s.length <= 10^4
 - s consists of lowercase English letters.`,
@@ -2746,9 +2746,9 @@ func main() {
 
 	// Rotate Array
 	{
-		Title:      "Rotate Array",
-		Slug:       "rotate-array",
-		Difficulty: "Medium",
+		Title:       "Rotate Array",
+		Slug:        "rotate-array",
+		Difficulty:  "Medium",
 		Description: `Given an integer array nums, rotate the array to the right by k steps, where k is non-negative.`,
 		Constraints: `- 1 <= nums.length <= 10^5
 - -2^31 <= nums[i] <= 2^31 - 1
@@ -3367,9 +3367,9 @@ func main() {
 
 	// Integer to English Words (Hard)
 	{
-		Title:      "Integer to English Words",
-		Slug:       "integer-to-english-words",
-		Difficulty: "Hard",
+		Title:       "Integer to English Words",
+		Slug:        "integer-to-english-words",
+		Difficulty:  "Hard",
 		Description: `Convert a non-negative integer num to its English words representation.`,
 		Constraints: `- 0 <= num <= 2^31 - 1`,
 		Examples: `Example 1:
@@ -3634,9 +3634,9 @@ func main() {
 
 	// Permutations (Backtracking)
 	{
-		Title:      "Permutations",
-		Slug:       "permutations",
-		Difficulty: "Medium",
+		Title:       "Permutations",
+		Slug:        "permutations",
+		Difficulty:  "Medium",
 		Description: `Given an array nums of distinct integers, return all the possible permutations. You can return the answer in any order.`,
 		Constraints: `- 1 <= nums.length <= 6
 - -10 <= nums[i] <= 10
@@ -4084,9 +4084,9 @@ func main() {
 
 	// Generate Parentheses (Backtracking)
 	{
-		Title:      "Generate Parentheses",
-		Slug:       "generate-parentheses",
-		Difficulty: "Medium",
+		Title:       "Generate Parentheses",
+		Slug:        "generate-parentheses",
+		Difficulty:  "Medium",
 		Description: `Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.`,
 		Constraints: `- 1 <= n <= 8`,
 		Examples: `Example 1:
@@ -4514,9 +4514,9 @@ func main() {
 
 	// Palindrome Partitioning (Backtracking)
 	{
-		Title:      "Palindrome Partitioning",
-		Slug:       "palindrome-partitioning",
-		Difficulty: "Medium",
+		Title:       "Palindrome Partitioning",
+		Slug:        "palindrome-partitioning",
+		Difficulty:  "Medium",
 		Description: `Given a string s, partition s such that every substring of the partition is a palindrome. Return all possible palindrome partitioning of s.`,
 		Constraints: `- 1 <= s.length <= 16
 - s contains only lowercase English letters.`,
@@ -4962,9 +4962,9 @@ func main() {
 
 	// Permutations II (Backtracking)
 	{
-		Title:      "Permutations II",
-		Slug:       "permutations-ii",
-		Difficulty: "Medium",
+		Title:       "Permutations II",
+		Slug:        "permutations-ii",
+		Difficulty:  "Medium",
 		Description: `Given a collection of numbers, nums, that might contain duplicates, return all possible unique permutations in any order.`,
 		Constraints: `- 1 <= nums.length <= 8
 - -10 <= nums[i] <= 10`,
@@ -6999,9 +6999,9 @@ func main() {
 
 	// Trapping Rain Water (Two Pointers)
 	{
-		Title:      "Trapping Rain Water",
-		Slug:       "trapping-rain-water",
-		Difficulty: "Hard",
+		Title:       "Trapping Rain Water",
+		Slug:        "trapping-rain-water",
+		Difficulty:  "Hard",
 		Description: `Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.`,
 		Constraints: `- n == height.length
 - 1 <= n <= 2 * 10^4
@@ -7276,9 +7276,9 @@ func main() {
 
 	// Valid Palindrome II (Two Pointers)
 	{
-		Title:      "Valid Palindrome II",
-		Slug:       "valid-palindrome-ii",
-		Difficulty: "Easy",
+		Title:       "Valid Palindrome II",
+		Slug:        "valid-palindrome-ii",
+		Difficulty:  "Easy",
 		Description: `Given a string s, return true if the s can be palindrome after deleting at most one character from it.`,
 		Constraints: `- 1 <= s.length <= 10^5
 - s consists of lowercase English letters.`,
@@ -7736,9 +7736,9 @@ func main() {
 
 	// Remove Nth Node From End of List (Two Pointers / Linked List)
 	{
-		Title:      "Remove Nth Node From End of List",
-		Slug:       "remove-nth-node-from-end-of-list",
-		Difficulty: "Medium",
+		Title:       "Remove Nth Node From End of List",
+		Slug:        "remove-nth-node-from-end-of-list",
+		Difficulty:  "Medium",
 		Description: `Given the head of a linked list, remove the nth node from the end of the list and return its head.`,
 		Constraints: `- The number of nodes in the list is sz.
 - 1 <= sz <= 30
@@ -7992,9 +7992,9 @@ func main() {
 
 	// Longest Substring Without Repeating Characters (Sliding Window)
 	{
-		Title:      "Longest Substring Without Repeating Characters",
-		Slug:       "longest-substring-without-repeating-characters",
-		Difficulty: "Medium",
+		Title:       "Longest Substring Without Repeating Characters",
+		Slug:        "longest-substring-without-repeating-characters",
+		Difficulty:  "Medium",
 		Description: `Given a string s, find the length of the longest substring without repeating characters.`,
 		Constraints: `- 0 <= s.length <= 5 * 10^4
 - s consists of English letters, digits, symbols and spaces.`,
@@ -8579,9 +8579,9 @@ func main() {
 
 	// Max Consecutive Ones III (Sliding Window)
 	{
-		Title:      "Max Consecutive Ones III",
-		Slug:       "max-consecutive-ones-iii",
-		Difficulty: "Medium",
+		Title:       "Max Consecutive Ones III",
+		Slug:        "max-consecutive-ones-iii",
+		Difficulty:  "Medium",
 		Description: `Given a binary array nums and an integer k, return the maximum number of consecutive 1's in the array if you can flip at most k 0's.`,
 		Constraints: `- 1 <= nums.length <= 10^5
 - nums[i] is either 0 or 1.
@@ -8698,9 +8698,9 @@ func main() {
 
 	// Minimum Size Subarray Sum (Sliding Window)
 	{
-		Title:      "Minimum Size Subarray Sum",
-		Slug:       "minimum-size-subarray-sum",
-		Difficulty: "Medium",
+		Title:       "Minimum Size Subarray Sum",
+		Slug:        "minimum-size-subarray-sum",
+		Difficulty:  "Medium",
 		Description: `Given an array of positive integers nums and a positive integer target, return the minimal length of a subarray whose sum is greater than or equal to target. If there is no such subarray, return 0 instead.`,
 		Constraints: `- 1 <= target <= 10^9
 - 1 <= nums.length <= 10^5
@@ -11206,9 +11206,9 @@ func main() {
 
 	// Longest Palindromic Substring (Expand Around Center)
 	{
-		Title:      "Longest Palindromic Substring",
-		Slug:       "longest-palindromic-substring",
-		Difficulty: "Medium",
+		Title:       "Longest Palindromic Substring",
+		Slug:        "longest-palindromic-substring",
+		Difficulty:  "Medium",
 		Description: `Given a string s, return the longest palindromic substring in s.`,
 		Constraints: `- 1 <= s.length <= 1000
 - s consist of only digits and English letters.`,
@@ -11531,9 +11531,9 @@ func main() {
 
 	// Longest Increasing Subsequence (DP + Binary Search)
 	{
-		Title:      "Longest Increasing Subsequence",
-		Slug:       "longest-increasing-subsequence",
-		Difficulty: "Medium",
+		Title:       "Longest Increasing Subsequence",
+		Slug:        "longest-increasing-subsequence",
+		Difficulty:  "Medium",
 		Description: `Given an integer array nums, return the length of the longest strictly increasing subsequence.`,
 		Constraints: `- 1 <= nums.length <= 2500
 - -10^4 <= nums[i] <= 10^4`,
@@ -12328,9 +12328,9 @@ func main() {
 
 	// Partition Equal Subset Sum (0/1 Knapsack)
 	{
-		Title:      "Partition Equal Subset Sum",
-		Slug:       "partition-equal-subset-sum",
-		Difficulty: "Medium",
+		Title:       "Partition Equal Subset Sum",
+		Slug:        "partition-equal-subset-sum",
+		Difficulty:  "Medium",
 		Description: `Given an integer array nums, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.`,
 		Constraints: `- 1 <= nums.length <= 200
 - 1 <= nums[i] <= 100`,
@@ -13879,9 +13879,9 @@ func main() {
 
 	// Invert Binary Tree (DFS)
 	{
-		Title:      "Invert Binary Tree",
-		Slug:       "invert-binary-tree",
-		Difficulty: "Easy",
+		Title:       "Invert Binary Tree",
+		Slug:        "invert-binary-tree",
+		Difficulty:  "Easy",
 		Description: `Given the root of a binary tree, invert the tree, and return its root.`,
 		Constraints: `- The number of nodes in the tree is in the range [0, 100].
 - -100 <= Node.val <= 100`,
@@ -14191,9 +14191,9 @@ func main() {
 
 	// Binary Tree Level Order Traversal (BFS)
 	{
-		Title:      "Binary Tree Level Order Traversal",
-		Slug:       "binary-tree-level-order-traversal",
-		Difficulty: "Medium",
+		Title:       "Binary Tree Level Order Traversal",
+		Slug:        "binary-tree-level-order-traversal",
+		Difficulty:  "Medium",
 		Description: `Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).`,
 		Constraints: `- The number of nodes in the tree is in the range [0, 2000].
 - -1000 <= Node.val <= 1000`,
@@ -14957,9 +14957,9 @@ func main() {
 
 	// Kth Smallest Element in a BST (Inorder)
 	{
-		Title:      "Kth Smallest Element in a BST",
-		Slug:       "kth-smallest-element-in-a-bst",
-		Difficulty: "Medium",
+		Title:       "Kth Smallest Element in a BST",
+		Slug:        "kth-smallest-element-in-a-bst",
+		Difficulty:  "Medium",
 		Description: `Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.`,
 		Constraints: `- The number of nodes in the tree is n.
 - 1 <= k <= n <= 10^4
@@ -15638,9 +15638,9 @@ func main() {
 
 	// Symmetric Tree (DFS/BFS)
 	{
-		Title:      "Symmetric Tree",
-		Slug:       "symmetric-tree",
-		Difficulty: "Easy",
+		Title:       "Symmetric Tree",
+		Slug:        "symmetric-tree",
+		Difficulty:  "Easy",
 		Description: `Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).`,
 		Constraints: `- The number of nodes in the tree is in the range [1, 1000].
 - -100 <= Node.val <= 100`,
@@ -16094,9 +16094,9 @@ func main() {
 
 	// Binary Tree Right Side View (BFS/DFS)
 	{
-		Title:      "Binary Tree Right Side View",
-		Slug:       "binary-tree-right-side-view",
-		Difficulty: "Medium",
+		Title:       "Binary Tree Right Side View",
+		Slug:        "binary-tree-right-side-view",
+		Difficulty:  "Medium",
 		Description: `Given the root of a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.`,
 		Constraints: `- The number of nodes in the tree is in the range [0, 100].
 - -100 <= Node.val <= 100`,
@@ -16333,9 +16333,9 @@ func main() {
 
 	// Construct Binary Tree from Preorder and Inorder Traversal
 	{
-		Title:      "Construct Binary Tree from Preorder and Inorder Traversal",
-		Slug:       "construct-binary-tree-from-preorder-and-inorder-traversal",
-		Difficulty: "Medium",
+		Title:       "Construct Binary Tree from Preorder and Inorder Traversal",
+		Slug:        "construct-binary-tree-from-preorder-and-inorder-traversal",
+		Difficulty:  "Medium",
 		Description: `Given two integer arrays preorder and inorder where preorder is the preorder traversal of a binary tree and inorder is the inorder traversal of the same tree, construct and return the binary tree.`,
 		Constraints: `- 1 <= preorder.length <= 3000
 - inorder.length == preorder.length
@@ -16563,9 +16563,9 @@ func main() {
 
 	// Binary Tree Zigzag Level Order Traversal (BFS)
 	{
-		Title:      "Binary Tree Zigzag Level Order Traversal",
-		Slug:       "binary-tree-zigzag-level-order-traversal",
-		Difficulty: "Medium",
+		Title:       "Binary Tree Zigzag Level Order Traversal",
+		Slug:        "binary-tree-zigzag-level-order-traversal",
+		Difficulty:  "Medium",
 		Description: `Given the root of a binary tree, return the zigzag level order traversal of its nodes' values. (i.e., from left to right, then right to left for the next level and alternate between).`,
 		Constraints: `- The number of nodes in the tree is in the range [0, 2000].
 - -100 <= Node.val <= 100`,
@@ -17800,9 +17800,9 @@ func main() {
 
 	// Range Sum of BST (BST)
 	{
-		Title:      "Range Sum of BST",
-		Slug:       "range-sum-of-bst",
-		Difficulty: "Easy",
+		Title:       "Range Sum of BST",
+		Slug:        "range-sum-of-bst",
+		Difficulty:  "Easy",
 		Description: `Given the root node of a binary search tree and two integers low and high, return the sum of values of all nodes with a value in the inclusive range [low, high].`,
 		Constraints: `- The number of nodes in the tree is in the range [1, 2 * 10^4].
 - 1 <= Node.val <= 10^5
@@ -24293,9 +24293,9 @@ func main() {
 
 	// Reverse Linked List
 	{
-		Title:      "Reverse Linked List",
-		Slug:       "reverse-linked-list",
-		Difficulty: "Easy",
+		Title:       "Reverse Linked List",
+		Slug:        "reverse-linked-list",
+		Difficulty:  "Easy",
 		Description: `Given the head of a singly linked list, reverse the list, and return the reversed list.`,
 		Constraints: `- The number of nodes in the list is the range [0, 5000].
 - -5000 <= Node.val <= 5000`,
@@ -25424,9 +25424,9 @@ func main() {
 
 	// Reverse Linked List II
 	{
-		Title:      "Reverse Linked List II",
-		Slug:       "reverse-linked-list-ii",
-		Difficulty: "Medium",
+		Title:       "Reverse Linked List II",
+		Slug:        "reverse-linked-list-ii",
+		Difficulty:  "Medium",
 		Description: `Given the head of a singly linked list and two integers left and right where left <= right, reverse the nodes of the list from position left to position right, and return the reversed list.`,
 		Constraints: `- The number of nodes in the list is n.
 - 1 <= n <= 500
@@ -25654,9 +25654,9 @@ func main() {
 
 	// Swap Nodes in Pairs
 	{
-		Title:      "Swap Nodes in Pairs",
-		Slug:       "swap-nodes-in-pairs",
-		Difficulty: "Medium",
+		Title:       "Swap Nodes in Pairs",
+		Slug:        "swap-nodes-in-pairs",
+		Difficulty:  "Medium",
 		Description: `Given a linked list, swap every two adjacent nodes and return its head. You must solve the problem without modifying the values in the list's nodes (i.e., only nodes themselves may be changed.)`,
 		Constraints: `- The number of nodes in the list is in the range [0, 100].
 - 0 <= Node.val <= 100`,
@@ -27503,9 +27503,9 @@ func main() {
 
 	// Palindrome Linked List
 	{
-		Title:      "Palindrome Linked List",
-		Slug:       "palindrome-linked-list",
-		Difficulty: "Easy",
+		Title:       "Palindrome Linked List",
+		Slug:        "palindrome-linked-list",
+		Difficulty:  "Easy",
 		Description: `Given the head of a singly linked list, return true if it is a palindrome or false otherwise.`,
 		Constraints: `- The number of nodes in the list is in the range [1, 10^5].
 - 0 <= Node.val <= 9`,
@@ -28066,9 +28066,9 @@ func main() {
 
 	// Daily Temperatures
 	{
-		Title:      "Daily Temperatures",
-		Slug:       "daily-temperatures",
-		Difficulty: "Medium",
+		Title:       "Daily Temperatures",
+		Slug:        "daily-temperatures",
+		Difficulty:  "Medium",
 		Description: `Given an array of integers temperatures represents the daily temperatures, return an array answer such that answer[i] is the number of days you have to wait after the ith day to get a warmer temperature. If there is no future day for which this is possible, keep answer[i] == 0 instead.`,
 		Constraints: `- 1 <= temperatures.length <= 10^5
 - 30 <= temperatures[i] <= 100`,
@@ -28429,9 +28429,9 @@ func main() {
 
 	// Largest Rectangle in Histogram
 	{
-		Title:      "Largest Rectangle in Histogram",
-		Slug:       "largest-rectangle-in-histogram",
-		Difficulty: "Hard",
+		Title:       "Largest Rectangle in Histogram",
+		Slug:        "largest-rectangle-in-histogram",
+		Difficulty:  "Hard",
 		Description: `Given an array of integers heights representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.`,
 		Constraints: `- 1 <= heights.length <= 10^5
 - 0 <= heights[i] <= 10^4`,
@@ -29120,9 +29120,9 @@ func main() {
 
 	// Sum of Subarray Minimums
 	{
-		Title:      "Sum of Subarray Minimums",
-		Slug:       "sum-of-subarray-minimums",
-		Difficulty: "Medium",
+		Title:       "Sum of Subarray Minimums",
+		Slug:        "sum-of-subarray-minimums",
+		Difficulty:  "Medium",
 		Description: `Given an array of integers arr, find the sum of min(b), where b ranges over every (contiguous) subarray of arr. Since the answer may be large, return the answer modulo 10^9 + 7.`,
 		Constraints: `- 1 <= arr.length <= 3 * 10^4
 - 1 <= arr[i] <= 3 * 10^4`,
@@ -31413,9 +31413,9 @@ func main() {
 
 	// Meeting Rooms II
 	{
-		Title:      "Meeting Rooms II",
-		Slug:       "meeting-rooms-ii",
-		Difficulty: "Medium",
+		Title:       "Meeting Rooms II",
+		Slug:        "meeting-rooms-ii",
+		Difficulty:  "Medium",
 		Description: `Given an array of meeting time intervals intervals where intervals[i] = [starti, endi], return the minimum number of conference rooms required.`,
 		Constraints: `- 1 <= intervals.length <= 10^4
 - 0 <= starti < endi <= 10^6`,
@@ -32059,9 +32059,9 @@ func main() {
 
 	// Rearrange String K Distance Apart
 	{
-		Title:      "Rearrange String K Distance Apart",
-		Slug:       "rearrange-string-k-distance-apart",
-		Difficulty: "Hard",
+		Title:       "Rearrange String K Distance Apart",
+		Slug:        "rearrange-string-k-distance-apart",
+		Difficulty:  "Hard",
 		Description: `Given a string s and an integer k, rearrange s such that the same characters are at least distance k from each other. If it is not possible to rearrange the string, return an empty string "".`,
 		Constraints: `- 1 <= s.length <= 3 * 10^5
 - s consists of only lowercase English letters.
@@ -35566,9 +35566,9 @@ func main() {
 
 	// Count of Smaller Numbers After Self
 	{
-		Title:      "Count of Smaller Numbers After Self",
-		Slug:       "count-of-smaller-numbers-after-self",
-		Difficulty: "Hard",
+		Title:       "Count of Smaller Numbers After Self",
+		Slug:        "count-of-smaller-numbers-after-self",
+		Difficulty:  "Hard",
 		Description: `Given an integer array nums, return an integer array counts where counts[i] is the number of smaller elements to the right of nums[i].`,
 		Constraints: `- 1 <= nums.length <= 10^5
 - -10^4 <= nums[i] <= 10^4`,
@@ -37812,9 +37812,9 @@ func main() {
 
 	// Spiral Matrix
 	{
-		Title:      "Spiral Matrix",
-		Slug:       "spiral-matrix",
-		Difficulty: "Medium",
+		Title:       "Spiral Matrix",
+		Slug:        "spiral-matrix",
+		Difficulty:  "Medium",
 		Description: `Given an m x n matrix, return all elements of the matrix in spiral order.`,
 		Constraints: `- m == matrix.length
 - n == matrix[i].length
@@ -38501,9 +38501,9 @@ func main() {
 
 	// Diagonal Traverse
 	{
-		Title:      "Diagonal Traverse",
-		Slug:       "diagonal-traverse",
-		Difficulty: "Medium",
+		Title:       "Diagonal Traverse",
+		Slug:        "diagonal-traverse",
+		Difficulty:  "Medium",
 		Description: `Given an m x n matrix mat, return an array of all the elements of the array in a diagonal order.`,
 		Constraints: `- m == mat.length
 - n == mat[i].length
@@ -38630,9 +38630,9 @@ func main() {
 
 	// Spiral Matrix II
 	{
-		Title:      "Spiral Matrix II",
-		Slug:       "spiral-matrix-ii",
-		Difficulty: "Medium",
+		Title:       "Spiral Matrix II",
+		Slug:        "spiral-matrix-ii",
+		Difficulty:  "Medium",
 		Description: `Given a positive integer n, generate an n x n matrix filled with elements from 1 to n^2 in spiral order.`,
 		Constraints: `- 1 <= n <= 20`,
 		Examples: `Example 1:
@@ -39260,9 +39260,9 @@ func main() {
 
 	// Merge Intervals
 	{
-		Title:      "Merge Intervals",
-		Slug:       "merge-intervals",
-		Difficulty: "Medium",
+		Title:       "Merge Intervals",
+		Slug:        "merge-intervals",
+		Difficulty:  "Medium",
 		Description: `Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.`,
 		Constraints: `- 1 <= intervals.length <= 10^4
 - intervals[i].length == 2
@@ -39555,9 +39555,9 @@ func main() {
 
 	// Non-overlapping Intervals
 	{
-		Title:      "Non-overlapping Intervals",
-		Slug:       "non-overlapping-intervals",
-		Difficulty: "Medium",
+		Title:       "Non-overlapping Intervals",
+		Slug:        "non-overlapping-intervals",
+		Difficulty:  "Medium",
 		Description: `Given an array of intervals intervals where intervals[i] = [starti, endi], return the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.`,
 		Constraints: `- 1 <= intervals.length <= 10^5
 - intervals[i].length == 2
@@ -39687,9 +39687,9 @@ func main() {
 
 	// Meeting Rooms
 	{
-		Title:      "Meeting Rooms",
-		Slug:       "meeting-rooms",
-		Difficulty: "Easy",
+		Title:       "Meeting Rooms",
+		Slug:        "meeting-rooms",
+		Difficulty:  "Easy",
 		Description: `Given an array of meeting time intervals where intervals[i] = [starti, endi], determine if a person could attend all meetings.`,
 		Constraints: `- 0 <= intervals.length <= 10^4
 - intervals[i].length == 2
@@ -41701,9 +41701,9 @@ func main() {
 
 	// Pow(x, n)
 	{
-		Title:      "Pow(x, n)",
-		Slug:       "powx-n",
-		Difficulty: "Medium",
+		Title:       "Pow(x, n)",
+		Slug:        "powx-n",
+		Difficulty:  "Medium",
 		Description: `Implement pow(x, n), which calculates x raised to the power n (i.e., x^n).`,
 		Constraints: `- -100.0 < x < 100.0
 - -2^31 <= n <= 2^31-1
@@ -41928,9 +41928,9 @@ func main() {
 
 	// Number of 1 Bits
 	{
-		Title:      "Number of 1 Bits",
-		Slug:       "number-of-1-bits",
-		Difficulty: "Easy",
+		Title:       "Number of 1 Bits",
+		Slug:        "number-of-1-bits",
+		Difficulty:  "Easy",
 		Description: `Write a function that takes the binary representation of a positive integer and returns the number of set bits it has (also known as the Hamming weight).`,
 		Constraints: `- 1 <= n <= 2^31 - 1`,
 		Examples: `Example 1:
@@ -42032,9 +42032,9 @@ func main() {
 
 	// Reverse Bits
 	{
-		Title:      "Reverse Bits",
-		Slug:       "reverse-bits",
-		Difficulty: "Easy",
+		Title:       "Reverse Bits",
+		Slug:        "reverse-bits",
+		Difficulty:  "Easy",
 		Description: `Reverse bits of a given 32 bits unsigned integer.`,
 		Constraints: `- The input must be a binary string of length 32`,
 		Examples: `Example 1:
@@ -42240,9 +42240,9 @@ func main() {
 
 	// Counting Bits
 	{
-		Title:      "Counting Bits",
-		Slug:       "counting-bits",
-		Difficulty: "Easy",
+		Title:       "Counting Bits",
+		Slug:        "counting-bits",
+		Difficulty:  "Easy",
 		Description: `Given an integer n, return an array ans of length n + 1 such that for each i (0 <= i <= n), ans[i] is the number of 1's in the binary representation of i.`,
 		Constraints: `- 0 <= n <= 10^5
 
@@ -42358,9 +42358,9 @@ func main() {
 
 	// Sum of Two Integers
 	{
-		Title:      "Sum of Two Integers",
-		Slug:       "sum-of-two-integers",
-		Difficulty: "Medium",
+		Title:       "Sum of Two Integers",
+		Slug:        "sum-of-two-integers",
+		Difficulty:  "Medium",
 		Description: `Given two integers a and b, return the sum of the two integers without using the operators + and -.`,
 		Constraints: `- -1000 <= a, b <= 1000`,
 		Examples: `Example 1:
@@ -42460,9 +42460,9 @@ func main() {
 
 	// Missing Number
 	{
-		Title:      "Missing Number",
-		Slug:       "missing-number",
-		Difficulty: "Easy",
+		Title:       "Missing Number",
+		Slug:        "missing-number",
+		Difficulty:  "Easy",
 		Description: `Given an array nums containing n distinct numbers in the range [0, n], return the only number in the range that is missing from the array.`,
 		Constraints: `- n == nums.length
 - 1 <= n <= 10^4
@@ -42697,9 +42697,9 @@ func main() {
 
 	// Top K Frequent Elements
 	{
-		Title:      "Top K Frequent Elements",
-		Slug:       "top-k-frequent-elements",
-		Difficulty: "Medium",
+		Title:       "Top K Frequent Elements",
+		Slug:        "top-k-frequent-elements",
+		Difficulty:  "Medium",
 		Description: `Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.`,
 		Constraints: `- 1 <= nums.length <= 10^5
 - -10^4 <= nums[i] <= 10^4
@@ -43037,9 +43037,9 @@ func main() {
 
 	// Contains Duplicate II
 	{
-		Title:      "Contains Duplicate II",
-		Slug:       "contains-duplicate-ii",
-		Difficulty: "Easy",
+		Title:       "Contains Duplicate II",
+		Slug:        "contains-duplicate-ii",
+		Difficulty:  "Easy",
 		Description: `Given an integer array nums and an integer k, return true if there are two distinct indices i and j in the array such that nums[i] == nums[j] and abs(i - j) <= k.`,
 		Constraints: `- 1 <= nums.length <= 10^5
 - -10^9 <= nums[i] <= 10^9
@@ -43631,9 +43631,9 @@ func main() {
 
 	// Contiguous Array
 	{
-		Title:      "Contiguous Array",
-		Slug:       "contiguous-array",
-		Difficulty: "Medium",
+		Title:       "Contiguous Array",
+		Slug:        "contiguous-array",
+		Difficulty:  "Medium",
 		Description: `Given a binary array nums, return the maximum length of a contiguous subarray with an equal number of 0 and 1.`,
 		Constraints: `- 1 <= nums.length <= 10^5
 - nums[i] is either 0 or 1.`,
@@ -45445,9 +45445,9 @@ func main() {
 
 	// Longest Substring with At Most Two Distinct Characters
 	{
-		Title:      "Longest Substring with At Most Two Distinct Characters",
-		Slug:       "longest-substring-with-at-most-two-distinct-characters",
-		Difficulty: "Medium",
+		Title:       "Longest Substring with At Most Two Distinct Characters",
+		Slug:        "longest-substring-with-at-most-two-distinct-characters",
+		Difficulty:  "Medium",
 		Description: `Given a string s, return the length of the longest substring that contains at most two distinct characters.`,
 		Constraints: `- 1 <= s.length <= 10^5
 - s consists of English letters.`,
@@ -45894,9 +45894,9 @@ func main() {
 
 	// Count Primes
 	{
-		Title:      "Count Primes",
-		Slug:       "count-primes",
-		Difficulty: "Medium",
+		Title:       "Count Primes",
+		Slug:        "count-primes",
+		Difficulty:  "Medium",
 		Description: `Given an integer n, return the number of prime numbers that are strictly less than n.`,
 		Constraints: `- 0 <= n <= 5 * 10^6`,
 		Examples: `Example 1:
@@ -45997,9 +45997,9 @@ func main() {
 
 	// Bitwise AND of Numbers Range
 	{
-		Title:      "Bitwise AND of Numbers Range",
-		Slug:       "bitwise-and-of-numbers-range",
-		Difficulty: "Medium",
+		Title:       "Bitwise AND of Numbers Range",
+		Slug:        "bitwise-and-of-numbers-range",
+		Difficulty:  "Medium",
 		Description: `Given two integers left and right that represent the range [left, right], return the bitwise AND of all numbers in this range, inclusive.`,
 		Constraints: `- 0 <= left <= right <= 2^31 - 1`,
 		Examples: `Example 1:
@@ -46103,9 +46103,9 @@ func main() {
 
 	// Maximum XOR of Two Numbers in an Array
 	{
-		Title:      "Maximum XOR of Two Numbers in an Array",
-		Slug:       "maximum-xor-of-two-numbers-in-an-array",
-		Difficulty: "Medium",
+		Title:       "Maximum XOR of Two Numbers in an Array",
+		Slug:        "maximum-xor-of-two-numbers-in-an-array",
+		Difficulty:  "Medium",
 		Description: `Given an integer array nums, return the maximum result of nums[i] XOR nums[j], where 0 <= i <= j < n.`,
 		Constraints: `- 1 <= nums.length <= 2 * 10^5
 - 0 <= nums[i] <= 2^31 - 1`,
@@ -46206,9 +46206,9 @@ func main() {
 
 	// Max Points on a Line
 	{
-		Title:      "Max Points on a Line",
-		Slug:       "max-points-on-a-line",
-		Difficulty: "Hard",
+		Title:       "Max Points on a Line",
+		Slug:        "max-points-on-a-line",
+		Difficulty:  "Hard",
 		Description: `Given an array of points where points[i] = [xi, yi] represents a point on the X-Y plane, return the maximum number of points that lie on the same straight line.`,
 		Constraints: `- 1 <= points.length <= 300
 - points[i].length == 2
@@ -46891,9 +46891,9 @@ func main() {
 
 	// Super Pow
 	{
-		Title:      "Super Pow",
-		Slug:       "super-pow",
-		Difficulty: "Medium",
+		Title:       "Super Pow",
+		Slug:        "super-pow",
+		Difficulty:  "Medium",
 		Description: `Your task is to calculate a^b mod 1337 where a is a positive integer and b is an extremely large positive integer given in the form of an array.`,
 		Constraints: `- 1 <= a <= 2^31 - 1
 - 1 <= b.length <= 2000

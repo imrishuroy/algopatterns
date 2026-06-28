@@ -570,7 +570,6 @@ describe("Root layout", () => {
     const RootLayout = (await import("@/app/layout")).default;
     render(React.createElement(RootLayout, null, React.createElement("div", { "data-testid": "child" }, "Content")));
     expect(screen.getByTestId("header")).toBeInTheDocument();
-    expect(screen.getByTestId("footer")).toBeInTheDocument();
     expect(screen.getByTestId("child")).toHaveTextContent("Content");
   });
 
@@ -579,7 +578,6 @@ describe("Root layout", () => {
     render(React.createElement(RootLayout, null, React.createElement("div", { "data-testid": "child" }, "test")));
     expect(screen.getByTestId("child")).toHaveTextContent("test");
     expect(screen.getByTestId("header")).toBeInTheDocument();
-    expect(screen.getByTestId("footer")).toBeInTheDocument();
   });
 
   it("has metadata export", async () => {

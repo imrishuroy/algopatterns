@@ -49,7 +49,7 @@ export function ChatInput({
 
   return (
     <div className="border-t border-gray-800 p-2">
-      <div className="flex items-end gap-2">
+      <div className="flex items-stretch gap-2">
         <textarea
           ref={textareaRef}
           value={input}
@@ -64,7 +64,7 @@ export function ChatInput({
         {isLoading ? (
           <button
             onClick={onStop}
-            className="p-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+            className="px-3 bg-red-600 hover:bg-red-700 text-white rounded transition-colors flex items-center"
             title="Stop"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@ export function ChatInput({
           <button
             onClick={handleSend}
             disabled={!input.trim() || disabled}
-            className="p-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded transition-colors"
+            className="px-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded transition-colors flex items-center"
             title="Send"
           >
             <svg

@@ -264,7 +264,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
                   ? "bg-indigo-600/20 border-indigo-500/50 text-indigo-400"
                   : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600"
               }`}
-              title="AI Tutor (Cmd+Shift+A)"
+              title="Thor AI (Cmd+Shift+A)"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path

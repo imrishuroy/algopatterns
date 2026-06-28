@@ -13,7 +13,7 @@ export function AIToggleButton({ isOpen, onClick, hasNewMessage }: AIToggleButto
     <button
       onClick={onClick}
       className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-full shadow-lg shadow-purple-500/25 flex items-center justify-center transition-all hover:scale-105 z-40"
-      title="Open AI Tutor"
+      title="Open Thor AI"
     >
       <svg
         className="w-7 h-7 text-white"

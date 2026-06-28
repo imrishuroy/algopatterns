@@ -7,6 +7,7 @@ import { ChatInput } from "./ChatInput";
 import { QuickActions } from "./QuickActions";
 import { PatternQuickActions } from "./PatternQuickActions";
 import { useAuth } from "@/contexts/AuthContext";
+import Image from "next/image";
 import type { ContextType, PatternQuickAction } from "@/types/ai";
 
 interface AIChatPanelProps {
@@ -127,10 +128,10 @@ export function AIChatPanel({
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 bg-gray-900 border-b border-gray-800">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-white">AI Assistant</span>
-          <span className="text-[10px] text-gray-500 px-1.5 py-0.5 bg-gray-800 rounded">
-            {isViewingArchived ? "Archived" : contextType === "pattern" ? "Pattern" : "Socratic"}
-          </span>
+          <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden">
+            <Image src="/thor_ai_icon.png" alt="Thor AI" width={16} height={16} className="object-cover rounded-full" />
+          </div>
+          <span className="text-sm font-medium text-white">Thor AI</span>
         </div>
         <div className="flex items-center gap-1">
           {/* History toggle */}
@@ -277,7 +278,7 @@ export function AIChatPanel({
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
               />
             </svg>
-            <p className="text-sm text-gray-400 mb-3">Sign in to use AI Assistant</p>
+            <p className="text-sm text-gray-400 mb-3">Sign in to use Thor AI</p>
             <a
               href="/login"
               className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm transition-colors"

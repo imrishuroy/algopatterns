@@ -73,7 +73,7 @@ export default function RootLayout({
                     <FilterProvider>
                       <Header />
                       <main className="flex-1">{children}</main>
-                      <Footer />
+                      {/* <Footer /> */}
                     </FilterProvider>
                   </ProgressProvider>
                 </HighlightProvider>

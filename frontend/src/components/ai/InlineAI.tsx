@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { aiApiClient } from "@/lib/ai-api";
+import Image from "next/image";
 
 interface InlineAIProps {
   isOpen: boolean;
@@ -136,12 +137,10 @@ export function InlineAI({
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 bg-gray-800 border-b border-gray-700">
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+          <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden">
+            <Image src="/thor_ai_icon.png" alt="Thor AI" width={16} height={16} className="object-cover rounded-full" />
           </div>
-          <span className="text-sm font-medium text-white">AI Assistant</span>
+          <span className="text-sm font-medium text-white">Thor AI</span>
           <span className="text-xs text-gray-500">⌘K</span>
         </div>
         <button

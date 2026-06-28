@@ -117,7 +117,14 @@ describe("AIChatPanel", () => {
 
   it("renders content when open", () => {
     render(<AIChatPanel {...defaultPanelProps} />);
-    expect(screen.getByText("AI Assistant")).toBeInTheDocument();
+    expect(screen.getByText("Thor AI")).toBeInTheDocument();
+  });
+
+  it("renders Thor AI icon in the header", () => {
+    render(<AIChatPanel {...defaultPanelProps} />);
+    const icon = screen.getByAltText("Thor AI");
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute("src");
   });
 
   it("returns null when closed", () => {
@@ -125,18 +132,6 @@ describe("AIChatPanel", () => {
       <AIChatPanel {...defaultPanelProps} isOpen={false} />,
     );
     expect(container.firstChild).toBeNull();
-  });
-
-  it("shows Socratic badge by default and Archived when viewing archived", () => {
-    const { rerender } = render(<AIChatPanel {...defaultPanelProps} />);
-    expect(screen.getByText("Socratic")).toBeInTheDocument();
-
-    vi.mocked(useAIChat).mockReturnValue({
-      ...baseChatMock(),
-      isViewingArchived: true,
-    });
-    rerender(<AIChatPanel {...defaultPanelProps} />);
-    expect(screen.getByText("Archived")).toBeInTheDocument();
   });
 
   it("close button calls onClose", () => {
@@ -304,7 +299,7 @@ describe("AIChatPanel", () => {
       user: null,
     });
     render(<AIChatPanel {...defaultPanelProps} />);
-    expect(screen.getByText("Sign in to use AI Assistant")).toBeInTheDocument();
+    expect(screen.getByText("Sign in to use Thor AI")).toBeInTheDocument();
     expect(screen.getByText("Sign In")).toBeInTheDocument();
   });
 
@@ -398,14 +393,14 @@ describe("AIToggleButton", () => {
 
   it("renders button when isOpen is false", () => {
     render(<AIToggleButton isOpen={false} onClick={vi.fn()} />);
-    const btn = screen.getByTitle("Open AI Tutor");
+    const btn = screen.getByTitle("Open Thor AI");
     expect(btn).toBeInTheDocument();
     expect(btn.tagName).toBe("BUTTON");
   });
 
   it("renders SVG icon", () => {
     render(<AIToggleButton isOpen={false} onClick={vi.fn()} />);
-    const btn = screen.getByTitle("Open AI Tutor");
+    const btn = screen.getByTitle("Open Thor AI");
     const svg = btn.querySelector("svg");
     expect(svg).toBeInTheDocument();
     expect(svg!.getAttribute("viewBox")).toBe("0 0 24 24");
@@ -414,7 +409,7 @@ describe("AIToggleButton", () => {
   it("calls onClick when clicked", () => {
     const onClick = vi.fn();
     render(<AIToggleButton isOpen={false} onClick={onClick} />);
-    fireEvent.click(screen.getByTitle("Open AI Tutor"));
+    fireEvent.click(screen.getByTitle("Open Thor AI"));
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
@@ -427,7 +422,7 @@ describe("AIToggleButton", () => {
 
   it("has correct CSS classes when visible", () => {
     render(<AIToggleButton isOpen={false} onClick={vi.fn()} />);
-    const btn = screen.getByTitle("Open AI Tutor");
+    const btn = screen.getByTitle("Open Thor AI");
     expect(btn.className).toContain("fixed");
     expect(btn.className).toContain("bottom-6");
     expect(btn.className).toContain("right-6");
@@ -438,7 +433,7 @@ describe("AIToggleButton", () => {
     render(
       <AIToggleButton isOpen={false} onClick={vi.fn()} hasNewMessage={true} />,
     );
-    const btn = screen.getByTitle("Open AI Tutor");
+    const btn = screen.getByTitle("Open Thor AI");
     const badge = btn.querySelector("span");
     expect(badge).toBeInTheDocument();
     expect(badge!.className).toContain("bg-red-500");
@@ -449,7 +444,7 @@ describe("AIToggleButton", () => {
     render(
       <AIToggleButton isOpen={false} onClick={vi.fn()} hasNewMessage={false} />,
     );
-    const btn = screen.getByTitle("Open AI Tutor");
+    const btn = screen.getByTitle("Open Thor AI");
     const badge = btn.querySelector("span");
     // The only span would be the badge, so it shouldn't exist
     expect(badge).toBeNull();
@@ -457,13 +452,13 @@ describe("AIToggleButton", () => {
 
   it("does not render badge when hasNewMessage is undefined", () => {
     render(<AIToggleButton isOpen={false} onClick={vi.fn()} />);
-    const btn = screen.getByTitle("Open AI Tutor");
+    const btn = screen.getByTitle("Open Thor AI");
     expect(btn.querySelector("span")).toBeNull();
   });
 
   it("has descriptive title attribute for accessibility", () => {
     render(<AIToggleButton isOpen={false} onClick={vi.fn()} />);
-    expect(screen.getByTitle("Open AI Tutor")).toBeInTheDocument();
+    expect(screen.getByTitle("Open Thor AI")).toBeInTheDocument();
   });
 });
 
@@ -811,19 +806,26 @@ describe("InlineAI", () => {
 
   it("renders when isOpen is true", () => {
     render(<InlineAI {...defaultInlineProps} />);
-    expect(screen.getByText("AI Assistant")).toBeInTheDocument();
+    expect(screen.getByText("Thor AI")).toBeInTheDocument();
+  });
+
+  it("renders Thor AI icon in the header", () => {
+    render(<InlineAI {...defaultInlineProps} />);
+    const icon = screen.getByAltText("Thor AI");
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute("src");
   });
 
   it("shows header with title", () => {
     render(<InlineAI {...defaultInlineProps} />);
-    expect(screen.getByText("AI Assistant")).toBeInTheDocument();
+    expect(screen.getByText("Thor AI")).toBeInTheDocument();
     expect(screen.getByText("⌘K")).toBeInTheDocument();
   });
 
   it("has close button that calls onClose", () => {
     const onClose = vi.fn();
     render(<InlineAI {...defaultInlineProps} onClose={onClose} />);
-    const header = screen.getByText("AI Assistant").closest("div")!;
+    const header = screen.getByText("Thor AI").closest("div")!;
     const buttons = header.parentElement!.querySelectorAll("button");
     // The close button is the only button in the header aside from action buttons
     const closeBtn = Array.from(buttons).find(
@@ -1016,7 +1018,7 @@ describe("InlineAI", () => {
   it("does not call onClose when clicking inside the component", () => {
     const onClose = vi.fn();
     render(<InlineAI {...defaultInlineProps} onClose={onClose} />);
-    const panel = screen.getByText("AI Assistant").closest('[class*="z-50"]')!;
+    const panel = screen.getByText("Thor AI").closest('[class*="z-50"]')!;
     fireEvent.mouseDown(panel);
     expect(onClose).not.toHaveBeenCalled();
   });
@@ -1039,7 +1041,7 @@ describe("InlineAI", () => {
         position={{ top: 200, left: 300 }}
       />,
     );
-    const panel = screen.getByText("AI Assistant").closest('[class*="z-50"]') as HTMLElement;
+    const panel = screen.getByText("Thor AI").closest('[class*="z-50"]') as HTMLElement;
     expect(panel.style.top).toBe("200px");
     expect(panel.style.left).toBe("300px");
   });

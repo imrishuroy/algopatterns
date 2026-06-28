@@ -74,7 +74,7 @@ class AIApiClient {
     req: ChatRequest,
     onChunk: (chunk: string) => void,
     onError: (error: string) => void,
-    onDone: () => void
+    onDone: (sessionId?: string) => void
   ): () => void {
     const controller = new AbortController();
 
@@ -153,7 +153,7 @@ class AIApiClient {
     response: Response,
     onChunk: (chunk: string) => void,
     onError: (error: string) => void,
-    onDone: () => void
+    onDone: (sessionId?: string) => void
   ): Promise<void> {
     const reader = response.body?.getReader();
     if (!reader) {
@@ -176,8 +176,19 @@ class AIApiClient {
         // Handle both "data: {...}" and "data:{...}" formats
         if (line.startsWith("data:")) {
           const data = line.startsWith("data: ") ? line.slice(6) : line.slice(5);
-          if (data === "[DONE]" || data.includes('"done":true')) {
+          if (data === "[DONE]") {
             onDone();
+            return;
+          }
+          if (data.includes('"done":true')) {
+            let sessionId: string | undefined;
+            try {
+              const parsed = JSON.parse(data);
+              sessionId = parsed.session_id;
+            } catch {
+              // ignore parse errors
+            }
+            onDone(sessionId);
             return;
           }
           try {

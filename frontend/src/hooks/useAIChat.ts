@@ -19,6 +19,7 @@ interface UseAIChatOptions {
   code?: string;
   language?: string;
   errorMessage?: string;
+  isAuthenticated?: boolean;
 }
 
 export function useAIChat(options: UseAIChatOptions = {}) {
@@ -39,6 +40,9 @@ export function useAIChat(options: UseAIChatOptions = {}) {
 
       // Don't reload if we already loaded for this context
       if (historyLoadedRef.current === contextKey) return;
+
+      // Don't attempt until authenticated
+      if (!options.isAuthenticated) return;
 
       setIsLoadingHistory(true);
       try {
@@ -78,15 +82,15 @@ export function useAIChat(options: UseAIChatOptions = {}) {
         }
 
         historyLoadedRef.current = contextKey;
-      } catch {
-        // Silently fail - history loading is not critical
+      } catch (err) {
+        console.warn("[useAIChat] Failed to load history:", err);
       } finally {
         setIsLoadingHistory(false);
       }
     };
 
     loadHistory();
-  }, [options.problemSlug, options.patternId]);
+  }, [options.problemSlug, options.patternId, options.isAuthenticated]);
 
   const sendMessage = useCallback(
     async (content: string, useStreaming = true) => {
@@ -167,7 +171,7 @@ export function useAIChat(options: UseAIChatOptions = {}) {
             );
             setIsLoading(false);
           },
-          () => {
+          (sessionId?: string) => {
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
@@ -175,6 +179,7 @@ export function useAIChat(options: UseAIChatOptions = {}) {
                   : msg
               )
             );
+            if (sessionId) setSessionId(sessionId);
             setIsLoading(false);
             abortRef.current = null;
           }
@@ -235,8 +240,8 @@ export function useAIChat(options: UseAIChatOptions = {}) {
     if (sessionId) {
       try {
         await aiApiClient.clearSession(sessionId);
-      } catch {
-        // Ignore errors
+      } catch (err) {
+        console.warn("[useAIChat] Failed to clear session:", err);
       }
     }
     setMessages([]);
@@ -268,8 +273,8 @@ export function useAIChat(options: UseAIChatOptions = {}) {
           setArchivedSessions(archivedRes.data.sessions);
         }
       }
-    } catch {
-      // Continue even if archive fails
+    } catch (err) {
+      console.warn("[useAIChat] Failed to archive session:", err);
     }
 
     setMessages([]);
@@ -292,7 +297,8 @@ export function useAIChat(options: UseAIChatOptions = {}) {
         setMessages(loadedMessages);
         setSessionId(archivedSessionId);
       }
-    } catch {
+    } catch (err) {
+      console.warn("[useAIChat] Failed to load archived session:", err);
       setError("Failed to load archived chat");
     } finally {
       setIsLoadingHistory(false);

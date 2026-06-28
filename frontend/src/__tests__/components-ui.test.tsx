@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 
-// -----------------------------------------------------------------------
 // Module-level mocks (must be before imports, hoisted by vitest)
-// -----------------------------------------------------------------------
 
 vi.mock("next/image", () => ({
   default: (props: Record<string, unknown>) => {
@@ -89,9 +87,7 @@ vi.mock("@/lib/contentHash", () => ({
   getContentText: vi.fn().mockImplementation((el: HTMLElement) => el.textContent || ""),
 }));
 
-// -----------------------------------------------------------------------
 // Component imports (after mocks)
-// -----------------------------------------------------------------------
 
 import CodeBlock from "@/components/ui/CodeBlock";
 import Confetti from "@/components/ui/Confetti";
@@ -102,9 +98,7 @@ import { HighlightableCode } from "@/components/ui/HighlightableCode";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { GoogleButton } from "@/components/ui/GoogleButton";
 
-// -----------------------------------------------------------------------
 // Setup helpers
-// -----------------------------------------------------------------------
 
 function mockClipboard() {
   const writeText = vi.fn().mockResolvedValue(undefined);
@@ -134,9 +128,7 @@ class MockResizeObserver {
   disconnect = vi.fn();
 }
 
-// -----------------------------------------------------------------------
 // Common defaults
-// -----------------------------------------------------------------------
 
 function defaultAuth(isAuthenticated = false) {
   mockUseAuth.mockReturnValue({
@@ -172,9 +164,7 @@ function defaultTextSelection() {
   });
 }
 
-// -----------------------------------------------------------------------
 // CodeBlock
-// -----------------------------------------------------------------------
 
 describe("CodeBlock", () => {
   const sampleCode = `function hello() {\n  console.log("world");\n}`;
@@ -319,9 +309,7 @@ describe("CodeBlock", () => {
   });
 });
 
-// -----------------------------------------------------------------------
 // Confetti
-// -----------------------------------------------------------------------
 
 describe("Confetti", () => {
   beforeEach(() => {
@@ -384,9 +372,7 @@ describe("Confetti", () => {
   });
 });
 
-// -----------------------------------------------------------------------
 // ConflictDialog
-// -----------------------------------------------------------------------
 
 describe("ConflictDialog", () => {
   const localHighlight = {
@@ -612,9 +598,7 @@ describe("ConflictDialog", () => {
   });
 });
 
-// -----------------------------------------------------------------------
 // Dropdown
-// -----------------------------------------------------------------------
 
 describe("Dropdown", () => {
   const options = ["javascript", "python", "java", "cpp"];
@@ -705,9 +689,7 @@ describe("Dropdown", () => {
   });
 });
 
-// -----------------------------------------------------------------------
 // Highlightable
-// -----------------------------------------------------------------------
 
 describe("Highlightable", () => {
   const mockCreateHighlight = vi.fn();
@@ -861,9 +843,7 @@ describe("Highlightable", () => {
   });
 });
 
-// -----------------------------------------------------------------------
 // HighlightableCode
-// -----------------------------------------------------------------------
 
 describe("HighlightableCode", () => {
   const code = `function hello() {\n  return "world";\n}`;
@@ -1092,9 +1072,7 @@ describe("HighlightableCode", () => {
   });
 });
 
-// -----------------------------------------------------------------------
 // LanguageToggle
-// -----------------------------------------------------------------------
 
 describe("LanguageToggle", () => {
   it("renders buttons for each language", () => {
@@ -1202,9 +1180,7 @@ describe("LanguageToggle", () => {
   });
 });
 
-// -----------------------------------------------------------------------
 // GoogleButton (additional tests)
-// -----------------------------------------------------------------------
 
 describe("GoogleButton additional", () => {
   it("renders with default text 'Continue with Google'", () => {

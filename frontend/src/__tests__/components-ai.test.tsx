@@ -8,9 +8,7 @@ import {
 } from "@testing-library/react";
 import type { AIMessage } from "@/types/ai";
 
-// ---------------------------------------------------------------------------
 // Mocks – hoisted before imports
-// ---------------------------------------------------------------------------
 
 vi.mock("@/lib/ai-api", () => ({
   aiApiClient: {
@@ -35,9 +33,7 @@ vi.mock("@/contexts/AuthContext", () => ({
   useAuth: vi.fn(),
 }));
 
-// ---------------------------------------------------------------------------
 // Imports
-// ---------------------------------------------------------------------------
 
 import { useAIChat } from "@/hooks/useAIChat";
 import { useAuth } from "@/contexts/AuthContext";
@@ -47,11 +43,10 @@ import { AIToggleButton } from "@/components/ai/AIToggleButton";
 import { ChatInput } from "@/components/ai/ChatInput";
 import { ChatMessage } from "@/components/ai/ChatMessage";
 import { InlineAI } from "@/components/ai/InlineAI";
+import { PatternQuickActions } from "@/components/ai/PatternQuickActions";
 import { QuickActions } from "@/components/ai/QuickActions";
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
 
 function createMessage(overrides: Partial<AIMessage> = {}): AIMessage {
   return {
@@ -108,9 +103,7 @@ function fireKeyDown(
   fireEvent.keyDown(el, { key, ...opts });
 }
 
-// ---------------------------------------------------------------------------
 // AIChatPanel
-// ---------------------------------------------------------------------------
 
 describe("AIChatPanel", () => {
   beforeEach(() => {
@@ -393,9 +386,7 @@ describe("AIChatPanel", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // AIToggleButton
-// ---------------------------------------------------------------------------
 
 describe("AIToggleButton", () => {
   it("renders null when isOpen is true", () => {
@@ -476,9 +467,7 @@ describe("AIToggleButton", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // ChatInput
-// ---------------------------------------------------------------------------
 
 describe("ChatInput", () => {
   it("renders textarea and send button", () => {
@@ -605,9 +594,7 @@ describe("ChatInput", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // ChatMessage
-// ---------------------------------------------------------------------------
 
 describe("ChatMessage", () => {
   it("renders user message with right alignment", () => {
@@ -783,9 +770,7 @@ describe("ChatMessage", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // InlineAI
-// ---------------------------------------------------------------------------
 
 describe("InlineAI", () => {
   const basePosition = { top: 100, left: 100 };
@@ -1069,9 +1054,7 @@ describe("InlineAI", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
 // QuickActions
-// ---------------------------------------------------------------------------
 
 describe("QuickActions", () => {
   const defaultQuickProps = {
@@ -1382,5 +1365,98 @@ describe("QuickActions", () => {
     buttons.forEach((btn) => {
       expect(btn.className).toContain("rounded-md");
     });
+  });
+});
+
+// PatternQuickActions
+
+describe("PatternQuickActions", () => {
+  const defaultPatternQuickProps = {
+    patternId: "two-pointers",
+    patternName: "Two Pointers",
+    activeSection: "Core Technique",
+    onAction: vi.fn(),
+  };
+
+  it("renders all five action buttons", () => {
+    render(<PatternQuickActions {...defaultPatternQuickProps} />);
+    expect(screen.getByText("Explain Concept")).toBeInTheDocument();
+    expect(screen.getByText("Compare Patterns")).toBeInTheDocument();
+    expect(screen.getByText("When to Use")).toBeInTheDocument();
+    expect(screen.getByText("Walk Through")).toBeInTheDocument();
+    expect(screen.getByText("Practice Next")).toBeInTheDocument();
+  });
+
+  it("calls onAction with 'explain' and active section", () => {
+    render(<PatternQuickActions {...defaultPatternQuickProps} />);
+    fireEvent.click(screen.getByText("Explain Concept"));
+    expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(
+      "explain",
+      expect.stringContaining("Core Technique")
+    );
+  });
+
+  it("calls onAction with 'compare' referencing pattern name", () => {
+    render(<PatternQuickActions {...defaultPatternQuickProps} />);
+    fireEvent.click(screen.getByText("Compare Patterns"));
+    expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(
+      "compare",
+      expect.stringContaining("Two Pointers")
+    );
+  });
+
+  it("calls onAction with 'whenToUse' referencing pattern name", () => {
+    render(<PatternQuickActions {...defaultPatternQuickProps} />);
+    fireEvent.click(screen.getByText("When to Use"));
+    expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(
+      "whenToUse",
+      expect.stringContaining("Two Pointers")
+    );
+  });
+
+  it("calls onAction with 'walkThrough' using active section", () => {
+    render(<PatternQuickActions {...defaultPatternQuickProps} />);
+    fireEvent.click(screen.getByText("Walk Through"));
+    expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(
+      "walkThrough",
+      expect.stringContaining("Core Technique")
+    );
+  });
+
+  it("calls onAction with 'practiceNext' referencing pattern name", () => {
+    render(<PatternQuickActions {...defaultPatternQuickProps} />);
+    fireEvent.click(screen.getByText("Practice Next"));
+    expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(
+      "practiceNext",
+      expect.stringContaining("Two Pointers")
+    );
+  });
+
+  it("uses 'this pattern' fallback when activeSection is empty", () => {
+    render(
+      <PatternQuickActions
+        {...defaultPatternQuickProps}
+        activeSection=""
+      />
+    );
+    fireEvent.click(screen.getByText("Explain Concept"));
+    expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(
+      "explain",
+      expect.stringContaining("this pattern")
+    );
+  });
+
+  it("uses 'the core technique' fallback when activeSection is empty for walkthrough", () => {
+    render(
+      <PatternQuickActions
+        {...defaultPatternQuickProps}
+        activeSection=""
+      />
+    );
+    fireEvent.click(screen.getByText("Walk Through"));
+    expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(
+      "walkThrough",
+      expect.stringContaining("the core technique")
+    );
   });
 });

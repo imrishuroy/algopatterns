@@ -82,6 +82,7 @@ export function AIChatPanel({
     code,
     language,
     errorMessage,
+    isAuthenticated,
   });
 
   const scrollToBottom = useCallback(() => {

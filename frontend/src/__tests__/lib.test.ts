@@ -18,9 +18,7 @@ import {
 import { quizService } from "@/lib/quizService";
 import { quotes } from "@/lib/quotes";
 
-// ---------------------------------------------------------------------------
 // Shared mockFetch used by api, ai-api, and quizService sections
-// ---------------------------------------------------------------------------
 
 let mockFetch: ReturnType<typeof vi.fn>;
 

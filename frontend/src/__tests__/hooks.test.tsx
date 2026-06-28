@@ -820,7 +820,7 @@ describe("useAIChat", () => {
       },
     });
 
-    const { result } = renderHook(() => useAIChat({ problemSlug: "two-sum" }));
+    const { result } = renderHook(() => useAIChat({ problemSlug: "two-sum", isAuthenticated: true }));
 
     await waitFor(() => {
       expect(result.current.isLoadingHistory).toBe(false);
@@ -835,6 +835,212 @@ describe("useAIChat", () => {
     const { result } = renderHook(() => useAIChat());
     expect(result.current.isLoadingHistory).toBe(false);
     expect(aiApiClient.getSessions).not.toHaveBeenCalled();
+  });
+
+  it("should skip history loading when isAuthenticated is false", () => {
+    const { result } = renderHook(() =>
+      useAIChat({ problemSlug: "two-sum", isAuthenticated: false })
+    );
+    expect(result.current.isLoadingHistory).toBe(false);
+    expect(aiApiClient.getSessions).not.toHaveBeenCalled();
+    expect(result.current.sessionId).toBeNull();
+  });
+
+  it("should load history when isAuthenticated changes from false to true", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: { sessions: [] },
+    });
+
+    const { rerender } = renderHook(
+      (props: { problemSlug: string; isAuthenticated: boolean }) =>
+        useAIChat(props),
+      { initialProps: { problemSlug: "two-sum", isAuthenticated: false } }
+    );
+
+    expect(aiApiClient.getSessions).not.toHaveBeenCalled();
+
+    rerender({ problemSlug: "two-sum", isAuthenticated: true });
+
+    await waitFor(() => {
+      expect(aiApiClient.getSessions).toHaveBeenCalled();
+    });
+  });
+
+  it("should set sessionId from streaming onDone when sessionId is provided", async () => {
+    const abortFn = vi.fn();
+    vi.mocked(aiApiClient.chatStream).mockImplementation(
+      (_req, onChunk, _onError, onDone) => {
+        onChunk("Hello");
+        onDone("stream-session-123");
+        return abortFn;
+      }
+    );
+
+    const { result } = renderHook(() => useAIChat());
+
+    await act(async () => {
+      await result.current.sendMessage("test", true);
+    });
+
+    expect(result.current.sessionId).toBe("stream-session-123");
+  });
+
+  it("should set isViewingArchived to true after loading an archived session", async () => {
+    vi.mocked(aiApiClient.getSessionMessages).mockResolvedValue({
+      success: true,
+      data: {
+        messages: [
+          {
+            id: "m1",
+            session_id: "arch-1",
+            role: "user",
+            content: "Old",
+            created_at: "2024-01-01T00:00:00Z",
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.getArchivedSessions).mockResolvedValue({
+      success: true,
+      data: {
+        sessions: [
+          {
+            id: "arch-1",
+            user_id: "u1",
+            is_archived: true,
+            problem_slug: "two-sum",
+            started_at: "2024-01-01T00:00:00Z",
+            last_message_at: "2024-01-01T00:00:00Z",
+            message_count: 1,
+            total_tokens: 10,
+          },
+        ],
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ problemSlug: "two-sum", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isLoadingHistory).toBe(false);
+    });
+
+    expect(result.current.isViewingArchived).toBe(false);
+
+    await act(async () => {
+      await result.current.loadArchivedSession("arch-1");
+    });
+
+    expect(result.current.isViewingArchived).toBe(true);
+  });
+
+  it("should set isViewingArchived to false after starting new chat from archived view", async () => {
+    vi.mocked(aiApiClient.getSessionMessages).mockResolvedValue({
+      success: true,
+      data: {
+        messages: [
+          {
+            id: "m1",
+            session_id: "arch-1",
+            role: "user",
+            content: "Old",
+            created_at: "2024-01-01T00:00:00Z",
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.getArchivedSessions).mockResolvedValue({
+      success: true,
+      data: {
+        sessions: [
+          {
+            id: "arch-1",
+            user_id: "u1",
+            is_archived: true,
+            problem_slug: "two-sum",
+            started_at: "2024-01-01T00:00:00Z",
+            last_message_at: "2024-01-01T00:00:00Z",
+            message_count: 1,
+            total_tokens: 10,
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.archiveSession).mockResolvedValue({
+      success: true,
+      data: { archived: true },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ problemSlug: "two-sum", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isLoadingHistory).toBe(false);
+    });
+
+    await act(async () => {
+      await result.current.loadArchivedSession("arch-1");
+    });
+    expect(result.current.isViewingArchived).toBe(true);
+
+    await act(async () => {
+      await result.current.startNewChat();
+    });
+
+    expect(result.current.isViewingArchived).toBe(false);
+  });
+
+  it("should load chat history when patternId is provided", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: {
+        sessions: [
+          {
+            id: "pattern-session",
+            user_id: "u1",
+            pattern_id: "two-pointers",
+            is_archived: false,
+            started_at: "2024-01-01T00:00:00Z",
+            last_message_at: "2024-01-01T00:00:00Z",
+            message_count: 1,
+            total_tokens: 5,
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.getSessionMessages).mockResolvedValue({
+      success: true,
+      data: {
+        messages: [
+          {
+            id: "pm1",
+            session_id: "pattern-session",
+            role: "user",
+            content: "Pattern question",
+            created_at: "2024-01-01T00:00:00Z",
+          },
+        ],
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ patternId: "two-pointers", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isLoadingHistory).toBe(false);
+    });
+
+    expect(aiApiClient.getArchivedSessions).toHaveBeenCalledWith(
+      undefined,
+      "two-pointers"
+    );
+    expect(result.current.sessionId).toBe("pattern-session");
+    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.messages[0].content).toBe("Pattern question");
   });
 });
 

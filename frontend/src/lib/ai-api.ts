@@ -54,6 +54,13 @@ class AIApiClient {
         problem_title: req.problemTitle,
         problem_description: req.problemDescription,
         pattern_id: req.patternId,
+        pattern_name: req.patternName,
+        pattern_difficulty: req.patternDifficulty,
+        time_complexity: req.timeComplexity,
+        space_complexity: req.spaceComplexity,
+        section_content: req.sectionContent,
+        active_section: req.activeSection,
+        context_type: req.contextType,
         code: req.code,
         language: req.language,
         history: req.history,
@@ -71,6 +78,25 @@ class AIApiClient {
   ): () => void {
     const controller = new AbortController();
 
+    const buildBody = () => JSON.stringify({
+      message: req.message,
+      problem_slug: req.problemSlug,
+      problem_title: req.problemTitle,
+      problem_description: req.problemDescription,
+      pattern_id: req.patternId,
+      pattern_name: req.patternName,
+      pattern_difficulty: req.patternDifficulty,
+      time_complexity: req.timeComplexity,
+      space_complexity: req.spaceComplexity,
+      section_content: req.sectionContent,
+      active_section: req.activeSection,
+      context_type: req.contextType,
+      code: req.code,
+      language: req.language,
+      history: req.history,
+      error_message: req.errorMessage,
+    });
+
     (async () => {
       try {
         // Ensure we have a valid token before streaming
@@ -80,17 +106,7 @@ class AIApiClient {
           method: "POST",
           headers,
           credentials: "include",
-          body: JSON.stringify({
-            message: req.message,
-            problem_slug: req.problemSlug,
-            problem_title: req.problemTitle,
-            problem_description: req.problemDescription,
-            pattern_id: req.patternId,
-            code: req.code,
-            language: req.language,
-            history: req.history,
-            error_message: req.errorMessage,
-          }),
+          body: buildBody(),
           signal: controller.signal,
         });
 
@@ -104,17 +120,7 @@ class AIApiClient {
                 method: "POST",
                 headers: retryHeaders,
                 credentials: "include",
-                body: JSON.stringify({
-                  message: req.message,
-                  problem_slug: req.problemSlug,
-                  problem_title: req.problemTitle,
-                  problem_description: req.problemDescription,
-                  pattern_id: req.patternId,
-                  code: req.code,
-                  language: req.language,
-                  history: req.history,
-                  error_message: req.errorMessage,
-                }),
+                body: buildBody(),
                 signal: controller.signal,
               });
 
@@ -286,9 +292,12 @@ class AIApiClient {
     return response.json();
   }
 
-  async getArchivedSessions(problemSlug: string): Promise<ApiResponse<{ sessions: AISessionData[] }>> {
+  async getArchivedSessions(problemSlug?: string, patternId?: string): Promise<ApiResponse<{ sessions: AISessionData[] }>> {
     const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions/archived?problem_slug=${encodeURIComponent(problemSlug)}`, {
+    const params = new URLSearchParams();
+    if (problemSlug) params.set("problem_slug", problemSlug);
+    if (patternId) params.set("pattern_id", patternId);
+    const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions/archived?${params.toString()}`, {
       method: "GET",
       headers,
       credentials: "include",

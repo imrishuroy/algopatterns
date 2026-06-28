@@ -134,6 +134,8 @@ func TestChatRequestDefaults(t *testing.T) {
 	req := ChatRequest{
 		Messages: []Message{UserMessage("hello")},
 	}
+	assert.Len(t, req.Messages, 1)
+	assert.Equal(t, "hello", req.Messages[0].Content)
 	assert.Equal(t, float64(0), req.Temperature)
 	assert.Equal(t, float64(0), req.TopP)
 	assert.Equal(t, 0, req.MaxTokens)
@@ -176,6 +178,7 @@ func TestChatRequestTopP(t *testing.T) {
 		Messages: []Message{UserMessage("hi")},
 		TopP:     0.9,
 	}
+	assert.Len(t, req.Messages, 1)
 	assert.Equal(t, 0.9, req.TopP)
 }
 
@@ -185,5 +188,6 @@ func TestChatRequestExtraBody(t *testing.T) {
 		Messages:  []Message{UserMessage("hi")},
 		ExtraBody: extra,
 	}
+	assert.Len(t, req.Messages, 1)
 	assert.Equal(t, extra, req.ExtraBody)
 }

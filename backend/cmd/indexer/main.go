@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"os"
 	"strings"
@@ -54,10 +55,15 @@ func main() {
 			log.Fatal().Err(err).Msg("Failed to index problems")
 		}
 	case "patterns":
-		log.Info().Msg("Pattern indexing not yet implemented - patterns are static")
+		if err := indexPatterns(ctx, indexer); err != nil {
+			log.Fatal().Err(err).Msg("Failed to index patterns")
+		}
 	case "all":
 		if err := indexProblems(ctx, db, indexer); err != nil {
 			log.Fatal().Err(err).Msg("Failed to index problems")
+		}
+		if err := indexPatterns(ctx, indexer); err != nil {
+			log.Fatal().Err(err).Msg("Failed to index patterns")
 		}
 	default:
 		log.Fatal().Str("type", *indexType).Msg("Unknown index type")
@@ -146,4 +152,81 @@ func parseHints(hintsStr string) []string {
 		}
 	}
 	return hints
+}
+
+type patternsFile struct {
+	Version       string          `json:"version"`
+	TotalPatterns int             `json:"totalPatterns"`
+	Patterns      []patternRecord `json:"patterns"`
+}
+
+type patternRecord struct {
+	ID              string            `json:"id"`
+	Category        string            `json:"category"`
+	Difficulty      string            `json:"difficulty"`
+	Description     string            `json:"description"`
+	WhenToUse       []string          `json:"whenToUse"`
+	CodeTemplates   map[string]string `json:"codeTemplates"`
+	KeyInsights     []string          `json:"keyInsights"`
+	CommonMistakes  []string          `json:"commonMistakes"`
+	Variations      []variationRecord `json:"variations"`
+	CommonProblems  []string          `json:"commonProblems"`
+	TimeComplexity  string            `json:"timeComplexity"`
+	SpaceComplexity string            `json:"spaceComplexity"`
+}
+
+type variationRecord struct {
+	Name        string            `json:"name"`
+	Description string            `json:"desc"`
+	When        string            `json:"when"`
+	Template    map[string]string `json:"template"`
+	Problems    []string          `json:"problems"`
+}
+
+func indexPatterns(ctx context.Context, indexer *rag.Indexer) error {
+	log.Info().Msg("Loading patterns from patterns.json...")
+
+	data, err := os.ReadFile("data/patterns.json")
+	if err != nil {
+		return err
+	}
+
+	var pf patternsFile
+	if err := json.Unmarshal(data, &pf); err != nil {
+		return err
+	}
+
+	log.Info().Int("count", len(pf.Patterns)).Msg("Found patterns to index")
+
+	for i, pr := range pf.Patterns {
+		log.Info().Int("progress", i+1).Int("total", len(pf.Patterns)).Str("id", pr.ID).Msg("Indexing pattern")
+
+		p := rag.Pattern{
+			ID:             pr.ID,
+			Category:       pr.Category,
+			Description:    pr.Description,
+			WhenToUse:      pr.WhenToUse,
+			KeyInsights:    pr.KeyInsights,
+			CommonMistakes: pr.CommonMistakes,
+			CodeTemplates:  pr.CodeTemplates,
+		}
+
+		for _, vr := range pr.Variations {
+			when := vr.When
+			if when == "" {
+				when = "Various scenarios"
+			}
+			p.Variations = append(p.Variations, rag.PatternVariation{
+				Name:        vr.Name,
+				Description: vr.Description + "\nWhen to use: " + when,
+			})
+		}
+
+		if err := indexer.IndexPattern(ctx, p); err != nil {
+			log.Error().Err(err).Str("patternId", pr.ID).Msg("Failed to index pattern, continuing...")
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	return nil
 }

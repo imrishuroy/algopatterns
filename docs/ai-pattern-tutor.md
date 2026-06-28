@@ -1,29 +1,34 @@
 # AI Pattern Tutor - Design Document
 
-**Version:** 1.5 (MVP)
+**Version:** 2.0 (Implemented)
 **Author:** Rishu
-**Date:** 2026-06-27
-**Status:** Ready for Implementation
+**Date:** 2026-06-27 (design) / 2026-06-28 (implemented)
+**Status:** Implemented
 
 ---
 
 ## Table of Contents
 
 1. [Executive Summary](#executive-summary)
-2. [Problem Statement](#problem-statement)
-3. [Goals & Non-Goals](#goals--non-goals)
-4. [Content Inventory](#content-inventory)
-5. [User Personas & Use Cases](#user-personas--use-cases)
-6. [UI/UX Design](#uiux-design)
-7. [AI Prompt Design](#ai-prompt-design)
-8. [API Design](#api-design)
-9. [Frontend Integration](#frontend-integration)
-10. [Conversation Memory Model](#conversation-memory-model)
-11. [Rate Limiting & Abuse Prevention](#rate-limiting--abuse-prevention)
-12. [Cost Projection](#cost-projection)
-13. [Success Metrics](#success-metrics)
-14. [Implementation Plan](#implementation-plan)
-15. [Future Work (Post-MVP)](#future-work-post-mvp)
+2. [Implementation Summary](#implementation-summary)
+3. [Problem Statement](#problem-statement)
+4. [Goals & Non-Goals](#goals--non-goals)
+5. [Content Inventory](#content-inventory)
+6. [User Personas & Use Cases](#user-personas--use-cases)
+7. [UI/UX Design](#uiux-design)
+8. [AI Prompt Design](#ai-prompt-design)
+9. [API Design](#api-design)
+10. [Frontend Integration](#frontend-integration)
+11. [RAG Indexing](#rag-indexing)
+12. [Highlight-to-AI Integration](#highlight-to-ai-integration)
+13. [Conversation Memory Model](#conversation-memory-model)
+14. [Chat History & Sessions](#chat-history--sessions)
+15. [Rate Limiting & Abuse Prevention](#rate-limiting--abuse-prevention)
+16. [Cost Projection](#cost-projection)
+17. [Success Metrics](#success-metrics)
+18. [Implementation Plan](#implementation-plan)
+19. [Files Changed](#files-changed)
+20. [Future Work (Post-MVP)](#future-work-post-mvp)
 
 ---
 
@@ -35,16 +40,34 @@ Unlike the problem-page AI (which focuses on debugging user code), the pattern A
 
 ### Key Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| **UI Pattern** | Floating side panel (reuse AIChatPanel) | Consistent with problem page UX, minimal rework |
-| **Context Source** | Section-level RAG (not full pattern JSON) | Minimizes token bloat, lower latency, cheaper |
-| **Quick Actions** | Pattern-specific: Explain concept, Compare patterns, When to use, Tutorial walkthrough | Different from problem-page (hint/review/explain) |
-| **Backend** | New prompt templates + existing endpoints | No new API needed, just prompt variation |
-| **Session Scope** | Per-pattern, not per-problem | Conversations are about understanding the pattern itself |
-| **Routing** | Explicit `context_type` enum | Decoupled, future-proof for new feature types |
-| **Memory** | Tier 1 only (raw history window) | Sessions are short; Postgres is source of truth |
-| **Infrastructure** | None beyond existing Postgres + Go backend | Redis, workers, queues deferred to Phase 2 |
+| Decision | Choice | Rationale | Status |
+|----------|--------|-----------|--------|
+| **UI Pattern** | Full-height resizable sidebar (reuse AIChatPanel) | Consistent with problem page UX, always-visible | Implemented |
+| **Default state** | AI panel open by default | Matches problem page behavior, increases discoverability | Implemented |
+| **Context Source** | Section-level RAG + pattern metadata from frontend | Minimizes token bloat, lower latency, cheaper | Implemented |
+| **Quick Actions** | Pattern-specific: Explain concept, Compare patterns, When to use, Walk through, Practice next | Different from problem-page (hint/review/explain) | Implemented |
+| **Backend** | New prompt templates + existing endpoints | No new API needed, just prompt variation | Implemented |
+| **Session Scope** | Per-pattern, not per-problem | Conversations are about understanding the pattern itself | Implemented |
+| **Routing** | Explicit `context_type` enum | Decoupled, future-proof for new feature types | Implemented |
+| **Memory** | Tier 1 only (raw history window) | Sessions are short; Postgres is source of truth | Implemented |
+| **RAG** | 132 pattern embeddings indexed via OpenAI text-embedding-3-small | Grounds answers in actual pattern content | Implemented |
+| **Chat history** | Per-pattern session persistence in Postgres | Sessions survive page reloads; archived via "+" button | Implemented |
+| **Highlight-to-AI** | "Ask AI" button in text selection toolbar | Lets users ask about specific text/code selections | Implemented (Added beyond v1.5 plan) |
+| **Infrastructure** | None beyond existing Postgres + Go backend | Redis, workers, queues deferred to Phase 2 | As planned |
+
+---
+
+## Implementation Summary
+
+The feature was implemented in a single iteration covering backend, frontend, RAG indexing, and chat history. Key additions beyond the v1.5 design:
+
+| Addition | Reason |
+|----------|--------|
+| Full-height resizable sidebar | Better UX — accessible while scrolling tutorial content |
+| AI panel open by default | Matches problem page; increases feature discoverability |
+| Highlight-to-AI integration | Users select text → toolbar "Ask AI" button → sends selected text as prompt |
+| Pattern chat history persistence | Sessions saved per-pattern in Postgres; archived chats viewable via history panel |
+| Footer size reduction | `py-3` (from `py-4 md:py-6`) to reduce page height for the sidebar layout |
 
 ---
 
@@ -189,41 +212,44 @@ This keeps the base prompt at **~1,200-2,700 tokens** per request, well below th
 
 ### Layout
 
-The AI panel on the patterns page follows the same pattern as the problem page — a slide-in side panel:
+The AI panel on the patterns page is a **full-height resizable sidebar** alongside the main content:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  Sticky Header: "Two Pointers" ● Medium  │ O(n) O(1) │ [Stats Ring] │ [AI] │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  [Tutorial] [Problems (12)] [Cheatsheet]          ┌──────────────────────┐  │
-│                                                    │  AI Assistant        │  │
-│  ┌────────────────────────────────────┐            │  ┌────────────────┐ │  │
-│  │ Section 1: Introduction            │            │  │ How is two     │ │  │
-│  │ Markdown content here...           │            │  │ pointer diff.. │ │  │
-│  │                                    │            │  └────────────────┘ │  │
-│  │  [Code Block ▼]                    │            │  ┌────────────────┐ │  │
-│  └────────────────────────────────────┘            │  │ Great question! │ │  │
-│                                                    │  │ Two pointers is │ │  │
-│  ┌────────────────────────────────────┐            │  │ different from │ │  │
-│  │ Section 2: Key Technique           │            │  │ sliding window  │ │  │
-│  │ ...                                │            │  │ because...      │ │  │
-│  └────────────────────────────────────┘            │  └────────────────┘ │  │
-│                                                    │                     │  │
-│  ┌────────────────────────────────────┐            │  [Quick Actions]    │  │
-│  │ Interactive Visualizer             │            │  ┌─────┬──────┬───┐ │  │
-│  └────────────────────────────────────┘            │  │Exp. │Comp. │Use│ │  │
-│                                                    │  └─────┴──────┴───┘ │  │
-│                                                    │  [Type a message...] │  │
-│                                                    └──────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌───────────────┬────────────────────────────────────────────────────────────────┐
+│               │  Back                                                        │
+│               │  Two Pointers  ● Medium  │ O(n) O(1) │ [Stats] │ [AI Toggle] │
+│  Global       ├────────────────────────────────────────────────────────────────┤
+│  Header       │  [Tutorial] [Problems (12)] [Cheatsheet]                      │
+│  (64px)       ├────────────────────────────────────────┬───────────────────────┤
+│               │                                        │  AI Assistant        │
+│               │  Section 1: Introduction               │  ┌─────────────────┐ │
+│               │  Markdown content here...              │  │ How is two      │ │
+│               │                                        │  │ pointer diff..  │ │
+│               │  Section 2: Key Technique              │  └─────────────────┘ │
+│               │  ...                                   │  ┌─────────────────┐ │
+│               │                                        │  │ Great question! │ │
+│               │  Section 3: Common Mistakes            │  │ Two pointers is │ │
+│               │  ...                                   │  │ different from  │ │
+│               │                                        │  │ sliding window  │ │
+│               │  (scrollable)                          │  └─────────────────┘ │
+│               │                                        │                     │
+│               │                                        │  [Quick Actions]    │
+│               │                                        │  [Type message...]  │
+│               │                                        │                     │
+│               │                                        │  (380px, resizable) │
+└───────────────┴────────────────────────────────────────┴───────────────────────┘
 ```
+
+The container uses `h-[calc(100vh-64px)]` to account for the global header. The sidebar is **resizable via a draggable divider** (15%-45% range, default 28%). On mobile, the panel becomes a full-screen overlay.
+
+The panel is **open by default** on both the pattern page and problem page.
 
 ### AI Toggle
 
-- **Button in sticky header**: Sparkle icon next to the stats ring
-- **Keyboard shortcut**: `Cmd+Shift+A` (same as problem page)
-- **Mobile**: Full-screen overlay (same pattern as problem page)
+- **Button in header**: Sparkle icon next to the stats ring
+- **Keyboard shortcut**: `Cmd+Shift+A`
+- **Mobile**: Full-screen overlay
+- Default state: **open**
 
 ### Quick Actions (Pattern-Specific)
 
@@ -475,7 +501,153 @@ Each action sends a pre-prompted message through the existing `sendMessage` hook
 
 ---
 
-## Conversation Memory Model
+## RAG Indexing
+
+### Pattern Content Embeddings
+
+All 15 DSA patterns from `backend/data/patterns.json` are indexed as vector embeddings in CockroachDB's `content_embeddings` table. Each pattern produces 4-9 chunks:
+
+| Chunk Type | Content | Example ID |
+|-----------|---------|------------|
+| `overview` | Pattern name + description + whenToUse | `pattern-two-pointers-overview` |
+| `insights` | Numbered key insights | `pattern-two-pointers-insights` |
+| `mistakes` | Numbered common mistakes | `pattern-two-pointers-mistakes` |
+| `template` | Per-language code templates | `pattern-two-pointers-template-java` |
+| `variation` | Per-variation descriptions | `pattern-two-pointers-variation-0` |
+
+**Total**: 132 pattern embeddings (plus 721 problem embeddings from prior indexing).
+
+### Indexing Command
+
+```bash
+cd backend && go run ./cmd/indexer/main.go --type=patterns
+# or --type=all to index both problems and patterns
+```
+
+### Retrieval During Chat
+
+When `context_type=pattern`, the backend:
+1. Generates embedding for the user's query via OpenAI `text-embedding-3-small`
+2. Searches CockroachDB with `content_type=pattern` filter (scoped to `source_id=pattern.id` when available)
+3. Returns top 4 chunks with similarity ≥ 0.6
+4. Injects results into the prompt as `<ALGOPATTERNS_KNOWLEDGE_BASE>` XML blocks
+
+### Implementation
+
+- **Indexer structs**: `indexer.go` — `Pattern`, `PatternVariation`, `IndexPattern()`, `IndexAllPatterns()`
+- **CLI**: `cmd/indexer/main.go` — JSON parsing struct, `indexPatterns()` function
+- **Service**: `service.go` — `getPatternRAGContext()` filters by `content_type=pattern`
+- **Embedding**: Uses OpenAI `text-embedding-3-small` (1536 dims) via existing `OpenAIEmbedding` provider
+
+---
+
+## Highlight-to-AI Integration
+
+### Feature
+
+Users can select any text in the tutorial content and click the **"Ask AI"** button in the selection toolbar to send the selected text as a question to the AI tutor.
+
+### UI
+
+The existing highlight toolbar (5 color buttons) now includes a separator and an "Ask AI" button:
+```
+[●] [●] [●] [●] [●] | [✨ Ask AI]
+```
+
+### Flow
+
+1. User selects text in tutorial → toolbar appears with highlight colors + "Ask AI"
+2. Clicking "Ask AI" builds a prompt: `"Please explain the following text from the '{section}' section of the {pattern} pattern:\n\n"{selected text}"`
+3. AI panel opens (if closed) and auto-sends the prompt
+4. Toolbar closes — no overlap with highlight saving
+
+### Implementation
+
+| File | Change |
+|------|--------|
+| `Highlightable.tsx` | Added `onAskAI` prop and "Ask AI" button in toolbar |
+| `AIChatPanel.tsx` | Added `initialMessage` + `initialMessageKey` props; auto-sends when key increments |
+| `PatternPageClient.tsx` | `handleAskAI` callback builds context-aware prompt, opens panel, increments key |
+| `PatternPageClient.tsx` | `handleCloseAI` clears initial message state so reopening doesn't resend |
+
+### Coexistence with Highlights
+
+The "Ask AI" button does not interfere with the existing highlight feature. Highlights (color + note) are for saving/bookmarking; "Ask AI" is for asking questions. Both use the same selection toolbar and coexist without conflict.
+
+---
+
+## Chat History & Sessions
+
+### Session Persistence
+
+Chat sessions are persisted in CockroachDB's `ai_sessions` table (created via migration `009_ai_tutor.up.sql`). Each session links to a `pattern_id`:
+
+```sql
+SELECT * FROM ai_sessions WHERE pattern_id = 'two-pointers' AND is_archived = false;
+```
+
+### History Loading
+
+When the user revisits a pattern page, the frontend loads their most recent non-archived session (within 24 hours). Archived sessions are viewable via the history panel (clock icon).
+
+### Archive Flow
+
+1. User clicks "+" (New Chat) button → current session is archived with auto-generated title (first message, truncated to 100 chars)
+2. Archived sessions appear in the history dropdown
+3. Clicking an archived session loads it in read-only mode
+
+### Backend Endpoints
+
+| Endpoint | Notes |
+|----------|-------|
+| `GET /sessions` | Returns all user sessions |
+| `GET /sessions/archived?pattern_id=X` | Returns archived sessions for a pattern (added for this feature) |
+| `POST /sessions/:id/archive` | Archives a session with optional title |
+
+### Implementation
+
+| File | Change |
+|------|--------|
+| `ai_chat_repository.go` | Added `GetArchivedSessionsForPattern()` |
+| `handler.go` | Updated `GetArchivedSessions` to accept `pattern_id` query param |
+| `ai-api.ts` | Updated `getArchivedSessions()` to accept optional `patternId` |
+| `useAIChat.ts` | History loading uses `patternId` when `problemSlug` is absent |
+| `AIChatPanel.tsx` | History button always visible, shows empty state when no saved chats |
+
+---
+
+## Files Changed
+
+### Backend
+
+| File | Change |
+|------|--------|
+| `internal/ai/prompts/templates.go` | Added `PatternTutorSystemPrompt`, `PatternChatPromptTemplate`, `BuildPatternChatPrompt()` |
+| `internal/ai/service.go` | Added `ContextType` enum, extended `ChatRequest`, routing in `Chat()`/`ChatStream()`, `getPatternRAGContext()` |
+| `internal/ai/handlers/handler.go` | Extended `ChatRequestBody`, updated `Chat`/`ChatStream`/`GetArchivedSessions` |
+| `internal/ai/rag/indexer.go` | Existing pattern indexing code (already present, now used) |
+| `internal/ai/rag/embeddings.go` | Existing OpenAI embedding provider (unchanged, reused) |
+| `internal/ai/rag/service.go` | Existing RAG service (unchanged, reused) |
+| `internal/repository/ai_chat_repository.go` | Added `GetArchivedSessionsForPattern()` |
+| `cmd/indexer/main.go` | Implemented pattern indexing via `--type=patterns` |
+| `data/patterns.json` | Existing pattern content (unchanged, indexed by indexer) |
+
+### Frontend
+
+| File | Change |
+|------|--------|
+| `src/types/ai.ts` | Added `ContextType`, `PatternQuickAction`, extended `ChatRequest` |
+| `src/lib/ai-api.ts` | Updated `chat()`, `chatStream()`, `getArchivedSessions()` for pattern fields |
+| `src/hooks/useAIChat.ts` | Extended `UseAIChatOptions`, history loading for pattern pages |
+| `src/components/ai/PatternQuickActions.tsx` | **New** — 5 pattern-specific quick actions |
+| `src/components/ai/AIChatPanel.tsx` | Pattern context support, `initialMessage`/`initialMessageKey`, history improvements |
+| `src/components/ai/index.ts` | Added `PatternQuickActions` export |
+| `src/components/ui/Highlightable.tsx` | Added `onAskAI` prop and "Ask AI" toolbar button |
+| `src/app/patterns/[slug]/PatternPageClient.tsx` | Full-height resizable sidebar, AI open by default, IntersectionObserver, Ask AI integration |
+| `src/app/patterns/[slug]/tabs/TutorialTab.tsx` | Added `data-section-id` attributes |
+| `src/app/problems/[slug]/ProblemPageClient.tsx` | AI panel open by default |
+| `src/components/layout/Footer.tsx` | Reduced padding to `py-3` |
+| `src/__tests__/PatternPageClient.test.tsx` | Added AuthContext mock, AIChatPanel mock, IntersectionObserver stub |
 
 ### Stateless Requests, Stateful Audit Trail
 
@@ -558,34 +730,61 @@ Basic injection patterns (e.g., "ignore previous instructions") are caught at th
 
 ## Implementation Plan
 
-### Phase 1: Backend Prompt Support (2 days)
+### Phase 1: Backend Prompt Support — COMPLETED
 
-| Task | Files | Description |
-|------|-------|-------------|
-| 1. Create pattern prompt template | `internal/ai/prompts/templates.go` | Add `PatternTutorPrompt` and `BuildPatternChatPrompt()` |
-| 2. Add `ContextType` routing | `internal/ai/handlers/handler.go`, `internal/ai/service.go` | Replace `pattern_id + empty code` check with explicit `context_type` enum routing |
-| 3. Add section-level context builder | `internal/ai/service.go` | Method to build RAG context from the active section (not full pattern) |
-| 4. Update rate limiter | `internal/middleware/ratelimit.go` | Add per-minute burst + per-hour cap for AI endpoints |
-| 5. Add formatting directives to system prompt | `internal/ai/prompts/templates.go` | Markdown, bolding, code block instructions |
+| Task | Files | Status |
+|------|-------|--------|
+| 1. Create pattern prompt template | `internal/ai/prompts/templates.go` | Done |
+| 2. Add `ContextType` routing | `internal/ai/handlers/handler.go`, `internal/ai/service.go` | Done |
+| 3. Add section-level context builder | `internal/ai/service.go` | Done |
+| 4. Pattern RAG indexing | `cmd/indexer/main.go` | Done (132 embeddings across 15 patterns) |
+| 5. Add formatting directives to system prompt | `internal/ai/prompts/templates.go` | Done |
 
-### Phase 2: Frontend — AI Panel on Patterns Page (2 days)
+### Phase 2: Frontend — AI Panel on Patterns Page — COMPLETED
 
-| Task | Files | Description |
-|------|-------|-------------|
-| 1. Add AI state to PatternPageClient | `PatternPageClient.tsx` | `useState` for panel open/close, pass pattern as context |
-| 2. Add throttled IntersectionObserver | `PatternPageClient.tsx` | Active section tracking at 200ms throttle |
-| 3. Add AI toggle button | `PatternPageClient.tsx` | Sparkle icon in sticky header |
-| 4. Render AIChatPanel | `PatternPageClient.tsx` | Reuse existing component, pass pattern data |
-| 5. Create PatternQuickActions component | New file | Explain, Compare, WhenToUse, WalkThrough, Practice |
-| 6. Update request payload to include `context_type` | `ai-api.ts` | Send `"context_type": "pattern"` on pattern page |
+| Task | Files | Status |
+|------|-------|--------|
+| 1. Add AI state to PatternPageClient | `PatternPageClient.tsx` | Done |
+| 2. Add throttled IntersectionObserver | `PatternPageClient.tsx` | Done (200ms throttle, `data-section-id` on TutorialTab) |
+| 3. Add AI toggle button | `PatternPageClient.tsx` | Done (sparkle icon in header) |
+| 4. Render AIChatPanel | `PatternPageClient.tsx` | Done (full-height resizable sidebar) |
+| 5. Create PatternQuickActions component | `PatternQuickActions.tsx` | Done |
+| 6. Update request payload to include `context_type` | `ai-api.ts`, `useAIChat.ts` | Done |
 
-### Phase 3: Context-Aware Features (1 day)
+### Phase 3: Context-Aware Features — COMPLETED
 
-| Task | Description |
-|------|-------------|
-| 1. Wire active section into chat requests | Send `activeSection` in every request |
-| 2. Contextual quick actions | Quick actions change based on visible section |
-| 3. Telemetry logging | Log retrieval chunks, feedback, latency to Postgres |
+| Task | Status |
+|------|--------|
+| 1. Wire active section into chat requests | Done (`activeSection` + `sectionContent` sent every request) |
+| 2. Contextual quick actions | Done (quick actions reference active section) |
+| 3. Chat history for patterns | Done (sessions persisted per-pattern, archived sessions supported) |
+| 4. Highlight-to-AI integration | Done (Added beyond plan — "Ask AI" in text selection toolbar) |
+
+### Phase 4: Polish — COMPLETED
+
+| Task | Status |
+|------|--------|
+| AI panel open by default (both pages) | Done |
+| Full-height layout (`h-[calc(100vh-64px)]`) | Done |
+| Resizable sidebar with draggable divider | Done |
+| Footer size reduction | Done |
+| Chat input visibility fix (overflow-hidden + h-full) | Done |
+| Initial message dedup (key-based, clears on close) | Done |
+
+---
+
+## Changes from v1.5 Design
+
+| Area | v1.5 (Design) | v2.0 (Implemented) |
+|------|---------------|-------------------|
+| **Layout** | Floating side panel within content | Full-height resizable sidebar alongside content |
+| **Default state** | AI panel closed by default | AI panel open by default (both pages) |
+| **Resize** | Not specified | Draggable divider, 15%-45% range, 28% default |
+| **Chat history** | Not specified | Per-pattern session persistence + archived chats |
+| **Highlight-to-AI** | Not in plan | "Ask AI" button in text selection toolbar |
+| **Footer** | Not addressed | Reduced to `py-3` for tighter vertical space |
+| **Chat input visibility** | Not addressed | Fixed with `overflow-hidden` + `h-full` chain |
+| **Mobile** | Overlay panel | Same — full-screen overlay on mobile |
 
 ---
 

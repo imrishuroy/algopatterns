@@ -137,7 +137,7 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
   return (
     <div className="space-y-14">
       {pattern.tutorial!.map((section, idx) => (
-        <article key={idx} className="scroll-mt-24" id={`section-${idx}`}>
+        <article key={idx} className="scroll-mt-24" id={`section-${idx}`} data-section-id={section.title}>
           {/* Section Header - Simple numbering */}
           <div className="flex items-baseline gap-3 mb-6">
             <span className="text-indigo-400 font-mono text-lg">

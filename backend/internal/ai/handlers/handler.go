@@ -63,6 +63,13 @@ type ChatRequestBody struct {
 	ProblemTitle       string                `json:"problem_title"`
 	ProblemDescription string                `json:"problem_description"`
 	PatternID          string                `json:"pattern_id"`
+	PatternName        string                `json:"pattern_name"`
+	PatternDifficulty  string                `json:"pattern_difficulty"`
+	TimeComplexity     string                `json:"time_complexity"`
+	SpaceComplexity    string                `json:"space_complexity"`
+	SectionContent     string                `json:"section_content"`
+	ActiveSection      string                `json:"active_section"`
+	ContextType        string                `json:"context_type"`
 	Code               string                `json:"code"`
 	Language           string                `json:"language"`
 	History            []ConversationMessage `json:"history"`
@@ -126,6 +133,13 @@ func (h *Handler) Chat(c *gin.Context) {
 		ProblemTitle:       req.ProblemTitle,
 		ProblemDescription: req.ProblemDescription,
 		PatternID:          req.PatternID,
+		PatternName:        req.PatternName,
+		PatternDifficulty:  req.PatternDifficulty,
+		TimeComplexity:     req.TimeComplexity,
+		SpaceComplexity:    req.SpaceComplexity,
+		SectionContent:     req.SectionContent,
+		ActiveSection:      req.ActiveSection,
+		ContextType:        ai.ContextType(req.ContextType),
 		Code:               req.Code,
 		Language:           req.Language,
 		History:            history,
@@ -204,6 +218,13 @@ func (h *Handler) ChatStream(c *gin.Context) {
 		ProblemTitle:       req.ProblemTitle,
 		ProblemDescription: req.ProblemDescription,
 		PatternID:          req.PatternID,
+		PatternName:        req.PatternName,
+		PatternDifficulty:  req.PatternDifficulty,
+		TimeComplexity:     req.TimeComplexity,
+		SpaceComplexity:    req.SpaceComplexity,
+		SectionContent:     req.SectionContent,
+		ActiveSection:      req.ActiveSection,
+		ContextType:        ai.ContextType(req.ContextType),
 		Code:               req.Code,
 		Language:           req.Language,
 		Stream:             true,
@@ -504,7 +525,7 @@ func (h *Handler) ArchiveSession(c *gin.Context) {
 	response.OK(c, gin.H{"archived": true})
 }
 
-// GetArchivedSessions returns archived sessions for a problem
+// GetArchivedSessions returns archived sessions for a problem or pattern
 func (h *Handler) GetArchivedSessions(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
@@ -513,12 +534,22 @@ func (h *Handler) GetArchivedSessions(c *gin.Context) {
 	}
 
 	problemSlug := c.Query("problem_slug")
-	if problemSlug == "" {
-		response.BadRequest(c, "problem_slug query param is required", nil)
+	patternID := c.Query("pattern_id")
+
+	if problemSlug == "" && patternID == "" {
+		response.BadRequest(c, "problem_slug or pattern_id query param is required", nil)
 		return
 	}
 
-	sessions, err := h.chatRepo.GetArchivedSessionsForProblem(c.Request.Context(), userID.String(), problemSlug, 20)
+	var sessions []repository.AISession
+	var err error
+
+	if patternID != "" {
+		sessions, err = h.chatRepo.GetArchivedSessionsForPattern(c.Request.Context(), userID.String(), patternID, 20)
+	} else {
+		sessions, err = h.chatRepo.GetArchivedSessionsForProblem(c.Request.Context(), userID.String(), problemSlug, 20)
+	}
+
 	if err != nil {
 		response.InternalError(c)
 		return

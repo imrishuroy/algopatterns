@@ -242,7 +242,7 @@ func TestNVIDIAProviderChat_APIError(t *testing.T) {
 func TestNVIDIAProviderChat_EmptyChoices(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		resp := nvidiaResponse{
-			Model:   "test",
+			Model: "test",
 			Choices: []struct {
 				Index   int `json:"index"`
 				Message struct {
@@ -427,7 +427,6 @@ func TestNVIDIAProviderChatStream_FallbackReasoning(t *testing.T) {
 			t.Fatal(chunk.Error)
 		}
 		assert.Equal(t, "fallback", chunk.ReasoningContent)
-		break
 	}
 }
 

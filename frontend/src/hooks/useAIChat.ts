@@ -2,13 +2,20 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { aiApiClient, type AISessionData } from "@/lib/ai-api";
-import type { AIMessage, ChatRequest, ConversationMessage } from "@/types/ai";
+import type { AIMessage, ChatRequest, ConversationMessage, ContextType } from "@/types/ai";
 
 interface UseAIChatOptions {
   problemSlug?: string;
   problemTitle?: string;
   problemDescription?: string;
   patternId?: string;
+  patternName?: string;
+  patternDifficulty?: string;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+  sectionContent?: string;
+  activeSection?: string;
+  contextType?: ContextType;
   code?: string;
   language?: string;
   errorMessage?: string;
@@ -24,26 +31,31 @@ export function useAIChat(options: UseAIChatOptions = {}) {
   const abortRef = useRef<(() => void) | null>(null);
   const historyLoadedRef = useRef<string | null>(null);
 
-  // Load chat history and archived sessions when problem changes
+  // Load chat history and archived sessions when problem/pattern changes
   useEffect(() => {
     const loadHistory = async () => {
-      if (!options.problemSlug) return;
+      const contextKey = options.problemSlug || options.patternId;
+      if (!contextKey) return;
 
-      // Don't reload if we already loaded for this problem
-      if (historyLoadedRef.current === options.problemSlug) return;
+      // Don't reload if we already loaded for this context
+      if (historyLoadedRef.current === contextKey) return;
 
       setIsLoadingHistory(true);
       try {
         // Load active session and archived sessions in parallel
         const [sessionsRes, archivedRes] = await Promise.all([
           aiApiClient.getSessions(),
-          aiApiClient.getArchivedSessions(options.problemSlug),
+          aiApiClient.getArchivedSessions(options.problemSlug, options.patternId),
         ]);
 
         if (sessionsRes.success && sessionsRes.data.sessions) {
-          // Find active session for this problem
+          // Find active session for this context
           const session = sessionsRes.data.sessions.find(
-            s => s.problem_slug === options.problemSlug && !s.is_archived
+            s => {
+              if (options.problemSlug) return s.problem_slug === options.problemSlug && !s.is_archived;
+              if (options.patternId) return s.pattern_id === options.patternId && !s.is_archived;
+              return false;
+            }
           );
 
           if (session) {
@@ -65,7 +77,7 @@ export function useAIChat(options: UseAIChatOptions = {}) {
           setArchivedSessions(archivedRes.data.sessions);
         }
 
-        historyLoadedRef.current = options.problemSlug;
+        historyLoadedRef.current = contextKey;
       } catch {
         // Silently fail - history loading is not critical
       } finally {
@@ -74,7 +86,7 @@ export function useAIChat(options: UseAIChatOptions = {}) {
     };
 
     loadHistory();
-  }, [options.problemSlug]);
+  }, [options.problemSlug, options.patternId]);
 
   const sendMessage = useCallback(
     async (content: string, useStreaming = true) => {
@@ -119,6 +131,13 @@ export function useAIChat(options: UseAIChatOptions = {}) {
         problemTitle: options.problemTitle,
         problemDescription: options.problemDescription,
         patternId: options.patternId,
+        patternName: options.patternName,
+        patternDifficulty: options.patternDifficulty,
+        timeComplexity: options.timeComplexity,
+        spaceComplexity: options.spaceComplexity,
+        sectionContent: options.sectionContent,
+        activeSection: options.activeSection,
+        contextType: options.contextType,
         code: options.code,
         language: options.language,
         history: history.length > 0 ? history : undefined,
@@ -195,7 +214,7 @@ export function useAIChat(options: UseAIChatOptions = {}) {
         setIsLoading(false);
       }
     },
-    [options.problemSlug, options.problemTitle, options.problemDescription, options.patternId, options.code, options.language, options.errorMessage, messages]
+    [options.problemSlug, options.problemTitle, options.problemDescription, options.patternId, options.patternName, options.patternDifficulty, options.timeComplexity, options.spaceComplexity, options.sectionContent, options.activeSection, options.contextType, options.code, options.language, options.errorMessage, messages]
   );
 
   const stopStreaming = useCallback(() => {
@@ -243,8 +262,8 @@ export function useAIChat(options: UseAIChatOptions = {}) {
       await aiApiClient.archiveSession(sessionId, title);
 
       // Add to archived sessions list
-      if (options.problemSlug) {
-        const archivedRes = await aiApiClient.getArchivedSessions(options.problemSlug);
+      if (options.problemSlug || options.patternId) {
+        const archivedRes = await aiApiClient.getArchivedSessions(options.problemSlug, options.patternId);
         if (archivedRes.success && archivedRes.data.sessions) {
           setArchivedSessions(archivedRes.data.sessions);
         }
@@ -256,7 +275,7 @@ export function useAIChat(options: UseAIChatOptions = {}) {
     setMessages([]);
     setError(null);
     setSessionId(null);
-  }, [sessionId, messages, options.problemSlug]);
+  }, [sessionId, messages, options.problemSlug, options.patternId]);
 
   // Load messages from an archived session (read-only view)
   const loadArchivedSession = useCallback(async (archivedSessionId: string) => {

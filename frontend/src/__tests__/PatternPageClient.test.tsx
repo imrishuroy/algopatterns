@@ -76,7 +76,27 @@ vi.mock("@/components/pricing", () => ({
   UpgradePrompt: () => <div data-testid="upgrade-prompt">Upgrade Required</div>,
 }));
 
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({
+    isAuthenticated: true,
+    user: { id: "test-user", name: "Test User" },
+    isLoading: false,
+  }),
+}));
+
+vi.mock("@/components/ai", () => ({
+  AIChatPanel: () => <div data-testid="ai-chat-panel">AI Chat Panel</div>,
+}));
+
 let mockTabParam: string | null = null;
+
+class MockIntersectionObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+  constructor(_callback: IntersectionObserverCallback, _options?: IntersectionObserverInit) {}
+}
+vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
 
 const mockPattern: Pattern = {
   id: "binary-search",

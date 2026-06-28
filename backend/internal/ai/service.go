@@ -65,6 +65,15 @@ func mapHistory(history []ConversationMessage) []prompts.ConversationTurn {
 	return turns
 }
 
+// ContextType discriminates between different AI tutor contexts
+type ContextType string
+
+const (
+	ContextProblem ContextType = "problem"
+	ContextPattern ContextType = "pattern"
+	ContextGeneral ContextType = "general"
+)
+
 // ChatRequest represents a chat request
 type ChatRequest struct {
 	SessionID          string
@@ -73,6 +82,13 @@ type ChatRequest struct {
 	ProblemTitle       string
 	ProblemDescription string
 	PatternID          string
+	PatternName        string
+	PatternDifficulty  string
+	TimeComplexity     string
+	SpaceComplexity    string
+	SectionContent     string
+	ActiveSection      string
+	ContextType        ContextType
 	Code               string
 	Language           string
 	Stream             bool
@@ -156,30 +172,46 @@ func (s *Service) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, err
 		return nil, err
 	}
 
-	// Get RAG context and map history
-	ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Message+" "+req.ProblemTitle, req.Language)
 	turns := mapHistory(req.History)
-	systemPrompt := prompts.BuildChatPrompt(req.ProblemTitle, req.Language, turns, ragContext)
+
+	var systemPrompt string
+	var userContent strings.Builder
+
+	if req.ContextType == ContextPattern {
+		ragContext := s.getPatternRAGContext(ctx, req.PatternID, req.Message)
+		systemPrompt = prompts.BuildPatternChatPrompt(
+			req.PatternName,
+			req.PatternDifficulty,
+			req.TimeComplexity,
+			req.SpaceComplexity,
+			req.SectionContent,
+			req.ActiveSection,
+			req.Language,
+			turns,
+			ragContext,
+		)
+
+		userContent.WriteString(req.Message)
+	} else {
+		ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Message+" "+req.ProblemTitle, req.Language)
+		systemPrompt = prompts.BuildChatPrompt(req.ProblemTitle, req.Language, turns, ragContext)
+
+		if req.ProblemDescription != "" {
+			userContent.WriteString(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s\n\n", req.ProblemDescription))
+		}
+		if req.Code != "" {
+			userContent.WriteString(fmt.Sprintf("MY CURRENT CODE:\n```%s\n%s\n```\n\n", req.Language, req.Code))
+		}
+		if req.ErrorMessage != "" {
+			userContent.WriteString(fmt.Sprintf("ERROR FROM RUNNING MY CODE:\n```\n%s\n```\n\n", req.ErrorMessage))
+		}
+		userContent.WriteString(req.Message)
+	}
 
 	messages := []llm.Message{
 		llm.SystemMessage(systemPrompt),
+		llm.UserMessage(userContent.String()),
 	}
-
-	// Build a comprehensive user message.
-	// (Note: History is already baked into the System Prompt via the prompts package)
-	var userContent strings.Builder
-	if req.ProblemDescription != "" {
-		userContent.WriteString(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s\n\n", req.ProblemDescription))
-	}
-	if req.Code != "" {
-		userContent.WriteString(fmt.Sprintf("MY CURRENT CODE:\n```%s\n%s\n```\n\n", req.Language, req.Code))
-	}
-	if req.ErrorMessage != "" {
-		userContent.WriteString(fmt.Sprintf("ERROR FROM RUNNING MY CODE:\n```\n%s\n```\n\n", req.ErrorMessage))
-	}
-	userContent.WriteString(req.Message)
-
-	messages = append(messages, llm.UserMessage(userContent.String()))
 
 	llmReq := llm.ChatRequest{
 		Messages:    messages,
@@ -215,28 +247,46 @@ func (s *Service) ChatStream(ctx context.Context, req ChatRequest) (<-chan llm.S
 		return nil, err
 	}
 
-	// Get RAG context and map history
-	ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Message+" "+req.ProblemTitle, req.Language)
 	turns := mapHistory(req.History)
-	systemPrompt := prompts.BuildChatPrompt(req.ProblemTitle, req.Language, turns, ragContext)
+
+	var systemPrompt string
+	var userContent strings.Builder
+
+	if req.ContextType == ContextPattern {
+		ragContext := s.getPatternRAGContext(ctx, req.PatternID, req.Message)
+		systemPrompt = prompts.BuildPatternChatPrompt(
+			req.PatternName,
+			req.PatternDifficulty,
+			req.TimeComplexity,
+			req.SpaceComplexity,
+			req.SectionContent,
+			req.ActiveSection,
+			req.Language,
+			turns,
+			ragContext,
+		)
+
+		userContent.WriteString(req.Message)
+	} else {
+		ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Message+" "+req.ProblemTitle, req.Language)
+		systemPrompt = prompts.BuildChatPrompt(req.ProblemTitle, req.Language, turns, ragContext)
+
+		if req.ProblemDescription != "" {
+			userContent.WriteString(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s\n\n", req.ProblemDescription))
+		}
+		if req.Code != "" {
+			userContent.WriteString(fmt.Sprintf("MY CURRENT CODE:\n```%s\n%s\n```\n\n", req.Language, req.Code))
+		}
+		if req.ErrorMessage != "" {
+			userContent.WriteString(fmt.Sprintf("ERROR FROM RUNNING MY CODE:\n```\n%s\n```\n\n", req.ErrorMessage))
+		}
+		userContent.WriteString(req.Message)
+	}
 
 	messages := []llm.Message{
 		llm.SystemMessage(systemPrompt),
+		llm.UserMessage(userContent.String()),
 	}
-
-	var userContent strings.Builder
-	if req.ProblemDescription != "" {
-		userContent.WriteString(fmt.Sprintf("PROBLEM DESCRIPTION:\n%s\n\n", req.ProblemDescription))
-	}
-	if req.Code != "" {
-		userContent.WriteString(fmt.Sprintf("MY CURRENT CODE:\n```%s\n%s\n```\n\n", req.Language, req.Code))
-	}
-	if req.ErrorMessage != "" {
-		userContent.WriteString(fmt.Sprintf("ERROR FROM RUNNING MY CODE:\n```\n%s\n```\n\n", req.ErrorMessage))
-	}
-	userContent.WriteString(req.Message)
-
-	messages = append(messages, llm.UserMessage(userContent.String()))
 
 	llmReq := llm.ChatRequest{
 		Messages:    messages,
@@ -445,6 +495,30 @@ func (s *Service) getRAGContext(ctx context.Context, _, query, language string) 
 	})
 	if err != nil {
 		log.Warn().Err(err).Msg("RAG search failed, continuing without context")
+		return ""
+	}
+
+	return s.ragService.BuildRAGContext(results)
+}
+
+// getPatternRAGContext retrieves relevant pattern content for pattern tutoring
+func (s *Service) getPatternRAGContext(ctx context.Context, patternID, query string) string {
+	if s.ragService == nil || !s.config.Features.EnableRAG {
+		return ""
+	}
+
+	opts := rag.SearchOptions{
+		ContentType: "pattern",
+		Limit:       4,
+		MinScore:    0.6,
+	}
+	if patternID != "" {
+		opts.SourceID = patternID
+	}
+
+	results, err := s.ragService.SearchContext(ctx, query, opts)
+	if err != nil {
+		log.Warn().Err(err).Msg("Pattern RAG search failed, continuing without context")
 		return ""
 	}
 

@@ -276,7 +276,7 @@ export default function ProblemPageClient({ params }: PageProps) {
   const [showSolution, setShowSolution] = useState(false);
 
   // AI Tutor state
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
+  const [isAIChatOpen, setIsAIChatOpen] = useState(true);
   const [errorForAI, setErrorForAI] = useState<string | undefined>();
 
   // Editor instance for inline AI

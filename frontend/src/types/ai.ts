@@ -14,6 +14,8 @@ export interface AISession {
   createdAt: Date;
 }
 
+export type ContextType = "problem" | "pattern" | "general";
+
 export interface HintRequest {
   problemSlug: string;
   problemTitle: string;
@@ -69,6 +71,13 @@ export interface ChatRequest {
   problemTitle?: string;
   problemDescription?: string;
   patternId?: string;
+  patternName?: string;
+  patternDifficulty?: string;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+  sectionContent?: string;
+  activeSection?: string;
+  contextType?: ContextType;
   code?: string;
   language?: string;
   history?: ConversationMessage[];
@@ -83,3 +92,10 @@ export interface ChatResponse {
 }
 
 export type AIFeatureType = "chat" | "hint" | "review" | "explain";
+
+export type PatternQuickAction =
+  | "explain"
+  | "compare"
+  | "whenToUse"
+  | "walkThrough"
+  | "practiceNext";

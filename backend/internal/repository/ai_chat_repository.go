@@ -261,6 +261,44 @@ func (r *AIChatRepository) GetArchivedSessionsForProblem(ctx context.Context, us
 	return sessions, nil
 }
 
+// GetArchivedSessionsForPattern retrieves archived sessions for a specific pattern
+func (r *AIChatRepository) GetArchivedSessionsForPattern(ctx context.Context, userID string, patternID string, limit int) ([]AISession, error) {
+	if limit <= 0 {
+		limit = 10
+	}
+
+	query := `
+		SELECT s.id, s.user_id, s.problem_id, p.slug, s.pattern_id, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
+		FROM ai_sessions s
+		LEFT JOIN problems p ON s.problem_id = p.id
+		WHERE s.user_id = $1
+		AND s.pattern_id = $2
+		AND s.is_archived = true
+		ORDER BY s.last_message_at DESC
+		LIMIT $3
+	`
+
+	rows, err := r.db.Pool.Query(ctx, query, userID, patternID, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sessions []AISession
+	for rows.Next() {
+		var s AISession
+		if err := rows.Scan(
+			&s.ID, &s.UserID, &s.ProblemID, &s.ProblemSlug, &s.PatternID,
+			&s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
+		); err != nil {
+			return nil, err
+		}
+		sessions = append(sessions, s)
+	}
+
+	return sessions, nil
+}
+
 // ClearSession deletes all messages in a session
 func (r *AIChatRepository) ClearSession(ctx context.Context, sessionID string, userID string) error {
 	// Verify ownership first

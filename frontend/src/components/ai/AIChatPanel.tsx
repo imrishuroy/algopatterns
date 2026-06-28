@@ -5,15 +5,27 @@ import { useAIChat } from "@/hooks/useAIChat";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { QuickActions } from "./QuickActions";
+import { PatternQuickActions } from "./PatternQuickActions";
 import { useAuth } from "@/contexts/AuthContext";
+import type { ContextType, PatternQuickAction } from "@/types/ai";
 
 interface AIChatPanelProps {
-  problemSlug: string;
-  problemTitle: string;
-  problemDescription: string;
-  code: string;
-  language: string;
+  problemSlug?: string;
+  problemTitle?: string;
+  problemDescription?: string;
+  patternId?: string;
+  patternName?: string;
+  patternDifficulty?: string;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+  activeSection?: string;
+  sectionContent?: string;
+  contextType?: ContextType;
+  code?: string;
+  language?: string;
   errorMessage?: string;
+  initialMessage?: string;
+  initialMessageKey?: number;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -22,9 +34,19 @@ export function AIChatPanel({
   problemSlug,
   problemTitle,
   problemDescription,
+  patternId,
+  patternName,
+  patternDifficulty,
+  timeComplexity,
+  spaceComplexity,
+  activeSection,
+  sectionContent,
+  contextType,
   code,
   language,
   errorMessage,
+  initialMessage,
+  initialMessageKey,
   isOpen,
   onClose,
 }: AIChatPanelProps) {
@@ -49,6 +71,14 @@ export function AIChatPanel({
     problemSlug,
     problemTitle,
     problemDescription,
+    patternId,
+    patternName,
+    patternDifficulty,
+    timeComplexity,
+    spaceComplexity,
+    sectionContent,
+    activeSection,
+    contextType,
     code,
     language,
     errorMessage,
@@ -69,9 +99,25 @@ export function AIChatPanel({
     [sendMessage]
   );
 
+  const handlePatternQuickAction = useCallback(
+    (_action: PatternQuickAction, message: string) => {
+      sendMessage(message);
+    },
+    [sendMessage]
+  );
+
   const handleHintUsed = useCallback(() => {
     setHintLevel((prev) => Math.min(prev + 1, 4));
   }, []);
+
+  const initialMessageRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (initialMessage && (initialMessageKey ?? 0) > initialMessageRef.current && isOpen) {
+      initialMessageRef.current = initialMessageKey ?? 0;
+      sendMessage(initialMessage);
+    }
+  }, [initialMessage, initialMessageKey, isOpen, sendMessage]);
 
   if (!isOpen) return null;
 
@@ -82,24 +128,22 @@ export function AIChatPanel({
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-white">AI Assistant</span>
           <span className="text-[10px] text-gray-500 px-1.5 py-0.5 bg-gray-800 rounded">
-            {isViewingArchived ? "Archived" : "Socratic"}
+            {isViewingArchived ? "Archived" : contextType === "pattern" ? "Pattern" : "Socratic"}
           </span>
         </div>
         <div className="flex items-center gap-1">
           {/* History toggle */}
-          {archivedSessions.length > 0 && (
-            <button
-              onClick={() => setShowHistory(!showHistory)}
-              className={`p-1.5 rounded transition-colors ${
-                showHistory ? "text-indigo-400 bg-indigo-900/30" : "text-gray-500 hover:text-white hover:bg-gray-800"
-              }`}
-              title="Chat history"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </button>
-          )}
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className={`p-1.5 rounded transition-colors ${
+              showHistory ? "text-indigo-400 bg-indigo-900/30" : "text-gray-500 hover:text-white hover:bg-gray-800"
+            }`}
+            title="Chat history"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
           {/* New chat button */}
           {messages.length > 0 && !isViewingArchived && (
             <button
@@ -158,43 +202,58 @@ export function AIChatPanel({
       </div>
 
       {/* History Panel */}
-      {showHistory && archivedSessions.length > 0 && (
+      {showHistory && (
         <div className="border-b border-gray-800 bg-gray-900/50 max-h-32 overflow-y-auto">
-          <div className="px-3 py-1.5 text-[10px] text-gray-500 uppercase tracking-wide">Previous Chats</div>
-          {archivedSessions.map((session) => (
-            <button
-              key={session.id}
-              onClick={() => {
-                loadArchivedSession(session.id);
-                setShowHistory(false);
-              }}
-              className="w-full px-3 py-2 text-left hover:bg-gray-800 transition-colors border-t border-gray-800/50"
-            >
-              <div className="text-xs text-gray-300 truncate">
-                {session.title || "Untitled chat"}
-              </div>
-              <div className="text-[10px] text-gray-500">
-                {new Date(session.last_message_at).toLocaleDateString()} · {session.message_count} messages
-              </div>
-            </button>
-          ))}
+          {archivedSessions.length > 0 ? (
+            <>
+              <div className="px-3 py-1.5 text-[10px] text-gray-500 uppercase tracking-wide">Previous Chats</div>
+              {archivedSessions.map((session) => (
+                <button
+                  key={session.id}
+                  onClick={() => {
+                    loadArchivedSession(session.id);
+                    setShowHistory(false);
+                  }}
+                  className="w-full px-3 py-2 text-left hover:bg-gray-800 transition-colors border-t border-gray-800/50"
+                >
+                  <div className="text-xs text-gray-300 truncate">
+                    {session.title || "Untitled chat"}
+                  </div>
+                  <div className="text-[10px] text-gray-500">
+                    {new Date(session.last_message_at).toLocaleDateString()} · {session.message_count} messages
+                  </div>
+                </button>
+              ))}
+            </>
+          ) : (
+            <div className="px-3 py-3 text-center text-xs text-gray-500">
+              No saved chats yet. Click <span className="text-gray-400">+</span> to save the current one.
+            </div>
+          )}
         </div>
       )}
 
       {/* Quick Actions */}
-      {isAuthenticated && (
+      {isAuthenticated && contextType === "pattern" && patternId && patternName ? (
+        <PatternQuickActions
+          patternId={patternId}
+          patternName={patternName}
+          activeSection={activeSection || ""}
+          onAction={handlePatternQuickAction}
+        />
+      ) : isAuthenticated && contextType !== "pattern" ? (
         <QuickActions
-          problemSlug={problemSlug}
-          problemTitle={problemTitle}
+          problemSlug={problemSlug || ""}
+          problemTitle={problemTitle || ""}
           problemDescription={problemDescription}
-          code={code}
-          language={language}
+          code={code || ""}
+          language={language || ""}
           errorMessage={errorMessage}
           hintLevel={hintLevel}
           onHintUsed={handleHintUsed}
           onResult={handleQuickActionResult}
         />
-      )}
+      ) : null}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3">
@@ -227,7 +286,11 @@ export function AIChatPanel({
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">
-            <p className="text-sm text-gray-400 mb-2">Ask about the problem or use quick actions above</p>
+            <p className="text-sm text-gray-400 mb-2">
+              {contextType === "pattern"
+                ? "Ask about the pattern or use quick actions above"
+                : "Ask about the problem or use quick actions above"}
+            </p>
             <p className="text-xs text-gray-500">I guide with questions, not answers</p>
           </div>
         ) : (

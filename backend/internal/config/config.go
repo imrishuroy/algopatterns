@@ -22,21 +22,21 @@ type Config struct {
 }
 
 type AIConfig struct {
-	Enabled           bool
-	DefaultProvider   string
-	FallbackProviders []string
-	ClaudeAPIKey  string
-	ClaudeModel   string
-	ClaudeBaseURL string
-	DeepSeekAPIKey string
-	DeepSeekModel  string
-	GroqAPIKey string
-	GroqModel  string
-	NVIDIAAPIKey string
-	NVIDIAModel  string
-	OpenAIAPIKey string
-	OpenAIModel  string
-	EmbeddingModel string
+	Enabled            bool
+	DefaultProvider    string
+	FallbackProviders  []string
+	ClaudeAPIKey       string
+	ClaudeModel        string
+	ClaudeBaseURL      string
+	DeepSeekAPIKey     string
+	DeepSeekModel      string
+	GroqAPIKey         string
+	GroqModel          string
+	NVIDIAAPIKey       string
+	NVIDIAModel        string
+	OpenAIAPIKey       string
+	OpenAIModel        string
+	EmbeddingModel     string
 	FreeRequestsPerDay int
 	MaxCodeLength      int
 }

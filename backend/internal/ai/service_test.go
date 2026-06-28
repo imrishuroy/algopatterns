@@ -14,12 +14,12 @@ import (
 
 // stubProvider implements llm.Provider for testing.
 type stubProvider struct {
-	name       string
-	chatFn     func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error)
-	streamFn   func(ctx context.Context, req llm.ChatRequest) (<-chan llm.StreamChunk, error)
-	healthFn   func(ctx context.Context) error
-	calls      []string
-	mu         sync.Mutex
+	name     string
+	chatFn   func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error)
+	streamFn func(ctx context.Context, req llm.ChatRequest) (<-chan llm.StreamChunk, error)
+	healthFn func(ctx context.Context) error
+	calls    []string
+	mu       sync.Mutex
 }
 
 func (s *stubProvider) Chat(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {

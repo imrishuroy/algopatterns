@@ -95,7 +95,7 @@ export function AIChatPanel({
   }, [messages, scrollToBottom]);
 
   const handleQuickActionResult = useCallback(
-    (result: string, _type: "hint" | "review" | "explain") => {
+    () => {
       sendMessage(`[Received AI response]`, false);
     },
     [sendMessage]

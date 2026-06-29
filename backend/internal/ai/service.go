@@ -531,7 +531,7 @@ func (s *Service) IsEnabled() bool {
 }
 
 // FilterSolutionContent checks if response might contain a solution
-func (s *Service) FilterSolutionContent(response, problemSlug string) bool {
+func (s *Service) FilterSolutionContent(response string, _ string) bool {
 	indicators := []string{
 		"here's the solution",
 		"the complete code",
@@ -547,12 +547,7 @@ func (s *Service) FilterSolutionContent(response, problemSlug string) bool {
 		}
 	}
 
-	codeBlockLines := countCodeBlockLines(response)
-	if codeBlockLines > 15 {
-		return true
-	}
-
-	return false
+	return countCodeBlockLines(response) > 15
 }
 
 func countCodeBlockLines(s string) int {

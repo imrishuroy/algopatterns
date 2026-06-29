@@ -51,7 +51,7 @@ function MessageContent({ content, isStreaming }: { content: string; isStreaming
             const [, lang, code] = match;
             return (
               <pre
-                key={index}
+                key={`code-${index}`}
                 className="bg-gray-900 rounded-md p-2 my-2 overflow-x-auto text-xs font-mono"
               >
                 {lang && (
@@ -62,7 +62,7 @@ function MessageContent({ content, isStreaming }: { content: string; isStreaming
             );
           }
         }
-        return <FormattedText key={index} text={part} />;
+        return <FormattedText key={`text-${index}`} text={part} />;
       })}
     </div>
   );
@@ -154,7 +154,7 @@ function FormattedText({ text }: { text: string }) {
 
   flushParagraph();
 
-  return <>{elements}</>;
+  return elements;
 }
 
 function formatInlineText(text: string): React.ReactNode {

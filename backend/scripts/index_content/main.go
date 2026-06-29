@@ -24,16 +24,19 @@ func main() {
 
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to load configuration")
+		log.Error().Err(err).Msg("Failed to load configuration")
+		return
 	}
 
 	if cfg.AI.OpenAIAPIKey == "" {
-		log.Fatal().Msg("OPENAI_API_KEY is required for embeddings")
+		log.Error().Msg("OPENAI_API_KEY is required for embeddings")
+		return
 	}
 
 	db, err := repository.NewDatabase(&cfg.Database)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to database")
+		log.Error().Err(err).Msg("Failed to connect to database")
+		return
 	}
 	defer db.Close()
 
@@ -53,14 +56,16 @@ func main() {
 
 	patterns, err := loadPatterns(*patternsFile)
 	if err != nil {
-		log.Fatal().Err(err).Str("file", *patternsFile).Msg("Failed to load patterns")
+		log.Error().Err(err).Str("file", *patternsFile).Msg("Failed to load patterns")
+		return
 	}
 
 	log.Info().Int("count", len(patterns)).Msg("Loaded patterns")
 
 	if !*dryRun {
 		if err := indexer.IndexAllPatterns(ctx, patterns); err != nil {
-			log.Fatal().Err(err).Msg("Failed to index patterns")
+			log.Error().Err(err).Msg("Failed to index patterns")
+			return
 		}
 	} else {
 		for _, p := range patterns {

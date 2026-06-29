@@ -115,7 +115,7 @@ func TestGroqProviderChat_Success(t *testing.T) {
 }
 
 func TestGroqProviderChat_RateLimited(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusTooManyRequests)
 	}))
 	defer srv.Close()
@@ -128,7 +128,7 @@ func TestGroqProviderChat_RateLimited(t *testing.T) {
 }
 
 func TestGroqProviderChat_APIError(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"error": "bad request"}`))
 	}))
@@ -144,7 +144,7 @@ func TestGroqProviderChat_APIError(t *testing.T) {
 }
 
 func TestGroqProviderChat_EmptyChoices(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		resp := groqResponse{
 			ID:      "chatcmpl-123",
 			Object:  "chat.completion",
@@ -277,7 +277,7 @@ func TestGroqProviderChatStream_Success(t *testing.T) {
 }
 
 func TestGroqProviderChatStream_RateLimited(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusTooManyRequests)
 	}))
 	defer srv.Close()
@@ -290,7 +290,7 @@ func TestGroqProviderChatStream_RateLimited(t *testing.T) {
 }
 
 func TestGroqProviderChatStream_APIError(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"error": "server error"}`))
 	}))
@@ -314,7 +314,7 @@ func TestGroqProviderChatStream_RequestError(t *testing.T) {
 }
 
 func TestGroqProviderChatStream_FinishReason(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		w.WriteHeader(http.StatusOK)
 
@@ -365,7 +365,7 @@ func TestGroqProviderChatStream_FinishReason(t *testing.T) {
 }
 
 func TestGroqProviderHealthCheck(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		resp := groqResponse{
 			Model: "test",
 			Choices: []struct {
@@ -397,7 +397,7 @@ func TestGroqProviderHealthCheck(t *testing.T) {
 }
 
 func TestGroqProviderHealthCheck_Failure(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 	}))
 	defer srv.Close()

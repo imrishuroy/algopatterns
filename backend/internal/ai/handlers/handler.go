@@ -246,7 +246,7 @@ func (h *Handler) ChatStream(c *gin.Context) {
 	// Collect full response for saving
 	var fullResponse string
 
-	c.Stream(func(w io.Writer) bool {
+	c.Stream(func(_ io.Writer) bool {
 		if chunk, ok := <-chunks; ok {
 			if chunk.Error != nil {
 				c.SSEvent("error", gin.H{"error": chunk.Error.Error()})
@@ -424,7 +424,7 @@ func (h *Handler) handleError(c *gin.Context, err error) {
 	}
 }
 
-// GetSessions returns the user's recent AI chat sessions
+// GetSessions handles request for user's AI chat sessions
 func (h *Handler) GetSessions(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
@@ -441,7 +441,7 @@ func (h *Handler) GetSessions(c *gin.Context) {
 	response.OK(c, gin.H{"sessions": sessions})
 }
 
-// GetSessionMessages returns all messages for a session
+// GetSessionMessages handles request for session messages
 func (h *Handler) GetSessionMessages(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
@@ -525,7 +525,7 @@ func (h *Handler) ArchiveSession(c *gin.Context) {
 	response.OK(c, gin.H{"archived": true})
 }
 
-// GetArchivedSessions returns archived sessions for a problem or pattern
+// GetArchivedSessions handles request for archived sessions
 func (h *Handler) GetArchivedSessions(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {

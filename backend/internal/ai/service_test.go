@@ -140,7 +140,7 @@ func TestChat_Success(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
 		name: "stub",
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
 			assert.Len(t, req.Messages, 2)
 			assert.Equal(t, "system", req.Messages[0].Role)
 			assert.Equal(t, "user", req.Messages[1].Role)
@@ -188,7 +188,7 @@ func TestChat_Success(t *testing.T) {
 func TestChat_ProviderFailure(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
 			return nil, errors.New("provider error")
 		},
 	})
@@ -248,7 +248,7 @@ func TestChatStream_StreamingDisabled(t *testing.T) {
 func TestChatStream_Success(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		streamFn: func(ctx context.Context, req llm.ChatRequest) (<-chan llm.StreamChunk, error) {
+		streamFn: func(_ context.Context, _ llm.ChatRequest) (<-chan llm.StreamChunk, error) {
 			ch := make(chan llm.StreamChunk, 2)
 			ch <- llm.StreamChunk{Content: "Hello"}
 			ch <- llm.StreamChunk{Done: true}
@@ -301,7 +301,7 @@ func TestGetHint_CodeTooLong(t *testing.T) {
 func TestGetHint_HintLevelAutoDetect(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
 			return &llm.ChatResponse{
 				Content:      "Here's a hint",
 				Model:        "test",
@@ -416,7 +416,7 @@ func TestReviewCode_CodeTooLong(t *testing.T) {
 func TestReviewCode_Success(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
 			return &llm.ChatResponse{
 				Content:      "Great code!",
 				Model:        "test",
@@ -487,7 +487,7 @@ func TestExplainError_CodeTooLong(t *testing.T) {
 func TestExplainError_Success(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
 			return &llm.ChatResponse{
 				Content:      "This error means...",
 				Model:        "test",
@@ -601,7 +601,7 @@ func TestValidateCode_EmptyString(t *testing.T) {
 func TestGetHint_ProviderFailure(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
 			return nil, errors.New("provider dead")
 		},
 	})
@@ -616,7 +616,7 @@ func TestGetHint_ProviderFailure(t *testing.T) {
 func TestReviewCode_ProviderFailure(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
 			return nil, errors.New("dead")
 		},
 	})
@@ -631,7 +631,7 @@ func TestReviewCode_ProviderFailure(t *testing.T) {
 func TestExplainError_ProviderFailure(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
 			return nil, errors.New("dead")
 		},
 	})
@@ -646,7 +646,7 @@ func TestExplainError_ProviderFailure(t *testing.T) {
 func TestChat_ProviderFailureWrapsCorrectly(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
 			return nil, errors.New("some internal error")
 		},
 	})
@@ -662,7 +662,7 @@ func TestChat_ProviderFailureWrapsCorrectly(t *testing.T) {
 func TestChatStream_ProviderFailure(t *testing.T) {
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		streamFn: func(ctx context.Context, req llm.ChatRequest) (<-chan llm.StreamChunk, error) {
+		streamFn: func(_ context.Context, _ llm.ChatRequest) (<-chan llm.StreamChunk, error) {
 			return nil, errors.New("stream error")
 		},
 	})
@@ -733,7 +733,7 @@ func TestChat_AllFieldsInUserMessage(t *testing.T) {
 	var capturedRequest llm.ChatRequest
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
 			capturedRequest = req
 			return &llm.ChatResponse{Content: "resp", Model: "test"}, nil
 		},
@@ -765,7 +765,7 @@ func TestChat_UsesRequesterModel(t *testing.T) {
 	var captured llm.ChatRequest
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
 			captured = req
 			return &llm.ChatResponse{Content: "a", Model: "test"}, nil
 		},
@@ -783,7 +783,7 @@ func TestGetHint_UsesRequesterConfig(t *testing.T) {
 	var captured llm.ChatRequest
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
 			captured = req
 			return &llm.ChatResponse{Content: "hint", Model: "test"}, nil
 		},
@@ -801,7 +801,7 @@ func TestReviewCode_UsesRequesterConfig(t *testing.T) {
 	var captured llm.ChatRequest
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
 			captured = req
 			return &llm.ChatResponse{Content: "r", Model: "test"}, nil
 		},
@@ -819,7 +819,7 @@ func TestExplainError_UsesRequesterConfig(t *testing.T) {
 	var captured llm.ChatRequest
 	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
 	mgr.RegisterProvider("stub", &stubProvider{
-		chatFn: func(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+		chatFn: func(_ context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
 			captured = req
 			return &llm.ChatResponse{Content: "e", Model: "test"}, nil
 		},

@@ -44,7 +44,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
   const [aiPanelWidth, setAiPanelWidth] = useState(28);
   const [activeSection, setActiveSection] = useState<string>("");
   const [sectionContent, setSectionContent] = useState<string>("");
-  const [aiInitialMessage, setAiInitialMessage] = useState<string | undefined>(undefined);
+  const [aiInitialMessage, setAiInitialMessage] = useState<string>();
   const [aiMessageKey, setAiMessageKey] = useState(0);
   const activeSectionRef = useRef(activeSection);
   const containerRef = useRef<HTMLDivElement>(null);

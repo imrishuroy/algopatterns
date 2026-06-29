@@ -257,10 +257,7 @@ func (p *ClaudeProvider) buildRequest(req ChatRequest) claudeRequest {
 		if msg.Role == "system" {
 			system = msg.Content
 		} else {
-			messages = append(messages, claudeMessage{
-				Role:    msg.Role,
-				Content: msg.Content,
-			})
+			messages = append(messages, claudeMessage(msg))
 		}
 	}
 

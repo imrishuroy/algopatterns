@@ -60,8 +60,9 @@ export default function CallStackVisualizer({
         return { ...state, isPlaying: action.payload };
       case "FINISHED":
         return { ...state, isPlaying: false, result: action.result };
+      default:
+        return state;
     }
-    return state;
   }
 
   const [playback, dispatch] = useReducer(playbackReducer, initialPlayback);

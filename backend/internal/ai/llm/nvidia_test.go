@@ -122,7 +122,7 @@ func TestNVIDIAProviderChat_Success(t *testing.T) {
 }
 
 func TestNVIDIAProviderChat_FallbackReasoningField(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		resp := nvidiaResponse{
 			Model: "test",
 			Choices: []struct {
@@ -211,7 +211,7 @@ func TestNVIDIAProviderChat_ExtraBody(t *testing.T) {
 }
 
 func TestNVIDIAProviderChat_RateLimited(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusTooManyRequests)
 	}))
 	defer srv.Close()
@@ -224,7 +224,7 @@ func TestNVIDIAProviderChat_RateLimited(t *testing.T) {
 }
 
 func TestNVIDIAProviderChat_APIError(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"error": "bad model"}`))
 	}))
@@ -240,7 +240,7 @@ func TestNVIDIAProviderChat_APIError(t *testing.T) {
 }
 
 func TestNVIDIAProviderChat_EmptyChoices(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		resp := nvidiaResponse{
 			Model: "test",
 			Choices: []struct {
@@ -378,7 +378,7 @@ func TestNVIDIAProviderChatStream_Success(t *testing.T) {
 }
 
 func TestNVIDIAProviderChatStream_FallbackReasoning(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		w.WriteHeader(http.StatusOK)
 
@@ -431,7 +431,7 @@ func TestNVIDIAProviderChatStream_FallbackReasoning(t *testing.T) {
 }
 
 func TestNVIDIAProviderChatStream_RateLimited(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusTooManyRequests)
 	}))
 	defer srv.Close()
@@ -444,7 +444,7 @@ func TestNVIDIAProviderChatStream_RateLimited(t *testing.T) {
 }
 
 func TestNVIDIAProviderChatStream_APIError(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
 	defer srv.Close()
@@ -467,7 +467,7 @@ func TestNVIDIAProviderChatStream_RequestError(t *testing.T) {
 }
 
 func TestNVIDIAProviderHealthCheck(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		resp := nvidiaResponse{
 			Model: "test",
 			Choices: []struct {
@@ -503,7 +503,7 @@ func TestNVIDIAProviderHealthCheck(t *testing.T) {
 }
 
 func TestNVIDIAProviderHealthCheck_Failure(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusServiceUnavailable)
 	}))
 	defer srv.Close()

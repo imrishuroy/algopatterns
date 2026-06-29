@@ -31,12 +31,14 @@ func main() {
 
 	db, err := repository.NewDatabase(&cfg.Database)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to database")
+		log.Error().Err(err).Msg("Failed to connect to database")
+		return
 	}
 	defer db.Close()
 
 	if cfg.AI.OpenAIAPIKey == "" {
-		log.Fatal().Msg("OPENAI_API_KEY is required for RAG indexing")
+		log.Error().Msg("OPENAI_API_KEY is required for RAG indexing")
+		return
 	}
 
 	embeddingProvider := rag.NewOpenAIEmbedding(rag.OpenAIEmbeddingConfig{
@@ -52,21 +54,26 @@ func main() {
 	switch *indexType {
 	case "problems":
 		if err := indexProblems(ctx, db, indexer); err != nil {
-			log.Fatal().Err(err).Msg("Failed to index problems")
+			log.Error().Err(err).Msg("Failed to index problems")
+			return
 		}
 	case "patterns":
 		if err := indexPatterns(ctx, indexer); err != nil {
-			log.Fatal().Err(err).Msg("Failed to index patterns")
+			log.Error().Err(err).Msg("Failed to index patterns")
+			return
 		}
 	case "all":
 		if err := indexProblems(ctx, db, indexer); err != nil {
-			log.Fatal().Err(err).Msg("Failed to index problems")
+			log.Error().Err(err).Msg("Failed to index problems")
+			return
 		}
 		if err := indexPatterns(ctx, indexer); err != nil {
-			log.Fatal().Err(err).Msg("Failed to index patterns")
+			log.Error().Err(err).Msg("Failed to index patterns")
+			return
 		}
 	default:
-		log.Fatal().Str("type", *indexType).Msg("Unknown index type")
+		log.Error().Str("type", *indexType).Msg("Unknown index type")
+		return
 	}
 
 	count, err := ragService.GetEmbeddingCount(ctx)

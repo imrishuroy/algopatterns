@@ -74,7 +74,7 @@ export function InlineAI({
   }, [isOpen, onClose]);
 
   const handleAction = useCallback(
-    async (action: ActionType, customPrompt?: string) => {
+    (action: ActionType, customPrompt?: string) => {
       setIsLoading(true);
       setActiveAction(action);
       setResponse("");
@@ -93,7 +93,7 @@ export function InlineAI({
         return;
       }
 
-      const abortController = aiApiClient.chatStream(
+      aiApiClient.chatStream(
         {
           message,
           problemSlug,
@@ -111,8 +111,6 @@ export function InlineAI({
           setIsLoading(false);
         }
       );
-
-      return () => abortController();
     },
     [selectedCode, fullCode, language, problemSlug]
   );

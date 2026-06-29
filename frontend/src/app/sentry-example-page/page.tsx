@@ -1,3 +1,4 @@
+// skipcq: JS-0067 — Next.js page component convention
 "use client";
 
 import * as Sentry from "@sentry/nextjs";

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach, beforeAll } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 
 const mockInit = vi.fn();
 const mockReplayIntegration = vi.fn(() => ({ name: "replay" }));

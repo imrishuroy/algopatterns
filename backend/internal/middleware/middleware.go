@@ -64,8 +64,12 @@ func Recovery() gin.HandlerFunc {
 		defer func() {
 			if err := recover(); err != nil {
 				requestID, _ := c.Get("request_id")
+				rid, ok := requestID.(string)
+				if !ok {
+					rid = "unknown"
+				}
 				log.Error().
-					Str("request_id", requestID.(string)).
+					Str("request_id", rid).
 					Interface("error", err).
 					Str("path", c.Request.URL.Path).
 					Msg("panic recovered")

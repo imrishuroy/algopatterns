@@ -8,7 +8,6 @@ type Mode = "can-jump" | "min-jumps";
 export default function JumpGameVisualizer() {
   const [mode, setMode] = useState<Mode>("can-jump");
   const [isPlaying, setIsPlaying] = useState(false);
-  const [step, setStep] = useState(0);
   const [speed, setSpeed] = useState(600);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -79,7 +78,6 @@ export default function JumpGameVisualizer() {
       }
 
       setCurrentIndex((i) => i + 1);
-      setStep((s) => s + 1);
     }, speed);
 
     return () => clearTimeout(timer);
@@ -96,7 +94,6 @@ export default function JumpGameVisualizer() {
   ]);
 
   const reset = () => {
-    setStep(0);
     setIsPlaying(false);
     setCurrentIndex(0);
     setMaxReach(0);
@@ -373,7 +370,7 @@ export default function JumpGameVisualizer() {
           ) : (
             <p>
               <strong className="text-blue-400">BFS-like Greedy:</strong> Think
-              of it as levels. currentEnd marks the boundary of current "level".
+              of it as levels. currentEnd marks the boundary of current &ldquo;level&rdquo;.
               When we reach it, we must jump (increment jumps) and set new
               boundary to farthest.
             </p>

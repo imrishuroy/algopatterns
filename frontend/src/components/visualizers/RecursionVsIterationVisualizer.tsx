@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer, startTransition } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -28,9 +28,31 @@ const customStyle = {
   },
 };
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+    default:
+      return state;
+  }
+}
+
 export default function RecursionVsIterationVisualizer() {
   const [input, setInput] = useState(5);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [recursionStep, setRecursionStep] = useState(0);
   const [iterationStep, setIterationStep] = useState(0);
   const [speed, setSpeed] = useState(800);
@@ -127,7 +149,9 @@ export default function RecursionVsIterationVisualizer() {
     const currentMax = Math.max(recursionStep, iterationStep);
 
     if (currentMax >= maxSteps - 1) {
-      setIsPlaying(false);
+      startTransition(() => {
+        dispatch({ type: "STOP" });
+      });
       return;
     }
 
@@ -153,7 +177,7 @@ export default function RecursionVsIterationVisualizer() {
   const reset = () => {
     setRecursionStep(0);
     setIterationStep(0);
-    setIsPlaying(false);
+    dispatch({ type: "STOP" });
   };
 
   const recursiveLines = recursiveCode.split("\n");
@@ -166,7 +190,7 @@ export default function RecursionVsIterationVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gray-800/50 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           Recursion vs Iteration
@@ -191,13 +215,13 @@ export default function RecursionVsIterationVisualizer() {
                 );
                 reset();
               }}
-              className="w-16 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-center"
+              className="w-16 px-2 py-1 bg-gray-800 border border-gray-700 rounded-md text-white text-center"
             />
           </div>
 
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            onClick={() => dispatch({ type: "TOGGLE" })}
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying
                 ? "bg-yellow-500 text-black hover:bg-yellow-400"
                 : "bg-green-500 text-white hover:bg-green-400"
@@ -208,7 +232,7 @@ export default function RecursionVsIterationVisualizer() {
 
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 transition"
           >
             Reset
           </button>
@@ -228,7 +252,7 @@ export default function RecursionVsIterationVisualizer() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="border border-purple-500/30 rounded-lg overflow-hidden">
+          <div className="border border-purple-500/30 rounded-md overflow-hidden">
             <div className="px-4 py-2 bg-purple-500/20 border-b border-purple-500/30 flex justify-between items-center">
               <span className="font-medium text-purple-300">Recursive</span>
               <span className="text-xs text-purple-400">
@@ -244,7 +268,7 @@ export default function RecursionVsIterationVisualizer() {
                   <div
                     key={`rec-line-${lineNum}-${line.slice(0, 10)}`}
                     className={`flex transition-all duration-200 ${
-                      isActive ? "bg-purple-500/20 -mx-4 px-4 rounded" : ""
+                      isActive ? "bg-purple-500/20 -mx-4 px-4 rounded-md" : ""
                     }`}
                   >
                     <span
@@ -284,7 +308,7 @@ export default function RecursionVsIterationVisualizer() {
                   ([key, value]) => (
                     <span
                       key={key}
-                      className="px-2 py-1 bg-purple-500/20 rounded text-xs font-mono text-purple-300"
+                      className="px-2 py-1 bg-purple-500/20 rounded-md text-xs font-mono text-purple-300"
                     >
                       {key}: {value}
                     </span>
@@ -295,7 +319,7 @@ export default function RecursionVsIterationVisualizer() {
             </div>
           </div>
 
-          <div className="border border-blue-500/30 rounded-lg overflow-hidden">
+          <div className="border border-blue-500/30 rounded-md overflow-hidden">
             <div className="px-4 py-2 bg-blue-500/20 border-b border-blue-500/30 flex justify-between items-center">
               <span className="font-medium text-blue-300">Iterative</span>
               <span className="text-xs text-blue-400">
@@ -311,7 +335,7 @@ export default function RecursionVsIterationVisualizer() {
                   <div
                     key={`iter-line-${lineNum}-${line.slice(0, 10)}`}
                     className={`flex transition-all duration-200 ${
-                      isActive ? "bg-blue-500/20 -mx-4 px-4 rounded" : ""
+                      isActive ? "bg-blue-500/20 -mx-4 px-4 rounded-md" : ""
                     }`}
                   >
                     <span
@@ -351,7 +375,7 @@ export default function RecursionVsIterationVisualizer() {
                   ([key, value]) => (
                     <span
                       key={key}
-                      className="px-2 py-1 bg-blue-500/20 rounded text-xs font-mono text-blue-300"
+                      className="px-2 py-1 bg-blue-500/20 rounded-md text-xs font-mono text-blue-300"
                     >
                       {key}: {value}
                     </span>
@@ -364,27 +388,27 @@ export default function RecursionVsIterationVisualizer() {
         </div>
 
         <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-lg font-bold text-white">
               {factorial(input)}
             </div>
             <div className="text-xs text-gray-500">Result ({input}!)</div>
           </div>
-          <div className="bg-purple-500/10 rounded-lg p-3 text-center">
+          <div className="bg-purple-500/10 rounded-md p-3 text-center">
             <div className="text-lg font-bold text-purple-400">O(n)</div>
             <div className="text-xs text-gray-500">Rec. Space</div>
           </div>
-          <div className="bg-blue-500/10 rounded-lg p-3 text-center">
+          <div className="bg-blue-500/10 rounded-md p-3 text-center">
             <div className="text-lg font-bold text-blue-400">O(1)</div>
             <div className="text-xs text-gray-500">Iter. Space</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-lg font-bold text-white">O(n)</div>
             <div className="text-xs text-gray-500">Both Time</div>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+        <div className="mt-4 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-md">
           <p className="text-indigo-300 text-sm">
             <strong>Key Insight:</strong> Recursion uses the call stack
             implicitly (O(n) space), while iteration uses explicit variables

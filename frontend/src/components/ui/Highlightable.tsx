@@ -11,6 +11,7 @@ interface HighlightableProps {
   contentType: string;
   contentId: string;
   className?: string;
+  onAskAI?: (selectedText: string) => void;
 }
 
 const COLOR_OPTIONS: { color: HighlightColor; bg: string }[] = [
@@ -44,6 +45,7 @@ export function Highlightable({
   contentType,
   contentId,
   className = "",
+  onAskAI,
 }: HighlightableProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -231,6 +233,14 @@ export function Highlightable({
     };
   }, [calculateOverlays]);
 
+  const closeToolbar = () => {
+    setSelection(null);
+    setToolbar(null);
+    setToolbarMode("colors");
+    setActiveHighlight(null);
+    setNoteText("");
+  };
+
   // Handle text selection
   useEffect(() => {
     const container = contentRef.current;
@@ -293,14 +303,6 @@ export function Highlightable({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
-  const closeToolbar = () => {
-    setSelection(null);
-    setToolbar(null);
-    setToolbarMode("colors");
-    setActiveHighlight(null);
-    setNoteText("");
-  };
 
   const handleOverlayClick = (overlay: HighlightOverlay, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -405,11 +407,16 @@ export function Highlightable({
     }
   };
 
-  const canRelocate = (highlight: Highlight): boolean => {
-    if (!contentRef.current) return false;
-    const currentText = getContentText(contentRef.current);
-    return currentText.includes(highlight.selectedText);
-  };
+  const [canRelocate, setCanRelocate] = useState(false);
+
+  useEffect(() => {
+    if (activeHighlight && contentRef.current) {
+      const currentText = getContentText(contentRef.current);
+      setCanRelocate(currentText.includes(activeHighlight.selectedText));
+    } else {
+      setCanRelocate(false);
+    }
+  }, [activeHighlight, activeHighlight?.id, activeHighlight?.selectedText, contentHash]);
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -475,7 +482,6 @@ export function Highlightable({
             ) : toolbarMode === "colors" && selection ? (
               /* Color Selection - click to highlight instantly */
               <div className="px-3 py-2.5">
-                <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-2">Highlight</p>
                 <div className="flex items-center gap-2">
                   {COLOR_OPTIONS.map(({ color, bg }) => (
                     <button
@@ -487,6 +493,24 @@ export function Highlightable({
                       title={`Highlight ${color}`}
                     />
                   ))}
+                  {onAskAI && (
+                    <>
+                      <div className="w-px h-6 bg-gray-700 mx-0.5" />
+                      <button
+                        onClick={() => {
+                          onAskAI(selection.text);
+                          closeToolbar();
+                        }}
+                        className="flex items-center gap-1 px-2 h-7 text-[11px] font-medium text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-md transition-colors border border-indigo-500/30"
+                        title="Ask Thor AI about this text"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        Ask Thor AI
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ) : toolbarMode === "highlight-menu" && activeHighlight ? (
@@ -505,11 +529,11 @@ export function Highlightable({
                     <p className="text-xs text-gray-400 italic line-clamp-3 mb-2">
                       &ldquo;{activeHighlight.selectedText.slice(0, 150)}{activeHighlight.selectedText.length > 150 ? "..." : ""}&rdquo;
                     </p>
-                    {canRelocate(activeHighlight) && (
+                    {canRelocate && (
                       <button
                         onClick={handleRelocate}
                         disabled={isSaving}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 rounded transition-colors disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 rounded-md transition-colors disabled:opacity-50"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

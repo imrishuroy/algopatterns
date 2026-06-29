@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useReducer } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TreeNode {
@@ -21,6 +21,49 @@ interface DPTreeVisualizerProps {
   showMemo?: boolean;
 }
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
+const initialPlayState: PlayState = { step: 0, isPlaying: false };
+
+const problemConfigs: Record<
+  Problem,
+  { input: number | number[]; title: string; description: string }
+> = {
+  fibonacci: {
+    input: 5,
+    title: "Fibonacci",
+    description: "fib(n) = fib(n-1) + fib(n-2)",
+  },
+  "climbing-stairs": {
+    input: 4,
+    title: "Climbing Stairs",
+    description: "ways(n) = ways(n-1) + ways(n-2)",
+  },
+  "house-robber": {
+    input: [2, 7, 9, 3],
+    title: "House Robber",
+    description: "rob(i) = max(nums[i] + rob(i+2), rob(i+1))",
+  },
+};
+
 export default function DPTreeVisualizer({
   problem: initialProblem = "fibonacci",
   showMemo: initialShowMemo = false,
@@ -30,41 +73,21 @@ export default function DPTreeVisualizer({
   const [activeNodes, setActiveNodes] = useState<Set<string>>(new Set());
   const [completedNodes, setCompletedNodes] = useState<Set<string>>(new Set());
   const [cacheHits, setCacheHits] = useState<Set<string>>(new Set());
-  const [nodeResults, setNodeResults] = useState<Map<string, number>>(
-    new Map()
+  const [{ step, isPlaying }, dispatch] = useReducer(
+    playReducer,
+    initialPlayState
   );
-  const [memoCache, setMemoCache] = useState<Map<number, number>>(new Map());
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [step, setStep] = useState(0);
   const [speed, setSpeed] = useState(600);
   const [callCount, setCallCount] = useState(0);
   const [cacheHitCount, setCacheHitCount] = useState(0);
 
-  const problemConfigs = {
-    fibonacci: {
-      input: 5,
-      title: "Fibonacci",
-      description: "fib(n) = fib(n-1) + fib(n-2)",
-    },
-    "climbing-stairs": {
-      input: 4,
-      title: "Climbing Stairs",
-      description: "ways(n) = ways(n-1) + ways(n-2)",
-    },
-    "house-robber": {
-      input: [2, 7, 9, 3],
-      title: "House Robber",
-      description: "rob(i) = max(nums[i] + rob(i+2), rob(i+1))",
-    },
-  };
-
   const buildFibTree = useCallback(
-    (
+    function buildFibTree(
       n: number,
       depth: number = 0,
       id: string = "0",
       memo: Set<number> = new Set()
-    ): TreeNode | null => {
+    ): TreeNode | null {
       if (n < 0) return null;
 
       const isCacheHit = showMemo && memo.has(n);
@@ -103,12 +126,12 @@ export default function DPTreeVisualizer({
   );
 
   const buildClimbingTree = useCallback(
-    (
+    function buildClimbingTree(
       n: number,
       depth: number = 0,
       id: string = "0",
       memo: Set<number> = new Set()
-    ): TreeNode | null => {
+    ): TreeNode | null {
       if (n < 0) return null;
 
       const isCacheHit = showMemo && memo.has(n);
@@ -153,59 +176,59 @@ export default function DPTreeVisualizer({
   );
 
   const buildRobberTree = useCallback(
-    (
-      nums: number[],
-      i: number = 0,
-      depth: number = 0,
-      id: string = "0",
-      memo: Set<number> = new Set()
-    ): TreeNode | null => {
-      if (i >= nums.length) {
-        return {
-          id,
-          label: `rob(${i})`,
-          value: i,
-          result: 0,
-          depth,
-          children: [],
-        };
-      }
-
-      const isCacheHit = showMemo && memo.has(i);
-
-      const node: TreeNode = {
+    function buildRobberTree(
+    nums: number[],
+    i = 0,
+    depth = 0,
+    id = "0",
+    memo: Set<number> = new Set()
+  ): TreeNode | null {
+    if (i >= nums.length) {
+      return {
         id,
         label: `rob(${i})`,
         value: i,
+        result: 0,
         depth,
         children: [],
-        isCacheHit,
       };
+    }
 
-      if (isCacheHit) {
-        return node;
-      }
+    const isCacheHit = showMemo && memo.has(i);
 
-      if (showMemo) {
-        memo.add(i);
-      }
+    const node: TreeNode = {
+      id,
+      label: `rob(${i})`,
+      value: i,
+      depth,
+      children: [],
+      isCacheHit,
+    };
 
-      const robChild = buildRobberTree(nums, i + 2, depth + 1, `${id}R`, memo);
-      const skipChild = buildRobberTree(nums, i + 1, depth + 1, `${id}S`, memo);
-
-      if (robChild) {
-        robChild.choice = `ROB $${nums[i]}`;
-        node.children.push(robChild);
-      }
-      if (skipChild) {
-        skipChild.choice = "SKIP";
-        node.children.push(skipChild);
-      }
-
+    if (isCacheHit) {
       return node;
-    },
-    [showMemo]
-  );
+    }
+
+    if (showMemo) {
+      memo.add(i);
+    }
+
+    const robChild = buildRobberTree(nums, i + 2, depth + 1, `${id}R`, memo);
+    const skipChild = buildRobberTree(nums, i + 1, depth + 1, `${id}S`, memo);
+
+    if (robChild) {
+      robChild.choice = `ROB $${nums[i]}`;
+      node.children.push(robChild);
+    }
+    if (skipChild) {
+      skipChild.choice = "SKIP";
+      node.children.push(skipChild);
+    }
+
+    return node;
+  },
+  [showMemo]
+);
 
   const tree = useMemo(() => {
     const config = problemConfigs[problem];
@@ -219,7 +242,7 @@ export default function DPTreeVisualizer({
       default:
         return null;
     }
-  }, [problem, buildFibTree, buildClimbingTree, buildRobberTree, showMemo]);
+  }, [problem, buildFibTree, buildClimbingTree, buildRobberTree]);
 
   const generateExecutionOrder = useCallback(
     (node: TreeNode | null): string[] => {
@@ -251,7 +274,7 @@ export default function DPTreeVisualizer({
   useEffect(() => {
     if (!isPlaying || step >= executionOrder.length) {
       if (step >= executionOrder.length && step > 0) {
-        setIsPlaying(false);
+        dispatch({ type: "STOP" });
       }
       return;
     }
@@ -277,20 +300,17 @@ export default function DPTreeVisualizer({
         setCompletedNodes((prev) => new Set([...prev, nodeId]));
       }
 
-      setStep((s) => s + 1);
+      dispatch({ type: "ADVANCE" });
     }, speed);
 
     return () => clearTimeout(timer);
   }, [isPlaying, step, executionOrder, speed]);
 
   const reset = () => {
-    setStep(0);
+    dispatch({ type: "RESET" });
     setActiveNodes(new Set());
     setCompletedNodes(new Set());
     setCacheHits(new Set());
-    setNodeResults(new Map());
-    setMemoCache(new Map());
-    setIsPlaying(false);
     setCallCount(0);
     setCacheHitCount(0);
   };
@@ -343,7 +363,7 @@ export default function DPTreeVisualizer({
           }}
           transition={{ duration: 0.2 }}
           className={`
-            relative px-3 py-2 rounded-lg font-mono text-sm font-medium
+            relative px-3 py-2 rounded-md font-mono text-sm font-medium
             border-2 transition-colors duration-300 min-w-[70px] text-center
             ${isActive ? "bg-yellow-500 border-yellow-400 text-black" : ""}
             ${isCacheHit && isCompleted ? "bg-purple-500/30 border-purple-500 text-purple-300" : ""}
@@ -424,7 +444,7 @@ export default function DPTreeVisualizer({
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           DP Decision Tree Visualizer
@@ -444,7 +464,7 @@ export default function DPTreeVisualizer({
                 setProblem(p);
                 reset();
               }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
                 problem === p
                   ? "bg-indigo-500 text-white"
                   : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -456,7 +476,7 @@ export default function DPTreeVisualizer({
         </div>
 
         {/* Memo Toggle */}
-        <div className="flex items-center gap-4 mb-4 p-3 bg-gray-800/50 rounded-lg">
+        <div className="flex items-center gap-4 mb-4 p-3 bg-gray-800/50 rounded-md">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -465,7 +485,7 @@ export default function DPTreeVisualizer({
                 setShowMemo(e.target.checked);
                 reset();
               }}
-              className="w-4 h-4 rounded accent-purple-500"
+              className="w-4 h-4 rounded-md accent-purple-500"
             />
             <span className="text-white font-medium">Enable Memoization</span>
           </label>
@@ -479,8 +499,8 @@ export default function DPTreeVisualizer({
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+            onClick={() => dispatch({ type: "TOGGLE" })}
+            className={`px-4 py-2 rounded-md font-medium transition flex items-center gap-2 ${
               isPlaying
                 ? "bg-yellow-500 text-black hover:bg-yellow-400"
                 : "bg-green-500 text-white hover:bg-green-400"
@@ -513,7 +533,7 @@ export default function DPTreeVisualizer({
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 transition"
           >
             Reset
           </button>
@@ -533,21 +553,21 @@ export default function DPTreeVisualizer({
 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-3 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xl font-bold text-white">{totalNodes}</div>
             <div className="text-xs text-gray-500">Total Nodes</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xl font-bold text-yellow-400">{callCount}</div>
             <div className="text-xs text-gray-500">Function Calls</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xl font-bold text-green-400">
               {completedNodes.size}
             </div>
             <div className="text-xs text-gray-500">Completed</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xl font-bold text-purple-400">
               {cacheHitCount}
             </div>
@@ -558,25 +578,25 @@ export default function DPTreeVisualizer({
         {/* Legend */}
         <div className="flex flex-wrap justify-center gap-4 mb-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500"></div>
+            <div className="w-4 h-4 rounded-md bg-yellow-500"></div>
             <span className="text-gray-400">Active</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
+            <div className="w-4 h-4 rounded-md bg-green-500/20 border-2 border-green-500"></div>
             <span className="text-gray-400">Completed</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-purple-500/30 border-2 border-purple-500"></div>
+            <div className="w-4 h-4 rounded-md bg-purple-500/30 border-2 border-purple-500"></div>
             <span className="text-gray-400">Cache Hit</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gray-800 border-2 border-gray-700"></div>
+            <div className="w-4 h-4 rounded-md bg-gray-800 border-2 border-gray-700"></div>
             <span className="text-gray-400">Pending</span>
           </div>
         </div>
 
         {/* Tree Visualization */}
-        <div className="bg-gray-800/30 rounded-lg p-6 overflow-x-auto">
+        <div className="bg-gray-800/30 rounded-md p-6 overflow-x-auto">
           <div className="flex justify-center min-w-max py-8">
             <AnimatePresence mode="wait">
               {tree && renderNode(tree)}
@@ -585,7 +605,7 @@ export default function DPTreeVisualizer({
         </div>
 
         {/* Formula Display */}
-        <div className="mt-4 p-3 bg-gray-800/50 rounded-lg">
+        <div className="mt-4 p-3 bg-gray-800/50 rounded-md">
           <code className="text-indigo-400 text-sm font-mono">
             {problemConfigs[problem].description}
           </code>
@@ -596,7 +616,7 @@ export default function DPTreeVisualizer({
           key={showMemo ? "memo" : "no-memo"}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`mt-4 p-4 rounded-lg border ${
+          className={`mt-4 p-4 rounded-md border ${
             showMemo
               ? "bg-purple-500/10 border-purple-500/30"
               : "bg-yellow-500/10 border-yellow-500/30"

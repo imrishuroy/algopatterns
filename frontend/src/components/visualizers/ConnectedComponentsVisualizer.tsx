@@ -8,6 +8,13 @@ interface Edge {
   to: number;
 }
 
+function find(p: number[], x: number): number {
+  if (p[x] !== x) {
+    return find(p, p[x]);
+  }
+  return x;
+}
+
 export default function ConnectedComponentsVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1000);
@@ -46,13 +53,6 @@ export default function ConnectedComponentsVisualizer() {
     setIsPlaying(false);
   }, []);
 
-  const find = useCallback((p: number[], x: number): number => {
-    if (p[x] !== x) {
-      return find(p, p[x]);
-    }
-    return x;
-  }, []);
-
   const getComponentColor = useCallback(
     (node: number, p: number[]): string => {
       const root = find(p, node);
@@ -66,7 +66,7 @@ export default function ConnectedComponentsVisualizer() {
       ];
       return colors[root % colors.length];
     },
-    [find]
+    []
   );
 
   useEffect(() => {
@@ -132,12 +132,11 @@ export default function ConnectedComponentsVisualizer() {
     parent,
     rank,
     componentCount,
-    find,
     speed,
   ]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Connected Components
@@ -153,7 +152,7 @@ export default function ConnectedComponentsVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -161,7 +160,7 @@ export default function ConnectedComponentsVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -180,7 +179,7 @@ export default function ConnectedComponentsVisualizer() {
         </div>
 
         {/* Component count */}
-        <div className="mb-4 p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg text-center">
+        <div className="mb-4 p-4 bg-purple-500/10 border border-purple-500/30 rounded-md text-center">
           <span className="text-gray-400">Components: </span>
           <motion.span
             key={componentCount}
@@ -194,7 +193,7 @@ export default function ConnectedComponentsVisualizer() {
 
         {/* Graph visualization */}
         <div className="mb-4 flex justify-center">
-          <svg width="320" height="200" className="bg-gray-800/30 rounded-lg">
+          <svg width="320" height="200" className="bg-gray-800/30 rounded-md">
             {/* Draw edges */}
             {edges.map((edge, idx) => {
               const from = nodePositions[edge.from];
@@ -248,13 +247,13 @@ export default function ConnectedComponentsVisualizer() {
         </div>
 
         {/* Edges list */}
-        <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
+        <div className="mb-4 p-3 bg-gray-800/50 rounded-md">
           <div className="text-sm text-gray-400 mb-2">Edges to process:</div>
           <div className="flex gap-2 flex-wrap">
             {edges.map((edge, idx) => (
               <div
                 key={`edge-${edge.from}-${edge.to}-${idx}`}
-                className={`px-2 py-1 rounded text-xs font-mono ${
+                className={`px-2 py-1 rounded-md text-xs font-mono ${
                   processedEdges.includes(idx)
                     ? "bg-green-500/30 text-green-300"
                     : idx === edgeIndex
@@ -269,7 +268,7 @@ export default function ConnectedComponentsVisualizer() {
         </div>
 
         {/* Parent array */}
-        <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
+        <div className="mb-4 p-3 bg-gray-800/50 rounded-md">
           <div className="text-sm text-gray-400 mb-2">parent[] array:</div>
           <div className="flex gap-2 justify-center">
             {parent.map((p, i) => (
@@ -277,7 +276,7 @@ export default function ConnectedComponentsVisualizer() {
                 <div className="text-xs text-gray-500 mb-1">{i}</div>
                 <motion.div
                   animate={{ backgroundColor: getComponentColor(i, parent) }}
-                  className="w-8 h-8 rounded flex items-center justify-center font-mono text-sm text-white"
+                  className="w-8 h-8 rounded-md flex items-center justify-center font-mono text-sm text-white"
                 >
                   {p}
                 </motion.div>
@@ -291,7 +290,7 @@ export default function ConnectedComponentsVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -301,7 +300,7 @@ export default function ConnectedComponentsVisualizer() {
         </motion.div>
 
         {/* Key insight */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-purple-400">Key Insight:</strong> Start with
             n components. Each successful union decreases count by 1. Nodes with

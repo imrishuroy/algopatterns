@@ -2,7 +2,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono, Fredoka } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+// import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { ProgressProvider } from "@/contexts/ProgressContext";
@@ -73,7 +73,7 @@ export default function RootLayout({
                     <FilterProvider>
                       <Header />
                       <main className="flex-1">{children}</main>
-                      <Footer />
+                      {/* <Footer /> */}
                     </FilterProvider>
                   </ProgressProvider>
                 </HighlightProvider>

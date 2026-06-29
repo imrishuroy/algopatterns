@@ -5,13 +5,6 @@ import { motion } from "framer-motion";
 
 type Approach = "recursion" | "memoization" | "tabulation" | "optimized";
 
-interface Step {
-  type: Approach;
-  action: string;
-  value?: number;
-  highlight?: string;
-}
-
 export default function DPComparisonVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(300);
@@ -19,9 +12,7 @@ export default function DPComparisonVisualizer() {
 
   const [recursionCalls, setRecursionCalls] = useState(0);
   const [recursionStack, setRecursionStack] = useState<string[]>([]);
-  const [recursionCompleted, setRecursionCompleted] = useState<
-    Map<number, number>
-  >(new Map());
+  const [, setRecursionCompleted] = useState<Map<number, number>>(new Map());
 
   const [memoCalls, setMemoCalls] = useState(0);
   const [memoCache, setMemoCache] = useState<Map<number, number>>(new Map());
@@ -37,7 +28,7 @@ export default function DPComparisonVisualizer() {
   const [optPrev1, setOptPrev1] = useState(1);
 
   const [isComplete, setIsComplete] = useState(false);
-  const [step, setStep] = useState(0);
+  const [, setStep] = useState(0);
 
   const totalRecursionCalls = Math.pow(2, n + 1) - 1;
 
@@ -177,7 +168,7 @@ export default function DPComparisonVisualizer() {
   const finalAnswer = fib(n);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           DP Approaches: Side-by-Side Race
@@ -192,7 +183,7 @@ export default function DPComparisonVisualizer() {
         <div className="flex items-center gap-2 mb-6">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             }`}
           >
@@ -200,7 +191,7 @@ export default function DPComparisonVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -226,7 +217,7 @@ export default function DPComparisonVisualizer() {
               borderColor:
                 getProgressPercent("recursion") >= 100 ? "#ef4444" : "#374151",
             }}
-            className="bg-gray-800/50 rounded-xl border-2 p-4"
+            className="bg-gray-800/50 rounded-md border-2 p-4"
           >
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-red-400 font-semibold">Pure Recursion</h4>
@@ -249,7 +240,7 @@ export default function DPComparisonVisualizer() {
             </div>
 
             {/* Call Stack Visualization */}
-            <div className="bg-gray-900/50 rounded-lg p-2 h-24 overflow-hidden">
+            <div className="bg-gray-900/50 rounded-md p-2 h-24 overflow-hidden">
               <div className="text-xs text-gray-500 mb-1">Call Stack:</div>
               <div className="space-y-0.5">
                 {recursionStack.slice(-5).map((call, i) => (
@@ -257,7 +248,7 @@ export default function DPComparisonVisualizer() {
                     key={`call-${call}-${i}`}
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    className="text-xs font-mono text-red-400 bg-red-500/10 px-2 py-0.5 rounded"
+                    className="text-xs font-mono text-red-400 bg-red-500/10 px-2 py-0.5 rounded-md"
                   >
                     {"  ".repeat(i)}
                     {call}
@@ -279,7 +270,7 @@ export default function DPComparisonVisualizer() {
                   ? "#eab308"
                   : "#374151",
             }}
-            className="bg-gray-800/50 rounded-xl border-2 p-4"
+            className="bg-gray-800/50 rounded-md border-2 p-4"
           >
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-yellow-400 font-semibold">Memoization</h4>
@@ -300,7 +291,7 @@ export default function DPComparisonVisualizer() {
             </div>
 
             {/* Cache Visualization */}
-            <div className="bg-gray-900/50 rounded-lg p-2 h-24">
+            <div className="bg-gray-900/50 rounded-md p-2 h-24">
               <div className="text-xs text-gray-500 mb-1">
                 Cache: (hits: {memoCacheHits})
               </div>
@@ -312,7 +303,7 @@ export default function DPComparisonVisualizer() {
                       scale: memoCache.has(i) ? 1 : 0.8,
                       opacity: memoCache.has(i) ? 1 : 0.3,
                     }}
-                    className={`w-8 h-8 rounded flex items-center justify-center text-xs font-mono ${
+                    className={`w-8 h-8 rounded-md flex items-center justify-center text-xs font-mono ${
                       memoCache.has(i)
                         ? "bg-yellow-500/30 border border-yellow-500 text-yellow-400"
                         : "bg-gray-700/50 text-gray-600"
@@ -335,7 +326,7 @@ export default function DPComparisonVisualizer() {
               borderColor:
                 getProgressPercent("tabulation") >= 100 ? "#3b82f6" : "#374151",
             }}
-            className="bg-gray-800/50 rounded-xl border-2 p-4"
+            className="bg-gray-800/50 rounded-md border-2 p-4"
           >
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-blue-400 font-semibold">Tabulation</h4>
@@ -358,7 +349,7 @@ export default function DPComparisonVisualizer() {
             </div>
 
             {/* Array Visualization */}
-            <div className="bg-gray-900/50 rounded-lg p-2 h-24">
+            <div className="bg-gray-900/50 rounded-md p-2 h-24">
               <div className="text-xs text-gray-500 mb-1">DP Array:</div>
               <div className="flex gap-1">
                 {tabArray.map((val, i) => (
@@ -371,7 +362,7 @@ export default function DPComparisonVisualizer() {
                           ? "rgba(59, 130, 246, 0.3)"
                           : "rgba(55, 65, 81, 0.5)",
                     }}
-                    className={`flex-1 h-12 rounded flex flex-col items-center justify-center border ${
+                    className={`flex-1 h-12 rounded-md flex flex-col items-center justify-center border ${
                       val !== null ? "border-blue-500" : "border-gray-700"
                     }`}
                   >
@@ -397,7 +388,7 @@ export default function DPComparisonVisualizer() {
               borderColor:
                 getProgressPercent("optimized") >= 100 ? "#22c55e" : "#374151",
             }}
-            className="bg-gray-800/50 rounded-xl border-2 p-4"
+            className="bg-gray-800/50 rounded-md border-2 p-4"
           >
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-green-400 font-semibold">Space Optimized</h4>
@@ -422,7 +413,7 @@ export default function DPComparisonVisualizer() {
             </div>
 
             {/* Two Variables Visualization */}
-            <div className="bg-gray-900/50 rounded-lg p-2 h-24">
+            <div className="bg-gray-900/50 rounded-md p-2 h-24">
               <div className="text-xs text-gray-500 mb-2">
                 Just 2 variables:
               </div>
@@ -430,7 +421,7 @@ export default function DPComparisonVisualizer() {
                 <motion.div
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ repeat: Infinity, duration: 1 }}
-                  className="bg-green-500/30 border-2 border-green-500 rounded-lg px-4 py-2 text-center"
+                  className="bg-green-500/30 border-2 border-green-500 rounded-md px-4 py-2 text-center"
                 >
                   <div className="text-xs text-green-400">prev2</div>
                   <div className="text-xl font-mono font-bold text-green-400">
@@ -440,7 +431,7 @@ export default function DPComparisonVisualizer() {
                 <motion.div
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ repeat: Infinity, duration: 1, delay: 0.5 }}
-                  className="bg-emerald-500/30 border-2 border-emerald-500 rounded-lg px-4 py-2 text-center"
+                  className="bg-emerald-500/30 border-2 border-emerald-500 rounded-md px-4 py-2 text-center"
                 >
                   <div className="text-xs text-emerald-400">prev1</div>
                   <div className="text-xl font-mono font-bold text-emerald-400">
@@ -461,7 +452,7 @@ export default function DPComparisonVisualizer() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-6 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl"
+            className="mt-6 p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-md"
           >
             <h4 className="text-green-400 font-semibold mb-3">
               Race Complete! fib({n}) = {finalAnswer}

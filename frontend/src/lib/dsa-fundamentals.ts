@@ -5085,7 +5085,7 @@ function numIslands(grid) {
       "Not marking visited, causing infinite recursion",
       "Using wrong direction values (confusing row/col)",
     ],
-    relatedProblems: ["Number of Islands", "Flood Fill", "Surrounded Regions", "Pacific Atlantic Water Flow", "Walls and Gates"],
+    relatedProblems: ["Number of Islands", "Flood Fill", "Surrounded-md Regions", "Pacific Atlantic Water Flow", "Walls and Gates"],
     relatedPatterns: ["graphs"],
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",

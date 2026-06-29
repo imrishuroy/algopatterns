@@ -21,7 +21,7 @@ export function GoogleButton({
         hover:bg-gray-50 dark:hover:bg-gray-600
         disabled:opacity-50 disabled:cursor-not-allowed
         border border-gray-300 dark:border-gray-600
-        rounded-lg transition-colors
+        rounded-md transition-colors
         text-gray-700 dark:text-gray-200 font-medium"
     >
       {isLoading ? (

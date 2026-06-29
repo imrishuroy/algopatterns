@@ -52,7 +52,7 @@ export default function MultipleChoice({
       </p>
 
       {codeToShow && (
-        <pre className="bg-gray-950 border border-gray-800 rounded-xl p-5 overflow-x-auto">
+        <pre className="bg-gray-950 border border-gray-800 rounded-md p-5 overflow-x-auto">
           <code className="text-gray-300 whitespace-pre-wrap font-mono text-sm leading-relaxed">
             {codeToShow}
           </code>
@@ -85,12 +85,12 @@ export default function MultipleChoice({
               key={option}
               onClick={() => !disabled && onAnswer(index)}
               disabled={disabled}
-              className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl border text-left transition-all ${borderClass} ${bgClass} ${
+              className={`w-full flex items-center gap-4 px-5 py-4 rounded-md border text-left transition-all ${borderClass} ${bgClass} ${
                 disabled ? "cursor-default" : "cursor-pointer"
               }`}
             >
               <span
-                className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold flex-shrink-0 ${
+                className={`w-8 h-8 rounded-md flex items-center justify-center text-sm font-semibold flex-shrink-0 ${
                   showResult && isCorrect
                     ? "bg-green-500 text-white"
                     : showResult && isSelected && !isCorrect

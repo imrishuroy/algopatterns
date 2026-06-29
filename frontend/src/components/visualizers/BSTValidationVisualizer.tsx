@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 
 interface TreeNode {
@@ -35,7 +35,6 @@ interface Step {
 export default function BSTValidationVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(900);
-  const [steps, setSteps] = useState<Step[]>([]);
   const [stepIndex, setStepIndex] = useState(-1);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [invalidNode, setInvalidNode] = useState<number | null>(null);
@@ -77,19 +76,16 @@ export default function BSTValidationVisualizer() {
     return result;
   }, []);
 
+  const steps = useMemo(() => generateSteps(), [generateSteps]);
+
   const reset = useCallback(() => {
-    setSteps(generateSteps());
     setStepIndex(-1);
     setVisitedNodes([]);
     setInvalidNode(null);
     setPhase("init");
     setMessage("Click Play to validate BST with bounds checking");
     setIsPlaying(false);
-  }, [generateSteps]);
-
-  useEffect(() => {
-    setSteps(generateSteps());
-  }, [generateSteps]);
+  }, []);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -204,7 +200,7 @@ export default function BSTValidationVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-red-500/10 to-orange-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">BST Validation</h3>
         <p className="text-gray-400 text-sm mt-1">
@@ -218,7 +214,7 @@ export default function BSTValidationVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -226,7 +222,7 @@ export default function BSTValidationVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -246,7 +242,7 @@ export default function BSTValidationVisualizer() {
 
         {/* Tree visualization */}
         <div className="mb-4 flex justify-center">
-          <svg width="300" height="220" className="bg-gray-800/30 rounded-lg">
+          <svg width="300" height="220" className="bg-gray-800/30 rounded-md">
             {/* Edges */}
             {renderEdge(5, 4)}
             {renderEdge(5, 7)}
@@ -270,7 +266,7 @@ export default function BSTValidationVisualizer() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-4 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg"
+            className="mb-4 p-3 bg-orange-500/10 border border-orange-500/30 rounded-md"
           >
             <div className="text-sm text-gray-400 mb-1">Current Check:</div>
             <div className="font-mono text-lg">
@@ -299,11 +295,11 @@ export default function BSTValidationVisualizer() {
         )}
 
         {/* Explanation of the invalid node */}
-        <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
+        <div className="mb-4 p-3 bg-gray-800/50 rounded-md">
           <div className="text-sm text-gray-400">
             <strong className="text-orange-400">Tree Structure:</strong> Node 6
             is in the RIGHT subtree of node 4, but 4 is in the LEFT subtree of
-            root 5. So 6 must be less than 5, but it's not!
+            root 5. So 6 must be less than 5, but it&apos;s not!
           </div>
         </div>
 
@@ -314,7 +310,7 @@ export default function BSTValidationVisualizer() {
             {steps.slice(0, stepIndex + 1).map((step, idx) => (
               <div
                 key={`step-${step.node}-${step.min}-${step.max}-${idx}`}
-                className={`text-sm font-mono px-2 py-1 rounded ${
+                className={`text-sm font-mono px-2 py-1 rounded-md ${
                   step.valid ? "text-green-400" : "text-red-400 bg-red-500/10"
                 }`}
               >
@@ -330,7 +326,7 @@ export default function BSTValidationVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? invalidNode
                 ? "bg-red-500/10 border border-red-500/30 text-red-400"
@@ -342,7 +338,7 @@ export default function BSTValidationVisualizer() {
         </motion.div>
 
         {/* Algorithm explanation */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-orange-400">Key Insight:</strong> Pass valid
             range (min, max) DOWN the tree. Left child inherits (min, node.val),

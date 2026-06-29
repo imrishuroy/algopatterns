@@ -53,8 +53,8 @@ const (
 type DiscountType string
 
 const (
-	DiscountTypePercentage   DiscountType = "percentage"
-	DiscountTypeFixedAmount  DiscountType = "fixed_amount"
+	DiscountTypePercentage  DiscountType = "percentage"
+	DiscountTypeFixedAmount DiscountType = "fixed_amount"
 )
 
 // IdempotencyStatus represents the status of an idempotency key

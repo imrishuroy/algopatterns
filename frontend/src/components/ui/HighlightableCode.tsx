@@ -247,7 +247,7 @@ export function HighlightableCode({
       {toolbarPosition && (
         <div
           data-highlight-toolbar
-          className="absolute z-[100] flex items-center gap-1 p-2 bg-gray-800 rounded-lg shadow-2xl border border-gray-600"
+          className="absolute z-[100] flex items-center gap-1 p-2 bg-gray-800 rounded-md shadow-2xl border border-gray-600"
           style={{
             top: toolbarPosition.top,
             left: toolbarPosition.left,
@@ -274,7 +274,7 @@ export function HighlightableCode({
             <>
               <button
                 onClick={handleDeleteHighlight}
-                className="px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded transition-colors"
+                className="px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-md transition-colors"
               >
                 Delete
               </button>
@@ -283,7 +283,7 @@ export function HighlightableCode({
                   setActiveHighlight(null);
                   setToolbarPosition(null);
                 }}
-                className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-300 hover:bg-gray-700 rounded transition-colors"
+                className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-300 hover:bg-gray-700 rounded-md transition-colors"
               >
                 Cancel
               </button>

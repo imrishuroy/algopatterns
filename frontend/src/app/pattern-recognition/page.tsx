@@ -35,7 +35,7 @@ export default function PatternRecognitionPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as Tab)}
-            className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${
+            className={`px-4 py-2 rounded-md font-medium whitespace-nowrap transition ${
               activeTab === tab.id
                 ? "bg-indigo-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
@@ -71,7 +71,7 @@ function CheatsheetTab() {
   return (
     <div className="space-y-6">
       {/* The Golden Rule */}
-      <div className="p-6 bg-gradient-to-r from-amber-900/30 to-yellow-900/30 rounded-xl border border-amber-500/30">
+      <div className="p-6 bg-gradient-to-r from-amber-900/30 to-yellow-900/30 rounded-md border border-amber-500/30">
         <h2 className="text-xl font-bold text-amber-400 mb-4">
           The Golden Rule: Check Constraints First
         </h2>
@@ -80,22 +80,22 @@ function CheatsheetTab() {
           algorithms are even possible.
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="p-3 bg-gray-900/50 rounded-lg text-center">
+          <div className="p-3 bg-gray-900/50 rounded-md text-center">
             <div className="text-red-400 font-mono font-bold">n ≤ 20</div>
             <div className="text-sm text-gray-400 mt-1">Brute force OK</div>
             <div className="text-xs text-gray-500">O(2ⁿ), O(n!)</div>
           </div>
-          <div className="p-3 bg-gray-900/50 rounded-lg text-center">
+          <div className="p-3 bg-gray-900/50 rounded-md text-center">
             <div className="text-orange-400 font-mono font-bold">n ≤ 3000</div>
             <div className="text-sm text-gray-400 mt-1">Nested loops OK</div>
             <div className="text-xs text-gray-500">O(n²)</div>
           </div>
-          <div className="p-3 bg-gray-900/50 rounded-lg text-center">
+          <div className="p-3 bg-gray-900/50 rounded-md text-center">
             <div className="text-green-400 font-mono font-bold">n ≤ 10⁶</div>
             <div className="text-sm text-gray-400 mt-1">Single loop</div>
             <div className="text-xs text-gray-500">O(n), O(n log n)</div>
           </div>
-          <div className="p-3 bg-gray-900/50 rounded-lg text-center">
+          <div className="p-3 bg-gray-900/50 rounded-md text-center">
             <div className="text-blue-400 font-mono font-bold">n &gt; 10⁶</div>
             <div className="text-sm text-gray-400 mt-1">Math/Binary Search</div>
             <div className="text-xs text-gray-500">O(log n), O(1)</div>
@@ -104,7 +104,7 @@ function CheatsheetTab() {
       </div>
 
       {/* Quick Pattern Lookup */}
-      <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
+      <div className="p-6 bg-gray-900 rounded-md border border-gray-800">
         <h2 className="text-xl font-bold text-white mb-4">
           Quick Pattern Lookup
         </h2>
@@ -137,7 +137,7 @@ function CheatsheetTab() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-2 bg-gray-800/50 rounded-lg"
+                  className="flex items-center gap-3 p-2 bg-gray-800/50 rounded-md"
                 >
                   <span className="text-white font-medium min-w-[100px]">
                     {item.input}
@@ -173,7 +173,7 @@ function CheatsheetTab() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-2 bg-gray-800/50 rounded-lg"
+                  className="flex items-center gap-3 p-2 bg-gray-800/50 rounded-md"
                 >
                   <span className="text-white font-medium min-w-[160px]">
                     {item.output}
@@ -190,7 +190,7 @@ function CheatsheetTab() {
       </div>
 
       {/* Decision Flowchart */}
-      <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
+      <div className="p-6 bg-gray-900 rounded-md border border-gray-800">
         <h2 className="text-xl font-bold text-white mb-4">
           Simple Decision Flow
         </h2>
@@ -455,7 +455,7 @@ function search(nums, target) {
           <button
             key={key}
             onClick={() => setSelected(key)}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               selected === key
                 ? "bg-indigo-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -467,7 +467,7 @@ function search(nums, target) {
       </div>
 
       {/* Content */}
-      <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
+      <div className="p-6 bg-gray-900 rounded-md border border-gray-800">
         <h2 className="text-2xl font-bold text-white mb-2">{current.title}</h2>
         <p className="text-gray-400 mb-4">{current.desc}</p>
 
@@ -479,7 +479,7 @@ function search(nums, target) {
             {current.algos.map((algo, i) => (
               <span
                 key={i}
-                className="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-lg text-sm"
+                className="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-md text-sm"
               >
                 {algo}
               </span>
@@ -878,7 +878,7 @@ function longestPalindrome(s) {
                 selectedPattern === pattern.id ? null : pattern.id
               )
             }
-            className={`p-4 rounded-xl border text-left transition ${
+            className={`p-4 rounded-md border text-left transition ${
               selectedPattern === pattern.id
                 ? "bg-indigo-500/20 border-indigo-500"
                 : "bg-gray-900 border-gray-800 hover:border-gray-700"
@@ -891,7 +891,7 @@ function longestPalindrome(s) {
 
       {/* Selected Pattern Detail */}
       {selected && (
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-800 animate-fade-in">
+        <div className="p-6 bg-gray-900 rounded-md border border-gray-800 animate-fade-in">
           <div className="mb-4">
             <h2 className="text-xl font-bold text-white">{selected.name}</h2>
             <p className="text-gray-400 text-sm">{selected.when}</p>
@@ -931,7 +931,7 @@ function longestPalindrome(s) {
                     href={`https://leetcode.com/problems/${slug}/`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition"
+                    className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-md text-sm transition"
                   >
                     {problem}
                   </a>
@@ -1044,12 +1044,12 @@ function KeywordsTab() {
       {keywords.map((group, i) => (
         <div
           key={i}
-          className={`p-4 rounded-xl border ${colorMap[group.color]}`}
+          className={`p-4 rounded-md border ${colorMap[group.color]}`}
         >
           <div className="font-semibold mb-2">{group.category}</div>
           <div className="flex flex-wrap gap-2">
             {group.words.map((word, j) => (
-              <span key={j} className="px-2 py-1 bg-black/20 rounded text-sm">
+              <span key={j} className="px-2 py-1 bg-black/20 rounded-md text-sm">
                 &quot;{word}&quot;
               </span>
             ))}

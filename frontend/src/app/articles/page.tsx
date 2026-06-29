@@ -43,7 +43,7 @@ export default function ArticlesPage() {
               href={`/articles/${article.slug}`}
               className="group block"
             >
-              <article className="bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10">
+              <article className="bg-gray-900 rounded-md overflow-hidden border border-gray-800 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10">
                 <div className="p-6 md:p-8">
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
@@ -85,7 +85,7 @@ export default function ArticlesPage() {
                         {article.tags.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-1 bg-gray-800 rounded text-gray-400 text-xs"
+                            className="px-2 py-1 bg-gray-800 rounded-md text-gray-400 text-xs"
                           >
                             {tag}
                           </span>
@@ -119,7 +119,7 @@ export default function ArticlesPage() {
           ))}
         </div>
 
-        <div className="mt-16 p-8 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-2xl border border-indigo-500/20 text-center">
+        <div className="mt-16 p-8 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-md border border-indigo-500/20 text-center">
           <h3 className="text-2xl font-bold text-white mb-2">
             More Articles Coming Soon
           </h3>
@@ -127,7 +127,7 @@ export default function ArticlesPage() {
             We are working on comprehensive guides for Dynamic Programming,
             Graph Algorithms, System Design, and more.
           </p>
-          <button className="px-6 py-3 bg-indigo-500 text-white rounded-lg font-medium hover:bg-indigo-400 transition">
+          <button className="px-6 py-3 bg-indigo-500 text-white rounded-md font-medium hover:bg-indigo-400 transition">
             Get Notified
           </button>
         </div>

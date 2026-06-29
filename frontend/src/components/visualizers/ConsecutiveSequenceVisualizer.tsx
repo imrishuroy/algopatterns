@@ -22,10 +22,18 @@ const SEQUENCE_COLORS = [
   "bg-orange-500",
 ];
 
+const INITIAL_NUMS = [100, 4, 200, 1, 3, 2];
+
+const INITIAL_NUMBERS: NumberState[] = INITIAL_NUMS.map((n) => ({
+  value: n,
+  state: "unseen" as const,
+  sequenceId: null,
+}));
+
 export default function ConsecutiveSequenceVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(600);
-  const [numbers, setNumbers] = useState<NumberState[]>([]);
+  const [numbers, setNumbers] = useState<NumberState[]>(INITIAL_NUMBERS);
   const [numSet, setNumSet] = useState<Set<number>>(new Set());
   const [currentNum, setCurrentNum] = useState<number | null>(null);
   const [currentSequence, setCurrentSequence] = useState<number[]>([]);
@@ -39,10 +47,8 @@ export default function ConsecutiveSequenceVisualizer() {
     "Click Play to find longest consecutive sequence"
   );
 
-  const initialNums = [100, 4, 200, 1, 3, 2];
-
   const reset = useCallback(() => {
-    const nums = initialNums.map((n) => ({
+    const nums = INITIAL_NUMS.map((n) => ({
       value: n,
       state: "unseen" as const,
       sequenceId: null,
@@ -60,10 +66,6 @@ export default function ConsecutiveSequenceVisualizer() {
   }, []);
 
   useEffect(() => {
-    reset();
-  }, [reset]);
-
-  useEffect(() => {
     if (!isPlaying) return;
 
     const timer = setTimeout(() => {
@@ -71,7 +73,7 @@ export default function ConsecutiveSequenceVisualizer() {
         setPhase("building-set");
         setMessage("Step 1: Building HashSet from array for O(1) lookups");
       } else if (phase === "building-set") {
-        const newSet = new Set(initialNums);
+        const newSet = new Set(INITIAL_NUMS);
         setNumSet(newSet);
         const newNumbers = numbers.map((n) => ({
           ...n,
@@ -195,7 +197,7 @@ export default function ConsecutiveSequenceVisualizer() {
   const sortedDisplay = [...numbers].sort((a, b) => a.value - b.value);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Longest Consecutive Sequence
@@ -211,7 +213,7 @@ export default function ConsecutiveSequenceVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -219,7 +221,7 @@ export default function ConsecutiveSequenceVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -249,7 +251,7 @@ export default function ConsecutiveSequenceVisualizer() {
                 animate={{
                   scale: num.value === currentNum ? 1.1 : 1,
                 }}
-                className={`w-14 h-14 rounded-lg flex items-center justify-center font-mono text-lg font-bold transition-colors ${getNumberStyle(num)}`}
+                className={`w-14 h-14 rounded-md flex items-center justify-center font-mono text-lg font-bold transition-colors ${getNumberStyle(num)}`}
               >
                 {num.value}
               </motion.div>
@@ -267,7 +269,7 @@ export default function ConsecutiveSequenceVisualizer() {
               <motion.div
                 key={num.value}
                 layout
-                className={`w-10 rounded-t-lg flex items-center justify-center font-mono text-sm font-bold transition-colors ${getNumberStyle(num)}`}
+                className={`w-10 rounded-t-md flex items-center justify-center font-mono text-sm font-bold transition-colors ${getNumberStyle(num)}`}
                 style={{
                   height: `${Math.max(30, Math.min(80, num.value / 2))}px`,
                 }}
@@ -283,13 +285,13 @@ export default function ConsecutiveSequenceVisualizer() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-4 p-3 bg-teal-500/10 border border-teal-500/30 rounded-lg"
+            className="mb-4 p-3 bg-teal-500/10 border border-teal-500/30 rounded-md"
           >
             <div className="text-xs text-gray-500 mb-1">Current Sequence:</div>
             <div className="flex gap-2 items-center">
               {currentSequence.map((num, i) => (
                 <React.Fragment key={num}>
-                  <span className="px-3 py-1 bg-teal-500 text-white rounded font-mono font-bold">
+                  <span className="px-3 py-1 bg-teal-500 text-white rounded-md font-mono font-bold">
                     {num}
                   </span>
                   {i < currentSequence.length - 1 && (
@@ -306,7 +308,7 @@ export default function ConsecutiveSequenceVisualizer() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-cyan-400">
               {longestSequence.length}
             </div>
@@ -317,7 +319,7 @@ export default function ConsecutiveSequenceVisualizer() {
               </div>
             )}
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-purple-400">
               {sequenceCount}
             </div>
@@ -330,7 +332,7 @@ export default function ConsecutiveSequenceVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -342,21 +344,21 @@ export default function ConsecutiveSequenceVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500" />
+            <div className="w-4 h-4 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Checking</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500" />
+            <div className="w-4 h-4 rounded-md bg-green-500" />
             <span className="text-gray-400">In Sequence</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gray-600" />
+            <div className="w-4 h-4 rounded-md bg-gray-600" />
             <span className="text-gray-400">Not Start</span>
           </div>
         </div>
 
         {/* Algorithm explanation */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-teal-400">Key Insight:</strong> Only start
             counting from sequence beginnings (numbers where n-1 doesn&apos;t

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, type RefObject } from "react";
+import { useState, useEffect, useCallback, startTransition, type RefObject } from "react";
 
 export interface SelectionInfo {
   text: string;
@@ -30,7 +30,9 @@ export function useTextSelection(
 
   useEffect(() => {
     if (!enabled) {
-      setSelection(null);
+      startTransition(() => {
+        setSelection(null);
+      });
       return;
     }
 

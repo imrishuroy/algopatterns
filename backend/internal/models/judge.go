@@ -4,18 +4,18 @@ package models
 // https://ce.judge0.com/
 
 type Judge0Submission struct {
-	SourceCode       string  `json:"source_code"`
-	LanguageID       int     `json:"language_id"`
-	Stdin            string  `json:"stdin,omitempty"`
-	ExpectedOutput   string  `json:"expected_output,omitempty"`
-	CPUTimeLimit     float64 `json:"cpu_time_limit,omitempty"`
-	CPUExtraTime     float64 `json:"cpu_extra_time,omitempty"`
-	WallTimeLimit    float64 `json:"wall_time_limit,omitempty"`
-	MemoryLimit      int     `json:"memory_limit,omitempty"`
-	StackLimit       int     `json:"stack_limit,omitempty"`
-	MaxFileSize      int     `json:"max_file_size,omitempty"`
-	EnableNetwork    bool    `json:"enable_network,omitempty"`
-	CallbackURL      string  `json:"callback_url,omitempty"`
+	SourceCode     string  `json:"source_code"`
+	LanguageID     int     `json:"language_id"`
+	Stdin          string  `json:"stdin,omitempty"`
+	ExpectedOutput string  `json:"expected_output,omitempty"`
+	CPUTimeLimit   float64 `json:"cpu_time_limit,omitempty"`
+	CPUExtraTime   float64 `json:"cpu_extra_time,omitempty"`
+	WallTimeLimit  float64 `json:"wall_time_limit,omitempty"`
+	MemoryLimit    int     `json:"memory_limit,omitempty"`
+	StackLimit     int     `json:"stack_limit,omitempty"`
+	MaxFileSize    int     `json:"max_file_size,omitempty"`
+	EnableNetwork  bool    `json:"enable_network,omitempty"`
+	CallbackURL    string  `json:"callback_url,omitempty"`
 }
 
 type Judge0BatchRequest struct {
@@ -36,17 +36,17 @@ type Judge0Status struct {
 }
 
 type Judge0Result struct {
-	Token          string        `json:"token,omitempty"`
-	Stdout         *string       `json:"stdout"`
-	Stderr         *string       `json:"stderr"`
-	CompileOutput  *string       `json:"compile_output"`
-	Message        *string       `json:"message"`
-	ExitCode       *int          `json:"exit_code"`
-	ExitSignal     *int          `json:"exit_signal"`
-	Status         *Judge0Status `json:"status"`
-	Time           *string       `json:"time"`
-	WallTime       *string       `json:"wall_time"`
-	Memory         *float64      `json:"memory"`
+	Token         string        `json:"token,omitempty"`
+	Stdout        *string       `json:"stdout"`
+	Stderr        *string       `json:"stderr"`
+	CompileOutput *string       `json:"compile_output"`
+	Message       *string       `json:"message"`
+	ExitCode      *int          `json:"exit_code"`
+	ExitSignal    *int          `json:"exit_signal"`
+	Status        *Judge0Status `json:"status"`
+	Time          *string       `json:"time"`
+	WallTime      *string       `json:"wall_time"`
+	Memory        *float64      `json:"memory"`
 }
 
 type Judge0BatchResult struct {
@@ -55,12 +55,12 @@ type Judge0BatchResult struct {
 
 // Judge0 status IDs
 const (
-	Judge0StatusInQueue            = 1
-	Judge0StatusProcessing         = 2
-	Judge0StatusAccepted           = 3
-	Judge0StatusWrongAnswer        = 4
-	Judge0StatusTimeLimitExceeded  = 5
-	Judge0StatusCompilationError   = 6
+	Judge0StatusInQueue             = 1
+	Judge0StatusProcessing          = 2
+	Judge0StatusAccepted            = 3
+	Judge0StatusWrongAnswer         = 4
+	Judge0StatusTimeLimitExceeded   = 5
+	Judge0StatusCompilationError    = 6
 	Judge0StatusRuntimeErrorSIGSEGV = 7
 	Judge0StatusRuntimeErrorSIGXFSZ = 8
 	Judge0StatusRuntimeErrorSIGFPE  = 9

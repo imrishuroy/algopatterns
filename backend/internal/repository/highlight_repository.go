@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	ErrHighlightExists    = errors.New("highlight already exists at this position")
-	ErrVersionConflict    = errors.New("highlight was modified by another request")
-	ErrHighlightNotFound  = errors.New("highlight not found")
+	ErrHighlightExists   = errors.New("highlight already exists at this position")
+	ErrVersionConflict   = errors.New("highlight was modified by another request")
+	ErrHighlightNotFound = errors.New("highlight not found")
 )
 
 type HighlightRepository struct {

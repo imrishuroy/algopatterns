@@ -17,7 +17,7 @@ export function UpgradePrompt({
 }: UpgradePromptProps) {
   if (compact) {
     return (
-      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-lg">
+      <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-md">
         <div className="text-2xl">🔒</div>
         <div className="flex-1">
           <p className="text-amber-200 text-sm">
@@ -26,7 +26,7 @@ export function UpgradePrompt({
         </div>
         <Link
           href="/pricing"
-          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg transition-colors"
+          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-md transition-colors"
         >
           Upgrade
         </Link>
@@ -35,7 +35,7 @@ export function UpgradePrompt({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-gray-800/50 to-gray-900/50 border border-gray-700 rounded-2xl text-center">
+    <div className="flex flex-col items-center justify-center p-8 bg-gradient-to-b from-gray-800/50 to-gray-900/50 border border-gray-700 rounded-md text-center">
       <div className="text-6xl mb-4">🔒</div>
       <h3 className="text-xl font-bold text-white mb-2">
         {title || "Premium Content"}
@@ -46,7 +46,7 @@ export function UpgradePrompt({
       </p>
       <Link
         href="/pricing"
-        className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors"
+        className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-md transition-colors"
       >
         Upgrade to Pro
       </Link>

@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useEffect,
+  startTransition,
   ReactNode,
 } from "react";
 
@@ -21,9 +22,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme;
-    if (savedTheme) {
-      setTheme(savedTheme);
+    const stored = localStorage.getItem("theme") as Theme | null;
+    if (stored) {
+      startTransition(() => {
+        setTheme(stored);
+      });
     }
   }, []);
 

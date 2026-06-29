@@ -406,10 +406,10 @@ func TestIdempotencyKeyConflictDetection(t *testing.T) {
 	requestHash := service.hashRequest(requestBody)
 
 	tests := []struct {
-		name         string
-		existingKey  *models.IdempotencyKey
-		newUserID    string
-		newHash      string
+		name           string
+		existingKey    *models.IdempotencyKey
+		newUserID      string
+		newHash        string
 		expectConflict bool
 	}{
 		{
@@ -611,10 +611,10 @@ func TestSubscriptionStatusTransitions(t *testing.T) {
 
 func TestOrderStatusTransitions(t *testing.T) {
 	tests := []struct {
-		name     string
-		status   models.OrderStatus
-		canPay   bool
-		isPaid   bool
+		name      string
+		status    models.OrderStatus
+		canPay    bool
+		isPaid    bool
 		isExpired bool
 	}{
 		{
@@ -657,10 +657,10 @@ func TestOrderStatusTransitions(t *testing.T) {
 
 func TestUpgradeToLifetime_Allowed(t *testing.T) {
 	tests := []struct {
-		name           string
-		currentPlanID  string
-		targetPlanID   string
-		shouldAllow    bool
+		name          string
+		currentPlanID string
+		targetPlanID  string
+		shouldAllow   bool
 	}{
 		{
 			name:          "free to lifetime - allowed",

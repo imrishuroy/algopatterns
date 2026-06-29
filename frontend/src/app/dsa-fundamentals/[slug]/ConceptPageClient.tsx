@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
   loading: () => (
-    <div className="h-64 rounded-xl animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+    <div className="h-64 rounded-md animate-pulse" style={{ background: "var(--bg-elevated)" }} />
   ),
   ssr: false,
 });
@@ -97,7 +97,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
                 <div className="flex items-center gap-2">
                   <span style={{ color: "var(--text-3)" }}>Time:</span>
                   <code
-                    className="px-2 py-0.5 rounded text-xs font-mono"
+                    className="px-2 py-0.5 rounded-md text-xs font-mono"
                     style={{
                       background: "var(--bg-elevated)",
                       color: "var(--accent-1)",
@@ -111,7 +111,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
                 <div className="flex items-center gap-2">
                   <span style={{ color: "var(--text-3)" }}>Space:</span>
                   <code
-                    className="px-2 py-0.5 rounded text-xs font-mono"
+                    className="px-2 py-0.5 rounded-md text-xs font-mono"
                     style={{
                       background: "var(--bg-elevated)",
                       color: "var(--accent-2)",
@@ -167,7 +167,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
             Use this concept when you encounter these scenarios:
           </p>
           <div
-            className="rounded-xl border p-5"
+            className="rounded-md border p-5"
             style={{
               background: "var(--bg-elevated)",
               borderColor: "var(--border-1)",
@@ -206,7 +206,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
               Code Implementation
             </h2>
             <div
-              className="flex rounded-lg p-1"
+              className="flex rounded-md p-1"
               style={{ background: "var(--bg-elevated)" }}
             >
               {(Object.keys(languageLabels) as SupportedLanguage[]).map(
@@ -256,7 +256,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
               These are the most important things to remember about this concept:
             </p>
             <div
-              className="rounded-xl border p-5"
+              className="rounded-md border p-5"
               style={{
                 background: "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
                 borderColor: "rgba(99, 102, 241, 0.2)",
@@ -307,7 +307,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
               Watch out for these common pitfalls when using this concept:
             </p>
             <div
-              className="rounded-xl border p-5"
+              className="rounded-md border p-5"
               style={{
                 background: "rgba(239, 68, 68, 0.05)",
                 borderColor: "rgba(239, 68, 68, 0.2)",
@@ -357,7 +357,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
               Practice these problems to solidify your understanding:
             </p>
             <div
-              className="rounded-xl border p-5"
+              className="rounded-md border p-5"
               style={{
                 background: "var(--bg-elevated)",
                 borderColor: "var(--border-1)",
@@ -367,7 +367,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
                 {concept.relatedProblems.map((problem, i) => (
                   <span
                     key={i}
-                    className="px-3 py-2 text-sm rounded-lg transition-colors"
+                    className="px-3 py-2 text-sm rounded-md transition-colors"
                     style={{
                       background: "var(--bg-base)",
                       color: "var(--text-2)",
@@ -402,7 +402,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
                 <Link
                   key={i}
                   href={`/patterns/${pattern}`}
-                  className="px-4 py-2 text-sm rounded-lg transition-all hover:scale-105"
+                  className="px-4 py-2 text-sm rounded-md transition-all hover:scale-105"
                   style={{
                     background: "var(--accent-gradient)",
                     color: "white",

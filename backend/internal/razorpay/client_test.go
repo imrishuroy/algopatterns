@@ -496,9 +496,9 @@ func TestVerifySignature_ConstantTimeComparison(_ *testing.T) {
 	// These should all take approximately the same time
 	// (using hmac.Equal which is constant-time)
 	testSignatures := []string{
-		validSignature,                            // Valid
-		"0" + validSignature[1:],                  // Wrong first char
-		validSignature[:63] + "0",                 // Wrong last char
+		validSignature,                                  // Valid
+		"0" + validSignature[1:],                        // Wrong first char
+		validSignature[:63] + "0",                       // Wrong last char
 		validSignature[:32] + "0" + validSignature[33:], // Wrong middle char
 		"totally_wrong_signature_that_doesnt_match_at_all_ever",
 	}

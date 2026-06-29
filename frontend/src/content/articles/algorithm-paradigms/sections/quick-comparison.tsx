@@ -13,7 +13,7 @@ export default function QuickComparisonSection() {
       </p>
 
       {/* Main Comparison Table */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-8 overflow-x-auto">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-700">
@@ -102,7 +102,7 @@ export default function QuickComparisonSection() {
       </h2>
 
       <div className="space-y-4 mb-8">
-        <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
+        <div className="flex items-start gap-4 p-4 bg-red-500/10 border border-red-500/30 rounded-md">
           <span className="text-2xl">🔴</span>
           <div>
             <p className="text-white font-semibold">Recursion</p>
@@ -112,7 +112,7 @@ export default function QuickComparisonSection() {
           </div>
         </div>
 
-        <div className="flex items-start gap-4 p-4 bg-orange-500/10 border border-orange-500/30 rounded-xl">
+        <div className="flex items-start gap-4 p-4 bg-orange-500/10 border border-orange-500/30 rounded-md">
           <span className="text-2xl">🟠</span>
           <div>
             <p className="text-white font-semibold">Backtracking</p>
@@ -122,7 +122,7 @@ export default function QuickComparisonSection() {
           </div>
         </div>
 
-        <div className="flex items-start gap-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+        <div className="flex items-start gap-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-md">
           <span className="text-2xl">🔵</span>
           <div>
             <p className="text-white font-semibold">Dynamic Programming</p>
@@ -132,7 +132,7 @@ export default function QuickComparisonSection() {
           </div>
         </div>
 
-        <div className="flex items-start gap-4 p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
+        <div className="flex items-start gap-4 p-4 bg-green-500/10 border border-green-500/30 rounded-md">
           <span className="text-2xl">🟢</span>
           <div>
             <p className="text-white font-semibold">Greedy</p>
@@ -148,7 +148,7 @@ export default function QuickComparisonSection() {
         How They Relate
       </h2>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-8 font-mono text-sm">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8 font-mono text-sm">
         <pre className="text-gray-300 whitespace-pre overflow-x-auto text-center">
           {`                    RECURSION
                    (base technique)
@@ -166,7 +166,7 @@ export default function QuickComparisonSection() {
         </pre>
       </div>
 
-      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6">
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-md p-6">
         <h4 className="text-lg font-semibold text-indigo-300 mb-3">
           Key Insight
         </h4>

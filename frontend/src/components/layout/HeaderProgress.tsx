@@ -13,7 +13,7 @@ export default function HeaderProgress() {
   const strokeDashoffset = circumference - (percent / 100) * circumference;
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2 bg-gray-800/80 rounded-xl border border-gray-700">
+    <div className="flex items-center gap-3 px-4 py-2 bg-gray-800/80 rounded-md border border-gray-700">
       <div className="relative w-12 h-12">
         <svg className="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
           <circle

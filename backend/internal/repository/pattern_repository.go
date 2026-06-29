@@ -608,9 +608,9 @@ func (r *PatternRepository) BulkCreate(ctx context.Context, patterns []models.Pa
 
 func (r *PatternRepository) ExportAll(ctx context.Context) ([]byte, error) {
 	req := &models.PatternListRequest{
-		Page:     1,
-		PageSize: 1000,
-		SortBy:   "category",
+		Page:      1,
+		PageSize:  1000,
+		SortBy:    "category",
 		SortOrder: "asc",
 	}
 	patterns, _, err := r.List(ctx, req)

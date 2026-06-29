@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 
 export default function PrefixSumVisualizer() {
@@ -17,12 +17,15 @@ export default function PrefixSumVisualizer() {
     "Click Play to build prefix sum array"
   );
 
-  const arr = [2, 4, 1, 3, 5];
-  const queries: [number, number][] = [
-    [1, 3],
-    [0, 4],
-    [2, 2],
-  ];
+  const arr = useMemo(() => [2, 4, 1, 3, 5], []);
+  const queries: [number, number][] = useMemo(
+    () => [
+      [1, 3],
+      [0, 4],
+      [2, 2],
+    ],
+    []
+  );
   const [queryIdx, setQueryIdx] = useState(0);
 
   const reset = useCallback(() => {
@@ -86,7 +89,7 @@ export default function PrefixSumVisualizer() {
   }, [isPlaying, phase, currentIdx, prefix, queryIdx, queries, arr, speed]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">Prefix Sum Array</h3>
         <p className="text-gray-400 text-sm mt-1">
@@ -100,7 +103,7 @@ export default function PrefixSumVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -108,7 +111,7 @@ export default function PrefixSumVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -142,7 +145,7 @@ export default function PrefixSumVisualizer() {
                         ? "#22c55e"
                         : "#374151",
                 }}
-                className="w-12 h-12 rounded-lg flex flex-col items-center justify-center font-mono"
+                className="w-12 h-12 rounded-md flex flex-col items-center justify-center font-mono"
               >
                 <span className="text-lg font-bold text-white">{val}</span>
                 <span className="text-xs text-gray-400">[{idx}]</span>
@@ -160,7 +163,7 @@ export default function PrefixSumVisualizer() {
                 key={`prefix-${val}-${idx}`}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`w-12 h-12 rounded-lg flex flex-col items-center justify-center font-mono ${
+                className={`w-12 h-12 rounded-md flex flex-col items-center justify-center font-mono ${
                   queryRange &&
                   (idx === queryRange[1] + 1 || idx === queryRange[0])
                     ? "bg-orange-500 ring-2 ring-orange-300"
@@ -172,7 +175,7 @@ export default function PrefixSumVisualizer() {
               </motion.div>
             ))}
             {prefix.length <= arr.length && (
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-600 text-gray-500">
+              <div className="w-12 h-12 rounded-md flex items-center justify-center border-2 border-dashed border-gray-600 text-gray-500">
                 ?
               </div>
             )}
@@ -184,7 +187,7 @@ export default function PrefixSumVisualizer() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-4 p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg"
+            className="mb-4 p-4 bg-orange-500/10 border border-orange-500/30 rounded-md"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -210,19 +213,19 @@ export default function PrefixSumVisualizer() {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-blue-400">
               {prefix.length - 1}/{arr.length}
             </div>
             <div className="text-xs text-gray-500">Built</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-orange-400">
               {queryIdx}/{queries.length}
             </div>
             <div className="text-xs text-gray-500">Queries</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-green-400">O(1)</div>
             <div className="text-xs text-gray-500">Per Query</div>
           </div>
@@ -233,7 +236,7 @@ export default function PrefixSumVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -243,7 +246,7 @@ export default function PrefixSumVisualizer() {
         </motion.div>
 
         {/* Formula */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-orange-400">Key Formula:</strong>{" "}
             sum(arr[i..j]) = prefix[j+1] - prefix[i]

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface HeapNode {
@@ -11,10 +11,38 @@ interface HeapNode {
 
 const LIST_COLORS = ["bg-blue-500", "bg-green-500", "bg-purple-500"];
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+    default:
+      return state;
+  }
+}
+
+const INITIAL_LISTS = [
+  [1, 4, 5],
+  [1, 3, 4],
+  [2, 6],
+];
+
 export default function MergeKListsVisualizer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [speed, setSpeed] = useState(800);
-  const [lists, setLists] = useState<number[][]>([]);
+  const [, setLists] = useState<number[][]>([]);
   const [pointers, setPointers] = useState<number[]>([]);
   const [heap, setHeap] = useState<HeapNode[]>([]);
   const [result, setResult] = useState<number[]>([]);
@@ -26,25 +54,21 @@ export default function MergeKListsVisualizer() {
   );
   const [message, setMessage] = useState("Click Play to merge K sorted lists");
 
-  const initialLists = [
-    [1, 4, 5],
-    [1, 3, 4],
-    [2, 6],
-  ];
-
   const reset = useCallback(() => {
-    setLists(initialLists.map((l) => [...l]));
-    setPointers(initialLists.map(() => 0));
+    setLists(INITIAL_LISTS.map((l) => [...l]));
+    setPointers(INITIAL_LISTS.map(() => 0));
     setHeap([]);
     setResult([]);
     setPhase("init");
     setCurrentExtracted(null);
     setMessage("Click Play to merge K sorted lists using min-heap");
-    setIsPlaying(false);
+    dispatch({ type: "STOP" });
   }, []);
 
   useEffect(() => {
-    reset();
+    startTransition(() => {
+      reset();
+    });
   }, [reset]);
 
   const sortHeap = (h: HeapNode[]) => {
@@ -61,13 +85,13 @@ export default function MergeKListsVisualizer() {
       } else if (phase === "initializing") {
         // Add first element from each list to heap
         const newHeap: HeapNode[] = [];
-        initialLists.forEach((list, i) => {
+        INITIAL_LISTS.forEach((list, i) => {
           if (list.length > 0) {
             newHeap.push({ value: list[0], listIndex: i, nodeIndex: 0 });
           }
         });
         setHeap(sortHeap(newHeap));
-        setPointers(initialLists.map(() => 0));
+        setPointers(INITIAL_LISTS.map(() => 0));
         setPhase("extracting");
         setMessage(
           `Heap initialized with first elements: [${newHeap.map((n) => n.value).join(", ")}]`
@@ -76,7 +100,7 @@ export default function MergeKListsVisualizer() {
         if (heap.length === 0) {
           setPhase("done");
           setMessage(`Done! Merged result: [${result.join(", ")}]`);
-          setIsPlaying(false);
+          dispatch({ type: "STOP" });
           return;
         }
 
@@ -96,8 +120,8 @@ export default function MergeKListsVisualizer() {
           newPointers[listIndex] = nextIndex;
           setPointers(newPointers);
 
-          if (nextIndex < initialLists[listIndex].length) {
-            const nextValue = initialLists[listIndex][nextIndex];
+          if (nextIndex < INITIAL_LISTS[listIndex].length) {
+            const nextValue = INITIAL_LISTS[listIndex][nextIndex];
             const newHeap = [
               ...heap,
               { value: nextValue, listIndex, nodeIndex: nextIndex },
@@ -125,7 +149,7 @@ export default function MergeKListsVisualizer() {
   }, [isPlaying, phase, heap, result, pointers, currentExtracted, speed]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Merge K Sorted Lists
@@ -139,9 +163,9 @@ export default function MergeKListsVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch({ type: "TOGGLE" })}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -149,7 +173,7 @@ export default function MergeKListsVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -170,13 +194,13 @@ export default function MergeKListsVisualizer() {
         {/* K Sorted Lists */}
         <div className="mb-6">
           <div className="text-sm text-gray-400 mb-2">
-            K = {initialLists.length} Sorted Lists:
+            K = {INITIAL_LISTS.length} Sorted Lists:
           </div>
           <div className="space-y-2">
-            {initialLists.map((list, listIdx) => (
+            {INITIAL_LISTS.map((list, listIdx) => (
               <div key={listIdx} className="flex items-center gap-2">
                 <span
-                  className={`w-6 h-6 rounded ${LIST_COLORS[listIdx]} flex items-center justify-center text-white text-xs font-bold`}
+                  className={`w-6 h-6 rounded-md ${LIST_COLORS[listIdx]} flex items-center justify-center text-white text-xs font-bold`}
                 >
                   {listIdx + 1}
                 </span>
@@ -188,7 +212,7 @@ export default function MergeKListsVisualizer() {
                         opacity: nodeIdx < pointers[listIdx] ? 0.3 : 1,
                         scale: nodeIdx === pointers[listIdx] ? 1.1 : 1,
                       }}
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center font-mono font-bold transition-colors ${
+                      className={`w-10 h-10 rounded-md flex items-center justify-center font-mono font-bold transition-colors ${
                         nodeIdx < pointers[listIdx]
                           ? "bg-gray-700 text-gray-500"
                           : nodeIdx === pointers[listIdx]
@@ -215,7 +239,7 @@ export default function MergeKListsVisualizer() {
           <div className="text-sm text-gray-400 mb-2">
             Min-Heap (current front pointers):
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-4 min-h-[80px]">
+          <div className="bg-gray-800/50 rounded-md p-4 min-h-[80px]">
             <div className="flex flex-col items-center">
               <AnimatePresence>
                 {heap.length > 0 ? (
@@ -264,12 +288,12 @@ export default function MergeKListsVisualizer() {
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg"
+            className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-md"
           >
             <div className="flex items-center gap-3">
               <span className="text-yellow-400 text-sm">Extracted:</span>
               <span
-                className={`px-3 py-1 rounded ${LIST_COLORS[currentExtracted.listIndex]} text-white font-bold`}
+                className={`px-3 py-1 rounded-md ${LIST_COLORS[currentExtracted.listIndex]} text-white font-bold`}
               >
                 {currentExtracted.value}
               </span>
@@ -283,7 +307,7 @@ export default function MergeKListsVisualizer() {
         {/* Result */}
         <div className="mb-4">
           <div className="text-sm text-gray-400 mb-2">Merged Result:</div>
-          <div className="bg-gray-800/50 rounded-lg p-3 min-h-[50px]">
+          <div className="bg-gray-800/50 rounded-md p-3 min-h-[50px]">
             <div className="flex gap-1 flex-wrap">
               <AnimatePresence>
                 {result.map((num, idx) => (
@@ -291,7 +315,7 @@ export default function MergeKListsVisualizer() {
                     key={`result-${num}-${idx}`}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="px-3 py-1 bg-violet-500 text-white rounded font-mono font-bold"
+                    className="px-3 py-1 bg-violet-500 text-white rounded-md font-mono font-bold"
                   >
                     {num}
                   </motion.span>
@@ -308,21 +332,21 @@ export default function MergeKListsVisualizer() {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-violet-400">
               {heap.length}
             </div>
             <div className="text-xs text-gray-500">Heap Size</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-green-400">
               {result.length}
             </div>
             <div className="text-xs text-gray-500">Merged Count</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-blue-400">
-              {initialLists.reduce((sum, l) => sum + l.length, 0) -
+              {INITIAL_LISTS.reduce((sum, l) => sum + l.length, 0) -
                 result.length}
             </div>
             <div className="text-xs text-gray-500">Remaining</div>
@@ -334,7 +358,7 @@ export default function MergeKListsVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -344,7 +368,7 @@ export default function MergeKListsVisualizer() {
         </motion.div>
 
         {/* Algorithm explanation */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-violet-400">Key Insight:</strong> Keep a
             min-heap of size K (one element from each list). Extract min, add to

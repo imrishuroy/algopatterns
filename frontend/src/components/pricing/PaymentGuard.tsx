@@ -114,7 +114,7 @@ export function PaymentGuard({
       </div>
 
       {/* Overlay with upgrade prompt */}
-      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/70 backdrop-blur-[2px] rounded-lg">
+      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/70 backdrop-blur-[2px] rounded-md">
         <div className="flex flex-col items-center text-center p-6 max-w-sm">
           {/* Lock icon */}
           <div className="w-12 h-12 mb-4 flex items-center justify-center bg-gray-800 rounded-full border border-gray-700">
@@ -144,7 +144,7 @@ export function PaymentGuard({
           {/* Upgrade button */}
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-md transition-colors"
           >
             <svg
               className="w-4 h-4"

@@ -81,13 +81,13 @@ export default function QuizResults({
       <div className="flex items-center justify-center gap-4 mb-8">
         <button
           onClick={onRetake}
-          className="px-6 py-2.5 border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
+          className="px-6 py-2.5 border border-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors"
         >
           Retake Quiz
         </button>
         <button
           onClick={onClose}
-          className="px-6 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-500 transition-colors"
+          className="px-6 py-2.5 bg-teal-600 text-white rounded-md hover:bg-teal-500 transition-colors"
         >
           Continue Learning
         </button>
@@ -105,7 +105,7 @@ export default function QuizResults({
             return (
               <div
                 key={q.id}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 rounded-md bg-gray-800/50 hover:bg-gray-800 transition-colors"
               >
                 <span
                   className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${

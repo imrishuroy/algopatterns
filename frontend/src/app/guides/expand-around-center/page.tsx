@@ -41,7 +41,7 @@ export default function ExpandAroundCenterGuide() {
       </header>
 
       {/* Table of Contents */}
-      <nav className="mb-10 p-4 bg-gray-900/50 rounded-xl border border-gray-800">
+      <nav className="mb-10 p-4 bg-gray-900/50 rounded-md border border-gray-800">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
           In This Guide
         </h2>
@@ -128,7 +128,7 @@ export default function ExpandAroundCenterGuide() {
               we can be smarter: for each position that could be a center,
               expand outward as long as characters match.
             </p>
-            <div className="mt-6 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+            <div className="mt-6 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-md">
               <p className="text-indigo-300 font-medium">
                 Think of it like dropping a pebble in water — the palindrome
                 &quot;ripples&quot; outward from the center, and we stop when
@@ -151,7 +151,7 @@ export default function ExpandAroundCenterGuide() {
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             {/* Odd Length */}
-            <div className="p-5 bg-gray-900 rounded-xl border border-gray-800">
+            <div className="p-5 bg-gray-900 rounded-md border border-gray-800">
               <h3 className="text-lg font-semibold text-green-400 mb-3">
                 Odd Length Palindromes
               </h3>
@@ -172,7 +172,7 @@ export default function ExpandAroundCenterGuide() {
             </div>
 
             {/* Even Length */}
-            <div className="p-5 bg-gray-900 rounded-xl border border-gray-800">
+            <div className="p-5 bg-gray-900 rounded-md border border-gray-800">
               <h3 className="text-lg font-semibold text-purple-400 mb-3">
                 Even Length Palindromes
               </h3>
@@ -194,7 +194,7 @@ export default function ExpandAroundCenterGuide() {
           </div>
 
           {/* Visual Example */}
-          <div className="p-5 bg-gray-900 rounded-xl border border-gray-800">
+          <div className="p-5 bg-gray-900 rounded-md border border-gray-800">
             <h4 className="text-sm font-semibold text-gray-400 mb-3">
               Example: String &quot;abba&quot; has 7 possible centers
             </h4>
@@ -289,7 +289,7 @@ export default function ExpandAroundCenterGuide() {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-gray-900 rounded-lg font-mono text-sm">
+          <div className="mt-6 p-4 bg-gray-900 rounded-md font-mono text-sm">
             <pre className="text-gray-300">{`expand(left, right):
     while left >= 0 AND right < n AND s[left] == s[right]:
         // Found a palindrome from left to right
@@ -304,7 +304,7 @@ export default function ExpandAroundCenterGuide() {
             Complexity Analysis
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="p-5 bg-gray-900 rounded-xl border border-gray-800">
+            <div className="p-5 bg-gray-900 rounded-md border border-gray-800">
               <h3 className="text-lg font-semibold text-yellow-400 mb-2">
                 Time: O(n²)
               </h3>
@@ -317,7 +317,7 @@ export default function ExpandAroundCenterGuide() {
                 </li>
               </ul>
             </div>
-            <div className="p-5 bg-gray-900 rounded-xl border border-gray-800">
+            <div className="p-5 bg-gray-900 rounded-md border border-gray-800">
               <h3 className="text-lg font-semibold text-green-400 mb-2">
                 Space: O(1)
               </h3>
@@ -360,7 +360,7 @@ export default function ExpandAroundCenterGuide() {
                 href={problem.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between p-4 bg-gray-900 rounded-lg border border-gray-800 hover:border-indigo-500/50 transition group"
+                className="flex items-center justify-between p-4 bg-gray-900 rounded-md border border-gray-800 hover:border-indigo-500/50 transition group"
               >
                 <div>
                   <span className="text-white font-medium group-hover:text-indigo-400 transition">
@@ -369,7 +369,7 @@ export default function ExpandAroundCenterGuide() {
                   <p className="text-gray-500 text-sm mt-1">{problem.hint}</p>
                 </div>
                 <span
-                  className={`px-2 py-1 rounded text-xs font-medium ${
+                  className={`px-2 py-1 rounded-md text-xs font-medium ${
                     problem.difficulty === "Easy"
                       ? "bg-green-500/20 text-green-400"
                       : problem.difficulty === "Medium"
@@ -390,7 +390,7 @@ export default function ExpandAroundCenterGuide() {
             When to Use / Not Use
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="p-5 bg-green-500/10 rounded-xl border border-green-500/30">
+            <div className="p-5 bg-green-500/10 rounded-md border border-green-500/30">
               <h3 className="text-lg font-semibold text-green-400 mb-3">
                 Use This Pattern
               </h3>
@@ -404,7 +404,7 @@ export default function ExpandAroundCenterGuide() {
                 <li>✓ When O(1) space is required</li>
               </ul>
             </div>
-            <div className="p-5 bg-red-500/10 rounded-xl border border-red-500/30">
+            <div className="p-5 bg-red-500/10 rounded-md border border-red-500/30">
               <h3 className="text-lg font-semibold text-red-400 mb-3">
                 Don&apos;t Use (Use DP Instead)
               </h3>
@@ -419,7 +419,7 @@ export default function ExpandAroundCenterGuide() {
               </ul>
             </div>
           </div>
-          <div className="mt-4 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+          <div className="mt-4 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-md">
             <p className="text-indigo-300 text-sm">
               <strong>Key distinction:</strong> Substring = contiguous
               characters. Subsequence = can skip characters. This pattern only
@@ -454,7 +454,7 @@ export default function ExpandAroundCenterGuide() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="p-4 bg-gray-900 rounded-lg border border-gray-800"
+                className="p-4 bg-gray-900 rounded-md border border-gray-800"
               >
                 <p className="text-red-400 font-medium">{item.mistake}</p>
                 <p className="text-gray-400 text-sm mt-1">Fix: {item.fix}</p>
@@ -464,7 +464,7 @@ export default function ExpandAroundCenterGuide() {
         </section>
 
         {/* Advanced Note */}
-        <section className="p-5 bg-gray-900/50 rounded-xl border border-gray-700">
+        <section className="p-5 bg-gray-900/50 rounded-md border border-gray-700">
           <h3 className="text-lg font-semibold text-gray-300 mb-2">
             Advanced: Manacher&apos;s Algorithm
           </h3>

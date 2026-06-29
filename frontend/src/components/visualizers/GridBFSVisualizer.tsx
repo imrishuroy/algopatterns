@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
 import { motion } from "framer-motion";
 
 type CellState = "water" | "land" | "visiting" | "visited";
@@ -29,9 +29,31 @@ const initialGridData = [
   [0, 0, 0, 1, 1],
 ];
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+    default:
+      return state;
+  }
+}
+
 export default function GridBFSVisualizer() {
   const [mode, setMode] = useState<Mode>("bfs");
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [speed, setSpeed] = useState(300);
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [queue, setQueue] = useState<[number, number][]>([]);
@@ -61,14 +83,16 @@ export default function GridBFSVisualizer() {
     setScanPosition([0, 0]);
     setPhase("scanning");
     setMessage("Click Play to start finding islands");
-    setIsPlaying(false);
+    dispatch({ type: "STOP" });
   }, []);
 
   useEffect(() => {
-    initGrid();
+    startTransition(() => {
+      initGrid();
+    });
   }, [initGrid]);
 
-  const getNeighbors = (r: number, c: number): [number, number][] => {
+  const getNeighbors = useCallback((r: number, c: number): [number, number][] => {
     const dirs = [
       [0, 1],
       [0, -1],
@@ -84,7 +108,7 @@ export default function GridBFSVisualizer() {
       }
     }
     return neighbors;
-  };
+  }, [grid]);
 
   useEffect(() => {
     if (!isPlaying || grid.length === 0) return;
@@ -96,7 +120,7 @@ export default function GridBFSVisualizer() {
         if (sr >= grid.length) {
           setPhase("done");
           setMessage(`Found ${islandCount} islands!`);
-          setIsPlaying(false);
+          dispatch({ type: "STOP" });
           return;
         }
 
@@ -193,6 +217,7 @@ export default function GridBFSVisualizer() {
     currentIsland,
     islandCount,
     speed,
+    getNeighbors,
   ]);
 
   const getCellColor = (cell: Cell) => {
@@ -211,7 +236,7 @@ export default function GridBFSVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Grid Traversal: Number of Islands
@@ -229,7 +254,7 @@ export default function GridBFSVisualizer() {
               setMode("bfs");
               initGrid();
             }}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               mode === "bfs"
                 ? "bg-cyan-500 text-white"
                 : "bg-gray-800 text-gray-400"
@@ -242,7 +267,7 @@ export default function GridBFSVisualizer() {
               setMode("dfs");
               initGrid();
             }}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               mode === "dfs"
                 ? "bg-purple-500 text-white"
                 : "bg-gray-800 text-gray-400"
@@ -255,9 +280,9 @@ export default function GridBFSVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch({ type: "TOGGLE" })}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -265,7 +290,7 @@ export default function GridBFSVisualizer() {
           </button>
           <button
             onClick={initGrid}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -285,11 +310,10 @@ export default function GridBFSVisualizer() {
 
         {/* Grid Visualization */}
         <div className="flex justify-center mb-4">
-          <div className="inline-block p-4 bg-gray-800/50 rounded-lg">
+          <div className="inline-block p-4 bg-gray-800/50 rounded-md">
             {grid.map((row, rowIndex) => (
               <div
-                // eslint-disable-next-line react/no-array-index-key -- row index is part of grid identity
-                key={`row${rowIndex}-${row.map(c => c.state).join('')}`}
+                key={`row${rowIndex}-${row.map(c => c.state).join('')}`} // skipcq: JS-0437
                 className="flex gap-1 mb-1"
               >
                 {row.map((cell) => (
@@ -298,7 +322,7 @@ export default function GridBFSVisualizer() {
                     animate={{
                       scale: cell.state === "visiting" ? 1.1 : 1,
                     }}
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center font-mono text-sm transition-colors relative ${getCellColor(cell)} ${
+                    className={`w-12 h-12 rounded-md flex items-center justify-center font-mono text-sm transition-colors relative ${getCellColor(cell)} ${
                       isScanPosition(cell.row, cell.col)
                         ? "ring-2 ring-white ring-offset-2 ring-offset-gray-900"
                         : ""
@@ -324,16 +348,15 @@ export default function GridBFSVisualizer() {
 
         {/* Data Structure Display */}
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="bg-gray-800/50 rounded-md p-3">
             <div className="text-xs text-gray-500 mb-2">
               {mode === "bfs" ? "Queue (FIFO)" : "Stack (LIFO)"}
             </div>
             <div className="flex flex-wrap gap-1 min-h-[32px]">
               {(mode === "bfs" ? queue : stack).map(([r, c], position) => (
                 <span
-                  // eslint-disable-next-line react/no-array-index-key -- queue/stack position determines processing order
-                  key={`frontier-r${r}-c${c}-pos${position}`}
-                  className={`px-2 py-1 rounded text-xs font-mono ${
+                  key={`frontier-r${r}-c${c}-pos${position}`} // skipcq: JS-0437
+                  className={`px-2 py-1 rounded-md text-xs font-mono ${
                     position === 0 && mode === "bfs"
                       ? "bg-yellow-500 text-black"
                       : position === (mode === "dfs" ? stack.length - 1 : -1)
@@ -349,7 +372,7 @@ export default function GridBFSVisualizer() {
               )}
             </div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="bg-gray-800/50 rounded-md p-3">
             <div className="text-xs text-gray-500 mb-2">Islands Found</div>
             <div className="flex items-center gap-2">
               <span className="text-3xl font-bold text-cyan-400">
@@ -359,7 +382,7 @@ export default function GridBFSVisualizer() {
                 {Array.from({ length: islandCount }).map((_, i) => (
                   <div
                     key={`island-${i + 1}`}
-                    className={`w-4 h-4 rounded ${ISLAND_COLORS[i % ISLAND_COLORS.length]}`}
+                    className={`w-4 h-4 rounded-md ${ISLAND_COLORS[i % ISLAND_COLORS.length]}`}
                   />
                 ))}
               </div>
@@ -372,7 +395,7 @@ export default function GridBFSVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : phase === "exploring"
@@ -386,25 +409,25 @@ export default function GridBFSVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gray-600" />
+            <div className="w-4 h-4 rounded-md bg-gray-600" />
             <span className="text-gray-400">Unvisited Land</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500" />
+            <div className="w-4 h-4 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Currently Exploring</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-blue-500" />
+            <div className="w-4 h-4 rounded-md bg-blue-500" />
             <span className="text-gray-400">Visited (Island)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gray-800" />
+            <div className="w-4 h-4 rounded-md bg-gray-800" />
             <span className="text-gray-400">Water</span>
           </div>
         </div>
 
         {/* Algorithm explanation */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong
               className={mode === "bfs" ? "text-cyan-400" : "text-purple-400"}

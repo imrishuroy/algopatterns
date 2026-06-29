@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function TwoSumVisualizer() {
@@ -19,7 +19,7 @@ export default function TwoSumVisualizer() {
     "init" | "checking" | "adding" | "found" | "done"
   >("init");
 
-  const nums = [2, 7, 11, 15, 3, 6];
+  const nums = useMemo(() => [2, 7, 11, 15, 3, 6], []);
   const target = 9;
 
   const reset = useCallback(() => {
@@ -76,7 +76,7 @@ export default function TwoSumVisualizer() {
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [isPlaying, currentIndex, phase, hashMap, speed]);
+  }, [isPlaying, currentIndex, phase, hashMap, nums, target, speed]);
 
   const getArrayCellStyle = (index: number) => {
     if (found && (index === found[0] || index === found[1])) {
@@ -92,7 +92,7 @@ export default function TwoSumVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-pink-500/10 to-rose-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Two Sum: Complement Lookup
@@ -105,7 +105,7 @@ export default function TwoSumVisualizer() {
       <div className="p-4">
         {/* Target display */}
         <div className="flex items-center gap-4 mb-4">
-          <div className="bg-gray-800 rounded-lg px-4 py-2">
+          <div className="bg-gray-800 rounded-md px-4 py-2">
             <span className="text-gray-400 text-sm">Target: </span>
             <span className="text-2xl font-bold text-pink-400">{target}</span>
           </div>
@@ -113,7 +113,7 @@ export default function TwoSumVisualizer() {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-purple-500/20 border border-purple-500 rounded-lg px-4 py-2"
+              className="bg-purple-500/20 border border-purple-500 rounded-md px-4 py-2"
             >
               <span className="text-gray-400 text-sm">Looking for: </span>
               <span className="text-2xl font-bold text-purple-400">
@@ -128,7 +128,7 @@ export default function TwoSumVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "found" || phase === "done"}
-            className={`px-3 md:px-4 py-2 rounded-lg font-medium text-sm md:text-base transition ${
+            className={`px-3 md:px-4 py-2 rounded-md font-medium text-sm md:text-base transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -136,7 +136,7 @@ export default function TwoSumVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-3 md:px-4 py-2 bg-gray-700 text-white rounded-lg font-medium text-sm md:text-base hover:bg-gray-600"
+            className="px-3 md:px-4 py-2 bg-gray-700 text-white rounded-md font-medium text-sm md:text-base hover:bg-gray-600"
           >
             Reset
           </button>
@@ -167,7 +167,7 @@ export default function TwoSumVisualizer() {
                   scale: idx === currentIndex ? 1.1 : 1,
                   y: idx === currentIndex ? -5 : 0,
                 }}
-                className={`w-10 h-10 md:w-14 md:h-14 rounded-lg border-2 flex flex-col items-center justify-center transition-colors ${getArrayCellStyle(idx)}`}
+                className={`w-10 h-10 md:w-14 md:h-14 rounded-md border-2 flex flex-col items-center justify-center transition-colors ${getArrayCellStyle(idx)}`}
               >
                 <span className="text-[10px] md:text-xs text-gray-400">i={idx}</span>
                 <span className="text-sm md:text-lg font-bold">{num}</span>
@@ -181,7 +181,7 @@ export default function TwoSumVisualizer() {
           <div className="text-sm text-gray-400 mb-2">
             HashMap: value → index
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-4 min-h-[80px]">
+          <div className="bg-gray-800/50 rounded-md p-4 min-h-[80px]">
             <div className="flex flex-wrap gap-2">
               <AnimatePresence>
                 {Array.from(hashMap.entries()).map(([value, index]) => (
@@ -190,7 +190,7 @@ export default function TwoSumVisualizer() {
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0 }}
-                    className={`px-3 py-2 rounded-lg font-mono text-sm ${
+                    className={`px-3 py-2 rounded-md font-mono text-sm ${
                       currentComplement === value
                         ? "bg-green-500 text-white ring-2 ring-green-300"
                         : "bg-blue-500/30 border border-blue-500 text-blue-300"
@@ -211,7 +211,7 @@ export default function TwoSumVisualizer() {
 
         {/* Current calculation */}
         {currentIndex < nums.length && phase !== "found" && (
-          <div className="p-3 bg-gray-800/50 rounded-lg mb-4">
+          <div className="p-3 bg-gray-800/50 rounded-md mb-4">
             <code className="text-sm font-mono">
               <span className="text-gray-400">complement = </span>
               <span className="text-pink-400">{target}</span>
@@ -239,7 +239,7 @@ export default function TwoSumVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "found"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : phase === "done"
@@ -253,21 +253,21 @@ export default function TwoSumVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500" />
+            <div className="w-4 h-4 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Current</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-blue-500/30 border border-blue-500" />
+            <div className="w-4 h-4 rounded-md bg-blue-500/30 border border-blue-500" />
             <span className="text-gray-400">In HashMap</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500" />
+            <div className="w-4 h-4 rounded-md bg-green-500" />
             <span className="text-gray-400">Found Pair</span>
           </div>
         </div>
 
         {/* Algorithm explanation */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-pink-400">Key Insight:</strong> For each
             number, check if its complement (target - num) exists in the map.

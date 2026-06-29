@@ -1374,7 +1374,7 @@ export const questions: Question[] = [
   },
   {
     id: "gr-18",
-    name: "Surrounded Regions",
+    name: "Surrounded-md Regions",
     url: "https://leetcode.com/problems/surrounded-regions",
     difficulty: "Medium",
     pattern: "DFS/BFS",

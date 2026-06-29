@@ -19,7 +19,6 @@ export default function UnifiedTracker({ questions }: UnifiedTrackerProps) {
     completed,
     toggleComplete,
     resetProgress,
-    isLoading,
     celebrationKey,
   } = useProgress();
   const [search, setSearch] = useState("");
@@ -50,7 +49,7 @@ export default function UnifiedTracker({ questions }: UnifiedTrackerProps) {
     const map = new Map<string, Pattern>();
     patterns.forEach((p) => {
       const matchingCategories = Object.entries(categoryToPatternId)
-        .filter(([_, patternId]) => patternId === p.id)
+        .filter(([, patternId]) => patternId === p.id)
         .map(([category]) => category);
       matchingCategories.forEach((cat) => map.set(cat, p));
     });
@@ -60,7 +59,7 @@ export default function UnifiedTracker({ questions }: UnifiedTrackerProps) {
   return (
     <div>
       {celebrationKey > 0 && <Confetti key={celebrationKey} />}
-      <div className="bg-gray-800/50 rounded-xl p-4 mb-6 border border-gray-700">
+      <div className="bg-gray-800/50 rounded-md p-4 mb-6 border border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
             Filters
@@ -105,14 +104,14 @@ export default function UnifiedTracker({ questions }: UnifiedTrackerProps) {
               placeholder="Search questions..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-sm focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           <select
             value={difficultyFilter}
             onChange={(e) => setDifficultyFilter(e.target.value)}
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm focus:outline-none focus:border-indigo-500"
+            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-sm focus:outline-none focus:border-indigo-500"
           >
             <option value="">All Difficulties</option>
             <option value="Easy">Easy</option>
@@ -123,7 +122,7 @@ export default function UnifiedTracker({ questions }: UnifiedTrackerProps) {
           <select
             value={companyFilter}
             onChange={(e) => setCompanyFilter(e.target.value)}
-            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm focus:outline-none focus:border-indigo-500"
+            className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-sm focus:outline-none focus:border-indigo-500"
           >
             <option value="">All Companies</option>
             {companies.map((c) => (
@@ -160,7 +159,7 @@ export default function UnifiedTracker({ questions }: UnifiedTrackerProps) {
                 {categoryQuestions.map((q) => (
                   <div
                     key={q.id}
-                    className={`flex items-center gap-4 p-4 bg-gray-800/50 rounded-lg border transition hover:translate-x-1 ${
+                    className={`flex items-center gap-4 p-4 bg-gray-800/50 rounded-md border transition hover:translate-x-1 ${
                       completed.has(q.id)
                         ? "border-green-500/30 bg-green-500/5"
                         : "border-gray-700"

@@ -22,7 +22,7 @@ export default function TypesSection() {
       </h2>
 
       <div className="grid md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-indigo-400 mb-2">
             Direct Recursion
           </h4>
@@ -35,7 +35,7 @@ export default function TypesSection() {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-purple-400 mb-2">
             Indirect Recursion
           </h4>
@@ -48,7 +48,7 @@ export default function TypesSection() {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-green-400 mb-2">
             Tail Recursion
           </h4>
@@ -61,7 +61,7 @@ export default function TypesSection() {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-orange-400 mb-2">
             Head Recursion
           </h4>
@@ -74,7 +74,7 @@ export default function TypesSection() {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-red-400 mb-2">
             Tree Recursion
           </h4>
@@ -87,7 +87,7 @@ export default function TypesSection() {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-cyan-400 mb-2">
             Mutual Recursion
           </h4>
@@ -101,7 +101,7 @@ export default function TypesSection() {
         </div>
       </div>
 
-      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6">
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-md p-6">
         <h4 className="text-lg font-semibold text-indigo-300 mb-3">
           Choosing the Right Type
         </h4>

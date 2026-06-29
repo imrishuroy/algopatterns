@@ -19,7 +19,7 @@ export default function CommonPitfallsSection() {
         Pitfall 1: The Greedy Trap
       </h2>
 
-      <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 mb-6">
+      <div className="bg-red-500/10 border border-red-500/30 rounded-md p-6 mb-6">
         <h4 className="text-lg font-semibold text-red-400 mb-3">
           When Greedy Looks Right But Isn&apos;t
         </h4>
@@ -28,14 +28,14 @@ export default function CommonPitfallsSection() {
           coins [1, 3, 4], make amount 6.
         </p>
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-gray-900 rounded-lg p-4">
+          <div className="bg-gray-900 rounded-md p-4">
             <p className="text-red-400 font-semibold mb-2">Greedy (WRONG)</p>
             <p className="text-gray-400 text-sm">
               Pick largest first: 4 + 1 + 1 ={" "}
               <strong className="text-white">3 coins</strong>
             </p>
           </div>
-          <div className="bg-gray-900 rounded-lg p-4">
+          <div className="bg-gray-900 rounded-md p-4">
             <p className="text-green-400 font-semibold mb-2">DP (CORRECT)</p>
             <p className="text-gray-400 text-sm">
               Optimal: 3 + 3 = <strong className="text-white">2 coins</strong>
@@ -44,7 +44,7 @@ export default function CommonPitfallsSection() {
         </div>
       </div>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-5 mb-8">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-5 mb-8">
         <h4 className="text-lg font-semibold text-white mb-3">
           When Greedy Works vs Fails
         </h4>
@@ -103,7 +103,7 @@ export default function CommonPitfallsSection() {
         Pitfall 2: DP vs Backtracking Confusion
       </h2>
 
-      <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-6 mb-6">
+      <div className="bg-orange-500/10 border border-orange-500/30 rounded-md p-6 mb-6">
         <h4 className="text-lg font-semibold text-orange-400 mb-3">
           Choosing the Wrong One
         </h4>
@@ -137,7 +137,7 @@ export default function CommonPitfallsSection() {
         </div>
       </div>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-5 mb-8">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-5 mb-8">
         <h4 className="text-lg font-semibold text-white mb-3">
           Quick Decision Rule
         </h4>
@@ -162,7 +162,7 @@ export default function CommonPitfallsSection() {
       </h2>
 
       <div className="grid md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-5">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-red-400 mb-3">
             Wrong (No Undo)
           </h4>
@@ -181,7 +181,7 @@ export default function CommonPitfallsSection() {
           />
         </div>
 
-        <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-5">
+        <div className="bg-green-500/10 border border-green-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-green-400 mb-3">
             Correct (With Undo)
           </h4>
@@ -206,7 +206,7 @@ export default function CommonPitfallsSection() {
         Pitfall 4: Incomplete Memoization Key
       </h2>
 
-      <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 mb-6">
+      <div className="bg-red-500/10 border border-red-500/30 rounded-md p-6 mb-6">
         <h4 className="text-lg font-semibold text-red-400 mb-3">
           Common Bug: Missing State in Key
         </h4>
@@ -234,7 +234,7 @@ int solve(int index, int remaining) {
         Pitfall 5: Missing Overlapping Subproblems
       </h2>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-5 mb-8">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-5 mb-8">
         <h4 className="text-lg font-semibold text-white mb-3">
           How to Check for Overlap
         </h4>
@@ -260,7 +260,7 @@ int solve(int index, int remaining) {
       </h2>
 
       <div className="space-y-3 mb-8">
-        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
+        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-md">
           <span className="text-red-400 text-lg">1</span>
           <p className="text-gray-300">
             <strong className="text-white">
@@ -269,7 +269,7 @@ int solve(int index, int remaining) {
             — test with counter-examples first
           </p>
         </div>
-        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
+        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-md">
           <span className="text-red-400 text-lg">2</span>
           <p className="text-gray-300">
             <strong className="text-white">
@@ -277,14 +277,14 @@ int solve(int index, int remaining) {
             </strong>
           </p>
         </div>
-        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
+        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-md">
           <span className="text-red-400 text-lg">3</span>
           <p className="text-gray-300">
             <strong className="text-white">Always undo choices</strong> in
             backtracking (Choose → Explore → Undo)
           </p>
         </div>
-        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
+        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-md">
           <span className="text-red-400 text-lg">4</span>
           <p className="text-gray-300">
             <strong className="text-white">
@@ -293,7 +293,7 @@ int solve(int index, int remaining) {
             , not just the index
           </p>
         </div>
-        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-lg">
+        <div className="flex items-start gap-3 p-3 bg-gray-900 rounded-md">
           <span className="text-red-400 text-lg">5</span>
           <p className="text-gray-300">
             <strong className="text-white">Check constraints first</strong> —
@@ -302,7 +302,7 @@ int solve(int index, int remaining) {
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 rounded-md p-6">
         <h4 className="text-xl font-bold text-indigo-300 mb-3">
           Final Summary
         </h4>

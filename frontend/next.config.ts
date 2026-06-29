@@ -1,17 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: process.cwd(),
+  },
   images: {
     formats: ["image/avif", "image/webp"],
   },
-  experimental: {
-    optimizePackageImports: [
-      "react-syntax-highlighter",
-      "react-markdown",
-      "remark-gfm",
-      "@monaco-editor/react",
-    ],
-  },
+  experimental: {},
 };
 
 export default nextConfig;

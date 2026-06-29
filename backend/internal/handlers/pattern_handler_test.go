@@ -40,23 +40,23 @@ func (m *MockPatternPaymentRepo) GetPlanByID(ctx context.Context, id string) (*m
 }
 
 type stubPatternService struct {
-	createResult    *models.Pattern
-	createErr       error
-	getByIDResult   *models.Pattern
-	getByIDErr      error
-	listResult      *models.PatternListResponse
-	listErr         error
-	updateResult    *models.Pattern
-	updateErr       error
-	deleteErr       error
+	createResult     *models.Pattern
+	createErr        error
+	getByIDResult    *models.Pattern
+	getByIDErr       error
+	listResult       *models.PatternListResponse
+	listErr          error
+	updateResult     *models.Pattern
+	updateErr        error
+	deleteErr        error
 	categoriesResult []string
-	categoriesErr   error
+	categoriesErr    error
 	bulkImportResult *models.BulkImportResponse
-	bulkImportErr   error
-	exportResult    []byte
-	exportErr       error
-	searchResult    []models.Pattern
-	searchErr       error
+	bulkImportErr    error
+	exportResult     []byte
+	exportErr        error
+	searchResult     []models.Pattern
+	searchErr        error
 }
 
 func (s *stubPatternService) Create(_ context.Context, _ *models.CreatePatternRequest) (*models.Pattern, error) {

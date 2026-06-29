@@ -76,7 +76,7 @@ export default function RemoveDuplicatesVisualizer() {
   const uniqueLength = slow + 1;
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Remove Duplicates (Sorted Array)
@@ -92,7 +92,7 @@ export default function RemoveDuplicatesVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -100,7 +100,7 @@ export default function RemoveDuplicatesVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -119,7 +119,7 @@ export default function RemoveDuplicatesVisualizer() {
         </div>
 
         {/* Original array */}
-        <div className="mb-2 p-2 bg-gray-800/30 rounded-lg">
+        <div className="mb-2 p-2 bg-gray-800/30 rounded-md">
           <span className="text-gray-500 text-xs">Original: </span>
           <span className="text-gray-400 font-mono text-sm">
             [{originalNums.join(", ")}]
@@ -141,7 +141,7 @@ export default function RemoveDuplicatesVisualizer() {
                   scale: idx === slow || idx === fast ? 1.1 : 1,
                   opacity: phase === "done" && idx > slow ? 0.3 : 1,
                 }}
-                className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-white text-sm"
+                className="w-10 h-10 rounded-md flex items-center justify-center font-bold text-white text-sm"
               >
                 {num}
               </motion.div>
@@ -172,13 +172,13 @@ export default function RemoveDuplicatesVisualizer() {
 
         {/* Pointer explanation */}
         <div className="mb-4 grid grid-cols-2 gap-2 text-sm">
-          <div className="p-2 bg-green-500/10 border border-green-500/30 rounded-lg">
+          <div className="p-2 bg-green-500/10 border border-green-500/30 rounded-md">
             <span className="text-green-400 font-bold">Slow (S): </span>
             <span className="text-gray-300">
               Position of last unique = {slow}
             </span>
           </div>
-          <div className="p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+          <div className="p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-md">
             <span className="text-yellow-400 font-bold">Fast (F): </span>
             <span className="text-gray-300">Scanning position = {fast}</span>
           </div>
@@ -189,7 +189,7 @@ export default function RemoveDuplicatesVisualizer() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-lg"
+            className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-md"
           >
             <div className="text-green-400 font-bold">
               Result: [{nums.slice(0, uniqueLength).join(", ")}]
@@ -217,7 +217,7 @@ export default function RemoveDuplicatesVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -229,21 +229,21 @@ export default function RemoveDuplicatesVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex gap-4 text-xs">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-green-500" />
+            <div className="w-3 h-3 rounded-md bg-green-500" />
             <span className="text-gray-400">Unique region</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-yellow-500" />
+            <div className="w-3 h-3 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Fast pointer</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-gray-500 opacity-50" />
+            <div className="w-3 h-3 rounded-md bg-gray-500 opacity-50" />
             <span className="text-gray-400">Ignored</span>
           </div>
         </div>
 
         {/* Key insight */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-purple-400">Key Insight:</strong> Slow marks
             where to write next unique. Fast scans for new values. When fast

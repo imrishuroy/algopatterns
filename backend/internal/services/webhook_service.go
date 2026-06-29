@@ -386,15 +386,15 @@ func (s *WebhookService) handleSubscriptionCharged(ctx context.Context, event mo
 			method, _ := paymentEntity["method"].(string)
 
 			payment := &models.Payment{
-				ID:                     uuid.New().String(),
-				UserID:                 sub.UserID,
-				SubscriptionID:         &sub.ID,
-				RazorpayPaymentID:      paymentID,
-				Amount:                 amount,
-				Currency:               "INR",
-				Method:                 &method,
-				Status:                 models.PaymentStatusCaptured,
-				CapturedAt:             &now,
+				ID:                uuid.New().String(),
+				UserID:            sub.UserID,
+				SubscriptionID:    &sub.ID,
+				RazorpayPaymentID: paymentID,
+				Amount:            amount,
+				Currency:          "INR",
+				Method:            &method,
+				Status:            models.PaymentStatusCaptured,
+				CapturedAt:        &now,
 			}
 
 			if err := s.repo.CreatePayment(ctx, payment); err != nil {

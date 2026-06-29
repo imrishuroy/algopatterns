@@ -104,7 +104,7 @@ export default function ContainerWaterVisualizer() {
   const svgHeight = maxHeight * 25 + 40;
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Container With Most Water
@@ -120,7 +120,7 @@ export default function ContainerWaterVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -128,7 +128,7 @@ export default function ContainerWaterVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -148,13 +148,13 @@ export default function ContainerWaterVisualizer() {
 
         {/* Area display */}
         <div className="mb-4 grid grid-cols-2 gap-4">
-          <div className="p-3 bg-gray-800/50 rounded-lg">
+          <div className="p-3 bg-gray-800/50 rounded-md">
             <span className="text-gray-400 text-sm">Current Area: </span>
             <span className="text-cyan-400 font-bold text-xl">
               {currentArea}
             </span>
           </div>
-          <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+          <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-md">
             <span className="text-gray-400 text-sm">Max Area: </span>
             <span className="text-cyan-400 font-bold text-xl">{maxArea}</span>
           </div>
@@ -165,7 +165,7 @@ export default function ContainerWaterVisualizer() {
           <svg
             width={svgWidth}
             height={svgHeight}
-            className="bg-gray-800/30 rounded-lg"
+            className="bg-gray-800/30 rounded-md"
           >
             {/* Water area */}
             {phase !== "init" && (
@@ -240,7 +240,7 @@ export default function ContainerWaterVisualizer() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-4 p-3 bg-gray-800/50 rounded-lg text-center font-mono"
+            className="mb-4 p-3 bg-gray-800/50 rounded-md text-center font-mono"
           >
             <span className="text-gray-400">Area = min(</span>
             <span className="text-blue-400">{heights[left]}</span>
@@ -260,7 +260,7 @@ export default function ContainerWaterVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -270,7 +270,7 @@ export default function ContainerWaterVisualizer() {
         </motion.div>
 
         {/* Key insight */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-cyan-400">Key Insight:</strong> Always move
             the shorter line. The shorter line limits height, so keeping it can

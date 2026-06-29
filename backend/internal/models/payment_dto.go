@@ -10,10 +10,10 @@ type CreateOrderRequest struct {
 
 // CreateOrderResponse represents the response after creating an order
 type CreateOrderResponse struct {
-	OrderID         string          `json:"order_id"`
-	RazorpayOrderID string          `json:"razorpay_order_id"`
-	RazorpayKeyID   string          `json:"razorpay_key_id"`
-	Plan            PlanSummary     `json:"plan"`
+	OrderID         string           `json:"order_id"`
+	RazorpayOrderID string           `json:"razorpay_order_id"`
+	RazorpayKeyID   string           `json:"razorpay_key_id"`
+	Plan            PlanSummary      `json:"plan"`
 	Pricing         PricingBreakdown `json:"pricing"`
 }
 
@@ -50,13 +50,13 @@ type VerifyPaymentResponse struct {
 
 // SubscriptionResponse represents a user's subscription for API response
 type SubscriptionResponse struct {
-	ID                 string        `json:"id,omitempty"`
-	PlanID             string        `json:"plan_id"`
-	Status             string        `json:"status"`
-	CurrentPeriodStart *time.Time    `json:"current_period_start,omitempty"`
-	CurrentPeriodEnd   *time.Time    `json:"current_period_end,omitempty"`
-	CancelAtPeriodEnd  bool          `json:"cancel_at_period_end,omitempty"`
-	Features           PlanFeatures  `json:"features"`
+	ID                 string       `json:"id,omitempty"`
+	PlanID             string       `json:"plan_id"`
+	Status             string       `json:"status"`
+	CurrentPeriodStart *time.Time   `json:"current_period_start,omitempty"`
+	CurrentPeriodEnd   *time.Time   `json:"current_period_end,omitempty"`
+	CancelAtPeriodEnd  bool         `json:"cancel_at_period_end,omitempty"`
+	Features           PlanFeatures `json:"features"`
 }
 
 // ValidateDiscountRequest represents a request to validate a discount code
@@ -82,10 +82,10 @@ type CancelSubscriptionRequest struct {
 
 // CancelSubscriptionResponse represents the response after canceling
 type CancelSubscriptionResponse struct {
-	ID               string     `json:"id"`
-	Status           string     `json:"status"`
-	CancelAtPeriodEnd bool      `json:"cancel_at_period_end"`
-	CurrentPeriodEnd *time.Time `json:"current_period_end,omitempty"`
+	ID                string     `json:"id"`
+	Status            string     `json:"status"`
+	CancelAtPeriodEnd bool       `json:"cancel_at_period_end"`
+	CurrentPeriodEnd  *time.Time `json:"current_period_end,omitempty"`
 }
 
 // PlansListResponse represents the list of available plans
@@ -119,20 +119,20 @@ type RazorpayWebhookEvent struct {
 
 // RazorpayPaymentEntity represents a payment entity from Razorpay
 type RazorpayPaymentEntity struct {
-	ID            string `json:"id"`
-	Entity        string `json:"entity"`
-	Amount        int    `json:"amount"`
-	Currency      string `json:"currency"`
-	Status        string `json:"status"`
-	OrderID       string `json:"order_id"`
-	Method        string `json:"method"`
-	Email         string `json:"email"`
-	Contact       string `json:"contact"`
-	Fee           int    `json:"fee"`
-	Tax           int    `json:"tax"`
-	ErrorCode     string `json:"error_code,omitempty"`
-	ErrorDesc     string `json:"error_description,omitempty"`
-	CapturedAt    int64  `json:"captured_at,omitempty"`
+	ID         string `json:"id"`
+	Entity     string `json:"entity"`
+	Amount     int    `json:"amount"`
+	Currency   string `json:"currency"`
+	Status     string `json:"status"`
+	OrderID    string `json:"order_id"`
+	Method     string `json:"method"`
+	Email      string `json:"email"`
+	Contact    string `json:"contact"`
+	Fee        int    `json:"fee"`
+	Tax        int    `json:"tax"`
+	ErrorCode  string `json:"error_code,omitempty"`
+	ErrorDesc  string `json:"error_description,omitempty"`
+	CapturedAt int64  `json:"captured_at,omitempty"`
 }
 
 // RazorpayOrderEntity represents an order entity from Razorpay

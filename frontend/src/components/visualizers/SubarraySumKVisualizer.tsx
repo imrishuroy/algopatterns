@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function SubarraySumKVisualizer() {
@@ -19,7 +19,7 @@ export default function SubarraySumKVisualizer() {
     "Click Play to count subarrays with sum = 3"
   );
 
-  const arr = [1, 2, 1, 1, 1];
+  const arr = useMemo(() => [1, 2, 1, 1, 1], []);
   const k = 3;
 
   const reset = useCallback(() => {
@@ -105,7 +105,7 @@ export default function SubarraySumKVisualizer() {
   ]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-pink-500/10 to-rose-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Subarray Sum Equals K
@@ -121,7 +121,7 @@ export default function SubarraySumKVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -129,7 +129,7 @@ export default function SubarraySumKVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -148,7 +148,7 @@ export default function SubarraySumKVisualizer() {
         </div>
 
         {/* Target K */}
-        <div className="mb-4 p-3 bg-pink-500/10 border border-pink-500/30 rounded-lg">
+        <div className="mb-4 p-3 bg-pink-500/10 border border-pink-500/30 rounded-md">
           <span className="text-gray-400">Target sum k = </span>
           <span className="text-2xl font-bold text-pink-400">{k}</span>
         </div>
@@ -164,7 +164,7 @@ export default function SubarraySumKVisualizer() {
                   scale: idx === currentIdx ? 1.1 : 1,
                   y: idx === currentIdx ? -5 : 0,
                 }}
-                className={`w-12 h-12 rounded-lg flex flex-col items-center justify-center font-mono ${
+                className={`w-12 h-12 rounded-md flex flex-col items-center justify-center font-mono ${
                   idx === currentIdx
                     ? "bg-yellow-500 text-black ring-2 ring-yellow-300"
                     : idx < currentIdx
@@ -181,18 +181,18 @@ export default function SubarraySumKVisualizer() {
 
         {/* Current state */}
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xs text-gray-500 mb-1">Running Sum</div>
             <div className="text-2xl font-bold text-blue-400">{sum}</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xs text-gray-500 mb-1">Looking For</div>
             <div className="text-2xl font-bold text-orange-400">
               {lookingFor !== null ? lookingFor : "-"}
             </div>
             <div className="text-xs text-gray-500">sum - k</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xs text-gray-500 mb-1">Count</div>
             <div className="text-2xl font-bold text-green-400">{count}</div>
           </div>
@@ -203,7 +203,7 @@ export default function SubarraySumKVisualizer() {
           <div className="text-sm text-gray-400 mb-2">
             Prefix Sum Map (sum → count):
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="bg-gray-800/50 rounded-md p-3">
             <div className="flex flex-wrap gap-2">
               <AnimatePresence>
                 {Array.from(prefixMap.entries()).map(([key, value]) => (
@@ -211,7 +211,7 @@ export default function SubarraySumKVisualizer() {
                     key={key}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className={`px-3 py-2 rounded-lg font-mono text-sm ${
+                    className={`px-3 py-2 rounded-md font-mono text-sm ${
                       key === lookingFor
                         ? "bg-orange-500 text-white ring-2 ring-orange-300"
                         : "bg-gray-700 text-gray-300"
@@ -227,7 +227,7 @@ export default function SubarraySumKVisualizer() {
 
         {/* Found subarrays indicator */}
         {count > 0 && (
-          <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+          <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-md">
             <div className="text-sm text-green-400">
               Found {count} subarray{count > 1 ? "s" : ""} with sum = {k}
             </div>
@@ -239,7 +239,7 @@ export default function SubarraySumKVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -249,7 +249,7 @@ export default function SubarraySumKVisualizer() {
         </motion.div>
 
         {/* Algorithm explanation */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-pink-400">Key Insight:</strong> If prefix[j]
             - prefix[i] = k, then subarray [i+1, j] sums to k. So we look for

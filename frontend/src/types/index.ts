@@ -493,3 +493,6 @@ export interface CancelSubscriptionResponse {
   cancel_at_period_end: boolean;
   current_period_end?: string;
 }
+
+// Re-export AI types
+export * from "./ai";

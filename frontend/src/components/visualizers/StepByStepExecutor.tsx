@@ -471,7 +471,7 @@ export default function StepByStepExecutor({
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gray-800/50 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           Step-by-Step Execution
@@ -487,7 +487,7 @@ export default function StepByStepExecutor({
             <button
               key={ex}
               onClick={() => handleExampleChange(ex)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
                 selectedExample === ex
                   ? "bg-indigo-500 text-white"
                   : "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -504,7 +504,7 @@ export default function StepByStepExecutor({
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <div className="bg-[#011627] rounded-lg overflow-hidden">
+            <div className="bg-[#011627] rounded-md overflow-hidden">
               <div className="px-4 py-2 bg-[#0d1b2a] border-b border-gray-800 flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
@@ -519,7 +519,7 @@ export default function StepByStepExecutor({
                     <div
                       key={`line-${lineNum}-${line.slice(0, 20).replace(/\s+/g, '')}`}
                       className={`flex transition-all duration-200 ${
-                        isActive ? "bg-yellow-500/20 -mx-4 px-4 rounded" : ""
+                        isActive ? "bg-yellow-500/20 -mx-4 px-4 rounded-md" : ""
                       }`}
                     >
                       <span
@@ -559,21 +559,21 @@ export default function StepByStepExecutor({
                 <button
                   onClick={handlePrev}
                   disabled={currentStep === 0}
-                  className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
                   Prev
                 </button>
                 <button
                   onClick={handleNext}
                   disabled={currentStep >= data.steps.length - 1}
-                  className="px-4 py-2 bg-indigo-500 text-white rounded-lg font-medium hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  className="px-4 py-2 bg-indigo-500 text-white rounded-md font-medium hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
                 >
                   Next
                 </button>
               </div>
               <button
                 onClick={handleReset}
-                className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg text-sm hover:bg-gray-700 transition"
+                className="px-4 py-2 bg-gray-800 text-gray-300 rounded-md text-sm hover:bg-gray-700 transition"
               >
                 Reset
               </button>
@@ -586,7 +586,7 @@ export default function StepByStepExecutor({
 
           <div className="space-y-4">
             <div
-              className={`p-4 rounded-lg border ${
+              className={`p-4 rounded-md border ${
                 step.explanation.includes("BASE CASE") ||
                 step.explanation.includes("base case")
                   ? "bg-yellow-500/10 border-yellow-500/30"
@@ -613,7 +613,7 @@ export default function StepByStepExecutor({
               </p>
             </div>
 
-            <div className="bg-gray-800/50 rounded-lg p-4">
+            <div className="bg-gray-800/50 rounded-md p-4">
               <h4 className="text-sm font-medium text-gray-400 mb-3">
                 Variables
               </h4>
@@ -621,7 +621,7 @@ export default function StepByStepExecutor({
                 {Object.entries(step.variables).map(([key, value]) => (
                   <div
                     key={key}
-                    className="flex justify-between items-center px-3 py-2 bg-gray-700/50 rounded"
+                    className="flex justify-between items-center px-3 py-2 bg-gray-700/50 rounded-md"
                   >
                     <span className="text-indigo-400 font-mono text-sm">
                       {key}
@@ -634,7 +634,7 @@ export default function StepByStepExecutor({
               </div>
             </div>
 
-            <div className="bg-gray-800/50 rounded-lg p-4">
+            <div className="bg-gray-800/50 rounded-md p-4">
               <h4 className="text-sm font-medium text-gray-400 mb-3">
                 Call Stack ({step.callStack.length})
               </h4>
@@ -642,7 +642,7 @@ export default function StepByStepExecutor({
                 {[...step.callStack].reverse().map((call, idx) => (
                   <div
                     key={`${call}-${idx}`}
-                    className={`px-3 py-2 rounded font-mono text-sm ${
+                    className={`px-3 py-2 rounded-md font-mono text-sm ${
                       idx === 0
                         ? "bg-indigo-500/20 border border-indigo-500/50 text-indigo-300"
                         : "bg-gray-700/30 text-gray-400"
@@ -655,7 +655,7 @@ export default function StepByStepExecutor({
             </div>
 
             {outputs.length > 0 && (
-              <div className="bg-gray-800/50 rounded-lg p-4">
+              <div className="bg-gray-800/50 rounded-md p-4">
                 <h4 className="text-sm font-medium text-gray-400 mb-3">
                   Returns
                 </h4>

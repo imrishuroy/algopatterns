@@ -41,12 +41,12 @@ export default function TrieInsertVisualizer() {
   }, []);
 
   const calculatePositions = useCallback(
-    (
+    function calculatePositions(
       node: TrieNode,
       depth: number,
       leftBound: number,
       rightBound: number
-    ): void => {
+    ): void {
       const children = Array.from(node.children.values());
       const width = rightBound - leftBound;
       const childWidth = width / (children.length || 1);
@@ -346,7 +346,7 @@ export default function TrieInsertVisualizer() {
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
             <strong className="text-violet-400">Key Insight:</strong> Shared
-            prefixes share nodes. "cat", "car", "card" all share "ca" prefix.
+            prefixes share nodes. &ldquo;cat&rdquo;, &ldquo;car&rdquo;, &ldquo;card&rdquo; all share &ldquo;ca&rdquo; prefix.
           </p>
         </div>
       </div>

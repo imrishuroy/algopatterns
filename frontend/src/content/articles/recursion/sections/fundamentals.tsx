@@ -20,7 +20,7 @@ export default function FundamentalsSection() {
         <strong className="text-white">base case</strong>.
       </p>
 
-      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6 mb-8">
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-md p-6 mb-8">
         <h3 className="text-xl font-bold text-indigo-300 mb-3">
           Definition of Recursion
         </h3>
@@ -101,7 +101,7 @@ export default function FundamentalsSection() {
         Key Components of Recursion
       </h2>
       <div className="grid md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-green-400 mb-2">
             Base Case
           </h4>
@@ -110,7 +110,7 @@ export default function FundamentalsSection() {
             would call itself infinitely, causing a stack overflow.
           </p>
         </div>
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-blue-400 mb-2">
             Recursive Case
           </h4>
@@ -121,7 +121,7 @@ export default function FundamentalsSection() {
         </div>
       </div>
 
-      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-md p-6">
         <h4 className="text-lg font-semibold text-yellow-400 mb-3">
           When to Use Recursion
         </h4>

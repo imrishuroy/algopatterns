@@ -22,7 +22,7 @@ export default function LanguageToggle({
   };
 
   return (
-    <div className="flex bg-gray-800 rounded-lg p-1">
+    <div className="flex bg-gray-800 rounded-md p-1">
       {languages.map((lang) => (
         <button
           key={lang}

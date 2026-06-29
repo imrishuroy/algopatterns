@@ -253,11 +253,11 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
   );
 
   const updateHighlight = useCallback(
-    async (
+    async function updateHighlight(
       id: string,
       req: UpdateHighlightRequest,
       retryCount = 0
-    ): Promise<Highlight | null> => {
+    ): Promise<Highlight | null> {
       if (!isAuthenticated) return null;
 
       const MAX_RETRIES = 2;

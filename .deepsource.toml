@@ -31,3 +31,4 @@ enabled = true
 environment = ["nodejs"]
 dialect = "typescript"
 plugins = ["react"]
+

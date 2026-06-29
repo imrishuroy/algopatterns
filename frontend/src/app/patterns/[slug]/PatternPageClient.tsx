@@ -180,7 +180,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
 
   const handleCloseAI = useCallback(() => {
     setIsAIChatOpen(false);
-    setAiInitialMessage(undefined);
+		setAiInitialMessage(undefined);
     setAiMessageKey(0);
   }, []);
 

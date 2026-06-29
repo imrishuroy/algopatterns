@@ -31,3 +31,13 @@ enabled = true
 environment = ["nodejs"]
 dialect = "typescript"
 plugins = ["react"]
+
+[[analyzers.issue_omission]]
+issue_code = "JS-0067"
+
+[[analyzers]]
+name = "secrets"
+enabled = true
+
+[[analyzers.issue_omission]]
+issue_code = "SCT-A000"

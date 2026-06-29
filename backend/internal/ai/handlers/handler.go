@@ -35,17 +35,17 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	{
 		aiGroup.POST("/chat", h.Chat)
 		aiGroup.POST("/chat/stream", h.ChatStream)
-		aiGroup.POST("/hint", h.GetHint)
+		aiGroup.POST("/hint", h.HandleHint)
 		aiGroup.POST("/review", h.ReviewCode)
 		aiGroup.POST("/explain", h.ExplainError)
 		aiGroup.GET("/status", h.Status)
 
 		// Session/history endpoints
-		aiGroup.GET("/sessions", h.GetSessions)
-		aiGroup.GET("/sessions/:sessionId/messages", h.GetSessionMessages)
+		aiGroup.GET("/sessions", h.ListSessions)
+		aiGroup.GET("/sessions/:sessionId/messages", h.ListSessionMessages)
 		aiGroup.DELETE("/sessions/:sessionId", h.ClearSession)
 		aiGroup.POST("/sessions/:sessionId/archive", h.ArchiveSession)
-		aiGroup.GET("/sessions/archived", h.GetArchivedSessions)
+		aiGroup.GET("/sessions/archived", h.ListArchivedSessions)
 	}
 }
 
@@ -279,8 +279,8 @@ type HintRequestBody struct {
 	PreviousHints      int    `json:"previous_hints"`
 }
 
-// GetHint handles hint requests
-func (h *Handler) GetHint(c *gin.Context) {
+// HandleHint handles hint requests
+func (h *Handler) HandleHint(c *gin.Context) {
 	var req HintRequestBody
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.ValidationError(c, map[string]string{"body": "Invalid request body"})
@@ -424,8 +424,8 @@ func (h *Handler) handleError(c *gin.Context, err error) {
 	}
 }
 
-// GetSessions handles request for user's AI chat sessions
-func (h *Handler) GetSessions(c *gin.Context) {
+// ListSessions returns the user's recent AI chat sessions
+func (h *Handler) ListSessions(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "User not authenticated")
@@ -441,8 +441,8 @@ func (h *Handler) GetSessions(c *gin.Context) {
 	response.OK(c, gin.H{"sessions": sessions})
 }
 
-// GetSessionMessages handles request for session messages
-func (h *Handler) GetSessionMessages(c *gin.Context) {
+// ListSessionMessages returns all messages for a session
+func (h *Handler) ListSessionMessages(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "User not authenticated")
@@ -525,8 +525,8 @@ func (h *Handler) ArchiveSession(c *gin.Context) {
 	response.OK(c, gin.H{"archived": true})
 }
 
-// GetArchivedSessions handles request for archived sessions
-func (h *Handler) GetArchivedSessions(c *gin.Context) {
+// ListArchivedSessions returns archived sessions for a problem or pattern
+func (h *Handler) ListArchivedSessions(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "User not authenticated")

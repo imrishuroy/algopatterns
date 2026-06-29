@@ -114,15 +114,15 @@ function setupJavaValidation(
       const parenStack: { char: string; line: number; col: number }[] = [];
       for (let i = 0; i < lines.length; i++) {
         for (let j = 0; j < lines[i].length; j++) {
-          const c = lines[i][j];
-          if (c === "(" || c === "[" || c === "{") {
-            parenStack.push({ char: c, line: i, col: j });
-          } else if (c === ")" || c === "]" || c === "}") {
-            const expected = c === ")" ? "(" : c === "]" ? "[" : "{";
+          const ch = lines[i][j];
+          if (ch === "(" || ch === "[" || ch === "{") {
+            parenStack.push({ char: ch, line: i, col: j });
+          } else if (ch === ")" || ch === "]" || ch === "}") {
+            const expected = ch === ")" ? "(" : ch === "]" ? "[" : "{";
             if (parenStack.length === 0 || parenStack[parenStack.length - 1].char !== expected) {
               markers.push({
                 severity: monaco.MarkerSeverity.Error,
-                message: `unexpected '${c}'`,
+                message: `unexpected '${ch}'`,
                 startLineNumber: i + 1,
                 startColumn: j + 1,
                 endLineNumber: i + 1,
@@ -2513,7 +2513,7 @@ export default function ProblemPageClient({ params }: PageProps) {
                   Test Cases
                   {(submission || runResults) && (
                     <span className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
-                      (submission?.status === "accepted" || (runResults && runResults.every(r => r.status === "accepted")))
+                      (submission?.status === "accepted" || runResults?.every(r => r.status === "accepted"))
                         ? "bg-emerald-500/20 text-emerald-400"
                         : "bg-red-500/20 text-red-400"
                     }`}>

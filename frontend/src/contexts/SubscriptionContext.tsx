@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  startTransition,
   type ReactNode,
 } from "react";
 import { apiClient } from "@/lib/api";
@@ -100,8 +101,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!authLoading) {
-      refreshSubscription();
-      fetchPlans();
+      startTransition(() => {
+        refreshSubscription();
+        fetchPlans();
+      });
     }
   }, [authLoading, refreshSubscription, fetchPlans]);
 

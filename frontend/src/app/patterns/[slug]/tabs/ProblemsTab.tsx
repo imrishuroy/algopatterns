@@ -117,34 +117,34 @@ export default function ProblemsTab({
     <div className="space-y-6">
       {/* Stats Bar */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 text-center">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-4 text-center">
           <div className="text-2xl font-bold text-white">{stats.total}</div>
           <div className="text-sm text-gray-500">Total</div>
         </div>
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 text-center">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-4 text-center">
           <div className="text-2xl font-bold text-indigo-400">
             {stats.completed}
           </div>
           <div className="text-sm text-gray-500">Solved</div>
         </div>
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 text-center">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-4 text-center">
           <div className="text-2xl font-bold text-green-400">{stats.easy}</div>
           <div className="text-sm text-gray-500">Easy</div>
         </div>
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 text-center">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-4 text-center">
           <div className="text-2xl font-bold text-yellow-400">
             {stats.medium}
           </div>
           <div className="text-sm text-gray-500">Medium</div>
         </div>
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 text-center">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-4 text-center">
           <div className="text-2xl font-bold text-red-400">{stats.hard}</div>
           <div className="text-sm text-gray-500">Hard</div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2">
             <div className="relative">
@@ -166,7 +166,7 @@ export default function ProblemsTab({
                 placeholder="Search problems..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
               />
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function ProblemsTab({
           <select
             value={difficultyFilter}
             onChange={(e) => setDifficultyFilter(e.target.value)}
-            className="px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500"
+            className="px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:border-indigo-500"
           >
             <option value="">All Difficulties</option>
             <option value="Easy">Easy</option>
@@ -187,7 +187,7 @@ export default function ProblemsTab({
             onChange={(e) =>
               setShowCompleted(e.target.value as "all" | "completed" | "todo")
             }
-            className="px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-indigo-500"
+            className="px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:border-indigo-500"
           >
             <option value="all">All Status</option>
             <option value="todo">To Do</option>
@@ -202,7 +202,7 @@ export default function ProblemsTab({
               <button
                 key={option}
                 onClick={() => setSortBy(option)}
-                className={`text-sm px-3 py-1.5 rounded-lg transition-colors ${
+                className={`text-sm px-3 py-1.5 rounded-md transition-colors ${
                   sortBy === option
                     ? "bg-indigo-500/20 text-indigo-400"
                     : "text-gray-400 hover:text-white"
@@ -220,7 +220,7 @@ export default function ProblemsTab({
         {filteredAndSorted.map((q, idx) => (
           <div
             key={q.id}
-            className={`flex items-center gap-4 p-4 bg-gray-900 rounded-xl border transition-all hover:translate-x-1 ${
+            className={`flex items-center gap-4 p-4 bg-gray-900 rounded-md border transition-all hover:translate-x-1 ${
               completed.has(q.id)
                 ? "border-green-500/30 bg-green-500/5"
                 : "border-gray-800 hover:border-gray-700"
@@ -315,7 +315,7 @@ export default function ProblemsTab({
               <Link
                 href={`/problems/${nameToSlug(q.name)}?from=${patternId}`}
                 onClick={saveScrollPosition}
-                className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium rounded-lg transition"
+                className="px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium rounded-md transition"
               >
                 Solve
               </Link>

@@ -13,7 +13,7 @@ interface Activity {
 
 export default function ActivitySelectionVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [step, setStep] = useState(0);
+  const [, setStep] = useState(0);
   const [speed, setSpeed] = useState(800);
   const [selectedActivities, setSelectedActivities] = useState<Set<number>>(
     new Set()
@@ -135,7 +135,7 @@ export default function ActivitySelectionVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Activity Selection Visualizer
@@ -154,7 +154,7 @@ export default function ActivitySelectionVisualizer() {
               phase === "selecting" &&
               (currentActivity ?? 0) >= sortedActivities.length
             }
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -162,7 +162,7 @@ export default function ActivitySelectionVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -185,7 +185,7 @@ export default function ActivitySelectionVisualizer() {
           {["unsorted", "sorting", "sorted", "selecting"].map((p, i) => (
             <div
               key={`p-${p}`}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
                 phase === p
                   ? "bg-green-500/20 border border-green-500 text-green-400"
                   : i <
@@ -221,7 +221,7 @@ export default function ActivitySelectionVisualizer() {
               <span key={`timeline-label-${i}`}>{i}</span>
             ))}
           </div>
-          <div className="relative h-64 bg-gray-800/50 rounded-lg overflow-hidden">
+          <div className="relative h-64 bg-gray-800/50 rounded-md overflow-hidden">
             {/* Time grid lines */}
             {Array.from({ length: timelineMax + 1 }).map((_, i) => (
               <div
@@ -241,7 +241,7 @@ export default function ActivitySelectionVisualizer() {
                 }}
                 className="absolute top-0 bottom-0 border-l-2 border-green-500 border-dashed z-10"
               >
-                <div className="absolute -top-6 -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-0.5 rounded">
+                <div className="absolute -top-6 -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-md">
                   lastEnd={lastEnd}
                 </div>
               </motion.div>
@@ -283,7 +283,7 @@ export default function ActivitySelectionVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg mb-4 ${
+          className={`p-3 rounded-md mb-4 ${
             message.includes("Selected")
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : message.includes("Skipped")
@@ -298,19 +298,19 @@ export default function ActivitySelectionVisualizer() {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-white">
               {activities.length}
             </div>
             <div className="text-xs text-gray-500">Total Activities</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-green-400">
               {selectedActivities.size}
             </div>
             <div className="text-xs text-gray-500">Selected</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-gray-400">
               {phase === "selecting" ? (currentActivity ?? 0) : 0}/
               {activities.length}
@@ -322,15 +322,15 @@ export default function ActivitySelectionVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500" />
+            <div className="w-4 h-4 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Current</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500/50 ring-2 ring-green-400" />
+            <div className="w-4 h-4 rounded-md bg-green-500/50 ring-2 ring-green-400" />
             <span className="text-gray-400">Selected</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gray-600 opacity-40" />
+            <div className="w-4 h-4 rounded-md bg-gray-600 opacity-40" />
             <span className="text-gray-400">Skipped</span>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer, startTransition } from "react";
 import CodeBlock from "@/components/ui/CodeBlock";
 
 interface MemoryBlock {
@@ -16,13 +16,27 @@ interface MemoryFrame {
   blocks: MemoryBlock[];
 }
 
-export default function MemoryVisualizer() {
-  const [frames, setFrames] = useState<MemoryFrame[]>([]);
-  const [step, setStep] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(1200);
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
 
-  const allSteps: {
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
+const allSteps: {
     action: "push" | "pop" | "update";
     frame?: MemoryFrame;
     message: string;
@@ -191,9 +205,18 @@ export default function MemoryVisualizer() {
     },
   ];
 
+export default function MemoryVisualizer() {
+  const [frames, setFrames] = useState<MemoryFrame[]>([]);
+  const [{ step, isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [speed, setSpeed] = useState(1200);
+
   useEffect(() => {
     if (!isPlaying || step >= allSteps.length) {
-      if (step >= allSteps.length) setIsPlaying(false);
+      if (step >= allSteps.length) {
+        startTransition(() => {
+          dispatch({ type: "STOP" });
+        });
+      }
       return;
     }
 
@@ -206,7 +229,7 @@ export default function MemoryVisualizer() {
         setFrames((prev) => prev.slice(0, -1));
       }
 
-      setStep((s) => s + 1);
+      dispatch({ type: "ADVANCE" });
     }, speed);
 
     return () => clearTimeout(timer);
@@ -214,8 +237,7 @@ export default function MemoryVisualizer() {
 
   const reset = () => {
     setFrames([]);
-    setStep(0);
-    setIsPlaying(false);
+    dispatch({ type: "RESET" });
   };
 
   const currentMessage =
@@ -240,7 +262,7 @@ export default function MemoryVisualizer() {
   const maxMemory = 64;
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gray-800/50 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           Memory Visualization
@@ -253,8 +275,8 @@ export default function MemoryVisualizer() {
       <div className="p-4">
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            onClick={() => dispatch({ type: "TOGGLE" })}
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying
                 ? "bg-yellow-500 text-black hover:bg-yellow-400"
                 : "bg-green-500 text-white hover:bg-green-400"
@@ -264,7 +286,7 @@ export default function MemoryVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 transition"
           >
             Reset
           </button>
@@ -300,7 +322,7 @@ export default function MemoryVisualizer() {
         </div>
 
         <div
-          className={`mb-4 p-3 rounded-lg border ${
+          className={`mb-4 p-3 rounded-md border ${
             step > 0 && allSteps[step - 1]?.action === "pop"
               ? "bg-green-500/10 border-green-500/30"
               : step > 0 && allSteps[step - 1]?.message.includes("BASE CASE")
@@ -322,7 +344,7 @@ export default function MemoryVisualizer() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-gray-800/30 rounded-lg p-4">
+          <div className="bg-gray-800/30 rounded-md p-4">
             <div className="text-sm text-gray-400 mb-3 flex items-center justify-between">
               <span>Call Stack</span>
               <span className="text-indigo-400">{frames.length} frames</span>
@@ -337,7 +359,7 @@ export default function MemoryVisualizer() {
                 [...frames].reverse().map((frame, idx) => (
                   <div
                     key={`${frame.functionName}-${idx}`}
-                    className={`p-3 rounded-lg border transition-all duration-300 ${
+                    className={`p-3 rounded-md border transition-all duration-300 ${
                       idx === 0
                         ? "bg-indigo-500/20 border-indigo-500/50 shadow-lg shadow-indigo-500/20"
                         : "bg-gray-700/30 border-gray-700"
@@ -350,7 +372,7 @@ export default function MemoryVisualizer() {
                       {frame.blocks.map((block) => (
                         <div
                           key={block.id}
-                          className={`flex justify-between items-center px-2 py-1 rounded text-xs font-mono border ${getTypeColor(block.type)}`}
+                          className={`flex justify-between items-center px-2 py-1 rounded-md text-xs font-mono border ${getTypeColor(block.type)}`}
                         >
                           <span className="text-gray-500">{block.address}</span>
                           <span>{block.name}</span>
@@ -371,25 +393,25 @@ export default function MemoryVisualizer() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-gray-800/30 rounded-lg p-4">
+            <div className="bg-gray-800/30 rounded-md p-4">
               <div className="text-sm text-gray-400 mb-3">Legend</div>
               <div className="space-y-2 text-xs">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-purple-500/30 border border-purple-500/50"></div>
+                  <div className="w-4 h-4 rounded-md bg-purple-500/30 border border-purple-500/50"></div>
                   <span className="text-gray-300">Return Address</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-blue-500/30 border border-blue-500/50"></div>
+                  <div className="w-4 h-4 rounded-md bg-blue-500/30 border border-blue-500/50"></div>
                   <span className="text-gray-300">Parameter</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-green-500/30 border border-green-500/50"></div>
+                  <div className="w-4 h-4 rounded-md bg-green-500/30 border border-green-500/50"></div>
                   <span className="text-gray-300">Local Variable</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-md p-4">
               <h4 className="text-red-400 font-medium text-sm mb-2">
                 Stack Overflow
               </h4>

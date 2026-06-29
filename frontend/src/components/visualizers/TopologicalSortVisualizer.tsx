@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Course {
@@ -16,14 +16,59 @@ interface Edge {
   active: boolean;
 }
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
+const COURSE_NAMES = [
+  "Intro CS",
+  "Data Struct",
+  "Algorithms",
+  "Databases",
+  "Web Dev",
+  "ML",
+];
+
+const NORMAL_PREREQS: [number, number][] = [
+  [0, 1],
+  [0, 4],
+  [1, 2],
+  [1, 3],
+  [2, 5],
+  [3, 5],
+];
+
+const CYCLE_PREREQS: [number, number][] = [
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 1],
+];
+
 export default function TopologicalSortVisualizer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [speed, setSpeed] = useState(800);
   const [courses, setCourses] = useState<Course[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [queue, setQueue] = useState<number[]>([]);
   const [order, setOrder] = useState<number[]>([]);
-  const [_currentCourse, setCurrentCourse] = useState<number | null>(null);
+  const [, setCurrentCourse] = useState<number | null>(null);
   const [message, setMessage] = useState(
     "Click Play to start topological sort (Kahn's Algorithm)"
   );
@@ -32,38 +77,13 @@ export default function TopologicalSortVisualizer() {
   );
   const [showCycleExample, setShowCycleExample] = useState(false);
 
-  const courseNames = [
-    "Intro CS",
-    "Data Struct",
-    "Algorithms",
-    "Databases",
-    "Web Dev",
-    "ML",
-  ];
-
-  const normalPrereqs: [number, number][] = [
-    [0, 1], // Intro CS -> Data Struct
-    [0, 4], // Intro CS -> Web Dev
-    [1, 2], // Data Struct -> Algorithms
-    [1, 3], // Data Struct -> Databases
-    [2, 5], // Algorithms -> ML
-    [3, 5], // Databases -> ML
-  ];
-
-  const cyclePrereqs: [number, number][] = [
-    [0, 1], // Intro CS -> Data Struct
-    [1, 2], // Data Struct -> Algorithms
-    [2, 3], // Algorithms -> Databases
-    [3, 1], // Databases -> Data Struct (CYCLE!)
-  ];
-
   const initGraph = useCallback(() => {
-    const prereqs = showCycleExample ? cyclePrereqs : normalPrereqs;
+    const prereqs = showCycleExample ? CYCLE_PREREQS : NORMAL_PREREQS;
     const numCourses = showCycleExample ? 4 : 6;
 
     const newCourses: Course[] = Array.from({ length: numCourses }, (_, i) => ({
       id: i,
-      name: courseNames[i],
+      name: COURSE_NAMES[i],
       indegree: 0,
       state: "waiting",
     }));
@@ -93,11 +113,13 @@ export default function TopologicalSortVisualizer() {
     setCurrentCourse(null);
     setPhase("init");
     setMessage("Click Play to start topological sort (Kahn's Algorithm)");
-    setIsPlaying(false);
+    dispatch({ type: "STOP" });
   }, [showCycleExample]);
 
   useEffect(() => {
-    initGraph();
+    startTransition(() => {
+      initGraph();
+    });
   }, [initGraph]);
 
   useEffect(() => {
@@ -109,13 +131,13 @@ export default function TopologicalSortVisualizer() {
           if (order.length === courses.length) {
             setPhase("done");
             setMessage(
-              `Success! Valid order: ${order.map((i) => courseNames[i]).join(" -> ")}`
+              `Success! Valid order: ${order.map((i) => COURSE_NAMES[i]).join(" -> ")}`
             );
           } else {
             setPhase("cycle");
             setMessage("Cycle detected! Cannot complete all courses.");
           }
-          setIsPlaying(false);
+          dispatch({ type: "STOP" });
           return;
         }
 
@@ -127,7 +149,7 @@ export default function TopologicalSortVisualizer() {
         newCourses[courseId] = { ...newCourses[courseId], state: "processing" };
         setCourses(newCourses);
         setMessage(
-          `Processing: ${courseNames[courseId]} (indegree was 0, ready to take)`
+          `Processing: ${COURSE_NAMES[courseId]} (indegree was 0, ready to take)`
         );
 
         setTimeout(() => {
@@ -174,7 +196,7 @@ export default function TopologicalSortVisualizer() {
     return () => clearTimeout(timer);
   }, [isPlaying, phase, queue, courses, edges, order, speed]);
 
-  const getNodePosition = (id: number, _total: number) => {
+  const getNodePosition = (id: number) => {
     if (showCycleExample) {
       const positions = [
         { x: 100, y: 50 },
@@ -210,7 +232,7 @@ export default function TopologicalSortVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Topological Sort: Course Schedule
@@ -225,9 +247,9 @@ export default function TopologicalSortVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch({ type: "TOGGLE" })}
             disabled={phase === "done" || phase === "cycle"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -235,7 +257,7 @@ export default function TopologicalSortVisualizer() {
           </button>
           <button
             onClick={initGraph}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -246,7 +268,7 @@ export default function TopologicalSortVisualizer() {
               onChange={(e) => {
                 setShowCycleExample(e.target.checked);
               }}
-              className="w-4 h-4 rounded accent-red-500"
+              className="w-4 h-4 rounded-md accent-red-500"
             />
             <span className="text-gray-400 text-sm">Show cycle example</span>
           </label>
@@ -265,7 +287,7 @@ export default function TopologicalSortVisualizer() {
         </div>
 
         {/* Graph Visualization */}
-        <div className="relative h-64 bg-gray-800/50 rounded-lg mb-4 overflow-hidden">
+        <div className="relative h-64 bg-gray-800/50 rounded-md mb-4 overflow-hidden">
           {/* Edges */}
           <svg className="absolute inset-0 w-full h-full">
             <defs>
@@ -290,9 +312,9 @@ export default function TopologicalSortVisualizer() {
                 <polygon points="0 0, 10 3.5, 0 7" fill="#374151" />
               </marker>
             </defs>
-            {edges.map((edge, i) => {
-              const from = getNodePosition(edge.from, courses.length);
-              const to = getNodePosition(edge.to, courses.length);
+            {edges.map((edge) => {
+              const from = getNodePosition(edge.from);
+              const to = getNodePosition(edge.to);
               const dx = to.x - from.x;
               const dy = to.y - from.y;
               const len = Math.sqrt(dx * dx + dy * dy);
@@ -322,13 +344,13 @@ export default function TopologicalSortVisualizer() {
           {/* Nodes */}
           <AnimatePresence>
             {courses.map((course) => {
-              const pos = getNodePosition(course.id, courses.length);
+              const pos = getNodePosition(course.id);
               return (
                 <motion.div
                   key={course.id}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1, x: pos.x, y: pos.y }}
-                  className={`absolute w-[70px] h-10 rounded-lg flex flex-col items-center justify-center ${getNodeColor(course.state)} transition-colors`}
+                  className={`absolute w-[70px] h-10 rounded-md flex flex-col items-center justify-center ${getNodeColor(course.state)} transition-colors`}
                   style={{ left: 0, top: 0 }}
                 >
                   <span className="text-xs font-bold text-white truncate px-1">
@@ -345,7 +367,7 @@ export default function TopologicalSortVisualizer() {
 
         {/* Queue and Order */}
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="bg-gray-800/50 rounded-md p-3">
             <div className="text-xs text-gray-500 mb-2">
               Queue (indegree = 0)
             </div>
@@ -353,13 +375,13 @@ export default function TopologicalSortVisualizer() {
               {queue.map((id, i) => (
                 <span
                   key={`queue-${id}-${i}`}
-                  className={`px-2 py-1 rounded text-xs font-medium ${
+                  className={`px-2 py-1 rounded-md text-xs font-medium ${
                     i === 0
                       ? "bg-yellow-500 text-black"
                       : "bg-cyan-500/50 text-cyan-200"
                   }`}
                 >
-                  {courseNames[id]}
+                  {COURSE_NAMES[id]}
                 </span>
               ))}
               {queue.length === 0 && (
@@ -367,15 +389,15 @@ export default function TopologicalSortVisualizer() {
               )}
             </div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3">
+          <div className="bg-gray-800/50 rounded-md p-3">
             <div className="text-xs text-gray-500 mb-2">Completed Order</div>
             <div className="flex flex-wrap gap-1 min-h-[32px]">
               {order.map((id, i) => (
                 <span
                   key={`order-${id}-${i}`}
-                  className="px-2 py-1 rounded text-xs font-medium bg-green-500/50 text-green-200"
+                  className="px-2 py-1 rounded-md text-xs font-medium bg-green-500/50 text-green-200"
                 >
-                  {i + 1}. {courseNames[id]}
+                    {i + 1}. {COURSE_NAMES[id]}
                 </span>
               ))}
               {order.length === 0 && (
@@ -387,19 +409,19 @@ export default function TopologicalSortVisualizer() {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-purple-400">
               {courses.length}
             </div>
             <div className="text-xs text-gray-500">Total Courses</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-green-400">
               {order.length}
             </div>
             <div className="text-xs text-gray-500">Completed</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-cyan-400">
               {queue.length}
             </div>
@@ -412,7 +434,7 @@ export default function TopologicalSortVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : phase === "cycle"
@@ -426,19 +448,19 @@ export default function TopologicalSortVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-gray-600" />
+            <div className="w-4 h-4 rounded-md bg-gray-600" />
             <span className="text-gray-400">Has Prerequisites</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-cyan-500" />
+            <div className="w-4 h-4 rounded-md bg-cyan-500" />
             <span className="text-gray-400">Ready (indegree=0)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500" />
+            <div className="w-4 h-4 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Processing</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500" />
+            <div className="w-4 h-4 rounded-md bg-green-500" />
             <span className="text-gray-400">Completed</span>
           </div>
         </div>

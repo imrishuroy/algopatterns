@@ -14,7 +14,7 @@ export default function ConstraintsGuideSection() {
         solution.
       </p>
 
-      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6 mb-8">
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-md p-6 mb-8">
         <h3 className="text-xl font-bold text-indigo-300 mb-3">
           The Golden Rule
         </h3>
@@ -32,7 +32,7 @@ export default function ConstraintsGuideSection() {
         Constraint → Approach Mapping
       </h2>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-8 overflow-x-auto">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-700">
@@ -117,7 +117,7 @@ export default function ConstraintsGuideSection() {
       </h2>
 
       <div className="grid md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-white mb-4">
             Operations per Complexity
           </h4>
@@ -157,7 +157,7 @@ export default function ConstraintsGuideSection() {
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-white mb-4">
             Safe Limits (1 sec)
           </h4>
@@ -200,9 +200,9 @@ export default function ConstraintsGuideSection() {
       </h2>
 
       <div className="space-y-4 mb-8">
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <div className="flex items-center gap-3 mb-3">
-            <span className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded text-sm font-mono">
+            <span className="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-md text-sm font-mono">
               N ≤ 10
             </span>
             <span className="text-white font-semibold">
@@ -216,9 +216,9 @@ export default function ConstraintsGuideSection() {
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <div className="flex items-center gap-3 mb-3">
-            <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded text-sm font-mono">
+            <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-md text-sm font-mono">
               N ≤ 1000
             </span>
             <span className="text-white font-semibold">
@@ -232,9 +232,9 @@ export default function ConstraintsGuideSection() {
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <div className="flex items-center gap-3 mb-3">
-            <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded text-sm font-mono">
+            <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-md text-sm font-mono">
               N ≤ 10⁵
             </span>
             <span className="text-white font-semibold">
@@ -248,9 +248,9 @@ export default function ConstraintsGuideSection() {
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <div className="flex items-center gap-3 mb-3">
-            <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded text-sm font-mono">
+            <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-md text-sm font-mono">
               N ≤ 10⁶
             </span>
             <span className="text-white font-semibold">
@@ -265,7 +265,7 @@ export default function ConstraintsGuideSection() {
         </div>
       </div>
 
-      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-md p-6">
         <h4 className="text-lg font-semibold text-yellow-400 mb-3">
           Interview Tip
         </h4>

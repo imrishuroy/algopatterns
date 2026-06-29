@@ -206,7 +206,7 @@ export default function LongestSubstringVisualizer() {
                     exit={{ opacity: 0, scale: 0 }}
                     className="px-3 py-1 bg-purple-500/30 rounded-lg font-mono text-purple-300"
                   >
-                    '{char}'
+                    &lsquo;{char}&rsquo;
                   </motion.div>
                 ))}
               </AnimatePresence>

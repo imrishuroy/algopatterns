@@ -34,12 +34,12 @@ export default function RecursionTreeVisualizer({
   const [speed, setSpeed] = useState(800);
 
   const buildFibTree = useCallback(
-    (
+    function buildFibTree(
       n: number,
       depth: number = 0,
       pos: number = 0,
       id: string = "0"
-    ): TreeNode | null => {
+    ): TreeNode | null {
       if (n < 0) return null;
 
       const node: TreeNode = {
@@ -95,7 +95,7 @@ export default function RecursionTreeVisualizer({
   }, [tree, generateExecutionOrder]);
 
   const calculateResult = useCallback(
-    (node: TreeNode): number => {
+    function calculateResult(node: TreeNode): number {
       if (node.value <= 1) return node.value;
 
       const leftResult = node.left
@@ -260,7 +260,7 @@ export default function RecursionTreeVisualizer({
   const finalResult = nodeResults.get("0");
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gray-800/50 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           Recursion Tree Visualizer
@@ -274,7 +274,7 @@ export default function RecursionTreeVisualizer({
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying
                 ? "bg-yellow-500 text-black hover:bg-yellow-400"
                 : "bg-green-500 text-white hover:bg-green-400"
@@ -284,7 +284,7 @@ export default function RecursionTreeVisualizer({
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 transition"
           >
             Reset
           </button>
@@ -303,17 +303,17 @@ export default function RecursionTreeVisualizer({
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-white">{totalNodes}</div>
             <div className="text-xs text-gray-500">Total Calls</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-green-400">
               {completedNodes.size}
             </div>
             <div className="text-xs text-gray-500">Completed</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-indigo-400">
               {finalResult !== undefined ? finalResult : "—"}
             </div>
@@ -336,13 +336,13 @@ export default function RecursionTreeVisualizer({
           </div>
         </div>
 
-        <div className="bg-gray-800/30 rounded-lg p-6 overflow-x-auto">
+        <div className="bg-gray-800/30 rounded-md p-6 overflow-x-auto">
           <div className="flex justify-center min-w-max py-4">
             {tree && renderNode(tree)}
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+        <div className="mt-4 p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-md">
           <p className="text-indigo-300 text-sm">
             <strong>Observation:</strong> Notice how fib(3) is calculated
             multiple times? This is called

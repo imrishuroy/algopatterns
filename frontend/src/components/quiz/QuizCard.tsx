@@ -18,7 +18,7 @@ export default function QuizCard({
 
   return (
     <>
-      <div className="bg-gradient-to-r from-teal-900/30 to-teal-800/30 rounded-xl border border-teal-700/30 p-6 mt-12">
+      <div className="bg-gradient-to-r from-teal-900/30 to-teal-800/30 rounded-md border border-teal-700/30 p-6 mt-12">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-teal-900/50 flex items-center justify-center flex-shrink-0">

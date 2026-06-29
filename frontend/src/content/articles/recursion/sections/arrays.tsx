@@ -155,7 +155,7 @@ private int[] merge(int[] left, int[] right) {
         language="java"
       />
 
-      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6 mt-8">
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-md p-6 mt-8">
         <h4 className="text-lg font-semibold text-indigo-300 mb-3">
           Practice Problems
         </h4>

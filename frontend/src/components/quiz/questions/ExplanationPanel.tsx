@@ -9,7 +9,7 @@ interface ExplanationPanelProps {
 export default function ExplanationPanel({ answer }: ExplanationPanelProps) {
   return (
     <div
-      className={`mt-6 p-5 rounded-xl border ${
+      className={`mt-6 p-5 rounded-md border ${
         answer.isCorrect
           ? "bg-green-950/30 border-green-800/50"
           : "bg-red-950/20 border-red-800/40"

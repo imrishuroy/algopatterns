@@ -127,7 +127,7 @@ export default function DSAFundamentalsClient({
                 Language:
               </span>
               <div
-                className="flex rounded-lg p-1"
+                className="flex rounded-md p-1"
                 style={{ background: "var(--bg-elevated)" }}
               >
                 {(
@@ -180,7 +180,7 @@ export default function DSAFundamentalsClient({
                 placeholder="Search concepts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-all"
+                className="w-full pl-10 pr-4 py-2 rounded-md text-sm focus:outline-none focus:ring-2 transition-all"
                 style={{
                   background: "var(--bg-elevated)",
                   color: "var(--text-1)",
@@ -193,7 +193,7 @@ export default function DSAFundamentalsClient({
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-all cursor-pointer"
+              className="px-4 py-2 rounded-md text-sm focus:outline-none focus:ring-2 transition-all cursor-pointer"
               style={{
                 background: "var(--bg-elevated)",
                 color: "var(--text-1)",
@@ -224,7 +224,7 @@ export default function DSAFundamentalsClient({
                 setSearchQuery("");
                 setSelectedCategory("all");
               }}
-              className="mt-4 px-4 py-2 rounded-lg transition-colors"
+              className="mt-4 px-4 py-2 rounded-md transition-colors"
               style={{
                 background: "var(--accent-1)",
                 color: "white",

@@ -1,9 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Stage = "recursion" | "memoization" | "tabulation" | "optimized";
+
+interface RecursionTraceItem {
+  call: string;
+  action: string;
+  depth: number;
+  result?: number;
+  choice?: string;
+  duplicate?: boolean;
+}
 
 interface StageInfo {
   title: string;
@@ -51,10 +60,34 @@ const stageOrder: Stage[] = [
   "optimized",
 ];
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
+const initialPlayState: PlayState = { step: 0, isPlaying: false };
+
 export default function DPTransformationVisualizer() {
   const [currentStage, setCurrentStage] = useState<Stage>("recursion");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [step, setStep] = useState(0);
+  const [{ step, isPlaying }, dispatch] = useReducer(
+    playReducer,
+    initialPlayState
+  );
   const [speed, setSpeed] = useState(500);
 
   const nums = [2, 7, 9, 3, 1];
@@ -159,26 +192,25 @@ export default function DPTransformationVisualizer() {
 
   useEffect(() => {
     if (!isPlaying || step >= trace.length) {
-      if (step >= trace.length) setIsPlaying(false);
+      if (step >= trace.length) dispatch({ type: "STOP" });
       return;
     }
 
     const timer = setTimeout(() => {
-      setStep((s) => s + 1);
+      dispatch({ type: "ADVANCE" });
     }, speed);
 
     return () => clearTimeout(timer);
   }, [isPlaying, step, trace.length, speed]);
 
   const reset = () => {
-    setStep(0);
-    setIsPlaying(false);
+    dispatch({ type: "RESET" });
   };
 
   const stageInfo = stages[currentStage];
 
   const renderRecursion = () => {
-    const currentTrace = trace.slice(0, step) as typeof recursionTrace;
+    const currentTrace = trace.slice(0, step) as RecursionTraceItem[];
     const callStack: string[] = [];
     const completed: { call: string; result: number; stepIdx: number }[] = [];
 
@@ -192,22 +224,22 @@ export default function DPTransformationVisualizer() {
       }
     }
 
-    const currentStep = step < trace.length ? trace[step] : null;
+    const currentStep: RecursionTraceItem | null =
+      step < trace.length ? (trace[step] as RecursionTraceItem) : null;
 
     return (
       <div className="grid grid-cols-2 gap-4">
         <div>
           <h4 className="text-white font-medium mb-2">Call Stack</h4>
-          <div className="bg-gray-800/50 rounded-lg p-4 min-h-[200px]">
+          <div className="bg-gray-800/50 rounded-md p-4 min-h-[200px]">
             <AnimatePresence>
               {callStack.map((call, depth) => (
                 <motion.div
-                  // eslint-disable-next-line react/no-array-index-key -- depth is part of call stack identity
                   key={`stack-${call}-depth${depth}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
-                  className={`p-2 mb-2 rounded font-mono text-sm ${
+                  className={`p-2 mb-2 rounded-md font-mono text-sm ${
                     depth === callStack.length - 1
                       ? "bg-yellow-500/20 border border-yellow-500 text-yellow-400"
                       : "bg-gray-700/50 text-gray-400"
@@ -226,15 +258,15 @@ export default function DPTransformationVisualizer() {
 
         <div>
           <h4 className="text-white font-medium mb-2">Computed Results</h4>
-          <div className="bg-gray-800/50 rounded-lg p-4 min-h-[200px]">
+          <div className="bg-gray-800/50 rounded-md p-4 min-h-[200px]">
             <AnimatePresence>
               {completed.slice(-5).map((c) => (
                 <motion.div
                   key={`result-${c.call}-${c.stepIdx}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`p-2 mb-2 rounded font-mono text-sm ${
-                    (currentTrace[step - 1] as any)?.duplicate
+                  className={`p-2 mb-2 rounded-md font-mono text-sm ${
+                    (currentTrace[step - 1] as { duplicate?: boolean })?.duplicate
                       ? "bg-red-500/20 border border-red-500 text-red-400"
                       : "bg-green-500/20 text-green-400"
                   }`}
@@ -246,15 +278,15 @@ export default function DPTransformationVisualizer() {
           </div>
         </div>
 
-        {currentStep && (currentStep as any).duplicate && (
+        {currentStep?.duplicate && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="col-span-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
+            className="col-span-2 p-3 bg-red-500/10 border border-red-500/30 rounded-md"
           >
             <span className="text-red-400 font-medium">Duplicate work!</span>
             <span className="text-red-300 ml-2">
-              {(currentStep as any).call} is being computed again
+              {currentStep!.call} is being computed again
             </span>
           </motion.div>
         )}
@@ -271,14 +303,14 @@ export default function DPTransformationVisualizer() {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <h4 className="text-white font-medium mb-2">Execution</h4>
-          <div className="bg-gray-800/50 rounded-lg p-4 min-h-[200px] space-y-2">
+          <div className="bg-gray-800/50 rounded-md p-4 min-h-[200px] space-y-2">
             <AnimatePresence>
               {currentTrace.slice(-6).map((t) => (
                 <motion.div
                   key={`trace-${t.call}-${t.action}-${t.result ?? 'pending'}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className={`p-2 rounded font-mono text-sm ${
+                  className={`p-2 rounded-md font-mono text-sm ${
                     t.action === "cache-hit"
                       ? "bg-purple-500/20 border border-purple-500 text-purple-400"
                       : t.action === "store"
@@ -301,7 +333,7 @@ export default function DPTransformationVisualizer() {
 
         <div>
           <h4 className="text-white font-medium mb-2">Memo Cache</h4>
-          <div className="bg-gray-800/50 rounded-lg p-4 min-h-[200px]">
+          <div className="bg-gray-800/50 rounded-md p-4 min-h-[200px]">
             <div className="grid grid-cols-5 gap-2">
               {[0, 1, 2, 3, 4].map((i) => (
                 <motion.div
@@ -310,7 +342,7 @@ export default function DPTransformationVisualizer() {
                     scale: memo[i] !== undefined ? 1 : 0.9,
                     opacity: memo[i] !== undefined ? 1 : 0.4,
                   }}
-                  className={`p-3 rounded-lg text-center ${
+                  className={`p-3 rounded-md text-center ${
                     memo[i] !== undefined
                       ? "bg-purple-500/20 border border-purple-500"
                       : "bg-gray-700/30 border border-gray-700"
@@ -330,7 +362,7 @@ export default function DPTransformationVisualizer() {
               ))}
             </div>
 
-            <div className="mt-4 p-2 bg-purple-500/10 rounded text-sm text-purple-300">
+            <div className="mt-4 p-2 bg-purple-500/10 rounded-md text-sm text-purple-300">
               Cache size: {Object.keys(memo).length} / 5
             </div>
           </div>
@@ -351,12 +383,11 @@ export default function DPTransformationVisualizer() {
           DP Table (filling right to left)
         </h4>
 
-        <div className="bg-gray-800/50 rounded-lg p-4">
+        <div className="bg-gray-800/50 rounded-md p-4">
           {/* Index row */}
           <div className="grid grid-cols-5 gap-2 mb-2">
             {nums.map((num, position) => (
               <div
-                // eslint-disable-next-line react/no-array-index-key -- static array with fixed positions
                 key={`tab-idx-pos${position}-val${num}`}
                 className="text-center text-xs text-gray-500"
               >
@@ -369,9 +400,8 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2 mb-4">
             {nums.map((num, position) => (
               <div
-                // eslint-disable-next-line react/no-array-index-key -- static array with fixed positions
                 key={`tab-val-pos${position}-$${num}`}
-                className="p-2 bg-gray-700/30 rounded text-center"
+                className="p-2 bg-gray-700/30 rounded-md text-center"
               >
                 <span className="text-gray-400 text-sm">${num}</span>
               </div>
@@ -382,7 +412,6 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2">
             {dp.map((val, position) => (
               <motion.div
-                // eslint-disable-next-line react/no-array-index-key -- dp array position is semantically meaningful
                 key={`tab-dp-pos${position}-${val ?? 'null'}`}
                 animate={{
                   scale: currentI === position ? 1.1 : 1,
@@ -393,7 +422,7 @@ export default function DPTransformationVisualizer() {
                         ? "#22c55e"
                         : "#374151",
                 }}
-                className={`p-3 rounded-lg text-center border-2 ${
+                className={`p-3 rounded-md text-center border-2 ${
                   val !== null ? "bg-green-500/20" : "bg-gray-700/30"
                 }`}
               >
@@ -417,7 +446,7 @@ export default function DPTransformationVisualizer() {
               key={step}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg"
+              className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-md"
             >
               <code className="text-blue-400 font-mono text-sm">
                 {lastStep.formula}
@@ -437,18 +466,17 @@ export default function DPTransformationVisualizer() {
       <div>
         <h4 className="text-white font-medium mb-2">Two Variables Only!</h4>
 
-        <div className="bg-gray-800/50 rounded-lg p-4">
+        <div className="bg-gray-800/50 rounded-md p-4">
           {/* Array reference */}
           <div className="grid grid-cols-5 gap-2 mb-4">
             {nums.map((num, position) => (
               <motion.div
-                // eslint-disable-next-line react/no-array-index-key -- static array with fixed positions
                 key={`opt-pos${position}-$${num}`}
                 animate={{
                   scale: lastStep?.i === position ? 1.1 : 1,
                   borderColor: lastStep?.i === position ? "#22c55e" : "#374151",
                 }}
-                className="p-2 bg-gray-700/30 rounded text-center border-2"
+                className="p-2 bg-gray-700/30 rounded-md text-center border-2"
               >
                 <div className="text-xs text-gray-500">nums[{position}]</div>
                 <span className="text-gray-400 font-mono">${num}</span>
@@ -460,7 +488,7 @@ export default function DPTransformationVisualizer() {
           <div className="flex justify-center gap-8 my-6">
             <motion.div
               animate={{ scale: lastStep ? 1.1 : 1 }}
-              className="p-4 bg-green-500/20 border-2 border-green-500 rounded-xl text-center min-w-[120px]"
+              className="p-4 bg-green-500/20 border-2 border-green-500 rounded-md text-center min-w-[120px]"
             >
               <div className="text-xs text-green-400 mb-1">next1</div>
               <div className="text-3xl font-mono font-bold text-green-400">
@@ -471,7 +499,7 @@ export default function DPTransformationVisualizer() {
 
             <motion.div
               animate={{ scale: lastStep ? 1.1 : 1 }}
-              className="p-4 bg-blue-500/20 border-2 border-blue-500 rounded-xl text-center min-w-[120px]"
+              className="p-4 bg-blue-500/20 border-2 border-blue-500 rounded-md text-center min-w-[120px]"
             >
               <div className="text-xs text-blue-400 mb-1">next2</div>
               <div className="text-3xl font-mono font-bold text-blue-400">
@@ -486,7 +514,7 @@ export default function DPTransformationVisualizer() {
               key={step}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-center"
+              className="p-3 bg-green-500/10 border border-green-500/30 rounded-md text-center"
             >
               <code className="text-green-400 font-mono text-sm">
                 {lastStep.formula}
@@ -494,7 +522,7 @@ export default function DPTransformationVisualizer() {
             </motion.div>
           )}
 
-          <div className="mt-4 p-3 bg-gray-700/30 rounded-lg text-center">
+          <div className="mt-4 p-3 bg-gray-700/30 rounded-md text-center">
             <span className="text-gray-400">Space used: </span>
             <span className="text-green-400 font-bold">2 variables</span>
             <span className="text-gray-500"> (constant space!)</span>
@@ -533,7 +561,7 @@ export default function DPTransformationVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div
         className={`p-4 bg-gradient-to-r ${getColorClasses(stageInfo.color)} border-b border-gray-800`}
       >
@@ -555,7 +583,7 @@ export default function DPTransformationVisualizer() {
                 setCurrentStage(stage);
                 reset();
               }}
-              className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+              className={`flex-shrink-0 px-4 py-2 rounded-md font-medium transition flex items-center gap-2 ${
                 currentStage === stage
                   ? `bg-${stages[stage].color}-500/20 border border-${stages[stage].color}-500 text-white`
                   : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -581,7 +609,7 @@ export default function DPTransformationVisualizer() {
 
         {/* Stage Info */}
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xs text-gray-500 mb-1">Time</div>
             <div
               className={`font-mono font-bold ${
@@ -591,7 +619,7 @@ export default function DPTransformationVisualizer() {
               {stageInfo.time}
             </div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xs text-gray-500 mb-1">Space</div>
             <div
               className={`font-mono font-bold ${
@@ -603,7 +631,7 @@ export default function DPTransformationVisualizer() {
               {stageInfo.space}
             </div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-xs text-gray-500 mb-1">Progress</div>
             <div className="font-mono font-bold text-white">
               {step} / {trace.length}
@@ -614,8 +642,8 @@ export default function DPTransformationVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            onClick={() => dispatch({ type: "TOGGLE" })}
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying
                 ? "bg-yellow-500 text-black hover:bg-yellow-400"
                 : "bg-green-500 text-white hover:bg-green-400"
@@ -624,15 +652,15 @@ export default function DPTransformationVisualizer() {
             {isPlaying ? "Pause" : "Play"}
           </button>
           <button
-            onClick={() => step < trace.length && setStep((s) => s + 1)}
+            onClick={() => { if (step < trace.length) dispatch({ type: "ADVANCE" }); }}
             disabled={step >= trace.length}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition disabled:opacity-50"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 transition disabled:opacity-50"
           >
             Step
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 transition"
           >
             Reset
           </button>
@@ -668,7 +696,7 @@ export default function DPTransformationVisualizer() {
           key={currentStage}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className={`mt-4 p-3 rounded-lg border ${getColorClasses(stageInfo.color)}`}
+          className={`mt-4 p-3 rounded-md border ${getColorClasses(stageInfo.color)}`}
         >
           <p className="text-gray-300 text-sm">
             <strong className="text-white">{stageInfo.title}:</strong>{" "}

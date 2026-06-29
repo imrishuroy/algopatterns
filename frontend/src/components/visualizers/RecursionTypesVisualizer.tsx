@@ -212,15 +212,8 @@ export default function RecursionTypesVisualizer() {
   const [selectedType, setSelectedType] = useState(0);
   const type = recursionTypes[selectedType];
 
-  const getColorClasses = (color: string) => ({
-    bg: `bg-${color}-500/10`,
-    border: `border-${color}-500/30`,
-    text: `text-${color}-400`,
-    bgSolid: `bg-${color}-500`,
-  });
-
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gray-800/50 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           Types of Recursion
@@ -236,7 +229,7 @@ export default function RecursionTypesVisualizer() {
             <button
               key={t.name}
               onClick={() => setSelectedType(idx)}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+              className={`px-3 py-2 rounded-md text-sm font-medium transition ${
                 selectedType === idx
                   ? `bg-${t.color}-500 text-white`
                   : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"
@@ -295,7 +288,7 @@ export default function RecursionTypesVisualizer() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+            <div className="bg-green-500/10 border border-green-500/30 rounded-md p-4">
               <h5 className="text-sm font-medium text-green-400 mb-3 flex items-center gap-2">
                 <span>✓</span> Advantages
               </h5>
@@ -312,7 +305,7 @@ export default function RecursionTypesVisualizer() {
               </ul>
             </div>
 
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-md p-4">
               <h5 className="text-sm font-medium text-red-400 mb-3 flex items-center gap-2">
                 <span>✗</span> Disadvantages
               </h5>
@@ -329,7 +322,7 @@ export default function RecursionTypesVisualizer() {
               </ul>
             </div>
 
-            <div className="bg-gray-800/50 rounded-lg p-4">
+            <div className="bg-gray-800/50 rounded-md p-4">
               <h5 className="text-sm font-medium text-gray-400 mb-3">
                 When to Use
               </h5>

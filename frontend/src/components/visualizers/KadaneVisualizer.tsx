@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
 import { motion } from "framer-motion";
 
 interface Step {
@@ -13,8 +13,28 @@ interface Step {
   subarrayEnd: number;
 }
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
 export default function KadaneVisualizer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [speed, setSpeed] = useState(1000);
   const [nums] = useState([-2, 1, -3, 4, -1, 2, 1, -5, 4]);
   const [currentStep, setCurrentStep] = useState(-1);
@@ -82,11 +102,13 @@ export default function KadaneVisualizer() {
     setCurrentStep(-1);
     setPhase("init");
     setMessage("Click Play to find the maximum subarray sum");
-    setIsPlaying(false);
+    dispatch({ type: "STOP" });
   }, [generateSteps]);
 
   useEffect(() => {
-    setSteps(generateSteps());
+    startTransition(() => {
+      setSteps(generateSteps());
+    });
   }, [generateSteps]);
 
   useEffect(() => {
@@ -110,7 +132,7 @@ export default function KadaneVisualizer() {
         setMessage(
           `Done! Maximum subarray sum = ${finalStep.maxSum} (indices ${finalStep.subarrayStart} to ${finalStep.subarrayEnd})`
         );
-        setIsPlaying(false);
+        dispatch({ type: "STOP" });
         return;
       }
 
@@ -136,9 +158,9 @@ export default function KadaneVisualizer() {
     currentStep >= 0 && currentStep < steps.length ? steps[currentStep] : null;
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-gray-800">
-        <h3 className="text-lg font-semibold text-white">Kadane's Algorithm</h3>
+        <h3 className="text-lg font-semibold text-white">Kadane&apos;s Algorithm</h3>
         <p className="text-gray-400 text-sm mt-1">
           Find maximum subarray sum in O(n) time
         </p>
@@ -148,9 +170,9 @@ export default function KadaneVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch({ type: "TOGGLE" })}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -158,7 +180,7 @@ export default function KadaneVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -178,7 +200,7 @@ export default function KadaneVisualizer() {
 
         {/* Stats */}
         <div className="mb-4 grid grid-cols-2 gap-4">
-          <div className="p-3 bg-gray-800/50 rounded-lg">
+          <div className="p-3 bg-gray-800/50 rounded-md">
             <span className="text-gray-400 text-sm">Current Sum: </span>
             <motion.span
               key={current?.currentSum}
@@ -193,7 +215,7 @@ export default function KadaneVisualizer() {
               {current?.currentSum ?? 0}
             </motion.span>
           </div>
-          <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+          <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-md">
             <span className="text-gray-400 text-sm">Max Sum: </span>
             <motion.span
               key={current?.maxSum}
@@ -228,7 +250,7 @@ export default function KadaneVisualizer() {
                         : "#374151",
                     scale: isCurrent ? 1.15 : 1,
                   }}
-                  className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
+                  className="w-10 h-10 rounded-md flex items-center justify-center font-bold text-sm"
                 >
                   <span
                     className={
@@ -259,7 +281,7 @@ export default function KadaneVisualizer() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className={`mb-4 p-3 rounded-lg text-center font-medium ${
+            className={`mb-4 p-3 rounded-md text-center font-medium ${
               current.decision === "start"
                 ? "bg-blue-500/20 border border-blue-500/50 text-blue-400"
                 : "bg-green-500/20 border border-green-500/50 text-green-400"
@@ -276,7 +298,7 @@ export default function KadaneVisualizer() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-4 p-4 bg-amber-500/20 border border-amber-500/50 rounded-lg text-center"
+            className="mb-4 p-4 bg-amber-500/20 border border-amber-500/50 rounded-md text-center"
           >
             <div className="text-amber-400 font-bold text-lg">
               Maximum Sum = {current.maxSum}
@@ -296,7 +318,7 @@ export default function KadaneVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -308,17 +330,17 @@ export default function KadaneVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex gap-4 text-xs">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-yellow-500" />
+            <div className="w-3 h-3 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Current</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-green-500" />
+            <div className="w-3 h-3 rounded-md bg-green-500" />
             <span className="text-gray-400">Max Subarray</span>
           </div>
         </div>
 
         {/* Key insight */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-amber-400">Key Insight:</strong> At each
             position, decide: extend previous subarray or start fresh? If

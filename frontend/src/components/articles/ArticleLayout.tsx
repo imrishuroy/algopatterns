@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ArticleMeta, ArticleSection } from "@/content/articles";
+import { ArticleMeta } from "@/content/articles";
 
 interface ArticleLayoutProps {
   article: ArticleMeta;
@@ -17,9 +16,6 @@ export default function ArticleLayout({
   currentSection,
 }: ArticleLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const pathname = usePathname();
-
-  const isOverviewPage = pathname === `/articles/${article.slug}`;
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -39,7 +35,7 @@ export default function ArticleLayout({
                 </h2>
                 <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                   <span
-                    className={`px-2 py-0.5 rounded ${
+                    className={`px-2 py-0.5 rounded-md ${
                       article.difficulty === "beginner"
                         ? "bg-green-500/20 text-green-400"
                         : article.difficulty === "intermediate"
@@ -66,7 +62,7 @@ export default function ArticleLayout({
                     <Link
                       key={section.slug}
                       href={sectionPath}
-                      className={`flex items-start gap-3 px-3 py-2.5 rounded-lg transition group ${
+                      className={`flex items-start gap-3 px-3 py-2.5 rounded-md transition group ${
                         isActive
                           ? "bg-indigo-500/20 text-indigo-300"
                           : "text-gray-400 hover:bg-gray-800 hover:text-white"
@@ -116,7 +112,7 @@ export default function ArticleLayout({
         {/* Toggle Sidebar Button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white p-1.5 rounded-r-lg border border-l-0 border-gray-700 transition"
+          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white p-1.5 rounded-r-md border border-l-0 border-gray-700 transition"
           style={{ left: sidebarOpen ? "18rem" : "0" }}
         >
           <svg
@@ -205,7 +201,7 @@ function SectionNavigation({
         {prevSection ? (
           <Link
             href={`/articles/${article.slug}/${prevSection.slug}`}
-            className="flex-1 p-4 bg-gray-900 hover:bg-gray-800 rounded-lg border border-gray-800 transition group"
+            className="flex-1 p-4 bg-gray-900 hover:bg-gray-800 rounded-md border border-gray-800 transition group"
           >
             <div className="text-xs text-gray-500 mb-1">Previous</div>
             <div className="text-sm font-medium text-white group-hover:text-indigo-400 transition flex items-center gap-2">
@@ -232,7 +228,7 @@ function SectionNavigation({
         {nextSection ? (
           <Link
             href={`/articles/${article.slug}/${nextSection.slug}`}
-            className="flex-1 p-4 bg-gray-900 hover:bg-gray-800 rounded-lg border border-gray-800 transition group text-right"
+            className="flex-1 p-4 bg-gray-900 hover:bg-gray-800 rounded-md border border-gray-800 transition group text-right"
           >
             <div className="text-xs text-gray-500 mb-1">Next</div>
             <div className="text-sm font-medium text-white group-hover:text-indigo-400 transition flex items-center justify-end gap-2">
@@ -255,7 +251,7 @@ function SectionNavigation({
         ) : (
           <Link
             href="/articles"
-            className="flex-1 p-4 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 hover:from-indigo-500/30 hover:to-purple-500/30 rounded-lg border border-indigo-500/30 transition group text-right"
+            className="flex-1 p-4 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 hover:from-indigo-500/30 hover:to-purple-500/30 rounded-md border border-indigo-500/30 transition group text-right"
           >
             <div className="text-xs text-indigo-400 mb-1">Completed!</div>
             <div className="text-sm font-medium text-white group-hover:text-indigo-300 transition flex items-center justify-end gap-2">

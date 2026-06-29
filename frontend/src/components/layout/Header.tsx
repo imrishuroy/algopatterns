@@ -45,7 +45,7 @@ const MoonIcon = () => (
 const ThemeToggle = ({ theme, onToggle }: { theme: string; onToggle: () => void }) => (
   <button
     onClick={onToggle}
-    className="p-2 rounded-lg transition-colors hover:bg-white/10"
+    className="p-2 rounded-md transition-colors hover:bg-white/10"
     title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
   >
     {theme === "dark" ? <SunIcon /> : <MoonIcon />}
@@ -381,7 +381,7 @@ const Header = () => {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="p-2 rounded-md transition-colors hover:bg-white/10"
               style={{ color: "var(--text-1)" }}
               aria-label="Toggle menu"
             >
@@ -406,7 +406,7 @@ const Header = () => {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-white/5"
+                className="flex items-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-colors hover:bg-white/5"
                 style={{ color: "var(--accent-1)" }}
               >
                 {link.label}

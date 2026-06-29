@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useReducer, useMemo, startTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Item {
@@ -10,27 +10,35 @@ interface Item {
   color: string;
 }
 
-export default function KnapsackVisualizer() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [step, setStep] = useState(0);
-  const [speed, setSpeed] = useState(600);
-  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
-  const [dpTable, setDpTable] = useState<number[][]>([]);
-  const [currentCell, setCurrentCell] = useState<{
-    i: number;
-    j: number;
-  } | null>(null);
-  const [decision, setDecision] = useState<string>("");
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
 
-  const capacity = 7;
-  const items: Item[] = [
-    { weight: 1, value: 1, name: "Phone", color: "blue" },
-    { weight: 3, value: 4, name: "Laptop", color: "purple" },
-    { weight: 4, value: 5, name: "Camera", color: "green" },
-    { weight: 2, value: 3, name: "Tablet", color: "orange" },
-  ];
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
 
-  const generateSteps = () => {
+const capacity = 7;
+const items: Item[] = [
+  { weight: 1, value: 1, name: "Phone", color: "blue" },
+  { weight: 3, value: 4, name: "Laptop", color: "purple" },
+  { weight: 4, value: 5, name: "Camera", color: "green" },
+  { weight: 2, value: 3, name: "Tablet", color: "orange" },
+];
+
+function generateSteps() {
     const n = items.length;
     const steps: {
       i: number;
@@ -83,21 +91,52 @@ export default function KnapsackVisualizer() {
     }
 
     return { steps, dp };
-  };
+  }
 
-  const { steps, dp: finalDp } = generateSteps();
+export default function KnapsackVisualizer() {
+  const [{ step, isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [speed, setSpeed] = useState(600);
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const [dpTable, setDpTable] = useState<number[][]>([]);
+  const [currentCell, setCurrentCell] = useState<{
+    i: number;
+    j: number;
+  } | null>(null);
+  const [decision, setDecision] = useState<string>("");
+
+  const { steps, dp: finalDp } = useMemo(() => generateSteps(), []);
 
   const [completed, setCompleted] = useState(false);
+
+  const backtrackSolution = useCallback(
+    function backtrackSolution() {
+      const selected = new Set<number>();
+      let w = capacity;
+
+      for (let i = items.length; i > 0 && w > 0; i--) {
+        const stepIdx = (i - 1) * (capacity + 1) + w;
+        if (stepIdx < steps.length && steps[stepIdx]?.take) {
+          selected.add(i - 1);
+          w -= items[i - 1].weight;
+        }
+      }
+
+      setSelectedItems(selected);
+    },
+    [steps]
+  );
 
   useEffect(() => {
     if (!isPlaying) return;
 
     if (step >= steps.length) {
-      setIsPlaying(false);
-      if (!completed) {
-        setCompleted(true);
-        backtrackSolution();
-      }
+      startTransition(() => {
+        dispatch({ type: "STOP" });
+        if (!completed) {
+          setCompleted(true);
+          backtrackSolution();
+        }
+      });
       return;
     }
 
@@ -113,30 +152,14 @@ export default function KnapsackVisualizer() {
         return newTable;
       });
 
-      setStep((st) => st + 1);
+      dispatch({ type: "ADVANCE" });
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [isPlaying, step, steps.length, speed, completed]);
+  }, [isPlaying, step, steps, speed, completed, backtrackSolution]);
 
-  const backtrackSolution = () => {
-    const selected = new Set<number>();
-    let w = capacity;
-
-    for (let i = items.length; i > 0 && w > 0; i--) {
-      const stepIdx = (i - 1) * (capacity + 1) + w;
-      if (stepIdx < steps.length && steps[stepIdx]?.take) {
-        selected.add(i - 1);
-        w -= items[i - 1].weight;
-      }
-    }
-
-    setSelectedItems(selected);
-  };
-
-  const reset = () => {
-    setStep(0);
-    setIsPlaying(false);
+  const reset = useCallback(() => {
+    dispatch({ type: "RESET" });
     setCompleted(false);
     setDpTable(
       Array(items.length + 1)
@@ -146,11 +169,13 @@ export default function KnapsackVisualizer() {
     setCurrentCell(null);
     setDecision("");
     setSelectedItems(new Set());
-  };
+  }, []);
 
   useEffect(() => {
-    reset();
-  }, []);
+    startTransition(() => {
+      reset();
+    });
+  }, [reset]);
 
   const getCellValue = (i: number, j: number) => {
     if (i === 0 || j < 0) return 0;
@@ -199,7 +224,7 @@ export default function KnapsackVisualizer() {
   );
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           0/1 Knapsack Visualizer
@@ -221,7 +246,7 @@ export default function KnapsackVisualizer() {
                   scale: selectedItems.has(idx) ? 1.05 : 1,
                   y: selectedItems.has(idx) ? -5 : 0,
                 }}
-                className={`relative p-3 rounded-xl bg-gradient-to-br ${getItemColorClass(item.color)} ${
+                className={`relative p-3 rounded-md bg-gradient-to-br ${getItemColorClass(item.color)} ${
                   selectedItems.has(idx)
                     ? "ring-2 ring-white ring-offset-2 ring-offset-gray-900"
                     : ""
@@ -249,7 +274,7 @@ export default function KnapsackVisualizer() {
         {/* Knapsack */}
         <div className="mb-6">
           <h4 className="text-white font-medium mb-3">Your Knapsack</h4>
-          <div className="relative bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-600 p-4 min-h-[100px]">
+          <div className="relative bg-gray-800/50 rounded-md border-2 border-dashed border-gray-600 p-4 min-h-[100px]">
             <div className="flex flex-wrap gap-2">
               <AnimatePresence>
                 {[...selectedItems].map((idx) => (
@@ -258,7 +283,7 @@ export default function KnapsackVisualizer() {
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
-                    className={`px-3 py-2 rounded-lg bg-gradient-to-br ${getItemColorClass(items[idx].color)} text-white text-sm font-medium`}
+                    className={`px-3 py-2 rounded-md bg-gradient-to-br ${getItemColorClass(items[idx].color)} text-white text-sm font-medium`}
                   >
                     {items[idx].name}
                   </motion.div>
@@ -307,8 +332,8 @@ export default function KnapsackVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            onClick={() => dispatch({ type: "TOGGLE" })}
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             }`}
           >
@@ -327,17 +352,17 @@ export default function KnapsackVisualizer() {
                   newTable[s.i][s.j] = s.value;
                   return newTable;
                 });
-                setStep((st) => st + 1);
+                dispatch({ type: "ADVANCE" });
               }
             }}
             disabled={step >= steps.length}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 disabled:opacity-50"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 disabled:opacity-50"
           >
             Step
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -386,7 +411,7 @@ export default function KnapsackVisualizer() {
                       scale:
                         currentCell?.i === i && currentCell?.j === j ? 1.15 : 1,
                     }}
-                    className={`w-12 h-12 border-2 rounded-lg flex items-center justify-center font-mono font-bold m-0.5 transition-colors ${getCellColor(i, j)}`}
+                    className={`w-12 h-12 border-2 rounded-md flex items-center justify-center font-mono font-bold m-0.5 transition-colors ${getCellColor(i, j)}`}
                   >
                     {i === 0 ? 0 : getCellValue(i, j) || ""}
                   </motion.div>
@@ -402,7 +427,7 @@ export default function KnapsackVisualizer() {
             key={step}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`mt-4 p-3 rounded-lg border ${
+            className={`mt-4 p-3 rounded-md border ${
               decision.includes("TAKE")
                 ? "bg-green-500/10 border-green-500/30 text-green-400"
                 : decision.includes("SKIP")

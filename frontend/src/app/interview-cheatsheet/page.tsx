@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 
 const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
   loading: () => (
-    <div className="h-32 rounded-xl animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+    <div className="h-32 rounded-md animate-pulse" style={{ background: "var(--bg-elevated)" }} />
   ),
   ssr: false,
 });
@@ -869,7 +869,7 @@ const ProblemLink = ({ problem }: { problem: string }) => {
       href={`https://leetcode.com/problems/${slug}/`}
       target="_blank"
       rel="noopener noreferrer"
-      className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition"
+      className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-md text-sm transition"
     >
       {problem}
     </a>
@@ -892,7 +892,7 @@ const PatternCard = ({
   isExpanded: boolean;
   onToggle: () => void;
 }) => (
-  <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+  <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
     <button
       onClick={onToggle}
       className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-800/50 transition"
@@ -938,7 +938,7 @@ const PatternCard = ({
 );
 
 const KeywordCard = ({ item }: { item: typeof KEYWORDS[number] }) => (
-  <div className="p-3 bg-gray-900 rounded-lg border border-gray-800 hover:border-gray-700 transition">
+  <div className="p-3 bg-gray-900 rounded-md border border-gray-800 hover:border-gray-700 transition">
     <div className="flex items-center justify-between mb-1">
       <span className="text-white font-medium">{item.keyword}</span>
       <span className="text-indigo-400 font-semibold text-sm">{item.algo}</span>
@@ -955,7 +955,7 @@ const DecisionOption = ({ option }: { option: { id: string; text: string } }) =>
 );
 
 const DecisionCard = ({ decision }: { decision: typeof DECISIONS[number] }) => (
-  <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
+  <div className="p-4 bg-gray-900 rounded-md border border-gray-800">
     <h3 className="font-semibold text-indigo-400 mb-2">{decision.question}</h3>
     <ul className="space-y-1">
       {decision.options.map((opt) => (
@@ -991,7 +991,7 @@ const ComplexityTable = () => (
 );
 
 const MistakeCard = ({ item }: { item: typeof MISTAKES[number] }) => (
-  <div className="p-3 bg-red-900/20 border border-red-500/30 rounded-lg flex items-start gap-3">
+  <div className="p-3 bg-red-900/20 border border-red-500/30 rounded-md flex items-start gap-3">
     <span className="text-red-400 font-medium min-w-[110px]">{item.pattern}</span>
     <span className="text-gray-300 text-sm">{item.mistake}</span>
   </div>
@@ -1008,7 +1008,7 @@ const InterviewCheatsheetPage = () => {
       </div>
 
       <section className="mb-8 md:mb-10">
-        <div className="p-4 md:p-6 bg-gray-900 rounded-xl border border-gray-800">
+        <div className="p-4 md:p-6 bg-gray-900 rounded-md border border-gray-800">
           <h2 className="text-lg md:text-xl font-bold text-white mb-2">The Golden Rule: Check Constraints First</h2>
           <p className="text-gray-400 mb-5">
             Before anything else, look at the input size. This tells you which algorithms are even possible.

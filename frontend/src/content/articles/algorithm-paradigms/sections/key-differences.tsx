@@ -24,7 +24,7 @@ export default function KeyDifferencesSection() {
         The Decision Tree Mental Model
       </h2>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-8 font-mono text-sm">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8 font-mono text-sm">
         <pre className="text-gray-300 whitespace-pre overflow-x-auto">
           {`Problem: Generate subsets of [1, 2]
 
@@ -48,7 +48,7 @@ All leaf nodes = All subsets: [], [1], [2], [1,2]`}
       </h2>
 
       <div className="grid md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-5">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-red-400 mb-2">Recursion</h4>
           <p className="text-gray-400 text-sm mb-3">
             Explores <strong className="text-white">every single path</strong>{" "}
@@ -59,7 +59,7 @@ All leaf nodes = All subsets: [], [1], [2], [1,2]`}
           </div>
         </div>
 
-        <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-5">
+        <div className="bg-orange-500/10 border border-orange-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-orange-400 mb-2">
             Backtracking
           </h4>
@@ -72,7 +72,7 @@ All leaf nodes = All subsets: [], [1], [2], [1,2]`}
           </div>
         </div>
 
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5">
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-blue-400 mb-2">DP</h4>
           <p className="text-gray-400 text-sm mb-3">
             Explores <strong className="text-white">unique states only</strong>,
@@ -83,7 +83,7 @@ All leaf nodes = All subsets: [], [1], [2], [1,2]`}
           </div>
         </div>
 
-        <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-5">
+        <div className="bg-green-500/10 border border-green-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-green-400 mb-2">Greedy</h4>
           <p className="text-gray-400 text-sm mb-3">
             Explores <strong className="text-white">exactly one path</strong>,
@@ -100,7 +100,7 @@ All leaf nodes = All subsets: [], [1], [2], [1,2]`}
         Difference 2: Where the Answer Appears
       </h2>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-8">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-700">
@@ -240,7 +240,7 @@ All leaf nodes = All subsets: [], [1], [2], [1,2]`}
         Difference 4: Same Problem, Different Questions
       </h2>
 
-      <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/30 rounded-xl p-6 mb-8">
+      <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/30 rounded-md p-6 mb-8">
         <h4 className="text-lg font-semibold text-purple-300 mb-4">
           Problem: Climbing Stairs (1 or 2 steps at a time)
         </h4>
@@ -282,7 +282,7 @@ All leaf nodes = All subsets: [], [1], [2], [1,2]`}
         </div>
       </div>
 
-      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+      <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-md p-6">
         <h4 className="text-lg font-semibold text-yellow-400 mb-3">
           The Core Insight
         </h4>

@@ -172,7 +172,7 @@ export default function RecurrenceBuilderVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-indigo-500/10 to-violet-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Recurrence Relation Builder
@@ -189,7 +189,7 @@ export default function RecurrenceBuilderVisualizer() {
             <button
               key={`p-${p}`}
               onClick={() => changeProblem(p)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
                 selectedProblem === p
                   ? "bg-indigo-500 text-white"
                   : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -201,7 +201,7 @@ export default function RecurrenceBuilderVisualizer() {
         </div>
 
         {/* Problem Statement */}
-        <div className="mb-6 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+        <div className="mb-6 p-4 bg-gray-800/50 rounded-md border border-gray-700">
           <h4 className="text-white font-semibold mb-2">{problem.title}</h4>
           <p className="text-gray-300">{problem.question}</p>
         </div>
@@ -221,7 +221,7 @@ export default function RecurrenceBuilderVisualizer() {
                 key={`step-${step.question.slice(0, 20)}-${idx}`}
                 initial={{ opacity: 0.5 }}
                 animate={{ opacity: revealedSteps.has(idx) ? 1 : 0.5 }}
-                className={`rounded-xl border-2 overflow-hidden transition-colors ${
+                className={`rounded-md border-2 overflow-hidden transition-colors ${
                   revealedSteps.has(idx)
                     ? "bg-indigo-500/10 border-indigo-500/50"
                     : "bg-gray-800/30 border-gray-700"
@@ -282,7 +282,7 @@ export default function RecurrenceBuilderVisualizer() {
           <button
             onClick={revealStep}
             disabled={showRecurrence}
-            className={`flex-1 py-3 rounded-xl font-medium transition ${
+            className={`flex-1 py-3 rounded-md font-medium transition ${
               showRecurrence
                 ? "bg-gray-700 text-gray-500 cursor-not-allowed"
                 : "bg-indigo-500 text-white hover:bg-indigo-400"
@@ -296,7 +296,7 @@ export default function RecurrenceBuilderVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-6 py-3 bg-gray-700 text-white rounded-xl font-medium hover:bg-gray-600"
+            className="px-6 py-3 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -308,7 +308,7 @@ export default function RecurrenceBuilderVisualizer() {
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              className="p-6 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl border-2 border-green-500/50"
+              className="p-6 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-md border-2 border-green-500/50"
             >
               <div className="text-center mb-4">
                 <span className="text-green-400 text-sm font-medium uppercase tracking-wide">
@@ -322,7 +322,7 @@ export default function RecurrenceBuilderVisualizer() {
                 transition={{ type: "spring", stiffness: 200 }}
                 className="text-center mb-4"
               >
-                <code className="text-2xl font-mono font-bold text-white bg-gray-800/50 px-6 py-3 rounded-xl inline-block">
+                <code className="text-2xl font-mono font-bold text-white bg-gray-800/50 px-6 py-3 rounded-md inline-block">
                   {problem.recurrence}
                 </code>
               </motion.div>
@@ -334,7 +334,7 @@ export default function RecurrenceBuilderVisualizer() {
                 </code>
               </div>
 
-              <div className="mt-4 p-3 bg-gray-800/50 rounded-lg">
+              <div className="mt-4 p-3 bg-gray-800/50 rounded-md">
                 <p className="text-gray-300 text-sm text-center">
                   Now you can implement this as recursion → memoization →
                   tabulation → space optimized!
@@ -345,7 +345,7 @@ export default function RecurrenceBuilderVisualizer() {
         </AnimatePresence>
 
         {/* Quick Reference */}
-        <div className="mt-6 p-4 bg-gray-800/30 rounded-xl">
+        <div className="mt-6 p-4 bg-gray-800/30 rounded-md">
           <h5 className="text-gray-400 text-sm font-medium mb-2">
             Combination Patterns:
           </h5>

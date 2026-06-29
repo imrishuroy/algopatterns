@@ -95,7 +95,7 @@ export default function TwoSumSortedVisualizer() {
   }, [isPlaying, phase, left, right, nums, target, speed]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Two Sum II (Sorted Array)
@@ -111,7 +111,7 @@ export default function TwoSumSortedVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -119,7 +119,7 @@ export default function TwoSumSortedVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -138,7 +138,7 @@ export default function TwoSumSortedVisualizer() {
         </div>
 
         {/* Target display */}
-        <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+        <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-md">
           <span className="text-gray-400">Target Sum: </span>
           <span className="text-blue-400 font-bold text-xl">{target}</span>
           {currentSum !== null && (
@@ -180,7 +180,7 @@ export default function TwoSumSortedVisualizer() {
                           : "#374151",
                   scale: idx === left || idx === right ? 1.1 : 1,
                 }}
-                className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-white"
+                className="w-12 h-12 rounded-md flex items-center justify-center font-bold text-white"
               >
                 {num}
               </motion.div>
@@ -214,7 +214,7 @@ export default function TwoSumSortedVisualizer() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-4 p-3 bg-gray-800/50 rounded-lg text-center"
+            className="mb-4 p-3 bg-gray-800/50 rounded-md text-center"
           >
             <span className="text-blue-400 font-mono">{nums[left]}</span>
             <span className="text-gray-400 mx-2">+</span>
@@ -233,7 +233,7 @@ export default function TwoSumSortedVisualizer() {
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center"
+            className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-md text-center"
           >
             <span className="text-green-400 font-bold text-lg">
               Found! indices [{left}, {right}] → {nums[left]} + {nums[right]} ={" "}
@@ -259,7 +259,7 @@ export default function TwoSumSortedVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? found
                 ? "bg-green-500/10 border border-green-500/30 text-green-400"
@@ -273,15 +273,15 @@ export default function TwoSumSortedVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex gap-4 text-xs">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-blue-500" />
+            <div className="w-3 h-3 rounded-md bg-blue-500" />
             <span className="text-gray-400">Left pointer</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-yellow-500" />
+            <div className="w-3 h-3 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Right pointer</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-green-500" />
+            <div className="w-3 h-3 rounded-md bg-green-500" />
             <span className="text-gray-400">Found pair</span>
           </div>
         </div>

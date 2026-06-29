@@ -1,10 +1,30 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
 export default function PermutationsVisualizer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [speed, setSpeed] = useState(700);
   const [nums] = useState([1, 2, 3]);
   const [currentPath, setCurrentPath] = useState<number[]>([]);
@@ -88,11 +108,13 @@ export default function PermutationsVisualizer() {
     setMessage("Click Play to generate all permutations");
     setStepIndex(-1);
     setSteps(generateSteps());
-    setIsPlaying(false);
+    dispatch({ type: "STOP" });
   }, [generateSteps]);
 
   useEffect(() => {
-    setSteps(generateSteps());
+    startTransition(() => {
+      setSteps(generateSteps());
+    });
   }, [generateSteps]);
 
   useEffect(() => {
@@ -112,7 +134,7 @@ export default function PermutationsVisualizer() {
         setMessage(
           `Done! Generated all ${results.length} permutations (${nums.length}! = ${results.length})`
         );
-        setIsPlaying(false);
+        dispatch({ type: "STOP" });
         return;
       }
 
@@ -143,7 +165,7 @@ export default function PermutationsVisualizer() {
   }, [isPlaying, phase, stepIndex, steps, nums, results.length, speed]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Permutations Generator
@@ -157,9 +179,9 @@ export default function PermutationsVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch({ type: "TOGGLE" })}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -167,7 +189,7 @@ export default function PermutationsVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -197,7 +219,7 @@ export default function PermutationsVisualizer() {
                   scale: used[idx] ? 0.9 : 1,
                   opacity: used[idx] ? 0.5 : 1,
                 }}
-                className="w-14 h-14 rounded-lg flex flex-col items-center justify-center"
+                className="w-14 h-14 rounded-md flex flex-col items-center justify-center"
               >
                 <span className="font-bold text-white">{num}</span>
                 <span
@@ -211,7 +233,7 @@ export default function PermutationsVisualizer() {
         </div>
 
         {/* Current path */}
-        <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+        <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-md">
           <div className="text-sm text-gray-400 mb-1">
             Current Permutation (building):
           </div>
@@ -224,7 +246,7 @@ export default function PermutationsVisualizer() {
                   key={`path-${num}-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center"
+                  className="w-12 h-12 bg-blue-500 rounded-md flex items-center justify-center"
                 >
                   <span className="font-bold text-white text-lg">{num}</span>
                 </motion.div>
@@ -245,7 +267,7 @@ export default function PermutationsVisualizer() {
                   key={`perm-${perm.join("-")}-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 font-mono text-sm"
+                  className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-md text-green-400 font-mono text-sm"
                 >
                   [{perm.join(", ")}]
                 </motion.div>
@@ -259,7 +281,7 @@ export default function PermutationsVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -269,7 +291,7 @@ export default function PermutationsVisualizer() {
         </motion.div>
 
         {/* Key insight */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-blue-400">
               Key Difference from Subsets:

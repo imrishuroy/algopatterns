@@ -137,7 +137,7 @@ export function AIChatPanel({
           {/* History toggle */}
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className={`p-1.5 rounded transition-colors ${
+            className={`p-1.5 rounded-md transition-colors ${
               showHistory ? "text-indigo-400 bg-indigo-900/30" : "text-gray-500 hover:text-white hover:bg-gray-800"
             }`}
             title="Chat history"
@@ -150,7 +150,7 @@ export function AIChatPanel({
           {messages.length > 0 && !isViewingArchived && (
             <button
               onClick={startNewChat}
-              className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded transition-colors"
+              className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
               title="New chat"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ export function AIChatPanel({
           {isViewingArchived && (
             <button
               onClick={startNewChat}
-              className="p-1.5 text-indigo-400 hover:text-indigo-300 hover:bg-gray-800 rounded transition-colors"
+              className="p-1.5 text-indigo-400 hover:text-indigo-300 hover:bg-gray-800 rounded-md transition-colors"
               title="Back to active chat"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@ export function AIChatPanel({
           {messages.length > 0 && !isViewingArchived && (
             <button
               onClick={clearMessages}
-              className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded transition-colors"
+              className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
               title="Clear"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +188,7 @@ export function AIChatPanel({
           )}
           <button
             onClick={onClose}
-            className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded transition-colors"
+            className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
             title="Close"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,7 +281,7 @@ export function AIChatPanel({
             <p className="text-sm text-gray-400 mb-3">Sign in to use Thor AI</p>
             <a
               href="/login"
-              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm transition-colors"
+              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm transition-colors"
             >
               Sign In
             </a>
@@ -298,7 +298,7 @@ export function AIChatPanel({
         ) : (
           <>
             {isViewingArchived && (
-              <div className="mb-3 px-2 py-1.5 bg-indigo-900/20 border border-indigo-800/50 rounded text-xs text-indigo-300">
+              <div className="mb-3 px-2 py-1.5 bg-indigo-900/20 border border-indigo-800/50 rounded-md text-xs text-indigo-300">
                 Viewing archived chat (read-only)
               </div>
             )}
@@ -310,7 +310,7 @@ export function AIChatPanel({
         )}
 
         {error && (
-          <div className="p-2 bg-red-900/20 border border-red-800 rounded text-red-400 text-xs">
+          <div className="p-2 bg-red-900/20 border border-red-800 rounded-md text-red-400 text-xs">
             {error}
           </div>
         )}

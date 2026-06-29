@@ -118,7 +118,7 @@ export default function SinglePageArticleLayout({
               <h2 className="text-lg font-bold text-white">{article.title}</h2>
               <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                 <span
-                  className={`px-2 py-0.5 rounded border ${getDifficultyColor(article.difficulty)}`}
+                  className={`px-2 py-0.5 rounded-md border ${getDifficultyColor(article.difficulty)}`}
                 >
                   {article.difficulty}
                 </span>
@@ -138,7 +138,7 @@ export default function SinglePageArticleLayout({
                   <button
                     key={section.slug}
                     onClick={() => scrollToSection(section.slug)}
-                    className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-lg transition group text-left ${
+                    className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-md transition group text-left ${
                       isActive
                         ? "bg-indigo-500/20 text-indigo-300"
                         : "text-gray-400 hover:bg-gray-800 hover:text-white"
@@ -205,7 +205,7 @@ export default function SinglePageArticleLayout({
       {/* Toggle Sidebar Button (Desktop) */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-1/2 -translate-y-1/2 z-40 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white p-1.5 rounded-r-lg border border-l-0 border-gray-700 transition hidden lg:block"
+        className="fixed top-1/2 -translate-y-1/2 z-40 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white p-1.5 rounded-r-md border border-l-0 border-gray-700 transition hidden lg:block"
         style={{ left: sidebarOpen ? "18rem" : "0" }}
       >
         <svg
@@ -306,7 +306,7 @@ export default function SinglePageArticleLayout({
 
           {/* End of Article */}
           <div className="mt-16 pt-8 border-t border-gray-800">
-            <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl border border-indigo-500/30 p-6 text-center">
+            <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-md border border-indigo-500/30 p-6 text-center">
               <div className="text-3xl mb-3">&#127881;</div>
               <h3 className="text-xl font-bold text-white mb-2">
                 You&apos;ve completed this article!
@@ -316,7 +316,7 @@ export default function SinglePageArticleLayout({
               </p>
               <Link
                 href="/articles"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-500 hover:bg-indigo-400 text-white font-medium rounded-lg transition"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-500 hover:bg-indigo-400 text-white font-medium rounded-md transition"
               >
                 Browse More Articles
                 <svg
@@ -378,7 +378,7 @@ function MobileTOC({
     <div className="lg:hidden mb-8">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-gray-900 rounded-lg border border-gray-800"
+        className="w-full flex items-center justify-between px-4 py-3 bg-gray-900 rounded-md border border-gray-800"
       >
         <span className="text-sm font-medium text-white">
           Table of Contents
@@ -399,7 +399,7 @@ function MobileTOC({
       </button>
 
       {isOpen && (
-        <div className="mt-2 p-3 bg-gray-900 rounded-lg border border-gray-800 space-y-1">
+        <div className="mt-2 p-3 bg-gray-900 rounded-md border border-gray-800 space-y-1">
           {sections.map((section, index) => (
             <button
               key={section.slug}
@@ -407,7 +407,7 @@ function MobileTOC({
                 onSectionClick(section.slug);
                 setIsOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left ${
                 activeSection === section.slug
                   ? "bg-indigo-500/20 text-indigo-300"
                   : "text-gray-400 hover:bg-gray-800"
@@ -446,7 +446,7 @@ function MobileFloatingTOC({
   return (
     <div className="lg:hidden fixed bottom-4 right-4 z-50">
       {isOpen && (
-        <div className="absolute bottom-14 right-0 w-64 p-3 bg-gray-900 rounded-lg border border-gray-800 shadow-xl space-y-1 max-h-80 overflow-y-auto">
+        <div className="absolute bottom-14 right-0 w-64 p-3 bg-gray-900 rounded-md border border-gray-800 shadow-xl space-y-1 max-h-80 overflow-y-auto">
           {sections.map((section, index) => (
             <button
               key={section.slug}
@@ -454,7 +454,7 @@ function MobileFloatingTOC({
                 onSectionClick(section.slug);
                 setIsOpen(false);
               }}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left ${
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left ${
                 activeSection === section.slug
                   ? "bg-indigo-500/20 text-indigo-300"
                   : "text-gray-400 hover:bg-gray-800"

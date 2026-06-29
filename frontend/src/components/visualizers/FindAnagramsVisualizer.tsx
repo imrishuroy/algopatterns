@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function FindAnagramsVisualizer() {
@@ -18,12 +18,15 @@ export default function FindAnagramsVisualizer() {
   const s = "cbaebabacd";
   const p = "abc";
 
-  // Pattern frequency (constant)
-  const pFreq = new Map<string, number>([
-    ["a", 1],
-    ["b", 1],
-    ["c", 1],
-  ]);
+  const pFreq = useMemo(
+    () =>
+      new Map<string, number>([
+        ["a", 1],
+        ["b", 1],
+        ["c", 1],
+      ]),
+    []
+  );
   const required = pFreq.size; // 3
 
   const reset = useCallback(() => {
@@ -119,6 +122,7 @@ export default function FindAnagramsVisualizer() {
     s,
     p,
     required,
+    pFreq,
     speed,
   ]);
 
@@ -177,7 +181,7 @@ export default function FindAnagramsVisualizer() {
           <div>
             <span className="text-gray-400">Pattern: </span>
             <span className="text-xl font-mono font-bold text-pink-400">
-              "{p}"
+              &ldquo;{p}&rdquo;
             </span>
           </div>
           <div className="text-sm text-gray-400">
@@ -198,7 +202,6 @@ export default function FindAnagramsVisualizer() {
 
               return (
                 <motion.div
-                  // eslint-disable-next-line react/no-array-index-key -- character position in string is semantically meaningful
                   key={`s-pos${position}-${char}`}
                   animate={{
                     scale: position === currentIdx ? 1.1 : 1,
@@ -301,7 +304,7 @@ export default function FindAnagramsVisualizer() {
               Anagrams found at indices: [{foundIndices.join(", ")}]
               {foundIndices.map((idx) => (
                 <span key={`found-${idx}-${s.slice(idx, idx + p.length)}`} className="ml-2 font-mono">
-                  "{s.slice(idx, idx + p.length)}"
+                  &ldquo;{s.slice(idx, idx + p.length)}&rdquo;
                 </span>
               ))}
             </div>
@@ -330,7 +333,7 @@ export default function FindAnagramsVisualizer() {
             <strong className="text-pink-400">Key Insight:</strong> Track how
             many unique characters have matching frequencies. When matches
             equals required unique chars, the window is an anagram. O(n) with a
-            "matches" counter!
+            &ldquo;matches&rdquo; counter!
           </p>
         </div>
       </div>

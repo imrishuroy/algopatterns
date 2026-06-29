@@ -610,7 +610,7 @@ describe("ChatMessage", () => {
     const msg = createMessage({ role: "user", content: "User text" });
     const { container } = render(<ChatMessage message={msg} />);
     const bubble = container.querySelector(".max-w-\\[90\\%\\]") as HTMLElement;
-    // The class contains both rounded-lg px-3 py-2 text-sm and role-specific styles
+    // The class contains both rounded-md px-3 py-2 text-sm and role-specific styles
     expect(bubble.className).toContain("bg-indigo-600");
     expect(bubble.className).toContain("text-white");
   });

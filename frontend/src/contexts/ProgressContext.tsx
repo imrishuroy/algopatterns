@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  startTransition,
   type ReactNode,
 } from "react";
 import { useAuth } from "./AuthContext";
@@ -95,7 +96,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   // Reset sync flag when user logs out
   useEffect(() => {
     if (!isAuthenticated) {
-      setHasSynced(false);
+      startTransition(() => {
+        setHasSynced(false);
+      });
     }
   }, [isAuthenticated]);
 

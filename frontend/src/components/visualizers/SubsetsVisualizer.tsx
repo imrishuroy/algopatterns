@@ -1,10 +1,30 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
 export default function SubsetsVisualizer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [speed, setSpeed] = useState(800);
   const [nums] = useState([1, 2, 3]);
   const [currentPath, setCurrentPath] = useState<number[]>([]);
@@ -44,11 +64,13 @@ export default function SubsetsVisualizer() {
     setMessage("Click Play to generate all subsets");
     setStepIndex(-1);
     setSteps(generateSteps());
-    setIsPlaying(false);
+    dispatch({ type: "STOP" });
   }, [generateSteps]);
 
   useEffect(() => {
-    setSteps(generateSteps());
+    startTransition(() => {
+      setSteps(generateSteps());
+    });
   }, [generateSteps]);
 
   useEffect(() => {
@@ -71,7 +93,7 @@ export default function SubsetsVisualizer() {
         setMessage(
           `Done! Generated all ${results.length} subsets using backtracking`
         );
-        setIsPlaying(false);
+        dispatch({ type: "STOP" });
         return;
       }
 
@@ -97,7 +119,7 @@ export default function SubsetsVisualizer() {
   }, [isPlaying, phase, stepIndex, steps, nums, results.length, speed]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">Subsets Generator</h3>
         <p className="text-gray-400 text-sm mt-1">
@@ -109,9 +131,9 @@ export default function SubsetsVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch({ type: "TOGGLE" })}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -119,7 +141,7 @@ export default function SubsetsVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -150,7 +172,7 @@ export default function SubsetsVisualizer() {
                     : "#374151",
                   scale: currentPath.includes(num) ? 1.1 : 1,
                 }}
-                className="w-12 h-12 rounded-lg flex flex-col items-center justify-center"
+                className="w-12 h-12 rounded-md flex flex-col items-center justify-center"
               >
                 <span
                   className={`font-bold ${currentPath.includes(num) ? "text-white" : "text-white"}`}
@@ -164,7 +186,7 @@ export default function SubsetsVisualizer() {
         </div>
 
         {/* Current path */}
-        <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+        <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-md">
           <div className="text-sm text-gray-400 mb-1">Current Path:</div>
           <div className="text-purple-400 font-mono text-lg">
             [{currentPath.join(", ")}]
@@ -172,7 +194,7 @@ export default function SubsetsVisualizer() {
         </div>
 
         {/* Decision tree visualization */}
-        <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
+        <div className="mb-4 p-3 bg-gray-800/50 rounded-md">
           <div className="text-sm text-gray-400 mb-2">Decision Tree:</div>
           <pre className="text-xs text-gray-300 font-mono overflow-x-auto">
             {`                    []
@@ -197,7 +219,7 @@ export default function SubsetsVisualizer() {
                   key={`[${subset.join(',')}]-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 font-mono text-sm"
+                  className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-md text-green-400 font-mono text-sm"
                 >
                   [{subset.join(", ")}]
                 </motion.div>
@@ -211,7 +233,7 @@ export default function SubsetsVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -221,7 +243,7 @@ export default function SubsetsVisualizer() {
         </motion.div>
 
         {/* Key insight */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-purple-400">Key Insight:</strong> At each
             index, we have two choices: include the element or skip it. Total

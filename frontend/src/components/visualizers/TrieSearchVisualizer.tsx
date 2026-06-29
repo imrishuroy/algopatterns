@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer, startTransition, useMemo } from "react";
 import { motion } from "framer-motion";
 
 interface TrieNode {
@@ -8,8 +8,28 @@ interface TrieNode {
   isEnd: boolean;
 }
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
 export default function TrieSearchVisualizer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [speed, setSpeed] = useState(700);
   const [searchMode, setSearchMode] = useState<"search" | "startsWith">(
     "search"
@@ -21,45 +41,47 @@ export default function TrieSearchVisualizer() {
   const [phase, setPhase] = useState<"init" | "searching" | "done">("init");
   const [message, setMessage] = useState("Click Play to search in the Trie");
 
-  // Pre-built trie with words: apple, app, ape, bat
-  const trie: TrieNode = {
-    children: {
-      a: {
-        children: {
-          p: {
-            children: {
-              p: {
-                children: {
-                  l: {
-                    children: {
-                      e: { children: {}, isEnd: true },
+  const trie: TrieNode = useMemo(
+    () => ({
+      children: {
+        a: {
+          children: {
+            p: {
+              children: {
+                p: {
+                  children: {
+                    l: {
+                      children: {
+                        e: { children: {}, isEnd: true },
+                      },
+                      isEnd: false,
                     },
-                    isEnd: false,
                   },
+                  isEnd: true,
                 },
-                isEnd: true, // "app"
+                e: { children: {}, isEnd: true },
               },
-              e: { children: {}, isEnd: true }, // "ape"
+              isEnd: false,
             },
-            isEnd: false,
           },
+          isEnd: false,
         },
-        isEnd: false,
-      },
-      b: {
-        children: {
-          a: {
-            children: {
-              t: { children: {}, isEnd: true }, // "bat"
+        b: {
+          children: {
+            a: {
+              children: {
+                t: { children: {}, isEnd: true },
+              },
+              isEnd: false,
             },
-            isEnd: false,
           },
+          isEnd: false,
         },
-        isEnd: false,
       },
-    },
-    isEnd: false,
-  };
+      isEnd: false,
+    }),
+    []
+  );
 
   const words = ["apple", "app", "ape", "bat"];
   const queries = ["app", "appl", "ap", "bat", "bad"];
@@ -70,11 +92,13 @@ export default function TrieSearchVisualizer() {
     setResult(null);
     setPhase("init");
     setMessage(`Click Play to ${searchMode}("${query}")`);
-    setIsPlaying(false);
+    dispatch({ type: "STOP" });
   }, [searchMode, query]);
 
   useEffect(() => {
-    reset();
+    startTransition(() => {
+      reset();
+    });
   }, [query, searchMode, reset]);
 
   useEffect(() => {
@@ -107,7 +131,7 @@ export default function TrieSearchVisualizer() {
           }
 
           setPhase("done");
-          setIsPlaying(false);
+          dispatch({ type: "STOP" });
           return;
         }
 
@@ -124,7 +148,7 @@ export default function TrieSearchVisualizer() {
             `'${char}' not found in Trie. ${searchMode}("${query}") = false`
           );
           setPhase("done");
-          setIsPlaying(false);
+          dispatch({ type: "STOP" });
           return;
         }
 
@@ -244,7 +268,7 @@ export default function TrieSearchVisualizer() {
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch({ type: "TOGGLE" })}
             disabled={phase === "done"}
             className={`px-4 py-2 rounded-lg font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
@@ -313,7 +337,7 @@ export default function TrieSearchVisualizer() {
                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                 } disabled:opacity-50`}
               >
-                "{q}"
+                &ldquo;{q}&rdquo;
               </button>
             ))}
           </div>

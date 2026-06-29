@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const nums = [2, 3, 4, 1, 5, 6];
+
 export default function MedianFinderVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1000);
@@ -14,8 +16,6 @@ export default function MedianFinderVisualizer() {
     "init" | "adding" | "balancing" | "calculating" | "done"
   >("init");
   const [message, setMessage] = useState("Click Play to find running median");
-
-  const nums = [2, 3, 4, 1, 5, 6];
 
   const reset = useCallback(() => {
     setCurrentIndex(0);
@@ -115,7 +115,7 @@ export default function MedianFinderVisualizer() {
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-rose-500/10 to-pink-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Find Median from Data Stream
@@ -131,7 +131,7 @@ export default function MedianFinderVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -139,7 +139,7 @@ export default function MedianFinderVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -170,7 +170,7 @@ export default function MedianFinderVisualizer() {
                   scale: idx === currentIndex ? 1.1 : 1,
                   y: idx === currentIndex ? -5 : 0,
                 }}
-                className={`w-12 h-12 rounded-lg flex items-center justify-center font-mono text-lg font-bold transition-colors ${getArrayCellStyle(idx)}`}
+                className={`w-12 h-12 rounded-md flex items-center justify-center font-mono text-lg font-bold transition-colors ${getArrayCellStyle(idx)}`}
               >
                 {num}
               </motion.div>
@@ -181,7 +181,7 @@ export default function MedianFinderVisualizer() {
         {/* Two Heaps Visualization */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {/* Max Heap (Left Half) */}
-          <div className="bg-gray-800/50 rounded-lg p-4">
+          <div className="bg-gray-800/50 rounded-md p-4">
             <div className="text-sm text-gray-400 mb-2 flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-blue-500"></span>
               MaxHeap (Left Half - Smaller)
@@ -228,7 +228,7 @@ export default function MedianFinderVisualizer() {
           </div>
 
           {/* Min Heap (Right Half) */}
-          <div className="bg-gray-800/50 rounded-lg p-4">
+          <div className="bg-gray-800/50 rounded-md p-4">
             <div className="text-sm text-gray-400 mb-2 flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-green-500"></span>
               MinHeap (Right Half - Larger)
@@ -276,7 +276,7 @@ export default function MedianFinderVisualizer() {
         </div>
 
         {/* Current Median */}
-        <div className="mb-4 p-4 bg-gradient-to-r from-rose-500/10 to-pink-500/10 rounded-lg border border-rose-500/30">
+        <div className="mb-4 p-4 bg-gradient-to-r from-rose-500/10 to-pink-500/10 rounded-md border border-rose-500/30">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs text-gray-500">Current Median</div>
@@ -293,19 +293,19 @@ export default function MedianFinderVisualizer() {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-blue-400">
               {maxHeap.length}
             </div>
             <div className="text-xs text-gray-500">Left Size</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-green-400">
               {minHeap.length}
             </div>
             <div className="text-xs text-gray-500">Right Size</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-purple-400">
               {currentIndex}/{nums.length}
             </div>
@@ -318,7 +318,7 @@ export default function MedianFinderVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : phase === "balancing"
@@ -330,7 +330,7 @@ export default function MedianFinderVisualizer() {
         </motion.div>
 
         {/* Algorithm explanation */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-rose-400">Key Insight:</strong> Keep two
             heaps balanced. MaxHeap stores smaller half, MinHeap stores larger

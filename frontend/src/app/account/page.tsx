@@ -98,7 +98,7 @@ export default function AccountPage() {
         <h1 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">Account Settings</h1>
 
         {/* Profile Section */}
-        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
+        <section className="bg-gray-900 border border-gray-800 rounded-md p-6 mb-6">
           <h2 className="text-xl font-semibold text-white mb-4">Profile</h2>
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-gray-800 gap-1">
@@ -113,7 +113,7 @@ export default function AccountPage() {
         </section>
 
         {/* Subscription Section */}
-        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
+        <section className="bg-gray-900 border border-gray-800 rounded-md p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-white">Subscription</h2>
             {isPro && (
@@ -155,7 +155,7 @@ export default function AccountPage() {
               )}
 
             {subscription?.cancel_at_period_end && (
-              <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+              <div className="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-md">
                 <p className="text-amber-400 text-sm">
                   Your subscription has been cancelled and will end on{" "}
                   {formatDate(subscription.current_period_end)}. You will
@@ -169,7 +169,7 @@ export default function AccountPage() {
             {!isPro && (
               <Link
                 href="/pricing"
-                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors"
+                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-md transition-colors"
               >
                 Upgrade to Pro
               </Link>
@@ -180,7 +180,7 @@ export default function AccountPage() {
               subscription?.plan_id !== "pro_lifetime" && (
                 <button
                   onClick={() => setShowCancelModal(true)}
-                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-md transition-colors"
                 >
                   Cancel Subscription
                 </button>
@@ -195,7 +195,7 @@ export default function AccountPage() {
         </section>
 
         {/* Features Section */}
-        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-6">
+        <section className="bg-gray-900 border border-gray-800 rounded-md p-6 mb-6">
           <h2 className="text-xl font-semibold text-white mb-4">
             Your Features
           </h2>
@@ -276,7 +276,7 @@ export default function AccountPage() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setShowCancelModal(false)}
           />
-          <div className="relative bg-gray-900 rounded-2xl p-6 w-full max-w-md mx-4 border border-gray-700">
+          <div className="relative bg-gray-900 rounded-md p-6 w-full max-w-md mx-4 border border-gray-700">
             <h2 className="text-xl font-bold text-white mb-4">
               Cancel Subscription
             </h2>
@@ -292,7 +292,7 @@ export default function AccountPage() {
               <select
                 value={cancelReason}
                 onChange={(e) => setCancelReason(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:border-emerald-500"
               >
                 <option value="">Select a reason</option>
                 <option value="too_expensive">Too expensive</option>
@@ -311,13 +311,13 @@ export default function AccountPage() {
                 value={cancelFeedback}
                 onChange={(e) => setCancelFeedback(e.target.value)}
                 placeholder="Tell us how we can improve..."
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 resize-none"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 resize-none"
                 rows={3}
               />
             </div>
 
             {cancelError && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm">
                 {cancelError}
               </div>
             )}
@@ -325,14 +325,14 @@ export default function AccountPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelModal(false)}
-                className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-md transition-colors"
               >
                 Keep Subscription
               </button>
               <button
                 onClick={handleCancelSubscription}
                 disabled={isCancelling}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-lg transition-colors"
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-md transition-colors"
               >
                 {isCancelling ? "Cancelling..." : "Confirm Cancel"}
               </button>
@@ -354,7 +354,7 @@ function FeatureItem({
   enabled: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+    <div className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-md">
       <div
         className={`w-2 h-2 rounded-full ${
           enabled ? "bg-emerald-500" : "bg-gray-600"

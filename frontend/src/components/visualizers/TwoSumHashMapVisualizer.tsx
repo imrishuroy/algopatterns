@@ -99,7 +99,7 @@ export default function TwoSumHashMapVisualizer() {
   }, [isPlaying, phase, currentIndex, nums, target, hashMap, speed]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-pink-500/10 to-rose-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">Two Sum - Hash Map</h3>
         <p className="text-gray-400 text-sm mt-1">
@@ -113,7 +113,7 @@ export default function TwoSumHashMapVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -121,7 +121,7 @@ export default function TwoSumHashMapVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -140,7 +140,7 @@ export default function TwoSumHashMapVisualizer() {
         </div>
 
         {/* Target */}
-        <div className="mb-4 p-3 bg-pink-500/10 border border-pink-500/30 rounded-lg text-center">
+        <div className="mb-4 p-3 bg-pink-500/10 border border-pink-500/30 rounded-md text-center">
           <span className="text-gray-400">Target: </span>
           <span className="text-pink-400 font-bold text-xl">{target}</span>
           {complement !== null && phase === "running" && (
@@ -166,7 +166,7 @@ export default function TwoSumHashMapVisualizer() {
                       : "#374151",
                   scale: idx === currentIndex ? 1.1 : 1,
                 }}
-                className="w-14 h-14 rounded-lg flex flex-col items-center justify-center"
+                className="w-14 h-14 rounded-md flex flex-col items-center justify-center"
               >
                 <span
                   className={`font-bold ${found?.includes(idx) || idx === currentIndex ? "text-black" : "text-white"}`}
@@ -180,7 +180,7 @@ export default function TwoSumHashMapVisualizer() {
         </div>
 
         {/* Hash Map visualization */}
-        <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
+        <div className="mb-4 p-3 bg-gray-800/50 rounded-md">
           <div className="text-sm text-gray-400 mb-2">
             Hash Map (value → index):
           </div>
@@ -199,7 +199,7 @@ export default function TwoSumHashMapVisualizer() {
                       backgroundColor:
                         entry.value === complement ? "#eab308" : "#4b5563",
                     }}
-                    className="px-3 py-1 rounded-lg text-sm font-mono"
+                    className="px-3 py-1 rounded-md text-sm font-mono"
                   >
                     <span
                       className={
@@ -238,7 +238,7 @@ export default function TwoSumHashMapVisualizer() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center"
+            className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-md text-center"
           >
             <span className="text-green-400 font-bold text-lg">
               nums[{found[0]}] + nums[{found[1]}] = {nums[found[0]]} +{" "}
@@ -252,7 +252,7 @@ export default function TwoSumHashMapVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? found
                 ? "bg-green-500/10 border border-green-500/30 text-green-400"
@@ -264,7 +264,7 @@ export default function TwoSumHashMapVisualizer() {
         </motion.div>
 
         {/* Key insight */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-pink-400">Key Insight:</strong> For each
             number, check if its complement (target - num) exists in the map.

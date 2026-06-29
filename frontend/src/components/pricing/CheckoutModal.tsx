@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useReducer } from "react";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import type { Plan, CreateOrderResponse, ValidateDiscountResponse } from "@/types";
 
@@ -50,6 +50,42 @@ interface CheckoutModalProps {
   userName?: string;
 }
 
+type FormState = {
+  discountCode: string;
+  discountValidation: ValidateDiscountResponse | null;
+  orderData: CreateOrderResponse | null;
+  error: string | null;
+};
+
+type FormAction =
+  | { type: "RESET" }
+  | { type: "SET_DISCOUNT_CODE"; payload: string }
+  | { type: "SET_DISCOUNT_VALIDATION"; payload: ValidateDiscountResponse | null }
+  | { type: "SET_ORDER_DATA"; payload: CreateOrderResponse | null }
+  | { type: "SET_ERROR"; payload: string | null };
+
+const initialFormState: FormState = {
+  discountCode: "",
+  discountValidation: null,
+  orderData: null,
+  error: null,
+};
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "RESET":
+      return initialFormState;
+    case "SET_DISCOUNT_CODE":
+      return { ...state, discountCode: action.payload };
+    case "SET_DISCOUNT_VALIDATION":
+      return { ...state, discountValidation: action.payload };
+    case "SET_ORDER_DATA":
+      return { ...state, orderData: action.payload };
+    case "SET_ERROR":
+      return { ...state, error: action.payload };
+  }
+}
+
 export function CheckoutModal({
   plan,
   isOpen,
@@ -59,13 +95,10 @@ export function CheckoutModal({
   userName,
 }: CheckoutModalProps) {
   const { createOrder, verifyPayment, validateDiscount } = useSubscription();
-  const [discountCode, setDiscountCode] = useState("");
-  const [discountValidation, setDiscountValidation] =
-    useState<ValidateDiscountResponse | null>(null);
+  const [{ discountCode, discountValidation, orderData, error }, dispatch] =
+    useReducer(formReducer, initialFormState);
   const [isValidating, setIsValidating] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [orderData, setOrderData] = useState<CreateOrderResponse | null>(null);
 
   const loadRazorpayScript = useCallback(() => {
     return new Promise<boolean>((resolve) => {
@@ -84,10 +117,7 @@ export function CheckoutModal({
   useEffect(() => {
     if (isOpen) {
       loadRazorpayScript();
-      setError(null);
-      setDiscountCode("");
-      setDiscountValidation(null);
-      setOrderData(null);
+      dispatch({ type: "RESET" });
     }
   }, [isOpen, loadRazorpayScript]);
 
@@ -95,21 +125,21 @@ export function CheckoutModal({
     if (!discountCode.trim()) return;
 
     setIsValidating(true);
-    setError(null);
+    dispatch({ type: "SET_ERROR", payload: null });
     const result = await validateDiscount(discountCode.trim(), plan.id);
     setIsValidating(false);
 
     if (result.success && result.data) {
-      setDiscountValidation(result.data);
+      dispatch({ type: "SET_DISCOUNT_VALIDATION", payload: result.data });
     } else {
-      setError(result.error || "Invalid discount code");
-      setDiscountValidation(null);
+      dispatch({ type: "SET_ERROR", payload: result.error || "Invalid discount code" });
+      dispatch({ type: "SET_DISCOUNT_VALIDATION", payload: null });
     }
   };
 
   const handleCheckout = async () => {
     setIsProcessing(true);
-    setError(null);
+    dispatch({ type: "SET_ERROR", payload: null });
 
     try {
       const result = await createOrder(
@@ -118,16 +148,16 @@ export function CheckoutModal({
       );
 
       if (!result.success || !result.data) {
-        setError(result.error || "Failed to create order");
+        dispatch({ type: "SET_ERROR", payload: result.error || "Failed to create order" });
         setIsProcessing(false);
         return;
       }
 
-      setOrderData(result.data);
+      dispatch({ type: "SET_ORDER_DATA", payload: result.data });
 
       const scriptLoaded = await loadRazorpayScript();
       if (!scriptLoaded) {
-        setError("Failed to load payment gateway");
+        dispatch({ type: "SET_ERROR", payload: "Failed to load payment gateway" });
         setIsProcessing(false);
         return;
       }
@@ -149,7 +179,7 @@ export function CheckoutModal({
           if (verifyResult.success) {
             onSuccess();
           } else {
-            setError(verifyResult.error || "Payment verification failed");
+            dispatch({ type: "SET_ERROR", payload: verifyResult.error || "Payment verification failed" });
           }
           setIsProcessing(false);
         },
@@ -170,7 +200,7 @@ export function CheckoutModal({
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch {
-      setError("An error occurred. Please try again.");
+      dispatch({ type: "SET_ERROR", payload: "An error occurred. Please try again." });
       setIsProcessing(false);
     }
   };
@@ -208,7 +238,7 @@ export function CheckoutModal({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-gray-900 rounded-2xl p-6 w-full max-w-md mx-4 border border-gray-700">
+      <div className="relative bg-gray-900 rounded-md p-6 w-full max-w-md mx-4 border border-gray-700">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white"
@@ -232,18 +262,18 @@ export function CheckoutModal({
             <input
               type="text"
               value={discountCode}
-              onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+              onChange={(e) => dispatch({ type: "SET_DISCOUNT_CODE", payload: e.target.value.toUpperCase() })}
               placeholder="Discount code"
-              className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
+              className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
               disabled={!!discountValidation}
             />
             {discountValidation ? (
               <button
                 onClick={() => {
-                  setDiscountCode("");
-                  setDiscountValidation(null);
+                  dispatch({ type: "SET_DISCOUNT_CODE", payload: "" });
+                  dispatch({ type: "SET_DISCOUNT_VALIDATION", payload: null });
                 }}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md"
               >
                 Remove
               </button>
@@ -251,7 +281,7 @@ export function CheckoutModal({
               <button
                 onClick={handleValidateDiscount}
                 disabled={isValidating || !discountCode.trim()}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-lg"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-md"
               >
                 {isValidating ? "..." : "Apply"}
               </button>
@@ -279,7 +309,7 @@ export function CheckoutModal({
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm">
             {error}
           </div>
         )}
@@ -287,7 +317,7 @@ export function CheckoutModal({
         <button
           onClick={handleCheckout}
           disabled={isProcessing}
-          className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-700 disabled:text-gray-500 text-white font-semibold rounded-lg transition-colors"
+          className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-700 disabled:text-gray-500 text-white font-semibold rounded-md transition-colors"
         >
           {isProcessing ? "Processing..." : `Pay ${formatPrice(pricing.total, pricing.currency)}`}
         </button>

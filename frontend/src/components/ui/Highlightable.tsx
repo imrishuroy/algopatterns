@@ -233,6 +233,14 @@ export function Highlightable({
     };
   }, [calculateOverlays]);
 
+  const closeToolbar = () => {
+    setSelection(null);
+    setToolbar(null);
+    setToolbarMode("colors");
+    setActiveHighlight(null);
+    setNoteText("");
+  };
+
   // Handle text selection
   useEffect(() => {
     const container = contentRef.current;
@@ -295,14 +303,6 @@ export function Highlightable({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
-  const closeToolbar = () => {
-    setSelection(null);
-    setToolbar(null);
-    setToolbarMode("colors");
-    setActiveHighlight(null);
-    setNoteText("");
-  };
 
   const handleOverlayClick = (overlay: HighlightOverlay, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -416,7 +416,7 @@ export function Highlightable({
     } else {
       setCanRelocate(false);
     }
-  }, [activeHighlight?.id, activeHighlight?.selectedText, contentHash]);
+  }, [activeHighlight, activeHighlight?.id, activeHighlight?.selectedText, contentHash]);
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -533,7 +533,7 @@ export function Highlightable({
                       <button
                         onClick={handleRelocate}
                         disabled={isSaving}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 rounded transition-colors disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 rounded-md transition-colors disabled:opacity-50"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

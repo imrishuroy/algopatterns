@@ -58,13 +58,13 @@ export function ChatInput({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 resize-none disabled:opacity-50"
+          className="flex-1 bg-gray-800 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 resize-none disabled:opacity-50"
           style={{ minHeight: "36px", maxHeight: "100px" }}
         />
         {isLoading ? (
           <button
             onClick={onStop}
-            className="px-3 bg-red-600 hover:bg-red-700 text-white rounded transition-colors flex items-center"
+            className="px-3 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors flex items-center"
             title="Stop"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@ export function ChatInput({
           <button
             onClick={handleSend}
             disabled={!input.trim() || disabled}
-            className="px-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded transition-colors flex items-center"
+            className="px-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-md transition-colors flex items-center"
             title="Send"
           >
             <svg

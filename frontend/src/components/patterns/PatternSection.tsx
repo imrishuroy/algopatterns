@@ -66,7 +66,7 @@ export default function PatternSection({
         {questions.map((q) => (
           <div
             key={q.id}
-            className={`flex items-center gap-4 p-4 bg-gray-800/50 rounded-lg border transition hover:translate-x-1 ${
+            className={`flex items-center gap-4 p-4 bg-gray-800/50 rounded-md border transition hover:translate-x-1 ${
               completed.has(q.id)
                 ? "border-green-500/30 bg-green-500/5"
                 : "border-gray-700"

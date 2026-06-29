@@ -78,7 +78,6 @@ interface PatternQuickActionsProps {
 }
 
 export function PatternQuickActions({
-  patternId,
   patternName,
   activeSection,
   onAction,

@@ -68,7 +68,7 @@ export default function CodeBlock({
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       const textArea = document.createElement("textarea");
       textArea.value = code;
       document.body.appendChild(textArea);
@@ -86,7 +86,7 @@ export default function CodeBlock({
       : normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1);
 
   return (
-    <div className="relative group rounded-xl overflow-hidden border border-gray-800 bg-[#011627] theme-dark">
+    <div className="relative group rounded-md overflow-hidden border border-gray-800 bg-[#011627] theme-dark">
       {/* Header bar */}
       <div className="flex items-center justify-between px-4 py-2 bg-[#0d1b2a] border-b border-gray-800">
         <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ export default function CodeBlock({
           {collapsible && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="px-3 py-1 text-xs rounded transition flex items-center gap-1 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300"
+              className="px-3 py-1 text-xs rounded-md transition flex items-center gap-1 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300"
             >
               <svg
                 className={`w-3 h-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
@@ -124,7 +124,7 @@ export default function CodeBlock({
           {showCopy && (
             <button
               onClick={handleCopy}
-              className={`px-3 py-1 text-xs rounded transition flex items-center gap-1 ${
+              className={`px-3 py-1 text-xs rounded-md transition flex items-center gap-1 ${
                 copied
                   ? "bg-green-500/20 text-green-400"
                   : "bg-gray-700/50 hover:bg-gray-600/50 text-gray-300"

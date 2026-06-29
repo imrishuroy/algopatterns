@@ -90,17 +90,13 @@ export function useInlineAI(editorInstance: EditorInstance | null) {
   useEffect(() => {
     if (!editorInstance) return;
 
-    const disposable = editorInstance.addCommand(
+    editorInstance.addCommand(
       // monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK
       2048 | 41, // CtrlCmd + K
       () => {
         open();
       }
     );
-
-    return () => {
-      // Cleanup is automatic with monaco
-    };
   }, [editorInstance, open]);
 
   return {

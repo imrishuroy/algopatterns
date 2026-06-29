@@ -43,7 +43,7 @@ public int fibMemo(int n, int[] memo) {
         language="java"
       />
 
-      <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 my-8">
+      <div className="bg-red-500/10 border border-red-500/30 rounded-md p-6 my-8">
         <h4 className="text-lg font-semibold text-red-400 mb-3">
           Performance Warning
         </h4>
@@ -141,7 +141,7 @@ private boolean isPrimeHelper(int n, int divisor) {
         language="java"
       />
 
-      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6 mt-8">
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-md p-6 mt-8">
         <h4 className="text-lg font-semibold text-indigo-300 mb-3">
           Practice Problems
         </h4>

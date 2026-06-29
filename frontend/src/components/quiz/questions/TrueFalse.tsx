@@ -29,7 +29,7 @@ export default function TrueFalse({
       </p>
 
       {question.codeSnippet && (
-        <pre className="bg-gray-950 border border-gray-800 rounded-xl p-5 overflow-x-auto">
+        <pre className="bg-gray-950 border border-gray-800 rounded-md p-5 overflow-x-auto">
           <code className="text-gray-300 whitespace-pre-wrap font-mono text-sm leading-relaxed">
             {question.codeSnippet}
           </code>
@@ -62,12 +62,12 @@ export default function TrueFalse({
               key={label}
               onClick={() => !disabled && onAnswer(value)}
               disabled={disabled}
-              className={`flex items-center justify-center gap-4 px-5 py-4 rounded-xl border transition-all ${borderClass} ${bgClass} ${
+              className={`flex items-center justify-center gap-4 px-5 py-4 rounded-md border transition-all ${borderClass} ${bgClass} ${
                 disabled ? "cursor-default" : "cursor-pointer"
               }`}
             >
               <span
-                className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold ${
+                className={`w-8 h-8 rounded-md flex items-center justify-center text-sm font-semibold ${
                   showResult && isCorrect
                     ? "bg-green-500 text-white"
                     : showResult && isSelected && !isCorrect

@@ -45,7 +45,7 @@ export function ConflictDialog({
       className="fixed inset-0 z-50 bg-transparent p-0 m-auto backdrop:bg-black/60"
       onClose={onCancel}
     >
-      <div className="bg-gray-900 rounded-xl border border-gray-700 shadow-2xl max-w-lg w-full p-0 overflow-hidden">
+      <div className="bg-gray-900 rounded-md border border-gray-700 shadow-2xl max-w-lg w-full p-0 overflow-hidden">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-700 bg-yellow-900/20">
           <div className="flex items-center gap-3">
@@ -78,7 +78,7 @@ export function ConflictDialog({
         {/* Content */}
         <div className="px-6 py-4 space-y-4">
           {/* Server Version */}
-          <div className="rounded-lg border border-gray-700 overflow-hidden">
+          <div className="rounded-md border border-gray-700 overflow-hidden">
             <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 flex items-center justify-between">
               <span className="text-sm font-medium text-gray-300">
                 Server Version
@@ -100,7 +100,7 @@ export function ConflictDialog({
                 </span>
               </div>
               {serverHighlight.note && (
-                <p className="text-sm text-gray-400 bg-gray-900/50 rounded px-3 py-2">
+                <p className="text-sm text-gray-400 bg-gray-900/50 rounded-md px-3 py-2">
                   {serverHighlight.note}
                 </p>
               )}
@@ -111,7 +111,7 @@ export function ConflictDialog({
           </div>
 
           {/* Local Version */}
-          <div className="rounded-lg border border-indigo-500/50 overflow-hidden">
+          <div className="rounded-md border border-indigo-500/50 overflow-hidden">
             <div className="px-4 py-2 bg-indigo-900/30 border-b border-indigo-500/50 flex items-center justify-between">
               <span className="text-sm font-medium text-indigo-300">
                 Your Changes
@@ -131,7 +131,7 @@ export function ConflictDialog({
                 </span>
               </div>
               {localHighlight.note && (
-                <p className="text-sm text-gray-400 bg-gray-900/50 rounded px-3 py-2">
+                <p className="text-sm text-gray-400 bg-gray-900/50 rounded-md px-3 py-2">
                   {localHighlight.note}
                 </p>
               )}
@@ -146,19 +146,19 @@ export function ConflictDialog({
         <div className="px-6 py-4 border-t border-gray-700 bg-gray-800/50 flex flex-col sm:flex-row gap-3">
           <button
             onClick={onKeepServer}
-            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors"
+            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-md bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors"
           >
             Keep Server Version
           </button>
           <button
             onClick={onKeepLocal}
-            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
           >
             Use My Changes
           </button>
           <button
             onClick={onCancel}
-            className="px-4 py-2.5 text-sm font-medium rounded-lg text-gray-400 hover:text-gray-300 hover:bg-gray-700 transition-colors"
+            className="px-4 py-2.5 text-sm font-medium rounded-md text-gray-400 hover:text-gray-300 hover:bg-gray-700 transition-colors"
           >
             Cancel
           </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Problem = "lcs" | "edit-distance" | "grid-paths";
@@ -9,18 +9,40 @@ interface DPTableVisualizerProps {
   problem?: Problem;
 }
 
+type PlayState = { step: number; isPlaying: boolean };
+type PlayAction =
+  | { type: "TOGGLE" }
+  | { type: "STOP" }
+  | { type: "ADVANCE" }
+  | { type: "RESET" };
+
+function playReducer(state: PlayState, action: PlayAction): PlayState {
+  switch (action.type) {
+    case "TOGGLE":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "STOP":
+      return { ...state, isPlaying: false };
+    case "ADVANCE":
+      return { ...state, step: state.step + 1 };
+    case "RESET":
+      return { step: 0, isPlaying: false };
+  }
+}
+
+const initialPlayState: PlayState = { step: 0, isPlaying: false };
+
 export default function DPTableVisualizer({
   problem: initialProblem = "lcs",
 }: DPTableVisualizerProps) {
   const [problem, setProblem] = useState<Problem>(initialProblem);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [step, setStep] = useState(0);
-  const [speed, setSpeed] = useState(400);
-  const [highlightedCells, setHighlightedCells] = useState<Set<string>>(
-    new Set()
+  const [{ step, isPlaying }, dispatch] = useReducer(
+    playReducer,
+    initialPlayState
   );
+  const [speed, setSpeed] = useState(400);
+  const [, setHighlightedCells] = useState<Set<string>>(new Set());
   const [currentCell, setCurrentCell] = useState<string | null>(null);
-  const [arrows, setArrows] = useState<{ from: string; to: string }[]>([]);
+  const [, setArrows] = useState<{ from: string; to: string }[]>([]);
 
   const problems = {
     lcs: {
@@ -187,7 +209,7 @@ export default function DPTableVisualizer({
 
   useEffect(() => {
     if (!isPlaying || step >= steps.length) {
-      if (step >= steps.length) setIsPlaying(false);
+      if (step >= steps.length) dispatch({ type: "STOP" });
       return;
     }
 
@@ -195,15 +217,14 @@ export default function DPTableVisualizer({
       const s = steps[step];
       setCurrentCell(`${s.i}-${s.j}`);
       setHighlightedCells((prev) => new Set([...prev, `${s.i}-${s.j}`]));
-      setStep((st) => st + 1);
+      dispatch({ type: "ADVANCE" });
     }, speed);
 
     return () => clearTimeout(timer);
   }, [isPlaying, step, steps, speed]);
 
   const reset = () => {
-    setStep(0);
-    setIsPlaying(false);
+    dispatch({ type: "RESET" });
     setHighlightedCells(new Set());
     setCurrentCell(null);
     setArrows([]);
@@ -323,7 +344,7 @@ export default function DPTableVisualizer({
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch({ type: "TOGGLE" })}
             className={`px-4 py-2 rounded-lg font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             }`}
@@ -331,17 +352,16 @@ export default function DPTableVisualizer({
             {isPlaying ? "Pause" : "Play"}
           </button>
           <button
-            onClick={() =>
-              step < steps.length &&
-              setStep((s) => {
-                const st = steps[s];
+            onClick={() => {
+              if (step < steps.length) {
+                const st = steps[step];
                 setCurrentCell(`${st.i}-${st.j}`);
                 setHighlightedCells(
                   (prev) => new Set([...prev, `${st.i}-${st.j}`])
                 );
-                return s + 1;
-              })
-            }
+                dispatch({ type: "ADVANCE" });
+              }
+            }}
             disabled={step >= steps.length}
             className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 disabled:opacity-50"
           >
@@ -378,7 +398,7 @@ export default function DPTableVisualizer({
               <div className="flex">
                 <div className="w-12 h-8" /> {/* Corner */}
                 <div className="w-12 h-8 flex items-center justify-center text-gray-500 text-sm">
-                  ""
+                  &ldquo;&rdquo;
                 </div>
                 {s2.split("").map((char, j) => (
                   <div

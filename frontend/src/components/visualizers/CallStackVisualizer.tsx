@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, useReducer } from "react";
 import CodeBlock from "@/components/ui/CodeBlock";
 
 interface StackFrame {
@@ -20,11 +20,53 @@ export default function CallStackVisualizer({
   example = "factorial",
   inputValue = 5,
 }: CallStackVisualizerProps) {
-  const [stack, setStack] = useState<StackFrame[]>([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [step, setStep] = useState(0);
+  type PlaybackState = {
+    step: number;
+    stack: StackFrame[];
+    result: number | null;
+    isPlaying: boolean;
+  };
+
+  const initialPlayback: PlaybackState = {
+    step: 0,
+    stack: [],
+    result: null,
+    isPlaying: false,
+  };
+
+  function playbackReducer(
+    state: PlaybackState,
+    action:
+      | { type: "RESET" }
+      | { type: "STEP_FORWARD"; allSteps: StackFrame[][] }
+      | { type: "SET_RESULT"; payload: number | null }
+      | { type: "SET_PLAYING"; payload: boolean }
+      | { type: "FINISHED"; result: number }
+  ): PlaybackState {
+    switch (action.type) {
+      case "RESET":
+        return initialPlayback;
+      case "STEP_FORWARD": {
+        const nextStep = state.step + 1;
+        return {
+          ...state,
+          stack: action.allSteps[state.step] || [],
+          step: nextStep,
+        };
+      }
+      case "SET_RESULT":
+        return { ...state, result: action.payload };
+      case "SET_PLAYING":
+        return { ...state, isPlaying: action.payload };
+      case "FINISHED":
+        return { ...state, isPlaying: false, result: action.result };
+    }
+    return state;
+  }
+
+  const [playback, dispatch] = useReducer(playbackReducer, initialPlayback);
+  const { step, stack, result, isPlaying } = playback;
   const [speed, setSpeed] = useState(1000);
-  const [result, setResult] = useState<number | null>(null);
 
   const generateFactorialSteps = useCallback((n: number): StackFrame[][] => {
     const steps: StackFrame[][] = [];
@@ -145,9 +187,7 @@ export default function CallStackVisualizer({
     return steps;
   }, []);
 
-  const [allSteps, setAllSteps] = useState<StackFrame[][]>([]);
-
-  useEffect(() => {
+  const allSteps = useMemo(() => {
     let steps: StackFrame[][];
     switch (example) {
       case "fibonacci":
@@ -159,10 +199,17 @@ export default function CallStackVisualizer({
       default:
         steps = generateFactorialSteps(inputValue);
     }
-    setAllSteps(steps);
-    setStep(0);
-    setStack([]);
-    setResult(null);
+    return steps;
+  }, [
+    example,
+    inputValue,
+    generateFactorialSteps,
+    generateFibonacciSteps,
+    generateSumSteps,
+  ]);
+
+  useEffect(() => {
+    dispatch({ type: "RESET" });
   }, [
     example,
     inputValue,
@@ -174,41 +221,35 @@ export default function CallStackVisualizer({
   useEffect(() => {
     if (!isPlaying || step >= allSteps.length) {
       if (step >= allSteps.length && allSteps.length > 0) {
-        setIsPlaying(false);
         if (example === "factorial") {
           let r = 1;
           for (let i = 2; i <= inputValue; i++) r *= i;
-          setResult(r);
+          dispatch({ type: "FINISHED", result: r });
         } else if (example === "sum") {
-          setResult((inputValue * (inputValue + 1)) / 2);
+          dispatch({ type: "FINISHED", result: (inputValue * (inputValue + 1)) / 2 });
         } else {
           const fib = (n: number): number =>
             n <= 1 ? n : fib(n - 1) + fib(n - 2);
-          setResult(fib(inputValue));
+          dispatch({ type: "FINISHED", result: fib(inputValue) });
         }
       }
       return;
     }
 
     const timer = setTimeout(() => {
-      setStack(allSteps[step]);
-      setStep((s) => s + 1);
+      dispatch({ type: "STEP_FORWARD", allSteps });
     }, speed);
 
     return () => clearTimeout(timer);
   }, [isPlaying, step, allSteps, speed, example, inputValue]);
 
   const reset = () => {
-    setStep(0);
-    setStack([]);
-    setIsPlaying(false);
-    setResult(null);
+    dispatch({ type: "RESET" });
   };
 
   const stepForward = () => {
     if (step < allSteps.length) {
-      setStack(allSteps[step]);
-      setStep((s) => s + 1);
+      dispatch({ type: "STEP_FORWARD", allSteps });
     }
   };
 
@@ -228,7 +269,7 @@ export default function CallStackVisualizer({
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gray-800/50 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           Call Stack Visualizer
@@ -250,8 +291,8 @@ export default function CallStackVisualizer({
 
           <div className="flex items-center gap-2 mb-4 flex-wrap">
             <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className={`px-4 py-2 rounded-lg font-medium transition ${
+              onClick={() => dispatch({ type: "SET_PLAYING", payload: !isPlaying })}
+              className={`px-4 py-2 rounded-md font-medium transition ${
                 isPlaying
                   ? "bg-yellow-500 text-black hover:bg-yellow-400"
                   : "bg-green-500 text-white hover:bg-green-400"
@@ -262,13 +303,13 @@ export default function CallStackVisualizer({
             <button
               onClick={stepForward}
               disabled={isPlaying || step >= allSteps.length}
-              className="px-4 py-2 bg-indigo-500 text-white rounded-lg font-medium hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-4 py-2 bg-indigo-500 text-white rounded-md font-medium hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               Step →
             </button>
             <button
               onClick={reset}
-              className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition"
+              className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 transition"
             >
               Reset
             </button>
@@ -289,7 +330,7 @@ export default function CallStackVisualizer({
           </div>
 
           {result !== null && (
-            <div className="mt-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
+            <div className="mt-4 p-3 bg-green-500/20 border border-green-500/30 rounded-md">
               <span className="text-green-400 font-medium">
                 Result: {result}
               </span>
@@ -297,7 +338,7 @@ export default function CallStackVisualizer({
           )}
         </div>
 
-        <div className="bg-gray-800/50 rounded-lg p-4 min-h-[300px]">
+        <div className="bg-gray-800/50 rounded-md p-4 min-h-[300px]">
           <div className="text-sm text-gray-400 mb-3 flex justify-between">
             <span>
               Call Stack (Step {step}/{allSteps.length})
@@ -314,7 +355,7 @@ export default function CallStackVisualizer({
               [...stack].reverse().map((frame, idx) => (
                 <div
                   key={frame.id}
-                  className={`p-3 rounded-lg border transition-all duration-300 ${
+                  className={`p-3 rounded-md border transition-all duration-300 ${
                     frame.isReturning
                       ? "bg-green-500/20 border-green-500/50 animate-pulse"
                       : idx === 0

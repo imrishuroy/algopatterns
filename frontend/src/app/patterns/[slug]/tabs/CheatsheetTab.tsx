@@ -7,7 +7,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
   loading: () => (
-    <div className="h-64 rounded-xl animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+    <div className="h-64 rounded-md animate-pulse" style={{ background: "var(--bg-elevated)" }} />
   ),
   ssr: false,
 });
@@ -36,7 +36,7 @@ export default function CheatsheetTab({ pattern }: CheatsheetTabProps) {
       {/* Two Column Layout */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* When to Use */}
-        <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900/50 rounded-md border border-gray-800 p-5">
           <h3 className="text-sm font-semibold text-green-400 uppercase tracking-wide mb-3">
             When to Use
           </h3>
@@ -54,7 +54,7 @@ export default function CheatsheetTab({ pattern }: CheatsheetTabProps) {
         </div>
 
         {/* Key Insights */}
-        <div className="bg-gray-900/50 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900/50 rounded-md border border-gray-800 p-5">
           <h3 className="text-sm font-semibold text-yellow-400 uppercase tracking-wide mb-3">
             Key Insights
           </h3>
@@ -74,7 +74,7 @@ export default function CheatsheetTab({ pattern }: CheatsheetTabProps) {
 
       {/* Common Mistakes */}
       {pattern.commonMistakes && pattern.commonMistakes.length > 0 && (
-        <div className="bg-red-500/5 rounded-xl border border-red-500/20 p-5">
+        <div className="bg-red-500/5 rounded-md border border-red-500/20 p-5">
           <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wide mb-3">
             Common Mistakes
           </h3>

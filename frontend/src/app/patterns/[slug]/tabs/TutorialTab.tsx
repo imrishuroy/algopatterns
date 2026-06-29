@@ -9,7 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { QuizCard } from "@/components/quiz";
 
 const VisualizerLoading = () => (
-  <div className="h-64 rounded-xl animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+  <div className="h-64 rounded-md animate-pulse" style={{ background: "var(--bg-elevated)" }} />
 );
 
 const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
@@ -80,13 +80,13 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
   if (!hasTutorial) {
     return (
       <div className="space-y-8">
-        <div className="bg-gray-900 rounded-2xl border border-gray-800 p-6">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-6">
           <h2 className="text-xl font-bold text-white mb-4">Overview</h2>
           <p className="text-gray-300 leading-relaxed">{pattern.description}</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-6">
+          <div className="bg-gray-900 rounded-md border border-gray-800 p-6">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <span className="text-green-400">✓</span> When to Use
             </h3>
@@ -100,7 +100,7 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
             </ul>
           </div>
 
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-6">
+          <div className="bg-gray-900 rounded-md border border-gray-800 p-6">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <span className="text-yellow-400">💡</span> Key Insights
             </h3>
@@ -116,7 +116,7 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
         </div>
 
         {pattern.commonMistakes && pattern.commonMistakes.length > 0 && (
-          <div className="bg-red-500/5 rounded-2xl border border-red-500/20 p-6">
+          <div className="bg-red-500/5 rounded-md border border-red-500/20 p-6">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <span className="text-red-400">⚠️</span> Common Mistakes
             </h3>
@@ -212,7 +212,7 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
                       const lines = content.split("\n");
 
                       return (
-                        <div className="my-6 rounded-lg overflow-hidden bg-gray-900 border border-gray-800">
+                        <div className="my-6 rounded-md overflow-hidden bg-gray-900 border border-gray-800">
                           <div className="p-4 overflow-x-auto">
                             {lines.map((line, i) => (
                               <div key={i} className="leading-relaxed">
@@ -248,14 +248,14 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
                     }
 
                     return (
-                      <code className="px-1.5 py-0.5 bg-gray-800 text-indigo-300 rounded text-[0.9em] font-mono">
+                      <code className="px-1.5 py-0.5 bg-gray-800 text-indigo-300 rounded-md text-[0.9em] font-mono">
                         {children}
                       </code>
                     );
                   },
                   pre: ({ children }) => <>{children}</>,
                   table: ({ children }) => (
-                    <div className="my-8 overflow-x-auto rounded-xl border border-gray-800 bg-gray-900/50">
+                    <div className="my-8 overflow-x-auto rounded-md border border-gray-800 bg-gray-900/50">
                       <table className="w-full border-collapse min-w-[500px]">
                         {children}
                       </table>
@@ -287,7 +287,7 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
                     </td>
                   ),
                   blockquote: ({ children }) => (
-                    <blockquote className="my-6 pl-4 border-l-4 border-indigo-500 bg-indigo-500/10 py-3 pr-4 rounded-r-lg">
+                    <blockquote className="my-6 pl-4 border-l-4 border-indigo-500 bg-indigo-500/10 py-3 pr-4 rounded-r-md">
                       {children}
                     </blockquote>
                   ),

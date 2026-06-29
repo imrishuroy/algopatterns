@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { quotes } from "@/lib/quotes";
 
 export default function QuoteSection() {
   const [quote, setQuote] = useState(quotes[0]);
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    setQuote(quotes[randomIndex]);
+    startTransition(() => {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      setQuote(quotes[randomIndex]);
+    });
   }, []);
 
   return (

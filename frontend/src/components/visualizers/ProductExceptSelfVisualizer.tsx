@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 
 export default function ProductExceptSelfVisualizer() {
@@ -18,7 +18,7 @@ export default function ProductExceptSelfVisualizer() {
     "Click Play to compute product except self"
   );
 
-  const arr = [1, 2, 3, 4];
+  const arr = useMemo(() => [1, 2, 3, 4], []);
 
   const reset = useCallback(() => {
     setLeftIdx(0);
@@ -29,7 +29,7 @@ export default function ProductExceptSelfVisualizer() {
     setPhase("init");
     setMessage("Click Play to compute product except self (without division)");
     setIsPlaying(false);
-  }, []);
+  }, [arr]);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -98,7 +98,7 @@ export default function ProductExceptSelfVisualizer() {
   ]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">
           Product of Array Except Self
@@ -114,7 +114,7 @@ export default function ProductExceptSelfVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
+            className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -122,7 +122,7 @@ export default function ProductExceptSelfVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
             Reset
           </button>
@@ -143,7 +143,7 @@ export default function ProductExceptSelfVisualizer() {
         {/* Phase indicator */}
         <div className="mb-4 flex gap-2">
           <div
-            className={`flex-1 p-2 rounded-lg text-center text-sm font-medium ${
+            className={`flex-1 p-2 rounded-md text-center text-sm font-medium ${
               phase === "left-pass"
                 ? "bg-blue-500 text-white"
                 : phase === "right-pass" || phase === "done"
@@ -154,7 +154,7 @@ export default function ProductExceptSelfVisualizer() {
             Pass 1: Left Products →
           </div>
           <div
-            className={`flex-1 p-2 rounded-lg text-center text-sm font-medium ${
+            className={`flex-1 p-2 rounded-md text-center text-sm font-medium ${
               phase === "right-pass"
                 ? "bg-green-500 text-white"
                 : phase === "done"
@@ -185,7 +185,7 @@ export default function ProductExceptSelfVisualizer() {
                       ? -5
                       : 0,
                 }}
-                className={`w-14 h-14 rounded-lg flex flex-col items-center justify-center font-mono ${
+                className={`w-14 h-14 rounded-md flex flex-col items-center justify-center font-mono ${
                   phase === "left-pass" && idx === leftIdx
                     ? "bg-blue-500 text-white ring-2 ring-blue-300"
                     : phase === "right-pass" && idx === rightIdx
@@ -214,7 +214,7 @@ export default function ProductExceptSelfVisualizer() {
                   key={`left-${val}-${idx}`}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="w-14 h-10 rounded-lg bg-blue-500/30 flex items-center justify-center font-mono text-blue-300"
+                  className="w-14 h-10 rounded-md bg-blue-500/30 flex items-center justify-center font-mono text-blue-300"
                 >
                   {val}
                 </motion.div>
@@ -225,7 +225,7 @@ export default function ProductExceptSelfVisualizer() {
 
         {/* Right Product tracker */}
         {phase === "right-pass" && (
-          <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+          <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-md">
             <span className="text-gray-400">Right Product (running): </span>
             <span className="text-2xl font-bold text-green-400">
               {rightProduct}
@@ -250,7 +250,7 @@ export default function ProductExceptSelfVisualizer() {
                           ? "#a855f7"
                           : "#7c3aed",
                     }}
-                    className="w-14 h-14 rounded-lg flex flex-col items-center justify-center font-mono text-white"
+                    className="w-14 h-14 rounded-md flex flex-col items-center justify-center font-mono text-white"
                   >
                     <span className="text-lg font-bold">{val}</span>
                     <span className="text-xs opacity-70">[{idx}]</span>
@@ -259,7 +259,7 @@ export default function ProductExceptSelfVisualizer() {
               : arr.map((_, idx) => (
                   <div
                     key={`placeholder-${idx}`}
-                    className="w-14 h-14 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center text-gray-500"
+                    className="w-14 h-14 rounded-md border-2 border-dashed border-gray-600 flex items-center justify-center text-gray-500"
                   >
                     ?
                   </div>
@@ -269,7 +269,7 @@ export default function ProductExceptSelfVisualizer() {
 
         {/* Expected result */}
         {phase === "done" && (
-          <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+          <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-md">
             <div className="text-sm text-gray-400">
               Verification: Each result[i] = product of all elements except
               arr[i]
@@ -285,7 +285,7 @@ export default function ProductExceptSelfVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? "bg-green-500/10 border border-green-500/30 text-green-400"
               : "bg-gray-800 text-gray-300"
@@ -295,7 +295,7 @@ export default function ProductExceptSelfVisualizer() {
         </motion.div>
 
         {/* Algorithm explanation */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-violet-400">Key Insight:</strong> result[i]
             = (product of all left) × (product of all right). Build left

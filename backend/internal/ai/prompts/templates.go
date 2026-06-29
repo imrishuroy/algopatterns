@@ -258,7 +258,8 @@ func formatCurrentProblem(sb *strings.Builder, problemTitle, problemDescription,
 func BuildHintPrompt(level int, problemTitle, userCode, language string, history []ConversationTurn, ragContext string) string {
 	var sb strings.Builder
 	sb.WriteString(BaseSystemPrompt + "\n\n")
-	sb.WriteString(fmt.Sprintf(HintPromptTemplate, level));sb.WriteString("\n\n")
+	sb.WriteString(fmt.Sprintf(HintPromptTemplate, level))
+	sb.WriteString("\n\n")
 	sb.WriteString(formatHistory(history))
 	injectRAG(&sb, ragContext)
 	formatCurrentProblem(&sb, problemTitle, "", userCode, language)
@@ -272,7 +273,9 @@ func BuildReviewPrompt(problemTitle, userCode, language string, focusAreas []str
 	sb.WriteString(ReviewPromptTemplate + "\n\n")
 
 	if len(focusAreas) > 0 {
-		sb.WriteString("FOCUS AREAS: ");sb.WriteString(strings.Join(focusAreas, ", "));sb.WriteString("\n\n")
+		sb.WriteString("FOCUS AREAS: ")
+		sb.WriteString(strings.Join(focusAreas, ", "))
+		sb.WriteString("\n\n")
 	}
 
 	sb.WriteString(formatHistory(history))
@@ -307,7 +310,8 @@ func BuildChatPrompt(problemTitle, language string, history []ConversationTurn, 
 	}
 
 	sb.WriteString(BaseSystemPrompt + "\n\n")
-	sb.WriteString(fmt.Sprintf(ChatPromptTemplate, sessionStage));sb.WriteString("\n\n")
+	sb.WriteString(fmt.Sprintf(ChatPromptTemplate, sessionStage))
+	sb.WriteString("\n\n")
 	sb.WriteString(formatHistory(history))
 	injectRAG(&sb, ragContext)
 	formatCurrentProblem(&sb, problemTitle, "", "", language)

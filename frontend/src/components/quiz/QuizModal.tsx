@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, startTransition } from "react";
 import type { QuizQuestion, Answer } from "@/types/quiz";
 import { quizService } from "@/lib/quizService";
 import MultipleChoice from "./questions/MultipleChoice";
@@ -35,8 +35,8 @@ export default function QuizModal({
     scorePercentage: number;
   } | null>(null);
 
-  const questionStartTime = useRef<number>(Date.now());
-  const quizStartTime = useRef<number>(Date.now());
+  const questionStartTime = useRef<number>(0);
+  const quizStartTime = useRef<number>(0);
 
   const currentQuestion = questions[currentIndex];
   const progress =
@@ -88,7 +88,9 @@ export default function QuizModal({
   }, [isOpen, patternId, sectionSlug]);
 
   useEffect(() => {
-    initQuiz();
+    startTransition(() => {
+      initQuiz();
+    });
   }, [initQuiz]);
 
   const handleAnswer = async (answer: unknown) => {
@@ -121,7 +123,9 @@ export default function QuizModal({
 
   const handleNext = () => {
     setShowExplanation(false);
-    questionStartTime.current = Date.now();
+    startTransition(() => {
+      questionStartTime.current = Date.now();
+    });
 
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -177,7 +181,7 @@ export default function QuizModal({
         onClick={handleClose}
       />
 
-      <div className="relative bg-gray-900 border border-gray-800 rounded-xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
+      <div className="relative bg-gray-900 border border-gray-800 rounded-md w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
           <div className="flex items-center gap-4">
@@ -200,7 +204,7 @@ export default function QuizModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-gray-800"
+            className="p-2 text-gray-400 hover:text-white transition-colors rounded-md hover:bg-gray-800"
           >
             <svg
               className="w-5 h-5"
@@ -244,7 +248,7 @@ export default function QuizModal({
               <p className="text-gray-400">{error}</p>
               <button
                 onClick={handleClose}
-                className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
               >
                 Close
               </button>
@@ -306,7 +310,7 @@ export default function QuizModal({
             {hasAnswered && (
               <button
                 onClick={handleNext}
-                className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-medium transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-md font-medium transition-colors"
               >
                 {currentIndex < questions.length - 1
                   ? "Next Question"

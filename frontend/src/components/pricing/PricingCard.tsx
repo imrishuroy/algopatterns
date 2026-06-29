@@ -56,7 +56,7 @@ export function PricingCard({
 
   return (
     <div
-      className={`relative rounded-2xl p-6 flex flex-col h-full ${
+      className={`relative rounded-md p-6 flex flex-col h-full ${
         plan.is_recommended
           ? "bg-gradient-to-b from-emerald-500/10 to-emerald-500/5 border-2 border-emerald-500"
           : "bg-gray-800/50 border border-gray-700"
@@ -91,7 +91,7 @@ export function PricingCard({
         </div>
         {plan.savings_percentage && plan.savings_percentage > 0 && (
           <div className="mt-2">
-            <span className="bg-emerald-500/20 text-emerald-400 text-sm px-2 py-1 rounded">
+            <span className="bg-emerald-500/20 text-emerald-400 text-sm px-2 py-1 rounded-md">
               Save {plan.savings_percentage}%
             </span>
           </div>
@@ -149,7 +149,7 @@ export function PricingCard({
         <button
         onClick={() => onSelect(plan)}
         disabled={isCurrentPlan || isLoading || isDowngrade}
-        className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
+        className={`w-full py-3 px-4 rounded-md font-semibold transition-colors ${
           isCurrentPlan
             ? "bg-gray-700 text-gray-400 cursor-not-allowed"
             : isDowngrade

@@ -1006,7 +1006,7 @@ describe("ProblemsTab", () => {
         patternId="arrays-strings"
       />,
     );
-    const rows = container.querySelectorAll('[class*="rounded-xl"]');
+    const rows = container.querySelectorAll('[class*="rounded-md"]');
     const problemRows = Array.from(rows).filter((r) =>
       r.className.includes("hover:translate-x-1"),
     );

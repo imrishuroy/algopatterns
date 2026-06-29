@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, startTransition } from "react";
 import { aiApiClient } from "@/lib/ai-api";
 import Image from "next/image";
 
@@ -26,13 +26,13 @@ export function InlineAI({
   fullCode,
   language,
   problemSlug,
-  problemTitle,
-  onApply,
 }: InlineAIProps) {
   const [input, setInput] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [activeAction, setActiveAction] = useState<ActionType | null>(null);
+  const [, setActiveAction] = useState<ActionType | null>(null);
+  const [computedTop, setComputedTop] = useState(0);
+  const [computedLeft, setComputedLeft] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +41,13 @@ export function InlineAI({
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    startTransition(() => {
+      setComputedTop(Math.min(position.top, window.innerHeight - 400));
+      setComputedLeft(Math.min(position.left, window.innerWidth - 400));
+    });
+  }, [position.top, position.left]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -126,10 +133,10 @@ export function InlineAI({
   return (
     <div
       ref={containerRef}
-      className="fixed z-50 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
+      className="fixed z-50 bg-gray-900 border border-gray-700 rounded-md shadow-2xl overflow-hidden"
       style={{
-        top: Math.min(position.top, window.innerHeight - 400),
-        left: Math.min(position.left, window.innerWidth - 400),
+        top: computedTop,
+        left: computedLeft,
         width: "380px",
         maxHeight: "350px",
       }}
@@ -145,7 +152,7 @@ export function InlineAI({
         </div>
         <button
           onClick={onClose}
-          className="p-1 text-gray-400 hover:text-white rounded transition-colors"
+          className="p-1 text-gray-400 hover:text-white rounded-md transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -193,13 +200,13 @@ export function InlineAI({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={selectedCode ? "Ask about this code..." : "Ask anything..."}
-            className="flex-1 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            className="flex-1 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
+            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-md text-sm transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

@@ -17,7 +17,7 @@ export default function HowToIdentifySection() {
       {/* Decision Flowchart */}
       <h2 className="text-2xl font-bold text-white mb-4">Decision Flowchart</h2>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-8 font-mono text-sm overflow-x-auto">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8 font-mono text-sm overflow-x-auto">
         <pre className="text-gray-300 whitespace-pre">
           {`START: Read the problem
           │
@@ -59,7 +59,7 @@ export default function HowToIdentifySection() {
       </h2>
 
       <div className="space-y-4 mb-8">
-        <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-5">
+        <div className="bg-orange-500/10 border border-orange-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-orange-400 mb-3">
             🟠 Backtracking Keywords
           </h4>
@@ -78,7 +78,7 @@ export default function HowToIdentifySection() {
             ].map((keyword) => (
               <span
                 key={keyword}
-                className="px-2 py-1 bg-orange-500/20 text-orange-300 rounded text-sm font-mono"
+                className="px-2 py-1 bg-orange-500/20 text-orange-300 rounded-md text-sm font-mono"
               >
                 {keyword}
               </span>
@@ -90,7 +90,7 @@ export default function HowToIdentifySection() {
           </p>
         </div>
 
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5">
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-blue-400 mb-3">
             🔵 DP Keywords
           </h4>
@@ -108,7 +108,7 @@ export default function HowToIdentifySection() {
             ].map((keyword) => (
               <span
                 key={keyword}
-                className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-sm font-mono"
+                className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-md text-sm font-mono"
               >
                 {keyword}
               </span>
@@ -120,7 +120,7 @@ export default function HowToIdentifySection() {
           </p>
         </div>
 
-        <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-5">
+        <div className="bg-green-500/10 border border-green-500/30 rounded-md p-5">
           <h4 className="text-lg font-semibold text-green-400 mb-3">
             🟢 Greedy Keywords
           </h4>
@@ -136,7 +136,7 @@ export default function HowToIdentifySection() {
             ].map((keyword) => (
               <span
                 key={keyword}
-                className="px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm font-mono"
+                className="px-2 py-1 bg-green-500/20 text-green-300 rounded-md text-sm font-mono"
               >
                 {keyword}
               </span>
@@ -154,7 +154,7 @@ export default function HowToIdentifySection() {
         Problem Type → Approach
       </h2>
 
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-8 overflow-x-auto">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-700">
@@ -234,7 +234,7 @@ export default function HowToIdentifySection() {
       </h2>
 
       <div className="grid md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-orange-400 mb-3">
             Is it Backtracking?
           </h4>
@@ -254,7 +254,7 @@ export default function HowToIdentifySection() {
           </ul>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-blue-400 mb-3">
             Is it DP?
           </h4>
@@ -274,7 +274,7 @@ export default function HowToIdentifySection() {
           </ul>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-green-400 mb-3">
             Is it Greedy?
           </h4>
@@ -294,7 +294,7 @@ export default function HowToIdentifySection() {
           </ul>
         </div>
 
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
+        <div className="bg-gray-900 rounded-md border border-gray-800 p-5">
           <h4 className="text-lg font-semibold text-purple-400 mb-3">
             DP vs Greedy?
           </h4>
@@ -321,7 +321,7 @@ export default function HowToIdentifySection() {
       </h2>
 
       <div className="space-y-4 mb-8">
-        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl">
+        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-md">
           <span className="text-3xl font-bold text-yellow-400">1</span>
           <p className="text-gray-300">
             <strong className="text-white">
@@ -334,7 +334,7 @@ export default function HowToIdentifySection() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/30 rounded-xl">
+        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/30 rounded-md">
           <span className="text-3xl font-bold text-blue-400">2</span>
           <p className="text-gray-300">
             <strong className="text-white">
@@ -347,7 +347,7 @@ export default function HowToIdentifySection() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-xl">
+        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-md">
           <span className="text-3xl font-bold text-green-400">3</span>
           <p className="text-gray-300">
             <strong className="text-white">
@@ -360,7 +360,7 @@ export default function HowToIdentifySection() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 rounded-xl">
+        <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 rounded-md">
           <span className="text-3xl font-bold text-red-400">4</span>
           <p className="text-gray-300">
             <strong className="text-white">
@@ -374,7 +374,7 @@ export default function HowToIdentifySection() {
         </div>
       </div>
 
-      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-6">
+      <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-md p-6">
         <h4 className="text-lg font-semibold text-indigo-300 mb-3">
           Pro Tip: Start with Brute Force
         </h4>

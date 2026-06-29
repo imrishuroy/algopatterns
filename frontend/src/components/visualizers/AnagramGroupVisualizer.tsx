@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const GROUP_COLORS = [
@@ -24,7 +24,7 @@ export default function AnagramGroupVisualizer() {
   );
   const [message, setMessage] = useState("Click Play to group anagrams");
 
-  const words = ["eat", "tea", "tan", "ate", "nat", "bat"];
+  const words = useMemo(() => ["eat", "tea", "tan", "ate", "nat", "bat"], []);
 
   const getSortedKey = (word: string) => {
     return [...word].sort().join("");
@@ -79,7 +79,7 @@ export default function AnagramGroupVisualizer() {
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [isPlaying, currentIndex, phase, groups, speed]);
+  }, [isPlaying, currentIndex, phase, groups, speed, words]);
 
   const getWordColor = (word: string) => {
     const key = getSortedKey(word);

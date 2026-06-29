@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 
 interface Particle {
   id: number;
@@ -46,10 +46,14 @@ export default function Confetti() {
       });
     }
 
-    setParticles(newParticles);
+    startTransition(() => {
+      setParticles(newParticles);
+    });
 
     const timeout = setTimeout(() => {
-      setParticles([]);
+      startTransition(() => {
+        setParticles([]);
+      });
     }, 2000);
 
     return () => clearTimeout(timeout);

@@ -23,7 +23,7 @@ function TutorialContent({
       {tutorial.map((section, idx) => (
         <div key={idx}>
           <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <span className="w-7 h-7 bg-indigo-500/30 rounded-lg flex items-center justify-center text-indigo-400 text-sm font-bold">
+            <span className="w-7 h-7 bg-indigo-500/30 rounded-md flex items-center justify-center text-indigo-400 text-sm font-bold">
               {idx + 1}
             </span>
             {section.title}
@@ -81,14 +81,14 @@ export default function PatternSectionCard({
   const hasTutorial = pattern.tutorial && pattern.tutorial.length > 0;
 
   return (
-    <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl border border-indigo-500/30 overflow-hidden mb-3">
+    <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-md border border-indigo-500/30 overflow-hidden mb-3">
       {/* Collapsed Header - Click to Expand */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-indigo-500/20 rounded-md flex items-center justify-center">
             <svg
               className="w-5 h-5 text-indigo-400"
               fill="none"
@@ -275,7 +275,7 @@ export default function PatternSectionCard({
                     </svg>
                     Common Mistakes
                   </h4>
-                  <div className="bg-red-900/10 border border-red-900/30 rounded-lg p-3">
+                  <div className="bg-red-900/10 border border-red-900/30 rounded-md p-3">
                     <ul className="space-y-1.5">
                       {pattern.commonMistakes.map((mistake, i) => (
                         <li
@@ -355,14 +355,14 @@ function VariationInline({
     "";
 
   return (
-    <div className="bg-gray-900/50 rounded-lg border border-gray-800 p-4">
+    <div className="bg-gray-900/50 rounded-md border border-gray-800 p-4">
       <div className="mb-3">
         <div className="flex items-center justify-between">
           <h5 className="font-medium text-white text-sm">{variation.name}</h5>
           {hasGuide && (
             <a
               href={variation.guide}
-              className="px-2 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs rounded transition flex items-center gap-1"
+              className="px-2 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 text-xs rounded-md transition flex items-center gap-1"
             >
               <svg
                 className="w-3 h-3"
@@ -413,7 +413,7 @@ function VariationInline({
               return (
                 <span
                   key={i}
-                  className="inline-flex items-center bg-gray-800 rounded overflow-hidden"
+                  className="inline-flex items-center bg-gray-800 rounded-md overflow-hidden"
                 >
                   <a
                     href={`/problems/${slug}`}

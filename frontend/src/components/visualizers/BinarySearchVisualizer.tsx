@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 
 interface Step {
@@ -23,7 +23,6 @@ export default function BinarySearchVisualizer() {
   const [phase, setPhase] = useState<"init" | "running" | "done">("init");
   const [message, setMessage] = useState(`Click Play to search for ${target}`);
   const [stepIndex, setStepIndex] = useState(-1);
-  const [steps, setSteps] = useState<Step[]>([]);
   const [eliminated, setEliminated] = useState<Set<number>>(new Set());
 
   const generateSteps = useCallback(() => {
@@ -67,6 +66,8 @@ export default function BinarySearchVisualizer() {
     return allSteps;
   }, [nums, target]);
 
+  const steps = useMemo(() => generateSteps(), [generateSteps]);
+
   const reset = useCallback(() => {
     setLeft(0);
     setRight(nums.length - 1);
@@ -76,13 +77,8 @@ export default function BinarySearchVisualizer() {
     setPhase("init");
     setMessage(`Click Play to search for ${target}`);
     setStepIndex(-1);
-    setSteps(generateSteps());
     setIsPlaying(false);
-  }, [nums.length, target, generateSteps]);
-
-  useEffect(() => {
-    setSteps(generateSteps());
-  }, [generateSteps]);
+  }, [nums.length, target]);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -146,7 +142,7 @@ export default function BinarySearchVisualizer() {
   }, [isPlaying, phase, stepIndex, steps, target, found, eliminated, speed]);
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border-b border-gray-800">
         <h3 className="text-lg font-semibold text-white">Binary Search</h3>
         <p className="text-gray-400 text-sm mt-1">
@@ -160,7 +156,7 @@ export default function BinarySearchVisualizer() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             disabled={phase === "done"}
-            className={`px-3 md:px-4 py-2 rounded-lg font-medium text-sm md:text-base transition ${
+            className={`px-3 md:px-4 py-2 rounded-md font-medium text-sm md:text-base transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
@@ -168,7 +164,7 @@ export default function BinarySearchVisualizer() {
           </button>
           <button
             onClick={reset}
-            className="px-3 md:px-4 py-2 bg-gray-700 text-white rounded-lg font-medium text-sm md:text-base hover:bg-gray-600"
+            className="px-3 md:px-4 py-2 bg-gray-700 text-white rounded-md font-medium text-sm md:text-base hover:bg-gray-600"
           >
             Reset
           </button>
@@ -187,7 +183,7 @@ export default function BinarySearchVisualizer() {
         </div>
 
         {/* Target */}
-        <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg text-center">
+        <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-md text-center">
           <span className="text-gray-400">Target: </span>
           <span className="text-blue-400 font-bold text-xl">{target}</span>
         </div>
@@ -217,7 +213,7 @@ export default function BinarySearchVisualizer() {
                       opacity: isEliminated ? 0.4 : 1,
                       scale: isMid ? 1.15 : 1,
                     }}
-                    className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm"
+                    className="w-10 h-10 rounded-md flex items-center justify-center font-bold text-sm"
                   >
                     <span
                       className={isFound || isMid ? "text-black" : "text-white"}
@@ -250,13 +246,13 @@ export default function BinarySearchVisualizer() {
         {/* Pointers info */}
         {phase !== "init" && (
           <div className="mb-4 grid grid-cols-3 gap-2 text-center text-sm">
-            <div className="p-2 bg-blue-500/20 rounded-lg">
+            <div className="p-2 bg-blue-500/20 rounded-md">
               <span className="text-blue-400">Left: {left}</span>
             </div>
-            <div className="p-2 bg-yellow-500/20 rounded-lg">
+            <div className="p-2 bg-yellow-500/20 rounded-md">
               <span className="text-yellow-400">Mid: {mid}</span>
             </div>
-            <div className="p-2 bg-purple-500/20 rounded-lg">
+            <div className="p-2 bg-purple-500/20 rounded-md">
               <span className="text-purple-400">Right: {right}</span>
             </div>
           </div>
@@ -267,7 +263,7 @@ export default function BinarySearchVisualizer() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-center"
+            className="mb-4 p-4 bg-green-500/20 border border-green-500/50 rounded-md text-center"
           >
             <span className="text-green-400 font-bold text-lg">
               Found {target} at index {found}!
@@ -284,7 +280,7 @@ export default function BinarySearchVisualizer() {
           key={message}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
+          className={`p-3 rounded-md text-sm ${
             phase === "done"
               ? found !== null
                 ? "bg-green-500/10 border border-green-500/30 text-green-400"
@@ -298,21 +294,21 @@ export default function BinarySearchVisualizer() {
         {/* Legend */}
         <div className="mt-4 flex gap-4 text-xs justify-center">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-yellow-500" />
+            <div className="w-3 h-3 rounded-md bg-yellow-500" />
             <span className="text-gray-400">Mid</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-green-500" />
+            <div className="w-3 h-3 rounded-md bg-green-500" />
             <span className="text-gray-400">Found</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-gray-700 opacity-40" />
+            <div className="w-3 h-3 rounded-md bg-gray-700 opacity-40" />
             <span className="text-gray-400">Eliminated</span>
           </div>
         </div>
 
         {/* Key insight */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
+        <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-blue-400">Key Insight:</strong> Each
             comparison eliminates half the remaining elements. For n elements,

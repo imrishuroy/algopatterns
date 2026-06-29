@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback, startTransition } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Pattern } from "@/types";
@@ -55,7 +55,9 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
 
   useEffect(() => {
     if (tabParam === "problems" || tabParam === "cheatsheet" || tabParam === "tutorial") {
-      setActiveTab(tabParam);
+      startTransition(() => {
+        setActiveTab(tabParam);
+      });
     }
   }, [tabParam]);
   const { completed, toggleComplete } = useProgress();
@@ -259,7 +261,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
             </div>
             <button
               onClick={() => setIsAIChatOpen(!isAIChatOpen)}
-              className={`p-2 rounded-lg transition-colors border ${
+              className={`p-2 rounded-md transition-colors border ${
                 isAIChatOpen
                   ? "bg-indigo-600/20 border-indigo-500/50 text-indigo-400"
                   : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600"
@@ -281,7 +283,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 text-sm font-medium rounded-t-md transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-gray-950 text-white border-t border-l border-r border-gray-800"
                   : "text-gray-400 hover:text-white hover:bg-gray-800/50"

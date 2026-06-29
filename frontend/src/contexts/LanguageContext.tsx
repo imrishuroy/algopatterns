@@ -5,6 +5,7 @@ import {
   useContext,
   useState,
   useEffect,
+  startTransition,
   ReactNode,
   useCallback,
 } from "react";
@@ -29,16 +30,15 @@ const VALID_LANGUAGES: SupportedLanguage[] = [
 const DEFAULT_LANGUAGE: SupportedLanguage = "java";
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] =
-    useState<SupportedLanguage>(DEFAULT_LANGUAGE);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [language, setLanguageState] = useState<SupportedLanguage>(DEFAULT_LANGUAGE);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as SupportedLanguage;
     if (stored && VALID_LANGUAGES.includes(stored)) {
-      setLanguageState(stored);
+      startTransition(() => {
+        setLanguageState(stored);
+      });
     }
-    setIsHydrated(true);
   }, []);
 
   const setLanguage = useCallback((lang: SupportedLanguage) => {
@@ -47,16 +47,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem(STORAGE_KEY, lang);
     }
   }, []);
-
-  if (!isHydrated) {
-    return (
-      <LanguageContext.Provider
-        value={{ language: DEFAULT_LANGUAGE, setLanguage }}
-      >
-        {children}
-      </LanguageContext.Provider>
-    );
-  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage }}>

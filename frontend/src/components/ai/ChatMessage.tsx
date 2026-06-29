@@ -13,7 +13,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}>
       <div
-        className={`max-w-[90%] rounded-lg px-3 py-2 text-sm ${
+        className={`max-w-[90%] rounded-md px-3 py-2 text-sm ${
           isUser
             ? "bg-indigo-600 text-white"
             : "bg-gray-800 text-gray-200 border border-gray-700"
@@ -52,7 +52,7 @@ function MessageContent({ content, isStreaming }: { content: string; isStreaming
             return (
               <pre
                 key={index}
-                className="bg-gray-900 rounded p-2 my-2 overflow-x-auto text-xs font-mono"
+                className="bg-gray-900 rounded-md p-2 my-2 overflow-x-auto text-xs font-mono"
               >
                 {lang && (
                   <div className="text-[10px] text-gray-500 mb-1 uppercase">{lang}</div>
@@ -211,7 +211,7 @@ function processInlineCode(text: string, startKey: number): React.ReactNode[] {
       parts.push(
         <code
           key={`code-${startKey}-${i}`}
-          className="bg-gray-900 px-1 py-0.5 rounded text-xs font-mono text-indigo-300"
+          className="bg-gray-900 px-1 py-0.5 rounded-md text-xs font-mono text-indigo-300"
         >
           {segment.slice(1, -1)}
         </code>

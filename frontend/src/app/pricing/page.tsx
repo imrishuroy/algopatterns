@@ -40,7 +40,7 @@ function FeatureHighlight({
 }) {
   return (
     <div className="text-center">
-      <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-400 mb-4">
+      <div className="inline-flex items-center justify-center w-16 h-16 rounded-md bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-400 mb-4">
         {FEATURE_ICONS[icon]}
       </div>
       <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
@@ -53,7 +53,7 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative bg-gray-900 rounded-2xl p-8 w-full max-w-md mx-4 border border-gray-700 text-center">
+      <div className="relative bg-gray-900 rounded-md p-8 w-full max-w-md mx-4 border border-gray-700 text-center">
         <div className="text-5xl mb-4">🎉</div>
         <h2 className="text-2xl font-bold text-white mb-2">Welcome to Pro!</h2>
         <p className="text-gray-400 mb-6">
@@ -61,7 +61,7 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
         </p>
         <button
           onClick={onClose}
-          className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg"
+          className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-md"
         >
           Start Learning
         </button>
@@ -113,7 +113,7 @@ function WhyUpgradeSection() {
 function LifetimePromise() {
   return (
     <div className="mt-10 md:mt-16 text-center">
-      <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-2xl p-6 md:p-8 max-w-2xl mx-auto">
+      <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-md p-6 md:p-8 max-w-2xl mx-auto">
         <h3 className="text-xl font-bold text-white mb-2">Lifetime Access Promise</h3>
         <p className="text-gray-400">
           Get the lifetime plan and receive all future updates, new patterns, and features at no

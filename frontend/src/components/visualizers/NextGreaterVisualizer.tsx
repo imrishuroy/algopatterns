@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function NextGreaterVisualizer() {
@@ -15,7 +15,7 @@ export default function NextGreaterVisualizer() {
     "Click Play to find next greater elements"
   );
 
-  const nums = [2, 1, 2, 4, 3];
+  const nums = useMemo(() => [2, 1, 2, 4, 3], []);
 
   const reset = useCallback(() => {
     setCurrentIdx(-1);
@@ -214,7 +214,7 @@ export default function NextGreaterVisualizer() {
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
             <strong className="text-orange-400">Key Insight:</strong> Elements
-            wait on stack until a larger element "answers" them. Each element
+            wait on stack until a larger element &ldquo;answers&rdquo; them. Each element
             pushed once, popped at most once = O(n).
           </p>
         </div>

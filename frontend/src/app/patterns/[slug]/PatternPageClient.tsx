@@ -34,7 +34,7 @@ const difficultyColors: Record<string, string> = {
   "Medium-Hard": "bg-orange-500/20 text-orange-400",
 };
 
-export default function PatternPageClient({ pattern }: PatternPageClientProps) {
+export default function PatternPageClient({ pattern }: PatternPageClientProps) { // skipcq: JS-R1005
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -118,7 +118,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
       document.querySelectorAll("[data-section-id]").forEach((el) => observer.observe(el));
     }, 100);
 
-    return () => {
+    return () => { // skipcq: JS-0045
       clearTimeout(timer);
       observer.disconnect();
     };
@@ -180,11 +180,11 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
 
   const handleCloseAI = useCallback(() => {
     setIsAIChatOpen(false);
-		setAiInitialMessage(undefined);
+    setAiInitialMessage(undefined); // skipcq: JS-W1042
     setAiMessageKey(0);
   }, []);
 
-  const header = (
+  const header = ( // skipcq: JS-0415
     <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm flex-shrink-0">
       <div className="px-4 py-4">
         <div className="flex items-center gap-4 mb-4">

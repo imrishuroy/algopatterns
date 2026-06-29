@@ -111,13 +111,13 @@ export default function KnapsackVisualizer() {
   const backtrackSolution = useCallback(
     function backtrackSolution() {
       const selected = new Set<number>();
-      let w = capacity;
+      let remaining = capacity;
 
-      for (let i = items.length; i > 0 && w > 0; i--) {
-        const stepIdx = (i - 1) * (capacity + 1) + w;
+      for (let i = items.length; i > 0 && remaining > 0; i--) {
+        const stepIdx = (i - 1) * (capacity + 1) + remaining;
         if (stepIdx < steps.length && steps[stepIdx]?.take) {
           selected.add(i - 1);
-          w -= items[i - 1].weight;
+          remaining -= items[i - 1].weight;
         }
       }
 

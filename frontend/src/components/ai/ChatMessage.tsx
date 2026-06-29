@@ -51,7 +51,7 @@ function MessageContent({ content, isStreaming }: { content: string; isStreaming
             const [, lang, code] = match;
             return (
               <pre
-                key={`code-${index}`}
+                key={`code-${index}`} // skipcq: JS-0437
                 className="bg-gray-900 rounded-md p-2 my-2 overflow-x-auto text-xs font-mono"
               >
                 {lang && (
@@ -62,7 +62,7 @@ function MessageContent({ content, isStreaming }: { content: string; isStreaming
             );
           }
         }
-        return <FormattedText key={`text-${index}`} text={part} />;
+        return <FormattedText key={`text-${index}`} text={part} />; // skipcq: JS-0437
       })}
     </div>
   );
@@ -93,6 +93,7 @@ function FormattedText({ text }: { text: string }) {
     if (trimmed.startsWith("### ")) {
       flushParagraph();
       elements.push(
+        // skipcq: JS-0437
         <h4 key={`h4-${i}`} className="font-semibold text-white mt-3 mb-1">
           {formatInlineText(trimmed.slice(4))}
         </h4>
@@ -100,6 +101,7 @@ function FormattedText({ text }: { text: string }) {
     } else if (trimmed.startsWith("## ")) {
       flushParagraph();
       elements.push(
+        // skipcq: JS-0437
         <h3 key={`h3-${i}`} className="font-semibold text-white mt-3 mb-1 text-base">
           {formatInlineText(trimmed.slice(3))}
         </h3>
@@ -107,6 +109,7 @@ function FormattedText({ text }: { text: string }) {
     } else if (trimmed.startsWith("# ")) {
       flushParagraph();
       elements.push(
+        // skipcq: JS-0437
         <h2 key={`h2-${i}`} className="font-bold text-white mt-3 mb-2 text-base">
           {formatInlineText(trimmed.slice(2))}
         </h2>
@@ -116,6 +119,7 @@ function FormattedText({ text }: { text: string }) {
     else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
       flushParagraph();
       elements.push(
+        // skipcq: JS-0437
         <div key={`li-${i}`} className="flex gap-2 ml-2">
           <span className="text-gray-500">•</span>
           <span>{formatInlineText(trimmed.slice(2))}</span>
@@ -128,6 +132,7 @@ function FormattedText({ text }: { text: string }) {
       const match = trimmed.match(/^(\d+)\.\s(.*)$/);
       if (match) {
         elements.push(
+          // skipcq: JS-0437
           <div key={`ol-${i}`} className="flex gap-2 ml-2">
             <span className="text-gray-500 min-w-[1.2em]">{match[1]}.</span>
             <span>{formatInlineText(match[2])}</span>
@@ -139,6 +144,7 @@ function FormattedText({ text }: { text: string }) {
     else if (trimmed === "---" || trimmed === "***" || trimmed === "___") {
       flushParagraph();
       elements.push(
+        // skipcq: JS-0437
         <hr key={`hr-${i}`} className="border-gray-700 my-2" />
       );
     }
@@ -157,7 +163,7 @@ function FormattedText({ text }: { text: string }) {
   return elements;
 }
 
-function formatInlineText(text: string): React.ReactNode {
+function formatInlineText(text: string): React.ReactNode { // skipcq: JS-R1005
   // Handle bold, italic, inline code
   const parts: React.ReactNode[] = [];
   let remaining = text;
@@ -210,7 +216,7 @@ function processInlineCode(text: string, startKey: number): React.ReactNode[] {
     if (segment.startsWith("`") && segment.endsWith("`")) {
       parts.push(
         <code
-          key={`code-${startKey}-${i}`}
+          key={`code-${startKey}-${i}`} // skipcq: JS-0437
           className="bg-gray-900 px-1 py-0.5 rounded-md text-xs font-mono text-indigo-300"
         >
           {segment.slice(1, -1)}

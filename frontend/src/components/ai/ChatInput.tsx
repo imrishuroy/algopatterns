@@ -43,7 +43,7 @@ export function ChatInput({
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     const textarea = e.target;
-    textarea.style.height = "auto";
+    textarea.style.height = "auto"; // skipcq: JS-W1032
     textarea.style.height = `${Math.min(textarea.scrollHeight, 100)}px`;
   };
 

@@ -29,6 +29,8 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
       return { ...state, step: state.step + 1 };
     case "RESET":
       return { step: 0, isPlaying: false };
+    default:
+      return state;
   }
 }
 

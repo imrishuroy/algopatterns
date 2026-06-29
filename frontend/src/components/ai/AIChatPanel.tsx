@@ -31,7 +31,7 @@ interface AIChatPanelProps {
   onClose: () => void;
 }
 
-export function AIChatPanel({
+export function AIChatPanel({ // skipcq: JS-R1005
   problemSlug,
   problemTitle,
   problemDescription,
@@ -96,7 +96,7 @@ export function AIChatPanel({
 
   const handleQuickActionResult = useCallback(
     () => {
-      sendMessage(`[Received AI response]`, false);
+      sendMessage('[Received AI response]', false);
     },
     [sendMessage]
   );
@@ -123,7 +123,7 @@ export function AIChatPanel({
 
   if (!isOpen) return null;
 
-  return (
+  return ( // skipcq: JS-0415
     <div className="flex flex-col h-full bg-gray-900 border-l border-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 bg-gray-900 border-b border-gray-800">

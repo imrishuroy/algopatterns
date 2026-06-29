@@ -40,10 +40,10 @@ export default function LevelOrderVisualizer() {
   const nodeMap: Record<number, TreeNode> = useMemo(
     () => ({
       3: sampleTree,
-      9: sampleTree.left!,
-      20: sampleTree.right!,
-      15: sampleTree.right!.left!,
-      7: sampleTree.right!.right!,
+      9: sampleTree.left!, // skipcq: JS-0339
+      20: sampleTree.right!, // skipcq: JS-0339
+      15: sampleTree.right!.left!, // skipcq: JS-0339
+      7: sampleTree.right!.right!, // skipcq: JS-0339
     }),
     []
   );

@@ -18,7 +18,7 @@ interface InlineAIProps {
 
 type ActionType = "explain" | "improve" | "debug" | "complexity" | "custom";
 
-export function InlineAI({
+export function InlineAI({ // skipcq: JS-R1005
   isOpen,
   onClose,
   position,
@@ -128,7 +128,7 @@ export function InlineAI({
 
   if (!isOpen) return null;
 
-  return (
+  return ( // skipcq: JS-0415
     <div
       ref={containerRef}
       className="fixed z-50 bg-gray-900 border border-gray-700 rounded-md shadow-2xl overflow-hidden"

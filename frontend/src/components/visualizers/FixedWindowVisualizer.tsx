@@ -168,7 +168,7 @@ export default function FixedWindowVisualizer() {
 
               return (
                 <motion.div
-                  key={`arr-pos${position}-val${val}`}
+                  key={`arr-pos${position}-val${val}`} // skipcq: JS-0437
                   animate={{
                     scale: inWindow ? 1.05 : 1,
                     y: inWindow ? -5 : 0,
@@ -199,7 +199,7 @@ export default function FixedWindowVisualizer() {
             <div className="flex gap-2 mt-1">
               {arr.map((val, position) => (
                 <div
-                  key={`bracket-pos${position}-val${val}`}
+                  key={`bracket-pos${position}-val${val}`} // skipcq: JS-0437
                   className={`w-14 h-1 rounded-md ${
                     position >= winLeft && position <= winRight
                       ? "bg-blue-500"

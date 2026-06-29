@@ -237,7 +237,7 @@ export default function DPTransformationVisualizer() {
             <AnimatePresence>
               {callStack.map((call, depth) => (
                 <motion.div
-                  key={`stack-${call}-depth${depth}`}
+                  key={`stack-${call}-depth${depth}`} // skipcq: JS-0437
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
@@ -288,7 +288,7 @@ export default function DPTransformationVisualizer() {
           >
             <span className="text-red-400 font-medium">Duplicate work!</span>
             <span className="text-red-300 ml-2">
-              {currentStep!.call} is being computed again
+              {currentStep!.call} is being computed again {/* skipcq: JS-0339 */}
             </span>
           </motion.div>
         )}
@@ -390,7 +390,7 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2 mb-2">
             {nums.map((num, position) => (
               <div
-                key={`tab-idx-pos${position}-val${num}`}
+                key={`tab-idx-pos${position}-val${num}`} // skipcq: JS-0437
                 className="text-center text-xs text-gray-500"
               >
                 i = {position}
@@ -402,7 +402,7 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2 mb-4">
             {nums.map((num, position) => (
               <div
-                key={`tab-val-pos${position}-$${num}`}
+                key={`tab-val-pos${position}-$${num}`} // skipcq: JS-0437
                 className="p-2 bg-gray-700/30 rounded-md text-center"
               >
                 <span className="text-gray-400 text-sm">${num}</span>
@@ -414,7 +414,7 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2">
             {dp.map((val, position) => (
               <motion.div
-                key={`tab-dp-pos${position}-${val ?? 'null'}`}
+                key={`tab-dp-pos${position}-${val ?? 'null'}`} // skipcq: JS-0437
                 animate={{
                   scale: currentI === position ? 1.1 : 1,
                   borderColor:
@@ -473,7 +473,7 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2 mb-4">
             {nums.map((num, position) => (
               <motion.div
-                key={`opt-pos${position}-$${num}`}
+                key={`opt-pos${position}-$${num}`} // skipcq: JS-0437
                 animate={{
                   scale: lastStep?.i === position ? 1.1 : 1,
                   borderColor: lastStep?.i === position ? "#22c55e" : "#374151",

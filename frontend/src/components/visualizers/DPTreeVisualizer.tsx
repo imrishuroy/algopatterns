@@ -178,9 +178,9 @@ export default function DPTreeVisualizer({
   const buildRobberTree = useCallback(
     function buildRobberTree(
     nums: number[],
-    i: number = 0,
-    depth: number = 0,
-    id: string = "0",
+    i = 0,
+    depth = 0,
+    id = "0",
     memo: Set<number> = new Set()
   ): TreeNode | null {
     if (i >= nums.length) {

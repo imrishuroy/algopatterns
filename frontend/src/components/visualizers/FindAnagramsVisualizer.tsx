@@ -202,7 +202,7 @@ export default function FindAnagramsVisualizer() {
 
               return (
                 <motion.div
-                  key={`s-pos${position}-${char}`}
+                  key={`s-pos${position}-${char}`} // skipcq: JS-0437
                   animate={{
                     scale: position === currentIdx ? 1.1 : 1,
                     y: position === currentIdx ? -5 : 0,

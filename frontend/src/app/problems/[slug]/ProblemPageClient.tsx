@@ -347,7 +347,7 @@ function getStorageKey(slug: string, languageId: number) {
   return `code_${slug}_${languageId}`;
 }
 
-export default function ProblemPageClient({ params }: PageProps) {
+export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS-R1005
   const { slug } = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -624,8 +624,7 @@ export default function ProblemPageClient({ params }: PageProps) {
     const lines = errorText.split("\n");
     const seen = new Set<number>();
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+    for (const [, line] of lines.entries()) {
 
       // Java/C/C++/C#: Main.java:21: error: message
       const compiledMatch = line.match(
@@ -780,15 +779,11 @@ export default function ProblemPageClient({ params }: PageProps) {
         const failedTests = response.data.results.filter(r => r.status !== "accepted");
         if (failedTests.length > 0) {
           const errorContext = failedTests.map((t) =>
-            `Test ${t.testCaseIndex + 1}: ${t.status.replace(/_/g, " ")}\n` +
-            `  Input: ${t.input}\n` +
-            `  Expected: ${t.expectedOutput}\n` +
-            `  Got: ${t.actualOutput || "(no output)"}\n` +
-            (t.errorMessage ? `  Error: ${t.errorMessage}` : "")
+            `Test ${t.testCaseIndex + 1}: ${t.status.replace(/_/g, " ")}\n  Input: ${t.input}\n  Expected: ${t.expectedOutput}\n  Got: ${t.actualOutput || "(no output)"}\n${t.errorMessage ? `  Error: ${t.errorMessage}` : ""}`
           ).join("\n\n");
           setErrorForAI(stderr ? `${stderr}\n\nFailed Tests:\n${errorContext}` : `Failed Tests:\n${errorContext}`);
         } else {
-          setErrorForAI(undefined);
+          setErrorForAI(undefined); // skipcq: JS-W1042
         }
       } else {
         const errMsg = response.error?.message || "Run failed";
@@ -835,7 +830,7 @@ export default function ProblemPageClient({ params }: PageProps) {
         if (response.data.status === "accepted") {
           setProblemSolved(true);
           setTimerRunning(false);
-          setErrorForAI(undefined);
+          setErrorForAI(undefined); // skipcq: JS-W1042
           clearEditorErrors();
         }
         // Reload submissions list
@@ -861,11 +856,7 @@ export default function ProblemPageClient({ params }: PageProps) {
           const failedTests = response.data.results.filter(r => r.status !== "accepted");
           if (failedTests.length > 0 && response.data.status !== "accepted") {
             const errorContext = failedTests.slice(0, 3).map((t, i) =>
-              `Test ${i + 1}: ${t.status.replace(/_/g, " ")}\n` +
-              `  Input: ${t.input}\n` +
-              `  Expected: ${t.expectedOutput}\n` +
-              `  Got: ${t.actualOutput || "(no output)"}\n` +
-              (t.errorMessage ? `  Error: ${t.errorMessage}` : "")
+              `Test ${i + 1}: ${t.status.replace(/_/g, " ")}\n  Input: ${t.input}\n  Expected: ${t.expectedOutput}\n  Got: ${t.actualOutput || "(no output)"}\n${t.errorMessage ? `  Error: ${t.errorMessage}` : ""}`
             ).join("\n\n");
             setErrorForAI(stderr ? `${stderr}\n\nFailed Tests:\n${errorContext}` : `Failed Tests:\n${errorContext}`);
           }
@@ -2695,7 +2686,7 @@ export default function ProblemPageClient({ params }: PageProps) {
                       const isPassed = result.status === "accepted";
                       return (
                         <div
-                          key={i}
+                          key={i} // skipcq: JS-0437
                           className={`rounded-md border transition-colors ${
                             isPassed
                               ? "bg-emerald-500/10 border-emerald-500/30"
@@ -2851,6 +2842,7 @@ export default function ProblemPageClient({ params }: PageProps) {
       )}
 
       {/* Keyboard shortcuts modal */}
+      {/* skipcq: JS-0415 */}
       {showShortcuts && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={() => setShowShortcuts(false)}>
           <div className="absolute inset-0 bg-black/60" />

@@ -1,5 +1,6 @@
 "use client";
 
+// skipcq: JS-0067 — Next.js error boundary convention
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 

@@ -11,6 +11,8 @@ import (
 
 	"log/slog"
 
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/imrishuroy/algopatterns/internal/ai"
@@ -39,9 +41,20 @@ func main() {
 
 	setupLogger(cfg.Logging)
 
+	if cfg.Sentry.DSN != "" {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn:         cfg.Sentry.DSN,
+			Environment: cfg.Sentry.Environment,
+		}); err != nil {
+			log.Fatal().Err(err).Msg("Failed to initialize Sentry")
+		}
+		log.Info().Str("environment", cfg.Sentry.Environment).Msg("Sentry initialized")
+	} else {
+		sentry.Init(sentry.ClientOptions{})
+	}
+
 	log.Info().Msg("Starting FANGReady API Server...")
 
-	// Initialize Prometheus metrics
 	metrics.Init()
 
 	db, err := repository.NewDatabase(&cfg.Database)
@@ -89,7 +102,6 @@ func main() {
 	webhookService := services.NewWebhookService(paymentRepo, razorpayClient, slog.Default())
 	featureAccess := services.NewFeatureAccess(paymentRepo)
 
-	// Initialize AI service
 	var aiService *ai.Service
 	if cfg.AI.Enabled {
 		llmManager := llm.NewManager(llm.ManagerConfig{
@@ -151,7 +163,6 @@ func main() {
 			},
 		}
 
-		// Initialize RAG service if OpenAI API key is available for embeddings
 		if cfg.AI.OpenAIAPIKey != "" {
 			embeddingProvider := rag.NewOpenAIEmbedding(rag.OpenAIEmbeddingConfig{
 				APIKey:     cfg.AI.OpenAIAPIKey,
@@ -214,6 +225,9 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 
 	rateLimiter := middleware.NewRateLimiter(cfg.Server.RateLimitRPS, cfg.Server.RateLimitBurst)
 
+	router.Use(sentrygin.New(sentrygin.Options{
+		Repanic: true,
+	}))
 	router.Use(middleware.Recovery())
 	router.Use(middleware.RequestID())
 	router.Use(middleware.Logger())
@@ -232,7 +246,6 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 	healthHandler := handlers.NewHealthHandler(db)
 	healthHandler.RegisterRoutes(&router.RouterGroup)
 
-	// Prometheus metrics endpoint
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	authMW := middleware.NewAuthMiddleware(authService)
@@ -267,7 +280,6 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 		paymentHandler := handlers.NewPaymentHandler(paymentService, webhookService, authMW)
 		paymentHandler.RegisterRoutes(v1)
 
-		// AI routes (only if service is enabled)
 		if aiService != nil {
 			aiChatRepo := repository.NewAIChatRepository(db)
 			aiHandler := aihandlers.NewHandler(aiService, authMW, aiChatRepo)

@@ -19,6 +19,12 @@ type Config struct {
 	Razorpay    RazorpayConfig
 	Email       EmailConfig
 	AI          AIConfig
+	Sentry      SentryConfig
+}
+
+type SentryConfig struct {
+	DSN         string
+	Environment string
 }
 
 type AIConfig struct {
@@ -205,6 +211,10 @@ func Load() (*Config, error) {
 			EmbeddingModel:     getEnv("EMBEDDING_MODEL", "text-embedding-3-small"),
 			FreeRequestsPerDay: getIntEnv("AI_FREE_REQUESTS_PER_DAY", 30),
 			MaxCodeLength:      getIntEnv("AI_MAX_CODE_LENGTH", 50000),
+		},
+		Sentry: SentryConfig{
+			DSN:         getEnv("SENTRY_DSN", ""),
+			Environment: getEnv("SENTRY_ENVIRONMENT", "development"),
 		},
 	}
 

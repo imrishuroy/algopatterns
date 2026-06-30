@@ -49,12 +49,7 @@ Sentry.init({
     }),
   ],
 
-  beforeSend(event: Sentry.ErrorEvent, hint: Sentry.EventHint) {
-    // skipcq: JS-0002 — Dev-only debug logging for Sentry events
-    if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
-      // eslint-disable-next-line no-console
-      console.log("[Sentry] Event captured:", event.event_id, hint.originalException);
-    }
+  beforeSend(event: Sentry.ErrorEvent) {
     return event;
   },
 });

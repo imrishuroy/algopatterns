@@ -97,7 +97,7 @@ export const startSpan = <T>(
   );
 };
 
-export const startSpanAsync = async <T>(
+export const startSpanAsync = <T>(
   name: string,
   operation: string,
   callback: () => Promise<T>

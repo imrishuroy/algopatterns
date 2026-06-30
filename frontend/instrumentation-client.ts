@@ -50,7 +50,9 @@ Sentry.init({
   ],
 
   beforeSend(event: Sentry.ErrorEvent, hint: Sentry.EventHint) {
-    if (process.env.NODE_ENV === "development") {
+    // skipcq: JS-0002 — Dev-only debug logging for Sentry events
+    if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
+      // eslint-disable-next-line no-console
       console.log("[Sentry] Event captured:", event.event_id, hint.originalException);
     }
     return event;

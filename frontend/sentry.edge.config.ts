@@ -26,10 +26,7 @@ Sentry.init({
     /^https:\/\/api\.algopatterns\.in/,
   ],
 
-  beforeSend(event: Sentry.ErrorEvent, hint: Sentry.EventHint) {
-    if (process.env.NODE_ENV === "development") {
-      console.log("[Sentry Edge] Event captured:", event.event_id, hint.originalException);
-    }
+  beforeSend(event: Sentry.ErrorEvent) {
     return event;
   },
 });

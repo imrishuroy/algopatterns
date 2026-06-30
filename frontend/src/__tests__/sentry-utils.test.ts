@@ -44,7 +44,7 @@ vi.mock("@sentry/nextjs", () => {
     getFeedback: mockGetFeedback,
     logger: mockLogger,
     metrics: mockMetrics,
-    Scope: class {},
+    Scope: Object,
     SeverityLevel: {},
   };
 });
@@ -211,7 +211,7 @@ describe("startSpan", () => {
 
 describe("startSpanAsync", () => {
   it("starts span and executes async callback", async () => {
-    const callback = vi.fn(async () => "async result");
+    const callback = vi.fn(() => Promise.resolve("async result"));
     const result = await startSpanAsync("async-span", "async.operation", callback);
 
     expect(mockSentry.startSpan).toHaveBeenCalledWith(
@@ -268,7 +268,9 @@ describe("showFeedback", () => {
   });
 
   it("handles missing feedback gracefully", () => {
-    vi.mocked(mockSentry.getFeedback).mockReturnValue(undefined);
+    vi.mocked(mockSentry.getFeedback).mockReturnValue(
+      undefined as unknown as ReturnType<typeof Sentry.getFeedback>
+    );
 
     expect(() => showFeedback()).not.toThrow();
   });
@@ -355,13 +357,13 @@ describe("logger", () => {
   it("logs info message", () => {
     logger.info("info message");
 
-    expect(mockSentry.logger.info).toHaveBeenCalledWith("info message", undefined);
+    expect(mockSentry.logger.info).toHaveBeenCalledWith("info message");
   });
 
   it("logs warn message", () => {
     logger.warn("warning message");
 
-    expect(mockSentry.logger.warn).toHaveBeenCalledWith("warning message", undefined);
+    expect(mockSentry.logger.warn).toHaveBeenCalledWith("warning message");
   });
 
   it("logs error message", () => {

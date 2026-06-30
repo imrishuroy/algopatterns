@@ -16,7 +16,7 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: (...args: unknown[]) => mockCaptureException(...args),
   withScope: (callback: (scope: unknown) => void) => mockWithScope(callback),
   getFeedback: () => mockGetFeedback(),
-  Scope: class {},
+  Scope: Object,
 }));
 
 import GlobalError from "@/app/global-error";

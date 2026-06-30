@@ -19,16 +19,16 @@ func init() {
 	sentry.Init(sentry.ClientOptions{})
 }
 
-func TestCaptureError_NilError(t *testing.T) {
+func TestCaptureError_NilError(_ *testing.T) {
 	CaptureError(context.Background(), nil, nil)
 }
 
-func TestCaptureError_WithError(t *testing.T) {
+func TestCaptureError_WithError(_ *testing.T) {
 	err := errors.New("test error")
 	CaptureError(context.Background(), err, map[string]string{"key": "value"})
 }
 
-func TestCaptureError_WithMultipleTags(t *testing.T) {
+func TestCaptureError_WithMultipleTags(_ *testing.T) {
 	err := errors.New("test error with multiple tags")
 	tags := map[string]string{
 		"service":  "api",
@@ -38,28 +38,28 @@ func TestCaptureError_WithMultipleTags(t *testing.T) {
 	CaptureError(context.Background(), err, tags)
 }
 
-func TestCaptureError_WithNilTags(t *testing.T) {
+func TestCaptureError_WithNilTags(_ *testing.T) {
 	err := errors.New("test error with nil tags")
 	CaptureError(context.Background(), err, nil)
 }
 
-func TestCaptureError_WithEmptyTags(t *testing.T) {
+func TestCaptureError_WithEmptyTags(_ *testing.T) {
 	err := errors.New("test error with empty tags")
 	CaptureError(context.Background(), err, map[string]string{})
 }
 
-func TestCaptureErrorWithContext_NilError(t *testing.T) {
+func TestCaptureErrorWithContext_NilError(_ *testing.T) {
 	CaptureErrorWithContext(context.Background(), nil, nil, nil)
 }
 
-func TestCaptureErrorWithContext_WithError(t *testing.T) {
+func TestCaptureErrorWithContext_WithError(_ *testing.T) {
 	err := errors.New("test error")
 	CaptureErrorWithContext(context.Background(), err, map[string]string{"key": "value"}, map[string]sentry.Context{
 		"custom": {"field": "value"},
 	})
 }
 
-func TestCaptureErrorWithContext_WithMultipleContexts(t *testing.T) {
+func TestCaptureErrorWithContext_WithMultipleContexts(_ *testing.T) {
 	err := errors.New("test error with multiple contexts")
 	tags := map[string]string{"service": "api"}
 	contexts := map[string]sentry.Context{
@@ -78,7 +78,7 @@ func TestCaptureErrorWithContext_WithMultipleContexts(t *testing.T) {
 	CaptureErrorWithContext(context.Background(), err, tags, contexts)
 }
 
-func TestCaptureErrorWithContext_NilContexts(t *testing.T) {
+func TestCaptureErrorWithContext_NilContexts(_ *testing.T) {
 	err := errors.New("test error with nil contexts")
 	CaptureErrorWithContext(context.Background(), err, map[string]string{"key": "value"}, nil)
 }
@@ -158,7 +158,7 @@ func TestCaptureErrorFromGin_WithoutSentryMiddleware(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
-func TestCaptureMessage(t *testing.T) {
+func TestCaptureMessage(_ *testing.T) {
 	CaptureMessage(context.Background(), "test message", sentry.LevelInfo)
 }
 
@@ -172,21 +172,21 @@ func TestCaptureMessage_AllLevels(t *testing.T) {
 	}
 
 	for _, level := range levels {
-		t.Run(fmt.Sprintf("Level_%s", level), func(t *testing.T) {
+		t.Run(fmt.Sprintf("Level_%s", level), func(_ *testing.T) {
 			CaptureMessage(context.Background(), fmt.Sprintf("test message at %s level", level), level)
 		})
 	}
 }
 
-func TestAddBreadcrumb(t *testing.T) {
+func TestAddBreadcrumb(_ *testing.T) {
 	AddBreadcrumb(context.Background(), "test", "test breadcrumb", map[string]interface{}{"key": "value"})
 }
 
-func TestAddBreadcrumb_WithNilData(t *testing.T) {
+func TestAddBreadcrumb_WithNilData(_ *testing.T) {
 	AddBreadcrumb(context.Background(), "navigation", "User clicked button", nil)
 }
 
-func TestAddBreadcrumb_WithComplexData(t *testing.T) {
+func TestAddBreadcrumb_WithComplexData(_ *testing.T) {
 	data := map[string]interface{}{
 		"user_id":    "user-123",
 		"action":     "click",
@@ -198,15 +198,15 @@ func TestAddBreadcrumb_WithComplexData(t *testing.T) {
 	AddBreadcrumb(context.Background(), "ui.interaction", "User submitted form", data)
 }
 
-func TestSetUser(t *testing.T) {
+func TestSetUser(_ *testing.T) {
 	SetUser(context.Background(), "user-123", "test@example.com", "testuser")
 }
 
-func TestSetUser_WithEmptyFields(t *testing.T) {
+func TestSetUser_WithEmptyFields(_ *testing.T) {
 	SetUser(context.Background(), "", "", "")
 }
 
-func TestSetUser_PartialInfo(t *testing.T) {
+func TestSetUser_PartialInfo(_ *testing.T) {
 	SetUser(context.Background(), "user-456", "", "")
 }
 
@@ -268,7 +268,7 @@ func TestStartSpan_WithEmptyOperation(t *testing.T) {
 	FinishSpan(span)
 }
 
-func TestFinishSpan_Nil(t *testing.T) {
+func TestFinishSpan_Nil(_ *testing.T) {
 	FinishSpan(nil)
 }
 
@@ -324,7 +324,7 @@ func TestIntegration_CaptureErrorAndSetUser(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
-func TestIntegration_SpanWithBreadcrumbs(t *testing.T) {
+func TestIntegration_SpanWithBreadcrumbs(_ *testing.T) {
 	span, ctx := StartSpan(context.Background(), "http.request", "Process request")
 
 	AddBreadcrumb(ctx, "validation", "Input validated", nil)

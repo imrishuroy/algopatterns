@@ -167,21 +167,37 @@ export function trackNavigation(from: string, to: string) {
 
 export const logger = {
   debug: (message: string, data?: Record<string, unknown>) => {
-    Sentry.logger.debug(message, data);
+    if (data) {
+      Sentry.logger.debug(message, data);
+    } else {
+      Sentry.logger.debug(message);
+    }
   },
   info: (message: string, data?: Record<string, unknown>) => {
-    Sentry.logger.info(message, data);
+    if (data) {
+      Sentry.logger.info(message, data);
+    } else {
+      Sentry.logger.info(message);
+    }
   },
   warn: (message: string, data?: Record<string, unknown>) => {
-    Sentry.logger.warn(message, data);
+    if (data) {
+      Sentry.logger.warn(message, data);
+    } else {
+      Sentry.logger.warn(message);
+    }
   },
   error: (message: string, data?: Record<string, unknown>) => {
-    Sentry.logger.error(message, data);
+    if (data) {
+      Sentry.logger.error(message, data);
+    } else {
+      Sentry.logger.error(message);
+    }
   },
 };
 
 export const metrics = {
-  count: (name: string, value: number = 1, tags?: Record<string, string>) => {
+  count: (name: string, value = 1, tags?: Record<string, string>) => {
     Sentry.metrics.count(name, value, { attributes: tags });
   },
   gauge: (name: string, value: number, tags?: Record<string, string>) => {

@@ -14,8 +14,8 @@ vi.mock("@sentry/nextjs", () => ({
   feedbackIntegration: mockFeedbackIntegration,
   captureRouterTransitionStart: mockCaptureRouterTransitionStart,
   captureRequestError: mockCaptureRequestError,
-  ErrorEvent: class {},
-  EventHint: class {},
+  ErrorEvent: Object,
+  EventHint: Object,
 }));
 
 beforeEach(() => {

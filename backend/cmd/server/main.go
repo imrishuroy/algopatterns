@@ -37,6 +37,12 @@ var (
 	BuildTime = "unknown"
 )
 
+func fatal(err error, msg string) {
+	sentry.CaptureException(err)
+	sentry.Flush(2 * time.Second)
+	log.Fatal().Err(err).Msg(msg)
+}
+
 func main() {
 	fmt.Println("Starting AlgoPatterns API server.....")
 
@@ -95,7 +101,7 @@ func main() {
 
 	db, err := repository.NewDatabase(&cfg.Database)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to database")
+		fatal(err, "Failed to connect to database")
 	}
 	defer db.Close()
 
@@ -235,7 +241,7 @@ func main() {
 			Msg("Server started")
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal().Err(err).Msg("Failed to start server")
+			fatal(err, "Failed to start server")
 		}
 	}()
 

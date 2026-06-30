@@ -1,13 +1,13 @@
 import * as Sentry from "@sentry/nextjs";
 
-export function captureError(
+export const captureError = (
   error: Error | unknown,
   context?: {
     tags?: Record<string, string>;
     extra?: Record<string, unknown>;
     level?: Sentry.SeverityLevel;
   }
-) {
+) => {
   if (!error) return;
 
   Sentry.withScope((scope: Sentry.Scope) => {
@@ -31,16 +31,16 @@ export function captureError(
       Sentry.captureMessage(String(error));
     }
   });
-}
+};
 
-export function captureMessage(
+export const captureMessage = (
   message: string,
   level: Sentry.SeverityLevel = "info",
   context?: {
     tags?: Record<string, string>;
     extra?: Record<string, unknown>;
   }
-) {
+) => {
   Sentry.withScope((scope: Sentry.Scope) => {
     scope.setLevel(level);
     if (context?.tags) {
@@ -55,9 +55,9 @@ export function captureMessage(
     }
     Sentry.captureMessage(message);
   });
-}
+};
 
-export function setUser(user: { id: string; email?: string; username?: string } | null) {
+export const setUser = (user: { id: string; email?: string; username?: string } | null) => {
   if (user) {
     Sentry.setUser({
       id: user.id,
@@ -67,27 +67,27 @@ export function setUser(user: { id: string; email?: string; username?: string } 
   } else {
     Sentry.setUser(null);
   }
-}
+};
 
-export function addBreadcrumb(
+export const addBreadcrumb = (
   category: string,
   message: string,
   data?: Record<string, unknown>,
   level: Sentry.SeverityLevel = "info"
-) {
+) => {
   Sentry.addBreadcrumb({
     category,
     message,
     data,
     level,
   });
-}
+};
 
-export function startSpan<T>(
+export const startSpan = <T>(
   name: string,
   operation: string,
   callback: () => T
-): T {
+): T => {
   return Sentry.startSpan(
     {
       name,
@@ -95,13 +95,13 @@ export function startSpan<T>(
     },
     callback
   );
-}
+};
 
-export async function startSpanAsync<T>(
+export const startSpanAsync = async <T>(
   name: string,
   operation: string,
   callback: () => Promise<T>
-): Promise<T> {
+): Promise<T> => {
   return Sentry.startSpan(
     {
       name,
@@ -109,21 +109,21 @@ export async function startSpanAsync<T>(
     },
     callback
   );
-}
+};
 
-export function setContext(name: string, context: Record<string, unknown> | null) {
+export const setContext = (name: string, context: Record<string, unknown> | null) => {
   Sentry.setContext(name, context);
-}
+};
 
-export function setTag(key: string, value: string) {
+export const setTag = (key: string, value: string) => {
   Sentry.setTag(key, value);
-}
+};
 
-export function setTags(tags: Record<string, string>) {
+export const setTags = (tags: Record<string, string>) => {
   Sentry.setTags(tags);
-}
+};
 
-export function showFeedback() {
+export const showFeedback = () => {
   const feedback = Sentry.getFeedback();
   if (feedback) {
     feedback.createForm().then((form: { appendToDom: () => void; open: () => void }) => {
@@ -131,14 +131,14 @@ export function showFeedback() {
       form.open();
     });
   }
-}
+};
 
-export function trackApiCall(
+export const trackApiCall = (
   endpoint: string,
   method: string,
   status: number,
   duration: number
-) {
+) => {
   addBreadcrumb(
     "http",
     `${method} ${endpoint}`,
@@ -150,20 +150,20 @@ export function trackApiCall(
     },
     status >= 400 ? "error" : "info"
   );
-}
+};
 
-export function trackUserAction(action: string, data?: Record<string, unknown>) {
+export const trackUserAction = (action: string, data?: Record<string, unknown>) => {
   addBreadcrumb("user", action, data, "info");
-}
+};
 
-export function trackNavigation(from: string, to: string) {
+export const trackNavigation = (from: string, to: string) => {
   addBreadcrumb(
     "navigation",
     `Navigated from ${from} to ${to}`,
     { from, to },
     "info"
   );
-}
+};
 
 export const logger = {
   debug: (message: string, data?: Record<string, unknown>) => {

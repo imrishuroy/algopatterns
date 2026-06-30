@@ -31,6 +31,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var (
+	GitCommit = "unknown"
+	GitTag    = "unknown"
+	BuildTime = "unknown"
+)
+
 func main() {
 	fmt.Println("Starting AlgoPatterns API server.....")
 
@@ -42,13 +48,43 @@ func main() {
 	setupLogger(cfg.Logging)
 
 	if cfg.Sentry.DSN != "" {
+		release := cfg.Sentry.Release
+		if release == "" {
+			if GitTag != "unknown" && GitTag != "" {
+				release = GitTag
+			} else if GitCommit != "unknown" && GitCommit != "" {
+				release = GitCommit
+			}
+		}
+
 		if err := sentry.Init(sentry.ClientOptions{
-			Dsn:         cfg.Sentry.DSN,
-			Environment: cfg.Sentry.Environment,
+			Dsn:              cfg.Sentry.DSN,
+			Environment:      cfg.Sentry.Environment,
+			Release:          release,
+			Debug:            cfg.Sentry.Debug,
+			SampleRate:       cfg.Sentry.SampleRate,
+			EnableTracing:    cfg.Sentry.EnableTracing,
+			TracesSampleRate: cfg.Sentry.TracesSampleRate,
+			AttachStacktrace: cfg.Sentry.AttachStacktrace,
+			SendDefaultPII:   cfg.Sentry.SendDefaultPII,
+			MaxBreadcrumbs:   cfg.Sentry.MaxBreadcrumbs,
+			ServerName:       cfg.Sentry.ServerName,
+			DisableLogs:      cfg.Sentry.DisableLogs,
+			DisableMetrics:   cfg.Sentry.DisableMetrics,
+			MaxSpans:         cfg.Sentry.MaxSpans,
 		}); err != nil {
 			log.Fatal().Err(err).Msg("Failed to initialize Sentry")
 		}
-		log.Info().Str("environment", cfg.Sentry.Environment).Msg("Sentry initialized")
+		defer sentry.Flush(2 * time.Second)
+		log.Info().
+			Str("environment", cfg.Sentry.Environment).
+			Str("release", release).
+			Str("git_commit", GitCommit).
+			Str("git_tag", GitTag).
+			Str("build_time", BuildTime).
+			Bool("tracing", cfg.Sentry.EnableTracing).
+			Float64("traces_sample_rate", cfg.Sentry.TracesSampleRate).
+			Msg("Sentry initialized")
 	} else {
 		sentry.Init(sentry.ClientOptions{})
 	}
@@ -226,7 +262,9 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 	rateLimiter := middleware.NewRateLimiter(cfg.Server.RateLimitRPS, cfg.Server.RateLimitBurst)
 
 	router.Use(sentrygin.New(sentrygin.Options{
-		Repanic: true,
+		Repanic:         true,
+		WaitForDelivery: false,
+		Timeout:         2 * time.Second,
 	}))
 	router.Use(middleware.Recovery())
 	router.Use(middleware.RequestID())

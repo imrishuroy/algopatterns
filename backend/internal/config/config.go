@@ -23,8 +23,21 @@ type Config struct {
 }
 
 type SentryConfig struct {
-	DSN         string
-	Environment string
+	DSN              string
+	Environment      string
+	Release          string
+	Debug            bool
+	SampleRate       float64
+	TracesSampleRate float64
+	EnableTracing    bool
+	AttachStacktrace bool
+	SendDefaultPII   bool
+	MaxBreadcrumbs   int
+	ServerName       string
+	DisableLogs      bool
+	DisableMetrics   bool
+	TracePropagation bool
+	MaxSpans         int
 }
 
 type AIConfig struct {
@@ -213,8 +226,21 @@ func Load() (*Config, error) {
 			MaxCodeLength:      getIntEnv("AI_MAX_CODE_LENGTH", 50000),
 		},
 		Sentry: SentryConfig{
-			DSN:         getEnv("SENTRY_DSN", ""),
-			Environment: getEnv("SENTRY_ENVIRONMENT", "development"),
+			DSN:              getEnv("SENTRY_DSN", ""),
+			Environment:      getEnv("SENTRY_ENVIRONMENT", "development"),
+			Release:          getEnv("SENTRY_RELEASE", ""),
+			Debug:            getBoolEnv("SENTRY_DEBUG", false),
+			SampleRate:       getFloatEnv("SENTRY_SAMPLE_RATE", 1.0),
+			TracesSampleRate: getFloatEnv("SENTRY_TRACES_SAMPLE_RATE", 0.1),
+			EnableTracing:    getBoolEnv("SENTRY_ENABLE_TRACING", true),
+			AttachStacktrace: getBoolEnv("SENTRY_ATTACH_STACKTRACE", true),
+			SendDefaultPII:   getBoolEnv("SENTRY_SEND_DEFAULT_PII", false),
+			MaxBreadcrumbs:   getIntEnv("SENTRY_MAX_BREADCRUMBS", 100),
+			ServerName:       getEnv("SENTRY_SERVER_NAME", ""),
+			DisableLogs:      getBoolEnv("SENTRY_DISABLE_LOGS", false),
+			DisableMetrics:   getBoolEnv("SENTRY_DISABLE_METRICS", false),
+			TracePropagation: getBoolEnv("SENTRY_TRACE_PROPAGATION", true),
+			MaxSpans:         getIntEnv("SENTRY_MAX_SPANS", 1000),
 		},
 	}
 

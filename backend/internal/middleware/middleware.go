@@ -1,10 +1,13 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/imrishuroy/algopatterns/pkg/response"
@@ -73,6 +76,22 @@ func Recovery() gin.HandlerFunc {
 					Interface("error", err).
 					Str("path", c.Request.URL.Path).
 					Msg("panic recovered")
+
+				if hub := sentrygin.GetHubFromContext(c); hub != nil {
+					hub.WithScope(func(scope *sentry.Scope) {
+						scope.SetTag("request_id", rid)
+						scope.SetContext("request", sentry.Context{
+							"path":      c.Request.URL.Path,
+							"method":    c.Request.Method,
+							"client_ip": c.ClientIP(),
+						})
+						if e, ok := err.(error); ok {
+							hub.CaptureException(e)
+						} else {
+							hub.CaptureMessage(fmt.Sprintf("panic: %v", err))
+						}
+					})
+				}
 
 				response.InternalError(c)
 				c.Abort()

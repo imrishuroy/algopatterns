@@ -51,6 +51,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history and tags for version detection
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -64,10 +66,24 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
 
+      - name: Get version info
+        id: version
+        run: |
+          GIT_TAG=$(git describe --tags --always 2>/dev/null || echo "unknown")
+          GIT_COMMIT=$(git rev-parse --short HEAD)
+          BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "git_tag=$GIT_TAG" >> $GITHUB_OUTPUT
+          echo "git_commit=$GIT_COMMIT" >> $GITHUB_OUTPUT
+          echo "build_time=$BUILD_TIME" >> $GITHUB_OUTPUT
+          echo "Version: $GIT_TAG ($GIT_COMMIT)"
+
       - name: Build Docker image
         working-directory: backend
         run: |
           docker build \
+            --build-arg GIT_COMMIT=${{ steps.version.outputs.git_commit }} \
+            --build-arg GIT_TAG=${{ steps.version.outputs.git_tag }} \
+            --build-arg BUILD_TIME=${{ steps.version.outputs.build_time }} \
             -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/algopatterns/${{ env.SERVICE_NAME }}:${{ github.sha }} \
             -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/algopatterns/${{ env.SERVICE_NAME }}:latest \
             .

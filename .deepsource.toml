@@ -13,7 +13,9 @@ exclude_patterns = [
   "**/node_modules/**",
   "frontend/coverage/**",
   "backend/migrations/**",
-  "backend/bin/**"
+  "backend/bin/**",
+  ".agents/**",
+  ".claude/**"
 ]
 
 [[analyzers]]

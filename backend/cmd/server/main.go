@@ -31,6 +31,18 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var (
+	GitCommit = "unknown"
+	GitTag    = "unknown"
+	BuildTime = "unknown"
+)
+
+func fatal(err error, msg string) {
+	sentry.CaptureException(err)
+	sentry.Flush(2 * time.Second)
+	log.Fatal().Err(err).Msg(msg)
+}
+
 func main() {
 	fmt.Println("Starting AlgoPatterns API server.....")
 
@@ -42,13 +54,43 @@ func main() {
 	setupLogger(cfg.Logging)
 
 	if cfg.Sentry.DSN != "" {
+		release := cfg.Sentry.Release
+		if release == "" {
+			if GitTag != "unknown" && GitTag != "" {
+				release = GitTag
+			} else if GitCommit != "unknown" && GitCommit != "" {
+				release = GitCommit
+			}
+		}
+
 		if err := sentry.Init(sentry.ClientOptions{
-			Dsn:         cfg.Sentry.DSN,
-			Environment: cfg.Sentry.Environment,
+			Dsn:              cfg.Sentry.DSN,
+			Environment:      cfg.Sentry.Environment,
+			Release:          release,
+			Debug:            cfg.Sentry.Debug,
+			SampleRate:       cfg.Sentry.SampleRate,
+			EnableTracing:    cfg.Sentry.EnableTracing,
+			TracesSampleRate: cfg.Sentry.TracesSampleRate,
+			AttachStacktrace: cfg.Sentry.AttachStacktrace,
+			SendDefaultPII:   cfg.Sentry.SendDefaultPII,
+			MaxBreadcrumbs:   cfg.Sentry.MaxBreadcrumbs,
+			ServerName:       cfg.Sentry.ServerName,
+			DisableLogs:      cfg.Sentry.DisableLogs,
+			DisableMetrics:   cfg.Sentry.DisableMetrics,
+			MaxSpans:         cfg.Sentry.MaxSpans,
 		}); err != nil {
 			log.Fatal().Err(err).Msg("Failed to initialize Sentry")
 		}
-		log.Info().Str("environment", cfg.Sentry.Environment).Msg("Sentry initialized")
+		defer sentry.Flush(2 * time.Second)
+		log.Info().
+			Str("environment", cfg.Sentry.Environment).
+			Str("release", release).
+			Str("git_commit", GitCommit).
+			Str("git_tag", GitTag).
+			Str("build_time", BuildTime).
+			Bool("tracing", cfg.Sentry.EnableTracing).
+			Float64("traces_sample_rate", cfg.Sentry.TracesSampleRate).
+			Msg("Sentry initialized")
 	} else {
 		sentry.Init(sentry.ClientOptions{})
 	}
@@ -59,7 +101,7 @@ func main() {
 
 	db, err := repository.NewDatabase(&cfg.Database)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to database")
+		fatal(err, "Failed to connect to database")
 	}
 	defer db.Close()
 
@@ -199,7 +241,7 @@ func main() {
 			Msg("Server started")
 
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal().Err(err).Msg("Failed to start server")
+			fatal(err, "Failed to start server")
 		}
 	}()
 
@@ -226,7 +268,9 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 	rateLimiter := middleware.NewRateLimiter(cfg.Server.RateLimitRPS, cfg.Server.RateLimitBurst)
 
 	router.Use(sentrygin.New(sentrygin.Options{
-		Repanic: true,
+		Repanic:         true,
+		WaitForDelivery: false,
+		Timeout:         2 * time.Second,
 	}))
 	router.Use(middleware.Recovery())
 	router.Use(middleware.RequestID())

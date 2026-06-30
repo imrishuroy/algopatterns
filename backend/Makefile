@@ -6,6 +6,11 @@ MAIN_PATH=./cmd/server
 DOCKER_IMAGE=algopatterns-api
 VERSION?=1.0.0
 
+# Git info for Sentry release tracking
+GIT_COMMIT?=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+GIT_TAG?=$(shell git describe --tags --always 2>/dev/null || echo "unknown")
+BUILD_TIME?=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+
 # Go parameters
 GOCMD=go
 GOBUILD=$(GOCMD) build
@@ -15,7 +20,7 @@ GOVET=$(GOCMD) vet
 GOFMT=gofmt
 
 # Build flags
-LDFLAGS=-ldflags "-w -s -X main.Version=$(VERSION)"
+LDFLAGS=-ldflags "-w -s -X main.Version=$(VERSION) -X main.GitCommit=$(GIT_COMMIT) -X main.GitTag=$(GIT_TAG) -X main.BuildTime=$(BUILD_TIME)"
 
 all: deps lint test build
 
@@ -68,9 +73,14 @@ clean:
 	rm -f coverage.out coverage.html
 
 ## docker-build: Build Docker image
-docker-build: build-linux
+docker-build:
 	@echo "Building Docker image..."
-	docker build -t $(DOCKER_IMAGE):$(VERSION) -t $(DOCKER_IMAGE):latest .
+	docker build \
+		--build-arg GIT_COMMIT=$(GIT_COMMIT) \
+		--build-arg GIT_TAG=$(GIT_TAG) \
+		--build-arg BUILD_TIME=$(BUILD_TIME) \
+		-t $(DOCKER_IMAGE):$(VERSION) \
+		-t $(DOCKER_IMAGE):latest .
 
 ## docker-run: Run Docker container
 docker-run:

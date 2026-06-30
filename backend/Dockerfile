@@ -1,6 +1,11 @@
 # Build stage
 FROM golang:1.26-alpine AS builder
 
+# Build arguments for version info
+ARG GIT_COMMIT=unknown
+ARG GIT_TAG=unknown
+ARG BUILD_TIME=unknown
+
 # Install build dependencies
 RUN apk add --no-cache git ca-certificates tzdata
 
@@ -16,9 +21,9 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the binary
+# Build the binary with version info embedded
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-    -ldflags="-w -s" \
+    -ldflags="-w -s -X main.GitCommit=${GIT_COMMIT} -X main.GitTag=${GIT_TAG} -X main.BuildTime=${BUILD_TIME}" \
     -o /app/bin/algopatterns-api \
     ./cmd/server
 

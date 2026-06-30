@@ -281,7 +281,7 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     cfg.Server.AllowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Request-ID", "Idempotency-Key"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Request-ID", "Idempotency-Key", "sentry-trace", "baggage"},
 		ExposeHeaders:    []string{"X-Request-ID", "Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,

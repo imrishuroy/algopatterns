@@ -17,7 +17,7 @@ const TARGET_N = 5;
 
 const buildTree = (
   n: number,
-  depth: number = 0,
+  depth = 0,
   memo: Set<number> = new Set()
 ): TreeNode | null => {
   if (depth > 5) return null;

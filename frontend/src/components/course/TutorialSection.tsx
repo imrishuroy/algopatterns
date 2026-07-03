@@ -93,344 +93,6 @@ interface TutorialSectionProps {
   sectionIndex: number;
 }
 
-const TutorialSection: React.FC<TutorialSectionProps> = ({
-  pattern,
-  section,
-  sectionIndex,
-}) => {
-  const { language: currentLang, setLanguage: setCurrentLang } = useLanguage();
-
-  // Get available approaches from section (for code examples)
-  const availableApproaches = section.approaches
-    ? (Object.keys(section.approaches) as DPApproach[]).filter(
-        (key) => section.approaches?.[key]?.java || section.approaches?.[key]?.javascript
-      )
-    : [];
-
-  // Get available templates (for pseudocode/templates)
-  const availableTemplates = section.templates
-    ? (Object.keys(section.templates) as DPApproach[]).filter(
-        (key) => section.templates?.[key]
-      )
-    : [];
-
-  const [selectedApproach, setSelectedApproach] = useState<DPApproach>(
-    availableApproaches[0] || availableTemplates[0] || "recursion"
-  );
-
-  const [selectedTemplate, setSelectedTemplate] = useState<DPApproach>(
-    availableTemplates[0] || "recursion"
-  );
-
-  return (
-    <article className="scroll-mt-24" id={`section-${sectionIndex}`}>
-      {/* Section Header */}
-      <div className="flex items-baseline gap-3 mb-6">
-        <span className="text-indigo-400 font-mono text-lg">
-          {sectionIndex + 1}.
-        </span>
-        <h2 className="text-2xl font-bold text-white">{section.title}</h2>
-      </div>
-
-      {/* Section Content */}
-      <div className="pl-7">
-        <div className="tutorial-content">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              p: ({ children }) => (
-                <p className="text-gray-300 leading-relaxed mb-5">
-                  {children}
-                </p>
-              ),
-              strong: ({ children }) => (
-                <strong className="text-white font-semibold">
-                  {children}
-                </strong>
-              ),
-              h1: ({ children }) => (
-                <h3 className="text-2xl font-bold text-white mt-8 mb-4">
-                  {children}
-                </h3>
-              ),
-              h2: ({ children }) => (
-                <h4 className="text-xl font-semibold text-white mt-6 mb-3">
-                  {children}
-                </h4>
-              ),
-              h3: ({ children }) => (
-                <h5 className="text-lg font-semibold text-indigo-400 mt-5 mb-2">
-                  {children}
-                </h5>
-              ),
-              ul: ({ children }) => (
-                <ul className="space-y-2 my-4">{children}</ul>
-              ),
-              ol: ({ children }) => (
-                <ol className="space-y-2 my-4 counter-reset-item">
-                  {children}
-                </ol>
-              ),
-              li: ({ children, ...props }) => {
-                const isOrdered =
-                  props.node?.position &&
-                  props.node.position.start.column > 1;
-                return (
-                  <li className="text-gray-300 leading-relaxed flex items-start gap-2">
-                    <span className="text-indigo-400 flex-shrink-0 select-none">
-                      {isOrdered ? "" : "•"}
-                    </span>
-                    <span>{children}</span>
-                  </li>
-                );
-              },
-              code: ({ className, children, ...props }) => {
-                const content = String(children).replace(/\n$/, "");
-                const languageMatch = className?.match(/language-(\w+)/);
-                const language = languageMatch ? languageMatch[1] : null;
-
-                const isBlock =
-                  className?.includes("language-") ||
-                  (typeof children === "string" && children.includes("\n")) ||
-                  props.node?.position?.start.line !== props.node?.position?.end.line;
-
-                if (isBlock) {
-                  // Detect language from content
-                  const detectLanguage = (code: string): { lang: string; label?: string } | null => {
-                    // Java-specific patterns (type declarations, generics, etc.)
-                    if (code.match(/\b(int|boolean|void|public|private|String|Integer|Map<|List<|new \w+\()\b/) ||
-                        code.match(/for\s*\(\s*int\s/)) {
-                      return { lang: "java" };
-                    }
-                    // Python-specific patterns (must have actual Python syntax, not just colons)
-                    if (code.match(/\bdef\s+\w+\s*\(/) || code.includes("elif ") ||
-                        code.match(/^\s*(import|from)\s+\w+/m) || code.includes("self.")) {
-                      return { lang: "python" };
-                    }
-                    // Generic code-like content (pseudocode/template)
-                    if (code.includes("//") || code.match(/\breturn\b/) || code.includes("if (") ||
-                        code.includes("function") || code.includes("for (") || code.includes("while (") ||
-                        code.includes("=>") || code.includes("const ") || code.includes("let ") ||
-                        code.match(/\bf\(\w+\)\s*=/) || code.match(/memo\[/)) {
-                      return { lang: "javascript", label: "Template" };
-                    }
-                    return null;
-                  };
-
-                  // Programming languages that should show with their name
-                  const knownLanguages = ["java", "javascript", "js", "python", "py", "cpp", "c", "go", "typescript", "ts"];
-                  const hasKnownLanguage = language && knownLanguages.includes(language.toLowerCase());
-
-                  if (hasKnownLanguage) {
-                    // Explicit language specified - use CodeBlock with that language
-                    return (
-                      <div className="my-6">
-                        <CodeBlock
-                          code={content}
-                          language={language}
-                          showCopy={true}
-                        />
-                      </div>
-                    );
-                  }
-
-                  const detected = detectLanguage(content);
-                  if (detected) {
-                    return (
-                      <div className="my-6">
-                        <CodeBlock
-                          code={content}
-                          language={detected.lang}
-                          label={detected.label}
-                          showCopy={true}
-                        />
-                      </div>
-                    );
-                  }
-
-                  // For plain text blocks (examples, output), use simple styling
-                  const lines = content.split("\n");
-                  return (
-                    <div className="my-6 rounded-md overflow-hidden bg-gray-900/80 border border-gray-800">
-                      <div className="p-4 overflow-x-auto">
-                        {lines.map((line, i) => (
-                          <div key={i} className="leading-relaxed">
-                            <span className="text-sm font-mono whitespace-pre text-gray-300">
-                              {line || " "}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Inline code
-                return (
-                  <code className="px-1.5 py-0.5 bg-gray-800/80 text-indigo-300 rounded text-[0.9em] font-mono border border-gray-700/50">
-                    {children}
-                  </code>
-                );
-              },
-              pre: ({ children }) => <>{children}</>,
-              table: ({ children }) => (
-                <div className="my-8 overflow-x-auto rounded-md border border-gray-800 bg-gray-900/50">
-                  <table className="w-full border-collapse min-w-[500px]">
-                    {children}
-                  </table>
-                </div>
-              ),
-              thead: ({ children }) => (
-                <thead className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-b border-gray-700">
-                  {children}
-                </thead>
-              ),
-              tbody: ({ children }) => (
-                <tbody className="divide-y divide-gray-800">
-                  {children}
-                </tbody>
-              ),
-              tr: ({ children }) => (
-                <tr className="hover:bg-gray-800/30 transition-colors">
-                  {children}
-                </tr>
-              ),
-              th: ({ children }) => (
-                <th className="px-5 py-4 text-left text-sm font-bold text-indigo-300 uppercase tracking-wider">
-                  {children}
-                </th>
-              ),
-              td: ({ children }) => (
-                <td className="px-5 py-4 text-gray-300 text-sm">
-                  {children}
-                </td>
-              ),
-              blockquote: ({ children }) => (
-                <blockquote className="my-6 pl-4 border-l-4 border-indigo-500 bg-indigo-500/10 py-3 pr-4 rounded-r-md">
-                  {children}
-                </blockquote>
-              ),
-            }}
-          >
-            {section.content}
-          </ReactMarkdown>
-        </div>
-
-        {/* Templates - Pseudocode with approach tabs */}
-        {section.templates && availableTemplates.length > 0 && (
-          <div className="mt-8">
-            <h4 className="text-base font-semibold text-gray-300 mb-3">Template</h4>
-            {/* Template Approach Tabs */}
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              {availableTemplates.map((approach) => (
-                <button
-                  key={approach}
-                  onClick={() => setSelectedTemplate(approach)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all ${
-                    selectedTemplate === approach
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-400 hover:text-gray-300 hover:bg-gray-800 border border-gray-700"
-                  }`}
-                >
-                  {APPROACH_LABELS[approach]}
-                </button>
-              ))}
-            </div>
-            <CodeBlock
-              code={section.templates[selectedTemplate] || ""}
-              language="javascript"
-              label="Template"
-              showCopy={true}
-            />
-          </div>
-        )}
-
-        {/* Code Block - Approaches (for DP patterns) */}
-        {section.approaches && availableApproaches.length > 0 && (
-          <div className="mt-8">
-            <h4 className="text-base font-semibold text-gray-300 mb-3">Example: {section.exampleName || "Code"}</h4>
-            {/* Approach Tabs */}
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              {availableApproaches.map((approach) => (
-                <button
-                  key={approach}
-                  onClick={() => setSelectedApproach(approach)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all ${
-                    selectedApproach === approach
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-400 hover:text-gray-300 hover:bg-gray-800 border border-gray-700"
-                  }`}
-                >
-                  {APPROACH_LABELS[approach]}
-                </button>
-              ))}
-              <div className="flex-1" />
-              <LanguageToggle
-                currentLang={currentLang}
-                onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
-                languages={
-                  Object.keys(section.approaches[selectedApproach] || {}).filter(
-                    (k) => section.approaches?.[selectedApproach]?.[k as "java" | "javascript"]
-                  )
-                }
-                size="sm"
-              />
-            </div>
-            <CodeBlock
-              code={
-                section.approaches[selectedApproach]?.[currentLang as "java" | "javascript"] ||
-                section.approaches[selectedApproach]?.java ||
-                section.approaches[selectedApproach]?.javascript ||
-                ""
-              }
-              language={currentLang}
-              collapsible={true}
-              highlightable
-              contentType="tutorial_code"
-              contentId={`${pattern.id}:section-${sectionIndex}:${selectedApproach}:${currentLang}`}
-            />
-          </div>
-        )}
-
-        {/* Code Block - Simple (for non-DP patterns) */}
-        {section.code && !section.approaches && (
-          <div className="mt-8">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-400">
-                Code
-              </span>
-              <LanguageToggle
-                currentLang={currentLang}
-                onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
-                languages={Object.keys(section.code).filter(
-                  (k) => section.code?.[k as keyof typeof section.code]
-                )}
-                size="sm"
-              />
-            </div>
-            <CodeBlock
-              code={
-                section.code[currentLang as keyof typeof section.code] ||
-                section.code.java ||
-                section.code.javascript ||
-                ""
-              }
-              language={currentLang}
-              collapsible={true}
-              highlightable
-              contentType="tutorial_code"
-              contentId={`${pattern.id}:section-${sectionIndex}:${currentLang}`}
-            />
-          </div>
-        )}
-
-        {/* Visualizers - Render based on pattern category and section title */}
-        {renderVisualizers(pattern, section)}
-      </div>
-    </article>
-  );
-};
-
 const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
   const cat = pattern.category;
   const title = section.title;
@@ -945,6 +607,344 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
         </div>
       )}
     </>
+  );
+};
+
+const TutorialSection: React.FC<TutorialSectionProps> = ({
+  pattern,
+  section,
+  sectionIndex,
+}) => {
+  const { language: currentLang, setLanguage: setCurrentLang } = useLanguage();
+
+  // Get available approaches from section (for code examples)
+  const availableApproaches = section.approaches
+    ? (Object.keys(section.approaches) as DPApproach[]).filter(
+        (key) => section.approaches?.[key]?.java || section.approaches?.[key]?.javascript
+      )
+    : [];
+
+  // Get available templates (for pseudocode/templates)
+  const availableTemplates = section.templates
+    ? (Object.keys(section.templates) as DPApproach[]).filter(
+        (key) => section.templates?.[key]
+      )
+    : [];
+
+  const [selectedApproach, setSelectedApproach] = useState<DPApproach>(
+    availableApproaches[0] || availableTemplates[0] || "recursion"
+  );
+
+  const [selectedTemplate, setSelectedTemplate] = useState<DPApproach>(
+    availableTemplates[0] || "recursion"
+  );
+
+  return (
+    <article className="scroll-mt-24" id={`section-${sectionIndex}`}>
+      {/* Section Header */}
+      <div className="flex items-baseline gap-3 mb-6">
+        <span className="text-indigo-400 font-mono text-lg">
+          {sectionIndex + 1}.
+        </span>
+        <h2 className="text-2xl font-bold text-white">{section.title}</h2>
+      </div>
+
+      {/* Section Content */}
+      <div className="pl-7">
+        <div className="tutorial-content">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ children }) => (
+                <p className="text-gray-300 leading-relaxed mb-5">
+                  {children}
+                </p>
+              ),
+              strong: ({ children }) => (
+                <strong className="text-white font-semibold">
+                  {children}
+                </strong>
+              ),
+              h1: ({ children }) => (
+                <h3 className="text-2xl font-bold text-white mt-8 mb-4">
+                  {children}
+                </h3>
+              ),
+              h2: ({ children }) => (
+                <h4 className="text-xl font-semibold text-white mt-6 mb-3">
+                  {children}
+                </h4>
+              ),
+              h3: ({ children }) => (
+                <h5 className="text-lg font-semibold text-indigo-400 mt-5 mb-2">
+                  {children}
+                </h5>
+              ),
+              ul: ({ children }) => (
+                <ul className="space-y-2 my-4">{children}</ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="space-y-2 my-4 counter-reset-item">
+                  {children}
+                </ol>
+              ),
+              li: ({ children, ...props }) => {
+                const isOrdered =
+                  props.node?.position &&
+                  props.node.position.start.column > 1;
+                return (
+                  <li className="text-gray-300 leading-relaxed flex items-start gap-2">
+                    <span className="text-indigo-400 flex-shrink-0 select-none">
+                      {isOrdered ? "" : "•"}
+                    </span>
+                    <span>{children}</span>
+                  </li>
+                );
+              },
+              code: ({ className, children, ...props }) => {
+                const content = String(children).replace(/\n$/, "");
+                const languageMatch = className?.match(/language-(\w+)/);
+                const language = languageMatch ? languageMatch[1] : null;
+
+                const isBlock =
+                  className?.includes("language-") ||
+                  (typeof children === "string" && children.includes("\n")) ||
+                  props.node?.position?.start.line !== props.node?.position?.end.line;
+
+                if (isBlock) {
+                  // Detect language from content
+                  const detectLanguage = (code: string): { lang: string; label?: string } | null => {
+                    // Java-specific patterns (type declarations, generics, etc.)
+                    if (code.match(/\b(int|boolean|void|public|private|String|Integer|Map<|List<|new \w+\()\b/) ||
+                        code.match(/for\s*\(\s*int\s/)) {
+                      return { lang: "java" };
+                    }
+                    // Python-specific patterns (must have actual Python syntax, not just colons)
+                    if (code.match(/\bdef\s+\w+\s*\(/) || code.includes("elif ") ||
+                        code.match(/^\s*(import|from)\s+\w+/m) || code.includes("self.")) {
+                      return { lang: "python" };
+                    }
+                    // Generic code-like content (pseudocode/template)
+                    if (code.includes("//") || code.match(/\breturn\b/) || code.includes("if (") ||
+                        code.includes("function") || code.includes("for (") || code.includes("while (") ||
+                        code.includes("=>") || code.includes("const ") || code.includes("let ") ||
+                        code.match(/\bf\(\w+\)\s*=/) || code.match(/memo\[/)) {
+                      return { lang: "javascript", label: "Template" };
+                    }
+                    return null;
+                  };
+
+                  // Programming languages that should show with their name
+                  const knownLanguages = ["java", "javascript", "js", "python", "py", "cpp", "c", "go", "typescript", "ts"];
+                  const hasKnownLanguage = language && knownLanguages.includes(language.toLowerCase());
+
+                  if (hasKnownLanguage) {
+                    // Explicit language specified - use CodeBlock with that language
+                    return (
+                      <div className="my-6">
+                        <CodeBlock
+                          code={content}
+                          language={language}
+                          showCopy
+                        />
+                      </div>
+                    );
+                  }
+
+                  const detected = detectLanguage(content);
+                  if (detected) {
+                    return (
+                      <div className="my-6">
+                        <CodeBlock
+                              code={content}
+                              language={detected.lang}
+                              label={detected.label}
+                              showCopy
+                            />
+                      </div>
+                    );
+                  }
+
+                  // For plain text blocks (examples, output), use simple styling
+                  const lines = content.split("\n");
+                  return (
+                    <div className="my-6 rounded-md overflow-hidden bg-gray-900/80 border border-gray-800">
+                      <div className="p-4 overflow-x-auto">
+                        {lines.map((line, lineIndex) => (
+                          <div key={`line-${lineIndex}-${line.slice(0, 20)}`} className="leading-relaxed">
+                            <span className="text-sm font-mono whitespace-pre text-gray-300">
+                              {line || " "}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Inline code
+                return (
+                  <code className="px-1.5 py-0.5 bg-gray-800/80 text-indigo-300 rounded text-[0.9em] font-mono border border-gray-700/50">
+                    {children}
+                  </code>
+                );
+              },
+              pre: ({ children }) => children,
+              table: ({ children }) => (
+                <div className="my-8 overflow-x-auto rounded-md border border-gray-800 bg-gray-900/50">
+                  <table className="w-full border-collapse min-w-[500px]">
+                    {children}
+                  </table>
+                </div>
+              ),
+              thead: ({ children }) => (
+                <thead className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-b border-gray-700">
+                  {children}
+                </thead>
+              ),
+              tbody: ({ children }) => (
+                <tbody className="divide-y divide-gray-800">
+                  {children}
+                </tbody>
+              ),
+              tr: ({ children }) => (
+                <tr className="hover:bg-gray-800/30 transition-colors">
+                  {children}
+                </tr>
+              ),
+              th: ({ children }) => (
+                <th className="px-5 py-4 text-left text-sm font-bold text-indigo-300 uppercase tracking-wider">
+                  {children}
+                </th>
+              ),
+              td: ({ children }) => (
+                <td className="px-5 py-4 text-gray-300 text-sm">
+                  {children}
+                </td>
+              ),
+              blockquote: ({ children }) => (
+                <blockquote className="my-6 pl-4 border-l-4 border-indigo-500 bg-indigo-500/10 py-3 pr-4 rounded-r-md">
+                  {children}
+                </blockquote>
+              ),
+            }}
+          >
+            {section.content}
+          </ReactMarkdown>
+        </div>
+
+        {/* Templates - Pseudocode with approach tabs */}
+        {section.templates && availableTemplates.length > 0 && (
+          <div className="mt-8">
+            <h4 className="text-base font-semibold text-gray-300 mb-3">Template</h4>
+            {/* Template Approach Tabs */}
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {availableTemplates.map((approach) => (
+                <button
+                  key={approach}
+                  onClick={() => setSelectedTemplate(approach)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all ${
+                    selectedTemplate === approach
+                      ? "bg-indigo-600 text-white"
+                      : "text-gray-400 hover:text-gray-300 hover:bg-gray-800 border border-gray-700"
+                  }`}
+                >
+                  {APPROACH_LABELS[approach]}
+                </button>
+              ))}
+            </div>
+            <CodeBlock
+              code={section.templates[selectedTemplate] || ""}
+              language="javascript"
+              label="Template"
+              showCopy
+            />
+          </div>
+        )}
+
+        {/* Code Block - Approaches (for DP patterns) */}
+        {section.approaches && availableApproaches.length > 0 && (
+          <div className="mt-8">
+            <h4 className="text-base font-semibold text-gray-300 mb-3">Example: {section.exampleName || "Code"}</h4>
+            {/* Approach Tabs */}
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {availableApproaches.map((approach) => (
+                <button
+                  key={approach}
+                  onClick={() => setSelectedApproach(approach)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all ${
+                    selectedApproach === approach
+                      ? "bg-indigo-600 text-white"
+                      : "text-gray-400 hover:text-gray-300 hover:bg-gray-800 border border-gray-700"
+                  }`}
+                >
+                  {APPROACH_LABELS[approach]}
+                </button>
+              ))}
+              <div className="flex-1" />
+              <LanguageToggle
+                currentLang={currentLang}
+                onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
+                languages={
+                  Object.keys(section.approaches[selectedApproach] || {}).filter(
+                    (k) => section.approaches?.[selectedApproach]?.[k as "java" | "javascript"]
+                  )
+                }
+                size="sm"
+              />
+            </div>
+            <CodeBlock
+              code={
+                section.approaches[selectedApproach]?.[currentLang as "java" | "javascript"] ||
+                section.approaches[selectedApproach]?.java ||
+                section.approaches[selectedApproach]?.javascript ||
+                ""
+              }
+              language={currentLang}
+              collapsible
+              highlightable
+              contentType="tutorial_code"
+              contentId={`${pattern.id}:section-${sectionIndex}:${selectedApproach}:${currentLang}`}
+            />
+          </div>
+        )}
+
+        {/* Code Block - Simple (for non-DP patterns) */}
+        {section.code && !section.approaches && (
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-gray-400">
+                Code
+              </span>
+              <LanguageToggle
+                currentLang={currentLang}
+                onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
+                languages={Object.keys(section.code).filter(
+                  (k) => section.code?.[k as keyof typeof section.code]
+                )}
+                size="sm"
+              />
+            </div>
+            <CodeBlock
+              code={
+                section.code[currentLang as keyof typeof section.code] ||
+                section.code.java ||
+                section.code.javascript ||
+                ""
+              }
+              language={currentLang}
+              collapsible
+              highlightable
+              contentType="tutorial_code"
+              contentId={`${pattern.id}:section-${sectionIndex}:${currentLang}`}
+            />
+          </div>
+        )}
+
+        {/* Visualizers - Render based on pattern category and section title */}
+        {renderVisualizers(pattern, section)}
+      </div>
+    </article>
   );
 };
 

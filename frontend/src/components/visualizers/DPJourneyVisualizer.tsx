@@ -32,7 +32,7 @@ const capacity = 7;
 const buildTree = (
   index: number,
   cap: number,
-  depth: number = 0,
+  depth = 0,
   memo: Set<string> = new Set()
 ): TreeNode | null => {
   if (depth > 3) return null;

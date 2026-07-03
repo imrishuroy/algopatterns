@@ -158,6 +158,37 @@ vi.mock("@/components/quiz", () => ({
   ),
 }));
 
+// Context mocks
+
+vi.mock("@/contexts/PatternProgressContext", () => ({
+  usePatternProgress: () => ({
+    isCompleted: vi.fn().mockReturnValue(false),
+    markComplete: vi.fn(),
+    markIncomplete: vi.fn(),
+    toggleComplete: vi.fn(),
+    getCompletedCount: vi.fn().mockReturnValue(0),
+    getProgress: vi.fn().mockReturnValue(0),
+  }),
+}));
+
+vi.mock("@/contexts/HighlightContext", () => ({
+  useHighlights: () => ({
+    highlights: [],
+    loading: false,
+    createHighlight: vi.fn(),
+    updateHighlight: vi.fn(),
+    deleteHighlight: vi.fn(),
+    getHighlightsForContent: vi.fn().mockReturnValue([]),
+    refreshHighlights: vi.fn(),
+  }),
+}));
+
+vi.mock("@/components/ui/Highlightable", () => ({
+  Highlightable: ({ children }: { children: ReactNode }) => (
+    <div data-testid="highlightable">{children}</div>
+  ),
+}));
+
 // Data mocks
 
 const mockPatternsData: Pattern[] = [
@@ -1340,17 +1371,15 @@ describe("UnifiedTracker", () => {
 // TutorialTab
 
 describe("TutorialTab", () => {
-  it("renders tutorial section titles from pattern data", async () => {
+  it("renders current tutorial section title from pattern data", async () => {
     const TutorialTab = (await import("@/app/patterns/[slug]/tabs/TutorialTab"))
       .default;
 
     render(<TutorialTab pattern={mockPatternsData[0]} />);
 
+    // The new TutorialTab shows one section at a time, starting with the first section
     expect(
       screen.getByText("Introduction to Arrays")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Hash Map Technique")
     ).toBeInTheDocument();
   });
 
@@ -1360,11 +1389,9 @@ describe("TutorialTab", () => {
 
     render(<TutorialTab pattern={mockPatternsData[0]} />);
 
+    // Only the first section content is shown initially
     expect(
       screen.getByText("Arrays are fundamental data structures.")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("The Hash Map provides O(1) lookups.")
     ).toBeInTheDocument();
   });
 
@@ -1374,17 +1401,18 @@ describe("TutorialTab", () => {
 
     render(<TutorialTab pattern={mockPatternsData[0]} />);
 
+    // Code blocks are shown for the current section
     expect(screen.getAllByTestId("language-toggle").length).toBeGreaterThanOrEqual(1);
   });
 
-  it("renders section numbering", async () => {
+  it("renders section numbering for current section", async () => {
     const TutorialTab = (await import("@/app/patterns/[slug]/tabs/TutorialTab"))
       .default;
 
     render(<TutorialTab pattern={mockPatternsData[0]} />);
 
+    // The first section shows "1." numbering
     expect(screen.getByText("1.")).toBeInTheDocument();
-    expect(screen.getByText("2.")).toBeInTheDocument();
   });
 
   it("renders fallback overview when pattern has no tutorial", async () => {
@@ -1438,14 +1466,15 @@ describe("TutorialTab", () => {
     expect(screen.getByText("Test mistake 2")).toBeInTheDocument();
   });
 
-  it("renders QuizCard at the bottom of tutorial content", async () => {
+  it("renders sidebar with navigation links including quiz option", async () => {
     const TutorialTab = (await import("@/app/patterns/[slug]/tabs/TutorialTab"))
       .default;
 
     render(<TutorialTab pattern={mockPatternsData[0]} />);
 
-    expect(screen.getByTestId("quiz-card")).toBeInTheDocument();
-    expect(screen.getByText("Quiz for arrays-strings")).toBeInTheDocument();
+    // The sidebar includes section navigation and Take Quiz button
+    // Quiz is accessed via sidebar navigation, not rendered at the bottom
+    expect(screen.getAllByText("Take Quiz").length).toBeGreaterThanOrEqual(1);
   });
 
   it("handles missing content gracefully for pattern without tutorial and no commonMistakes", async () => {

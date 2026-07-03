@@ -45,7 +45,9 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
     };
 
     sidebar.addEventListener("wheel", handleWheel, { passive: false });
-    return () => sidebar.removeEventListener("wheel", handleWheel);
+    return () => {
+      sidebar.removeEventListener("wheel", handleWheel);
+    };
   }, []);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
       requestAnimationFrame(() => {
         setCurrentSectionIndex(sections.length);
       });
-    } else if (hash && hash.startsWith("#section-")) {
+    } else if (hash?.startsWith("#section-")) {
       const index = parseInt(hash.replace("#section-", ""), 10);
       if (!isNaN(index) && index >= 0 && index < sections.length) {
         requestAnimationFrame(() => {
@@ -163,17 +165,19 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
             </div>
           ) : (
             <>
-              <Highlightable
-                contentType="pattern_tutorial"
-                contentId={`${pattern.id}:section-${currentSectionIndex}`}
-                onAskAI={onAskAI}
-              >
-                <TutorialSection
-                  pattern={pattern}
-                  section={currentSection!}
-                  sectionIndex={currentSectionIndex}
-                />
-              </Highlightable>
+              {currentSection && (
+                <Highlightable
+                  contentType="pattern_tutorial"
+                  contentId={`${pattern.id}:section-${currentSectionIndex}`}
+                  onAskAI={onAskAI}
+                >
+                  <TutorialSection
+                    pattern={pattern}
+                    section={currentSection}
+                    sectionIndex={currentSectionIndex}
+                  />
+                </Highlightable>
+              )}
               <CourseNavigation
                 pattern={pattern}
                 currentSectionIndex={currentSectionIndex}

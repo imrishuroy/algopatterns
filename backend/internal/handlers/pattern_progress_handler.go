@@ -27,8 +27,8 @@ func (h *PatternProgressHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	progress := rg.Group("/pattern-progress")
 	progress.Use(h.authMW.RequireAuth())
 	{
-		progress.GET("", h.GetAll)
-		progress.GET("/:patternId", h.GetByPattern)
+		progress.GET("", h.ListAll)
+		progress.GET("/:patternId", h.ListByPattern)
 		progress.POST("/:patternId/:sectionIndex", h.MarkComplete)
 		progress.DELETE("/:patternId/:sectionIndex", h.MarkIncomplete)
 		progress.POST("/:patternId/bulk", h.BulkMarkComplete)
@@ -36,7 +36,7 @@ func (h *PatternProgressHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	}
 }
 
-func (h *PatternProgressHandler) GetAll(c *gin.Context) {
+func (h *PatternProgressHandler) ListAll(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")
@@ -53,7 +53,7 @@ func (h *PatternProgressHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, models.BulkSyncProgressResponse{Progress: progress})
 }
 
-func (h *PatternProgressHandler) GetByPattern(c *gin.Context) {
+func (h *PatternProgressHandler) ListByPattern(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
 		response.Unauthorized(c, "Not authenticated")

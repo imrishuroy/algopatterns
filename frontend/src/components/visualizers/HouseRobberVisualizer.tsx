@@ -3,83 +3,9 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface TreeNode {
-  id: string;
-  index: number;
-  choice: "rob" | "skip";
-  value: number;
-  children: TreeNode[];
-  isCacheHit?: boolean;
-}
-
 type Phase = "tree" | "memo" | "table" | "optimized";
 
 const houses = [2, 7, 9, 3, 1];
-
-const buildTree = (
-  index: number,
-  depth: number = 0,
-  memo: Set<number> = new Set()
-): TreeNode | null => {
-  if (depth > 4 || index >= houses.length) return null;
-
-  const isCacheHit = memo.has(index);
-
-  const robNode: TreeNode = {
-    id: `${depth}-${index}-rob`,
-    index,
-    choice: "rob",
-    value: houses[index],
-    children: [],
-    isCacheHit,
-  };
-
-  const skipNode: TreeNode = {
-    id: `${depth}-${index}-skip`,
-    index,
-    choice: "skip",
-    value: 0,
-    children: [],
-    isCacheHit,
-  };
-
-  if (isCacheHit) {
-    return {
-      id: `${depth}-${index}`,
-      index,
-      choice: "rob",
-      value: 0,
-      children: [robNode, skipNode],
-      isCacheHit: true,
-    };
-  }
-
-  memo.add(index);
-
-  const robChild = buildTree(index + 2, depth + 1, memo);
-  if (robChild) robNode.children.push(robChild);
-
-  const skipChild = buildTree(index + 1, depth + 1, memo);
-  if (skipChild) skipNode.children.push(skipChild);
-
-  return {
-    id: `${depth}-${index}`,
-    index,
-    choice: "rob",
-    value: 0,
-    children: [robNode, skipNode],
-    isCacheHit: false,
-  };
-};
-
-const flattenTree = (node: TreeNode | null, order: string[] = []): string[] => {
-  if (!node) return order;
-  order.push(node.id);
-  for (const child of node.children) {
-    flattenTree(child, order);
-  }
-  return order;
-};
 
 const generateTableSteps = () => {
   const n = houses.length;

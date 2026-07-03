@@ -104,14 +104,14 @@ const Controls = ({
 
 const MaskDisplay = ({ mask, visited }: { mask: number; visited: Set<number> }) => (
   <div className="flex justify-center gap-2 mb-4">
-    {cities.map((city, i) => {
-      const isVisited = visited.has(i) || (mask & (1 << i)) !== 0;
+    {cities.map((city, cityIndex) => {
+      const isVisited = visited.has(cityIndex) || (mask & (1 << cityIndex)) !== 0;
       return (
-        <div key={i} className="flex flex-col items-center">
+        <div key={`mask-city-${city}`} className="flex flex-col items-center">
           <div className={`w-12 h-12 flex items-center justify-center rounded-full font-mono font-bold text-lg transition-all ${
             isVisited ? "bg-green-600 text-white" : "bg-gray-800 text-gray-400"
           }`}>{city}</div>
-          <div className="text-xs text-gray-500 mt-1">{(mask >> i) & 1}</div>
+          <div className="text-xs text-gray-500 mt-1">{(mask >> cityIndex) & 1}</div>
         </div>
       );
     })}
@@ -128,17 +128,17 @@ const DistanceMatrix = () => (
       <thead>
         <tr>
           <th className="p-1.5 text-gray-500 w-8"></th>
-          {cities.map((c, i) => (<th key={i} className="p-1.5 text-gray-400 w-10">{c}</th>))}
+          {cities.map((c) => (<th key={`city-${c}`} className="p-1.5 text-gray-400 w-10">{c}</th>))}
         </tr>
       </thead>
       <tbody>
-        {cities.map((c, i) => (
-          <tr key={i}>
+        {cities.map((c, rowIndex) => (
+          <tr key={`row-${c}`}>
             <td className="p-1.5 text-gray-400 font-mono">{c}</td>
-            {dist[i].map((d, j) => (
-              <td key={j} className="p-1">
+            {dist[rowIndex].map((d, colIndex) => (
+              <td key={`dist-${c}-${cities[colIndex]}`} className="p-1">
                 <div className={`w-10 h-8 flex items-center justify-center rounded text-xs ${
-                  i === j ? "bg-gray-900/50 text-gray-600" : "bg-gray-800 text-gray-300"
+                  rowIndex === colIndex ? "bg-gray-900/50 text-gray-600" : "bg-gray-800 text-gray-300"
                 }`}>{d}</div>
               </td>
             ))}
@@ -214,18 +214,18 @@ const TSPPhase = ({
           <thead>
             <tr>
               <th className="p-1.5 text-gray-500 w-16">mask</th>
-              {cities.map((c, i) => (<th key={i} className="p-1.5 text-gray-400 w-12">{c}</th>))}
+              {cities.map((c) => (<th key={`tsp-city-${c}`} className="p-1.5 text-gray-400 w-12">{c}</th>))}
             </tr>
           </thead>
           <tbody>
             {relevantMasks.map((mask) => (
               <tr key={mask}>
                 <td className="p-1.5 text-gray-400 font-mono text-xs">{mask.toString(2).padStart(n, "0")}</td>
-                {cities.map((_, pos) => {
+                {cities.map((city, pos) => {
                   const value = dpTable[mask]?.[pos];
                   const isCurrent = currentStep?.mask === mask && currentStep?.pos === pos;
                   return (
-                    <td key={pos} className="p-1">
+                    <td key={`dp-${mask}-${city}`} className="p-1">
                       <div className={`w-12 h-8 flex items-center justify-center rounded font-mono text-xs ${
                         isCurrent ? "bg-blue-600 border-2 border-blue-400 text-white font-bold" :
                         value !== null && value < INF ? "bg-gray-800 text-gray-300" : "bg-gray-900/50 text-gray-600"
@@ -250,7 +250,7 @@ const TSPPhase = ({
   );
 };
 
-export default function BitmaskDPVisualizer() {
+export default function BitmaskDPVisualizer() { // skipcq: JS-0067, JS-R1005
   const phases: Phase[] = ["concept", "tsp", "result"];
   const phaseLabels: Record<Phase, string> = { concept: "Concept", tsp: "TSP Steps", result: "Result" };
 

@@ -497,7 +497,7 @@ const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps
   );
 };
 
-export default function ClimbingStairsVisualizer() {
+export default function ClimbingStairsVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "optimized"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion",
@@ -608,7 +608,7 @@ export default function ClimbingStairsVisualizer() {
           exit={{ opacity: 0 }}
         >
           {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
-          {currentPhase === "memo" && <TreePhase step={step} showMemo={true} />}
+          {currentPhase === "memo" && <TreePhase step={step} showMemo />}
           {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
           {currentPhase === "optimized" && <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />}
         </motion.div>

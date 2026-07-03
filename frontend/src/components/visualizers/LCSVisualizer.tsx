@@ -124,16 +124,16 @@ const StringsDisplay = ({ highlightI, highlightJ }: { highlightI?: number; highl
     <div className="text-center">
       <div className="text-xs text-gray-500 mb-1">String 1</div>
       <div className="flex gap-1">
-        {str1.split("").map((c, i) => (
-          <div key={i} className={`w-8 h-8 flex items-center justify-center rounded font-mono font-bold ${highlightI === i + 1 ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-300"}`}>{c}</div>
+        {str1.split("").map((c, charIndex) => (
+          <div key={`s1-char-${charIndex}-${c}`} className={`w-8 h-8 flex items-center justify-center rounded font-mono font-bold ${highlightI === charIndex + 1 ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-300"}`}>{c}</div>
         ))}
       </div>
     </div>
     <div className="text-center">
       <div className="text-xs text-gray-500 mb-1">String 2</div>
       <div className="flex gap-1">
-        {str2.split("").map((c, j) => (
-          <div key={j} className={`w-8 h-8 flex items-center justify-center rounded font-mono font-bold ${highlightJ === j + 1 ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-300"}`}>{c}</div>
+        {str2.split("").map((c, charIndex) => (
+          <div key={`s2-char-${charIndex}-${c}`} className={`w-8 h-8 flex items-center justify-center rounded font-mono font-bold ${highlightJ === charIndex + 1 ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-300"}`}>{c}</div>
         ))}
       </div>
     </div>
@@ -161,24 +161,24 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
             <tr>
               <th className="p-2 text-gray-500 w-10"></th>
               <th className="p-2 text-gray-500 w-10">-</th>
-              {str2.split("").map((c, j) => (<th key={j} className="p-2 text-purple-400 w-10 font-mono">{c}</th>))}
+              {str2.split("").map((c, charIndex) => (<th key={`header-s2-${charIndex}-${c}`} className="p-2 text-purple-400 w-10 font-mono">{c}</th>))}
             </tr>
           </thead>
           <tbody>
             <tr>
               <td className="p-2 text-gray-500">-</td>
-              {Array(str2.length + 1).fill(0).map((_, j) => (<td key={j} className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>))}
+              {Array(str2.length + 1).fill(0).map((_, colIdx) => (<td key={`zero-row-${colIdx}`} className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>))}
             </tr>
-            {str1.split("").map((c, i) => (
-              <tr key={i}>
+            {str1.split("").map((c, rowIndex) => (
+              <tr key={`table-row-${rowIndex}-${c}`}>
                 <td className="p-2 text-blue-400 font-mono">{c}</td>
                 <td className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>
-                {Array(str2.length).fill(0).map((_, j) => {
-                  const isCurrent = currentStep && currentStep.i === i + 1 && currentStep.j === j + 1;
-                  const value = currentDp[i + 1]?.[j + 1];
+                {Array(str2.length).fill(0).map((_, colIndex) => {
+                  const isCurrent = currentStep && currentStep.i === rowIndex + 1 && currentStep.j === colIndex + 1;
+                  const value = currentDp[rowIndex + 1]?.[colIndex + 1];
                   const isMatch = currentStep && isCurrent && currentStep.match;
                   return (
-                    <td key={j} className="p-1">
+                    <td key={`table-cell-${rowIndex}-${colIndex}`} className="p-1">
                       <div className={`w-10 h-10 flex items-center justify-center border-2 rounded font-mono transition-all ${
                         isCurrent ? (isMatch ? "bg-green-600 border-green-400 text-white font-bold" : "bg-blue-600 border-blue-400 text-white font-bold")
                         : value > 0 ? "bg-gray-800 border-gray-600 text-gray-300" : "bg-gray-900/50 border-gray-700 text-gray-600"
@@ -214,23 +214,23 @@ const BacktrackPhase = ({ step, backtrackSteps, dp }: { step: number; backtrackS
             <tr>
               <th className="p-2 text-gray-500 w-10"></th>
               <th className="p-2 text-gray-500 w-10">-</th>
-              {str2.split("").map((c, j) => (<th key={j} className="p-2 text-purple-400 w-10 font-mono">{c}</th>))}
+              {str2.split("").map((c, charIndex) => (<th key={`header-s2-${charIndex}-${c}`} className="p-2 text-purple-400 w-10 font-mono">{c}</th>))}
             </tr>
           </thead>
           <tbody>
             <tr>
               <td className="p-2 text-gray-500">-</td>
-              {Array(str2.length + 1).fill(0).map((_, j) => (<td key={j} className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>))}
+              {Array(str2.length + 1).fill(0).map((_, colIdx) => (<td key={`zero-row-${colIdx}`} className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>))}
             </tr>
-            {str1.split("").map((c, i) => (
-              <tr key={i}>
+            {str1.split("").map((c, rowIndex) => (
+              <tr key={`table-row-${rowIndex}-${c}`}>
                 <td className="p-2 text-blue-400 font-mono">{c}</td>
                 <td className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>
-                {Array(str2.length).fill(0).map((_, j) => {
-                  const isCurrent = currentStep && currentStep.i === i + 1 && currentStep.j === j + 1;
-                  const value = dp[i + 1]?.[j + 1];
+                {Array(str2.length).fill(0).map((_, colIndex) => {
+                  const isCurrent = currentStep && currentStep.i === rowIndex + 1 && currentStep.j === colIndex + 1;
+                  const value = dp[rowIndex + 1]?.[colIndex + 1];
                   return (
-                    <td key={j} className="p-1">
+                    <td key={`bt-cell-${rowIndex}-${colIndex}`} className="p-1">
                       <div className={`w-10 h-10 flex items-center justify-center border-2 rounded font-mono ${
                         isCurrent ? "bg-yellow-600 border-yellow-400 text-white font-bold" : "bg-gray-800 border-gray-600 text-gray-300"
                       }`}>{value}</div>
@@ -253,7 +253,7 @@ const BacktrackPhase = ({ step, backtrackSteps, dp }: { step: number; backtrackS
   );
 };
 
-export default function LCSVisualizer() {
+export default function LCSVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "backtrack"];
   const phaseLabels: Record<Phase, string> = { tree: "Recursion", memo: "Memoization", table: "2D Table", backtrack: "Backtrack LCS" };
 

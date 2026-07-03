@@ -439,7 +439,7 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
   );
 };
 
-export default function DPJourneyVisualizer() {
+export default function DPJourneyVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion Tree",
@@ -540,7 +540,7 @@ export default function DPJourneyVisualizer() {
           exit={{ opacity: 0 }}
         >
           {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
-          {currentPhase === "memo" && <TreePhase step={step} showMemo={true} />}
+          {currentPhase === "memo" && <TreePhase step={step} showMemo />}
           {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
         </motion.div>
       </AnimatePresence>

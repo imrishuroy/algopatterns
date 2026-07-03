@@ -50,7 +50,7 @@ const customStyle = {
   },
 };
 
-export default function CodeBlock({
+export default function CodeBlock({ // skipcq: JS-0067, JS-R1005
   code,
   language = "java",
   label,

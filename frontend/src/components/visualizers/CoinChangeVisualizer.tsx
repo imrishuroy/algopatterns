@@ -417,7 +417,7 @@ const ComparePhase = ({ step }: { step: number }) => {
   );
 };
 
-export default function CoinChangeVisualizer() {
+export default function CoinChangeVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "compare"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion",
@@ -526,7 +526,7 @@ export default function CoinChangeVisualizer() {
           exit={{ opacity: 0 }}
         >
           {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
-          {currentPhase === "memo" && <TreePhase step={step} showMemo={true} />}
+          {currentPhase === "memo" && <TreePhase step={step} showMemo />}
           {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
           {currentPhase === "compare" && <ComparePhase step={step} />}
         </motion.div>

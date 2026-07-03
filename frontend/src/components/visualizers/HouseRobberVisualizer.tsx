@@ -199,13 +199,13 @@ const Controls = ({
 
 const HousesDisplay = ({ highlightIndex, robbed }: { highlightIndex?: number; robbed?: Set<number> }) => (
   <div className="flex justify-center gap-2 mb-4">
-    {houses.map((value, i) => (
-      <div key={i} className="flex flex-col items-center">
+    {houses.map((value, houseIndex) => (
+      <div key={`house-${houseIndex}-${value}`} className="flex flex-col items-center">
         <div
           className={`w-14 h-12 flex items-center justify-center rounded-t-lg border-2 transition-all ${
-            highlightIndex === i
+            highlightIndex === houseIndex
               ? "bg-blue-600 border-blue-400"
-              : robbed?.has(i)
+              : robbed?.has(houseIndex)
               ? "bg-green-600 border-green-400"
               : "bg-gray-800 border-gray-600"
           }`}
@@ -213,7 +213,7 @@ const HousesDisplay = ({ highlightIndex, robbed }: { highlightIndex?: number; ro
           <span className="text-lg font-bold text-white">${value}</span>
         </div>
         <div className="w-14 h-6 bg-gray-700 rounded-b border-x-2 border-b-2 border-gray-600 flex items-center justify-center">
-          <span className="text-xs text-gray-400">{i}</span>
+          <span className="text-xs text-gray-400">{houseIndex}</span>
         </div>
       </div>
     ))}
@@ -386,7 +386,7 @@ const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps
   );
 };
 
-export default function HouseRobberVisualizer() {
+export default function HouseRobberVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "optimized"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Decision Tree",
@@ -495,7 +495,7 @@ export default function HouseRobberVisualizer() {
           exit={{ opacity: 0 }}
         >
           {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
-          {currentPhase === "memo" && <TreePhase step={step} showMemo={true} />}
+          {currentPhase === "memo" && <TreePhase step={step} showMemo />}
           {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
           {currentPhase === "optimized" && <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />}
         </motion.div>

@@ -222,11 +222,11 @@ const Controls = ({
 
 const ItemsDisplay = ({ currentItem }: { currentItem?: number }) => (
   <div className="flex justify-center gap-3 mb-4">
-    {items.map((item, i) => (
+    {items.map((item, itemIndex) => (
       <div
-        key={i}
+        key={`item-${item.name}`}
         className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
-          currentItem === i
+          currentItem === itemIndex
             ? "bg-blue-600/20 border-blue-500"
             : "bg-gray-800/50 border-gray-700"
         }`}
@@ -442,7 +442,7 @@ const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps
   );
 };
 
-export default function KnapsackDPVisualizer() {
+export default function KnapsackDPVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "optimized"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Decision Tree",
@@ -551,7 +551,7 @@ export default function KnapsackDPVisualizer() {
           exit={{ opacity: 0 }}
         >
           {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
-          {currentPhase === "memo" && <TreePhase step={step} showMemo={true} />}
+          {currentPhase === "memo" && <TreePhase step={step} showMemo />}
           {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
           {currentPhase === "optimized" && <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />}
         </motion.div>

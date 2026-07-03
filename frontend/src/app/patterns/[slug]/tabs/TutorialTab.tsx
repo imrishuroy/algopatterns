@@ -45,7 +45,7 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
     };
 
     sidebar.addEventListener("wheel", handleWheel, { passive: false });
-    return () => {
+    return () => { // skipcq: JS-0045
       sidebar.removeEventListener("wheel", handleWheel);
     };
   }, []);

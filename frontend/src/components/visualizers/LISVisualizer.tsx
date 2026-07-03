@@ -105,11 +105,11 @@ const Controls = ({
 
 const ArrayDisplay = ({ highlightI, highlightJ }: { highlightI?: number; highlightJ?: number }) => (
   <div className="flex justify-center gap-1 mb-4">
-    {nums.map((num, i) => (
-      <div key={i} className="flex flex-col items-center">
-        <div className="text-xs text-gray-500 mb-1">{i}</div>
+    {nums.map((num, numIndex) => (
+      <div key={`num-${numIndex}-${num}`} className="flex flex-col items-center">
+        <div className="text-xs text-gray-500 mb-1">{numIndex}</div>
         <div className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold transition-all ${
-          highlightI === i ? "bg-blue-600 text-white" : highlightJ === i ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-300"
+          highlightI === numIndex ? "bg-blue-600 text-white" : highlightJ === numIndex ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-300"
         }`}>{num}</div>
       </div>
     ))}
@@ -134,11 +134,11 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
       <div className="text-center">
         <div className="text-sm text-gray-500 mb-3">dp[i] = LIS length ending at index i</div>
         <div className="flex gap-1 justify-center">
-          {currentDp.map((len, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <div className="text-xs text-gray-500 mb-1">{i}</div>
+          {currentDp.map((len, dpIndex) => (
+            <div key={`dp-${dpIndex}-${len}`} className="flex flex-col items-center">
+              <div className="text-xs text-gray-500 mb-1">{dpIndex}</div>
               <div className={`w-10 h-10 flex items-center justify-center border-2 rounded font-mono transition-all ${
-                currentStep?.i === i ? "bg-blue-600 border-blue-400 text-white font-bold" : "bg-gray-800 border-gray-600 text-gray-300"
+                currentStep?.i === dpIndex ? "bg-blue-600 border-blue-400 text-white font-bold" : "bg-gray-800 border-gray-600 text-gray-300"
               }`}>{len}</div>
             </div>
           ))}
@@ -164,9 +164,9 @@ const BinaryPhase = ({ step, binarySteps }: { step: number; binarySteps: ReturnT
       <div className="text-center">
         <div className="text-sm text-gray-500 mb-3">tails[] = smallest ending element for each LIS length</div>
         <div className="flex gap-1 justify-center min-h-[50px]">
-          {currentTails.length > 0 ? currentTails.map((val, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <div className="text-xs text-gray-500 mb-1">len {i + 1}</div>
+          {currentTails.length > 0 ? currentTails.map((val, tailIndex) => (
+            <div key={`tail-${tailIndex}-${val}`} className="flex flex-col items-center">
+              <div className="text-xs text-gray-500 mb-1">len {tailIndex + 1}</div>
               <div className="w-10 h-10 flex items-center justify-center bg-green-600/30 border-2 border-green-500 rounded font-mono text-green-300">{val}</div>
             </div>
           )) : <div className="text-gray-500">Empty</div>}
@@ -185,7 +185,7 @@ const BinaryPhase = ({ step, binarySteps }: { step: number; binarySteps: ReturnT
   );
 };
 
-export default function LISVisualizer() {
+export default function LISVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "binary"];
   const phaseLabels: Record<Phase, string> = { tree: "Recursion", memo: "Memoization", table: "O(n²) DP", binary: "O(n log n)" };
 

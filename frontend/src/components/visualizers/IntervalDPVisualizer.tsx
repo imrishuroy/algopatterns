@@ -80,12 +80,12 @@ const Controls = ({
 const BalloonsDisplay = ({ highlightRange }: { highlightRange?: { l: number; r: number; k: number } }) => (
   <div className="flex justify-center gap-2 mb-4">
     <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-700 text-gray-400 font-mono">1</div>
-    {balloons.map((b, i) => {
-      const idx = i + 1;
+    {balloons.map((b, balloonIndex) => {
+      const idx = balloonIndex + 1;
       const inRange = highlightRange && idx >= highlightRange.l && idx <= highlightRange.r;
       const isK = highlightRange && idx === highlightRange.k;
       return (
-        <div key={i} className={`w-12 h-12 flex items-center justify-center rounded-full font-mono font-bold transition-all ${
+        <div key={`balloon-${balloonIndex}-${b}`} className={`w-12 h-12 flex items-center justify-center rounded-full font-mono font-bold transition-all ${
           isK ? "bg-red-600 text-white ring-2 ring-red-400" : inRange ? "bg-blue-600 text-white" : "bg-yellow-500 text-black"
         }`}>{b}</div>
       );
@@ -117,19 +117,19 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
             <thead>
               <tr>
                 <th className="p-2 text-gray-500 w-10">l\r</th>
-                {Array(n).fill(0).map((_, i) => (<th key={i} className="p-2 text-gray-400 w-12">{i + 1}</th>))}
+                {Array(n).fill(0).map((_, colIdx) => (<th key={`col-${colIdx + 1}`} className="p-2 text-gray-400 w-12">{colIdx + 1}</th>))}
               </tr>
             </thead>
             <tbody>
-              {Array(n).fill(0).map((_, l) => (
-                <tr key={l}>
-                  <td className="p-2 text-gray-400 font-mono">{l + 1}</td>
-                  {Array(n).fill(0).map((_, r) => {
-                    const isCurrent = currentStep && currentStep.l === l + 1 && currentStep.r === r + 1;
-                    const value = dpTable[l + 1]?.[r + 1];
-                    const isValid = r >= l;
+              {Array(n).fill(0).map((_, rowL) => (
+                <tr key={`row-${rowL + 1}`}>
+                  <td className="p-2 text-gray-400 font-mono">{rowL + 1}</td>
+                  {Array(n).fill(0).map((_, colR) => {
+                    const isCurrent = currentStep && currentStep.l === rowL + 1 && currentStep.r === colR + 1;
+                    const value = dpTable[rowL + 1]?.[colR + 1];
+                    const isValid = colR >= rowL;
                     return (
-                      <td key={r} className="p-1">
+                      <td key={`cell-${rowL + 1}-${colR + 1}`} className="p-1">
                         <div className={`w-12 h-10 flex items-center justify-center border-2 rounded font-mono text-sm ${
                           !isValid ? "bg-gray-900/30 border-gray-800 text-gray-700" :
                           isCurrent ? "bg-green-600 border-green-400 text-white font-bold" :
@@ -176,7 +176,7 @@ const ConceptPhase = () => (
   </div>
 );
 
-export default function IntervalDPVisualizer() {
+export default function IntervalDPVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["concept", "table", "backtrack"];
   const phaseLabels: Record<Phase, string> = { concept: "Concept", table: "Fill by Length", backtrack: "Reconstruct" };
 

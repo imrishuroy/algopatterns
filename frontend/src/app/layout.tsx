@@ -10,6 +10,7 @@ import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { HighlightProvider } from "@/contexts/HighlightContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { PatternProgressProvider } from "@/contexts/PatternProgressContext";
 import { defaultMetadata } from "@/lib/seo";
 import { WebsiteJsonLd } from "@/components/seo/JsonLd";
 
@@ -34,7 +35,7 @@ const fredoka = Fredoka({
 
 export const metadata = defaultMetadata;
 
-export default function RootLayout({
+export default function RootLayout({ // skipcq: JS-0067
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -53,9 +54,9 @@ export default function RootLayout({
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-64T0261KB3');
+            window.gtag = function(){dataLayer.push(arguments);};
+            window.gtag('js', new Date());
+            window.gtag('config', 'G-64T0261KB3');
           `}
         </Script>
         <WebsiteJsonLd />
@@ -70,11 +71,13 @@ export default function RootLayout({
               <SubscriptionProvider>
                 <HighlightProvider>
                   <ProgressProvider>
-                    <FilterProvider>
-                      <Header />
-                      <main className="flex-1">{children}</main>
-                      {/* <Footer /> */}
-                    </FilterProvider>
+                    <PatternProgressProvider>
+                      <FilterProvider>
+                        <Header />
+                        <main className="flex-1">{children}</main>
+                        {/* <Footer /> */}
+                      </FilterProvider>
+                    </PatternProgressProvider>
                   </ProgressProvider>
                 </HighlightProvider>
               </SubscriptionProvider>

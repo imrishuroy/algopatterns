@@ -61,12 +61,36 @@ export interface PatternVariation {
   guide?: string;
 }
 
+export type DPApproach = "recursion" | "memoization" | "tabulation" | "spaceOptimized";
+
+export interface ApproachCode {
+  java?: string;
+  javascript?: string;
+}
+
 export interface TutorialSection {
   title: string;
   content: string;
+  // Name of the example problem (e.g., "Coin Change", "House Robber")
+  exampleName?: string;
+  // Simple code block (for non-DP or single approach)
   code?: {
     java?: string;
     javascript?: string;
+  };
+  // Multiple approaches for actual code examples (for DP patterns)
+  approaches?: {
+    recursion?: ApproachCode;
+    memoization?: ApproachCode;
+    tabulation?: ApproachCode;
+    spaceOptimized?: ApproachCode;
+  };
+  // Generic templates/pseudocode for each approach
+  templates?: {
+    recursion?: string;
+    memoization?: string;
+    tabulation?: string;
+    spaceOptimized?: string;
   };
 }
 

@@ -8,6 +8,7 @@ import { HighlightableCode } from "./HighlightableCode";
 interface CodeBlockProps {
   code: string;
   language?: string;
+  label?: string;
   showCopy?: boolean;
   collapsible?: boolean;
   highlightable?: boolean;
@@ -49,9 +50,10 @@ const customStyle = {
   },
 };
 
-export default function CodeBlock({
+export default function CodeBlock({ // skipcq: JS-0067, JS-R1005
   code,
   language = "java",
+  label,
   showCopy = true,
   collapsible = false,
   highlightable = false,
@@ -80,10 +82,11 @@ export default function CodeBlock({
     }
   };
 
-  const displayLang =
+  const displayLabel = label ?? (
     normalizedLang === "cpp"
       ? "C++"
-      : normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1);
+      : normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1)
+  );
 
   return (
     <div className="relative group rounded-md overflow-hidden border border-gray-800 bg-[#011627] theme-dark">
@@ -96,7 +99,7 @@ export default function CodeBlock({
             <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
           </div>
           <span className="text-xs text-gray-400 ml-2 font-medium">
-            {displayLang}
+            {displayLabel}
           </span>
         </div>
         <div className="flex items-center gap-2">

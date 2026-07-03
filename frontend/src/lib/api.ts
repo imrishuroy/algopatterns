@@ -341,16 +341,16 @@ class ApiClient {
   }
 
   // Payment endpoints
-  async getPlans(currency?: string): Promise<ApiResponse<PlansListResponse>> {
+  getPlans(currency?: string): Promise<ApiResponse<PlansListResponse>> {
     const query = currency ? `?currency=${currency}` : "";
     return this.request<PlansListResponse>(`/api/v1/payments/plans${query}`);
   }
 
-  async getSubscription(): Promise<ApiResponse<Subscription>> {
+  getSubscription(): Promise<ApiResponse<Subscription>> {
     return this.request<Subscription>("/api/v1/payments/subscription");
   }
 
-  async createOrder(
+  createOrder(
     req: CreateOrderRequest,
     idempotencyKey?: string
   ): Promise<ApiResponse<CreateOrderResponse>> {
@@ -365,7 +365,7 @@ class ApiClient {
     });
   }
 
-  async verifyPayment(
+  verifyPayment(
     req: VerifyPaymentRequest
   ): Promise<ApiResponse<VerifyPaymentResponse>> {
     return this.request<VerifyPaymentResponse>("/api/v1/payments/verify", {
@@ -374,7 +374,7 @@ class ApiClient {
     });
   }
 
-  async validateDiscount(
+  validateDiscount(
     req: ValidateDiscountRequest
   ): Promise<ApiResponse<ValidateDiscountResponse>> {
     return this.request<ValidateDiscountResponse>(
@@ -386,13 +386,46 @@ class ApiClient {
     );
   }
 
-  async cancelSubscription(
+  cancelSubscription(
     req: CancelSubscriptionRequest
   ): Promise<ApiResponse<CancelSubscriptionResponse>> {
     return this.request<CancelSubscriptionResponse>("/api/v1/payments/cancel", {
       method: "POST",
       body: JSON.stringify(req),
     });
+  }
+
+  // Pattern Progress
+  syncPatternProgress(
+    progress: { [key: string]: number[] }
+  ): Promise<ApiResponse<{ progress: { [key: string]: number[] } }>> {
+    return this.request<{ progress: { [key: string]: number[] } }>(
+      "/api/v1/pattern-progress/sync",
+      {
+        method: "POST",
+        body: JSON.stringify({ progress }),
+      }
+    );
+  }
+
+  markSectionComplete(
+    patternId: string,
+    sectionIndex: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>(
+      `/api/v1/pattern-progress/${patternId}/${sectionIndex}`,
+      { method: "POST" }
+    );
+  }
+
+  markSectionIncomplete(
+    patternId: string,
+    sectionIndex: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>(
+      `/api/v1/pattern-progress/${patternId}/${sectionIndex}`,
+      { method: "DELETE" }
+    );
   }
 }
 

@@ -10,6 +10,7 @@ import { FilterProvider } from "@/contexts/FilterContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { HighlightProvider } from "@/contexts/HighlightContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { PatternProgressProvider } from "@/contexts/PatternProgressContext";
 import { defaultMetadata } from "@/lib/seo";
 import { WebsiteJsonLd } from "@/components/seo/JsonLd";
 
@@ -70,11 +71,13 @@ export default function RootLayout({
               <SubscriptionProvider>
                 <HighlightProvider>
                   <ProgressProvider>
-                    <FilterProvider>
-                      <Header />
-                      <main className="flex-1">{children}</main>
-                      {/* <Footer /> */}
-                    </FilterProvider>
+                    <PatternProgressProvider>
+                      <FilterProvider>
+                        <Header />
+                        <main className="flex-1">{children}</main>
+                        {/* <Footer /> */}
+                      </FilterProvider>
+                    </PatternProgressProvider>
                   </ProgressProvider>
                 </HighlightProvider>
               </SubscriptionProvider>

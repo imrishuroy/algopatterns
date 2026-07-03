@@ -1,81 +1,68 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Pattern, SupportedLanguage } from "@/types";
-import LanguageToggle from "@/components/ui/LanguageToggle";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Pattern } from "@/types";
+import { CourseSidebar, CourseNavigation } from "@/components/course";
+import TutorialSection from "@/components/course/TutorialSection";
 import { QuizCard } from "@/components/quiz";
-
-const VisualizerLoading = () => (
-  <div className="h-64 rounded-md animate-pulse" style={{ background: "var(--bg-elevated)" }} />
-);
-
-const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
-  loading: VisualizerLoading,
-  ssr: false,
-});
-
-const DPTreeVisualizer = dynamic(() => import("@/components/visualizers/DPTreeVisualizer"), { loading: VisualizerLoading, ssr: false });
-const DPTransformationVisualizer = dynamic(() => import("@/components/visualizers/DPTransformationVisualizer"), { loading: VisualizerLoading, ssr: false });
-const DPTableVisualizer = dynamic(() => import("@/components/visualizers/DPTableVisualizer"), { loading: VisualizerLoading, ssr: false });
-const KnapsackVisualizer = dynamic(() => import("@/components/visualizers/KnapsackVisualizer"), { loading: VisualizerLoading, ssr: false });
-const DPComparisonVisualizer = dynamic(() => import("@/components/visualizers/DPComparisonVisualizer"), { loading: VisualizerLoading, ssr: false });
-const RecurrenceBuilderVisualizer = dynamic(() => import("@/components/visualizers/RecurrenceBuilderVisualizer"), { loading: VisualizerLoading, ssr: false });
-const ActivitySelectionVisualizer = dynamic(() => import("@/components/visualizers/ActivitySelectionVisualizer"), { loading: VisualizerLoading, ssr: false });
-const JumpGameVisualizer = dynamic(() => import("@/components/visualizers/JumpGameVisualizer"), { loading: VisualizerLoading, ssr: false });
-const GridBFSVisualizer = dynamic(() => import("@/components/visualizers/GridBFSVisualizer"), { loading: VisualizerLoading, ssr: false });
-const TopologicalSortVisualizer = dynamic(() => import("@/components/visualizers/TopologicalSortVisualizer"), { loading: VisualizerLoading, ssr: false });
-const DijkstraVisualizer = dynamic(() => import("@/components/visualizers/DijkstraVisualizer"), { loading: VisualizerLoading, ssr: false });
-const TwoSumVisualizer = dynamic(() => import("@/components/visualizers/TwoSumVisualizer"), { loading: VisualizerLoading, ssr: false });
-const AnagramGroupVisualizer = dynamic(() => import("@/components/visualizers/AnagramGroupVisualizer"), { loading: VisualizerLoading, ssr: false });
-const ConsecutiveSequenceVisualizer = dynamic(() => import("@/components/visualizers/ConsecutiveSequenceVisualizer"), { loading: VisualizerLoading, ssr: false });
-const KthLargestVisualizer = dynamic(() => import("@/components/visualizers/KthLargestVisualizer"), { loading: VisualizerLoading, ssr: false });
-const MedianFinderVisualizer = dynamic(() => import("@/components/visualizers/MedianFinderVisualizer"), { loading: VisualizerLoading, ssr: false });
-const MergeKListsVisualizer = dynamic(() => import("@/components/visualizers/MergeKListsVisualizer"), { loading: VisualizerLoading, ssr: false });
-const MergeIntervalsVisualizer = dynamic(() => import("@/components/visualizers/MergeIntervalsVisualizer"), { loading: VisualizerLoading, ssr: false });
-const MeetingRoomsVisualizer = dynamic(() => import("@/components/visualizers/MeetingRoomsVisualizer"), { loading: VisualizerLoading, ssr: false });
-const IntervalIntersectionVisualizer = dynamic(() => import("@/components/visualizers/IntervalIntersectionVisualizer"), { loading: VisualizerLoading, ssr: false });
-const LinkedListReversalVisualizer = dynamic(() => import("@/components/visualizers/LinkedListReversalVisualizer"), { loading: VisualizerLoading, ssr: false });
-const CycleDetectionVisualizer = dynamic(() => import("@/components/visualizers/CycleDetectionVisualizer"), { loading: VisualizerLoading, ssr: false });
-const ReorderListVisualizer = dynamic(() => import("@/components/visualizers/ReorderListVisualizer"), { loading: VisualizerLoading, ssr: false });
-const PrefixSumVisualizer = dynamic(() => import("@/components/visualizers/PrefixSumVisualizer"), { loading: VisualizerLoading, ssr: false });
-const SubarraySumKVisualizer = dynamic(() => import("@/components/visualizers/SubarraySumKVisualizer"), { loading: VisualizerLoading, ssr: false });
-const ProductExceptSelfVisualizer = dynamic(() => import("@/components/visualizers/ProductExceptSelfVisualizer"), { loading: VisualizerLoading, ssr: false });
-const FixedWindowVisualizer = dynamic(() => import("@/components/visualizers/FixedWindowVisualizer"), { loading: VisualizerLoading, ssr: false });
-const LongestSubstringVisualizer = dynamic(() => import("@/components/visualizers/LongestSubstringVisualizer"), { loading: VisualizerLoading, ssr: false });
-const FindAnagramsVisualizer = dynamic(() => import("@/components/visualizers/FindAnagramsVisualizer"), { loading: VisualizerLoading, ssr: false });
-const ValidParenthesesVisualizer = dynamic(() => import("@/components/visualizers/ValidParenthesesVisualizer"), { loading: VisualizerLoading, ssr: false });
-const NextGreaterVisualizer = dynamic(() => import("@/components/visualizers/NextGreaterVisualizer"), { loading: VisualizerLoading, ssr: false });
-const LargestRectangleVisualizer = dynamic(() => import("@/components/visualizers/LargestRectangleVisualizer"), { loading: VisualizerLoading, ssr: false });
-const TreeTraversalVisualizer = dynamic(() => import("@/components/visualizers/TreeTraversalVisualizer"), { loading: VisualizerLoading, ssr: false });
-const LevelOrderVisualizer = dynamic(() => import("@/components/visualizers/LevelOrderVisualizer"), { loading: VisualizerLoading, ssr: false });
-const BSTValidationVisualizer = dynamic(() => import("@/components/visualizers/BSTValidationVisualizer"), { loading: VisualizerLoading, ssr: false });
-const TrieInsertVisualizer = dynamic(() => import("@/components/visualizers/TrieInsertVisualizer"), { loading: VisualizerLoading, ssr: false });
-const TrieSearchVisualizer = dynamic(() => import("@/components/visualizers/TrieSearchVisualizer"), { loading: VisualizerLoading, ssr: false });
-const TwoSumSortedVisualizer = dynamic(() => import("@/components/visualizers/TwoSumSortedVisualizer"), { loading: VisualizerLoading, ssr: false });
-const ContainerWaterVisualizer = dynamic(() => import("@/components/visualizers/ContainerWaterVisualizer"), { loading: VisualizerLoading, ssr: false });
-const RemoveDuplicatesVisualizer = dynamic(() => import("@/components/visualizers/RemoveDuplicatesVisualizer"), { loading: VisualizerLoading, ssr: false });
-const UnionFindVisualizer = dynamic(() => import("@/components/visualizers/UnionFindVisualizer"), { loading: VisualizerLoading, ssr: false });
-const ConnectedComponentsVisualizer = dynamic(() => import("@/components/visualizers/ConnectedComponentsVisualizer"), { loading: VisualizerLoading, ssr: false });
-const TwoSumHashMapVisualizer = dynamic(() => import("@/components/visualizers/TwoSumHashMapVisualizer"), { loading: VisualizerLoading, ssr: false });
-const KadaneVisualizer = dynamic(() => import("@/components/visualizers/KadaneVisualizer"), { loading: VisualizerLoading, ssr: false });
-const PrefixSumArrayVisualizer = dynamic(() => import("@/components/visualizers/PrefixSumArrayVisualizer"), { loading: VisualizerLoading, ssr: false });
-const SubsetsVisualizer = dynamic(() => import("@/components/visualizers/SubsetsVisualizer"), { loading: VisualizerLoading, ssr: false });
-const PermutationsVisualizer = dynamic(() => import("@/components/visualizers/PermutationsVisualizer"), { loading: VisualizerLoading, ssr: false });
-const NQueensVisualizer = dynamic(() => import("@/components/visualizers/NQueensVisualizer"), { loading: VisualizerLoading, ssr: false });
-const BinarySearchVisualizer = dynamic(() => import("@/components/visualizers/BinarySearchVisualizer"), { loading: VisualizerLoading, ssr: false });
-const RotatedArrayVisualizer = dynamic(() => import("@/components/visualizers/RotatedArrayVisualizer"), { loading: VisualizerLoading, ssr: false });
-const KokoEatingVisualizer = dynamic(() => import("@/components/visualizers/KokoEatingVisualizer"), { loading: VisualizerLoading, ssr: false });
+import { Highlightable } from "@/components/ui/Highlightable";
 
 interface TutorialTabProps {
   pattern: Pattern;
+  onAskAI?: (selectedText: string) => void;
 }
 
-export default function TutorialTab({ pattern }: TutorialTabProps) {
-  const { language: currentLang, setLanguage: setCurrentLang } = useLanguage();
+const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const hasTutorial = pattern.tutorial && pattern.tutorial.length > 0;
+  const sections = pattern.tutorial || [];
+  const isQuizPage = currentSectionIndex === sections.length;
+
+  const handleSectionChange = useCallback((index: number) => {
+    setCurrentSectionIndex(index);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  // Handle sidebar scroll independently
+  useEffect(() => {
+    const sidebar = sidebarRef.current;
+    if (!sidebar) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const { scrollTop, scrollHeight, clientHeight } = sidebar;
+      const isAtTop = scrollTop === 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+      // Only prevent default if we can scroll in that direction
+      if ((e.deltaY < 0 && !isAtTop) || (e.deltaY > 0 && !isAtBottom)) {
+        e.stopPropagation();
+      } else if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+        // At boundary, let parent scroll
+      } else {
+        e.stopPropagation();
+      }
+    };
+
+    sidebar.addEventListener("wheel", handleWheel, { passive: false });
+    return () => sidebar.removeEventListener("wheel", handleWheel);
+  }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === "#quiz") {
+      requestAnimationFrame(() => {
+        setCurrentSectionIndex(sections.length);
+      });
+    } else if (hash && hash.startsWith("#section-")) {
+      const index = parseInt(hash.replace("#section-", ""), 10);
+      if (!isNaN(index) && index >= 0 && index < sections.length) {
+        requestAnimationFrame(() => {
+          setCurrentSectionIndex(index);
+        });
+      }
+    }
+  }, [sections.length]);
 
   if (!hasTutorial) {
     return (
@@ -134,782 +121,70 @@ export default function TutorialTab({ pattern }: TutorialTabProps) {
     );
   }
 
+  const currentSection = isQuizPage ? null : sections[currentSectionIndex];
+
   return (
-    <div className="space-y-14">
-      {pattern.tutorial!.map((section, idx) => (
-        <article key={idx} className="scroll-mt-24" id={`section-${idx}`} data-section-id={section.title}>
-          {/* Section Header - Simple numbering */}
-          <div className="flex items-baseline gap-3 mb-6">
-            <span className="text-indigo-400 font-mono text-lg">
-              {idx + 1}.
-            </span>
-            <h2 className="text-2xl font-bold text-white">{section.title}</h2>
-          </div>
+    <div className="flex gap-6">
+      {/* Sidebar */}
+      <div className="hidden lg:block w-64 flex-shrink-0">
+        <div
+          ref={sidebarRef}
+          className="sticky top-0 max-h-[70vh] overflow-y-auto overscroll-none scrollbar-none"
+        >
+          <CourseSidebar
+            pattern={pattern}
+            currentSectionIndex={currentSectionIndex}
+            onSectionChange={handleSectionChange}
+          />
+        </div>
+      </div>
 
-          {/* Section Content */}
-          <div className="pl-7">
-            <div className="tutorial-content">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  p: ({ children }) => (
-                    <p className="text-gray-300 leading-relaxed mb-5">
-                      {children}
-                    </p>
-                  ),
-                  strong: ({ children }) => (
-                    <strong className="text-white font-semibold">
-                      {children}
-                    </strong>
-                  ),
-                  h1: ({ children }) => (
-                    <h3 className="text-2xl font-bold text-white mt-8 mb-4">
-                      {children}
-                    </h3>
-                  ),
-                  h2: ({ children }) => (
-                    <h4 className="text-xl font-semibold text-white mt-6 mb-3">
-                      {children}
-                    </h4>
-                  ),
-                  h3: ({ children }) => (
-                    <h5 className="text-lg font-semibold text-indigo-400 mt-5 mb-2">
-                      {children}
-                    </h5>
-                  ),
-                  ul: ({ children }) => (
-                    <ul className="space-y-2 my-4">{children}</ul>
-                  ),
-                  ol: ({ children }) => (
-                    <ol className="space-y-2 my-4 counter-reset-item">
-                      {children}
-                    </ol>
-                  ),
-                  li: ({ children, ...props }) => {
-                    const isOrdered =
-                      props.node?.position &&
-                      props.node.position.start.column > 1;
-                    return (
-                      <li className="text-gray-300 leading-relaxed flex items-start gap-2">
-                        <span className="text-indigo-400 flex-shrink-0 select-none">
-                          {isOrdered ? "" : "•"}
-                        </span>
-                        <span>{children}</span>
-                      </li>
-                    );
-                  },
-                  code: ({ className, children, ...props }) => {
-                    const isBlock =
-                      className?.includes("language-") ||
-                      (typeof children === "string" && children.includes("\n"));
+      {/* Mobile Sidebar Toggle */}
+      <div className="lg:hidden">
+        <CourseSidebar
+          pattern={pattern}
+          currentSectionIndex={currentSectionIndex}
+          onSectionChange={handleSectionChange}
+        />
+      </div>
 
-                    if (
-                      isBlock ||
-                      props.node?.position?.start.line !==
-                        props.node?.position?.end.line
-                    ) {
-                      const content = String(children).replace(/\n$/, "");
-                      const lines = content.split("\n");
-
-                      return (
-                        <div className="my-6 rounded-md overflow-hidden bg-gray-900 border border-gray-800">
-                          <div className="p-4 overflow-x-auto">
-                            {lines.map((line, i) => (
-                              <div key={i} className="leading-relaxed">
-                                <span
-                                  className={`text-sm font-mono whitespace-pre ${
-                                    line.includes("←") ||
-                                    line.includes("Answer") ||
-                                    line.includes("✓")
-                                      ? "text-green-400 font-medium"
-                                      : line.startsWith("Array:") ||
-                                          line.startsWith("Prefix") ||
-                                          line.startsWith("String:")
-                                        ? "text-indigo-400"
-                                        : line.startsWith("Step") ||
-                                            line.startsWith("i=")
-                                          ? "text-gray-300"
-                                          : line.includes("Maximum") ||
-                                              line.includes("Final") ||
-                                              line.includes("Result")
-                                            ? "text-yellow-400"
-                                            : line.includes("|")
-                                              ? "text-gray-400"
-                                              : "text-gray-400"
-                                  }`}
-                                >
-                                  {line || " "}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <code className="px-1.5 py-0.5 bg-gray-800 text-indigo-300 rounded-md text-[0.9em] font-mono">
-                        {children}
-                      </code>
-                    );
-                  },
-                  pre: ({ children }) => <>{children}</>,
-                  table: ({ children }) => (
-                    <div className="my-8 overflow-x-auto rounded-md border border-gray-800 bg-gray-900/50">
-                      <table className="w-full border-collapse min-w-[500px]">
-                        {children}
-                      </table>
-                    </div>
-                  ),
-                  thead: ({ children }) => (
-                    <thead className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-b border-gray-700">
-                      {children}
-                    </thead>
-                  ),
-                  tbody: ({ children }) => (
-                    <tbody className="divide-y divide-gray-800">
-                      {children}
-                    </tbody>
-                  ),
-                  tr: ({ children }) => (
-                    <tr className="hover:bg-gray-800/30 transition-colors">
-                      {children}
-                    </tr>
-                  ),
-                  th: ({ children }) => (
-                    <th className="px-5 py-4 text-left text-sm font-bold text-indigo-300 uppercase tracking-wider">
-                      {children}
-                    </th>
-                  ),
-                  td: ({ children }) => (
-                    <td className="px-5 py-4 text-gray-300 text-sm">
-                      {children}
-                    </td>
-                  ),
-                  blockquote: ({ children }) => (
-                    <blockquote className="my-6 pl-4 border-l-4 border-indigo-500 bg-indigo-500/10 py-3 pr-4 rounded-r-md">
-                      {children}
-                    </blockquote>
-                  ),
-                }}
-              >
-                {section.content}
-              </ReactMarkdown>
-            </div>
-
-            {/* Code Block */}
-            {section.code && (
-              <div className="mt-8">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-gray-400">
-                    Code
-                  </span>
-                  <LanguageToggle
-                    currentLang={currentLang}
-                    onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
-                    languages={Object.keys(section.code).filter(
-                      (k) => section.code?.[k as keyof typeof section.code]
-                    )}
-                    size="sm"
-                  />
-                </div>
-                <CodeBlock
-                  code={
-                    section.code[currentLang as keyof typeof section.code] ||
-                    section.code.java ||
-                    section.code.javascript ||
-                    ""
-                  }
-                  language={currentLang}
-                  collapsible={true}
-                  highlightable
-                  contentType="tutorial_code"
-                  contentId={`${pattern.id}:section-${idx}:${currentLang}`}
-                />
+      {/* Main Content */}
+      <div className="flex-1 min-w-0 flex justify-center">
+        <div className="w-full max-w-3xl">
+          {isQuizPage ? (
+            <div>
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-white mb-2">Quiz</h2>
+                <p className="text-gray-400">
+                  Test your understanding of {pattern.category}
+                </p>
               </div>
-            )}
-
-            {/* DP Visualizers - Interactive Components */}
-            {pattern.category === "Dynamic Programming" &&
-              section.title.includes("Decision Trees") && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-indigo-400">▶</span> Interactive
-                    Decision Tree
-                  </h4>
-                  <DPTreeVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Dynamic Programming" &&
-              section.title.includes("Deriving Recurrence") && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-purple-400">▶</span> Interactive
-                    Recurrence Builder
-                  </h4>
-                  <RecurrenceBuilderVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Dynamic Programming" &&
-              section.title.includes("Complete DP Transformation") && (
-                <div className="mt-8 space-y-8">
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <span className="text-green-400">▶</span> Interactive
-                      Transformation
-                    </h4>
-                    <DPTransformationVisualizer />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <span className="text-pink-400">▶</span> Side-by-Side Race
-                    </h4>
-                    <DPComparisonVisualizer />
-                  </div>
-                </div>
-              )}
-
-            {pattern.category === "Dynamic Programming" &&
-              section.title.includes("1D DP") && (
-                <div className="mt-8 space-y-8">
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <span className="text-green-400">▶</span> Interactive DP
-                      Transformation
-                    </h4>
-                    <DPTransformationVisualizer />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <span className="text-pink-400">▶</span> Side-by-Side
-                      Comparison
-                    </h4>
-                    <DPComparisonVisualizer />
-                  </div>
-                </div>
-              )}
-
-            {pattern.category === "Dynamic Programming" &&
-              section.title.includes("Decision DP") && (
-                <div className="mt-8 space-y-8">
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <span className="text-green-400">▶</span> Interactive House
-                      Robber
-                    </h4>
-                    <DPTransformationVisualizer />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <span className="text-pink-400">▶</span> Side-by-Side
-                      Comparison
-                    </h4>
-                    <DPComparisonVisualizer />
-                  </div>
-                </div>
-              )}
-
-            {pattern.category === "Dynamic Programming" &&
-              section.title.includes("2D DP") && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-blue-400">▶</span> Interactive 2D
-                    Table
-                  </h4>
-                  <DPTableVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Dynamic Programming" &&
-              section.title.includes("Knapsack") && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-orange-400">▶</span> Interactive
-                    Knapsack
-                  </h4>
-                  <KnapsackVisualizer />
-                </div>
-              )}
-
-            {/* Greedy Visualizers */}
-            {pattern.category === "Greedy" &&
-              (section.title.includes("Activity") ||
-                section.title.includes("Interval") ||
-                section.title.includes("Scheduling")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-green-400">▶</span> Interactive
-                    Activity Selection
-                  </h4>
-                  <ActivitySelectionVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Greedy" &&
-              (section.title.includes("Jump") ||
-                section.title.includes("Reachability") ||
-                section.title.includes("Array Traversal")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-blue-400">▶</span> Interactive Jump
-                    Game
-                  </h4>
-                  <JumpGameVisualizer />
-                </div>
-              )}
-
-            {/* Graph Visualizers */}
-            {pattern.category === "Graphs" &&
-              (section.title.includes("Grid") ||
-                section.title.includes("Islands") ||
-                section.title.includes("DFS vs BFS")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-cyan-400">▶</span> Interactive Grid
-                    Traversal
-                  </h4>
-                  <GridBFSVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Graphs" &&
-              (section.title.includes("Topological") ||
-                section.title.includes("Course")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-purple-400">▶</span> Interactive
-                    Topological Sort
-                  </h4>
-                  <TopologicalSortVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Graphs" &&
-              (section.title.includes("Dijkstra") ||
-                section.title.includes("Weighted")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-orange-400">▶</span> Interactive
-                    Dijkstra
-                  </h4>
-                  <DijkstraVisualizer />
-                </div>
-              )}
-
-            {/* Hash Map / Set Visualizers */}
-            {pattern.category === "Hash Map / Set" &&
-              (section.title.includes("Two Sum") ||
-                section.title.includes("Complement")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-pink-400">▶</span> Interactive Two Sum
-                  </h4>
-                  <TwoSumVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Hash Map / Set" &&
-              (section.title.includes("Grouping") ||
-                section.title.includes("Anagram")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-indigo-400">▶</span> Interactive
-                    Anagram Grouping
-                  </h4>
-                  <AnagramGroupVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Hash Map / Set" &&
-              (section.title.includes("Consecutive") ||
-                section.title.includes("Sequence")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-teal-400">▶</span> Interactive
-                    Consecutive Sequence
-                  </h4>
-                  <ConsecutiveSequenceVisualizer />
-                </div>
-              )}
-
-            {/* Heap / Priority Queue Visualizers */}
-            {pattern.category === "Heap / Priority Queue" &&
-              (section.title.includes("Kth") ||
-                section.title.includes("K Largest") ||
-                section.title.includes("Top K")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-amber-400">▶</span> Interactive Kth
-                    Largest
-                  </h4>
-                  <KthLargestVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Heap / Priority Queue" &&
-              (section.title.includes("Two Heaps") ||
-                section.title.includes("Median")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-rose-400">▶</span> Interactive Median
-                    Finder
-                  </h4>
-                  <MedianFinderVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Heap / Priority Queue" &&
-              (section.title.includes("Merge K") ||
-                section.title.includes("Merging")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-violet-400">▶</span> Interactive Merge
-                    K Lists
-                  </h4>
-                  <MergeKListsVisualizer />
-                </div>
-              )}
-
-            {/* Intervals Visualizers */}
-            {pattern.category === "Intervals" &&
-              section.title.includes("Merge") &&
-              !section.title.includes("K") && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-emerald-400">▶</span> Interactive
-                    Merge Intervals
-                  </h4>
-                  <MergeIntervalsVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Intervals" &&
-              (section.title.includes("Meeting") ||
-                section.title.includes("Line Sweep")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-indigo-400">▶</span> Interactive
-                    Meeting Rooms
-                  </h4>
-                  <MeetingRoomsVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Intervals" &&
-              section.title.includes("Intersection") && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-cyan-400">▶</span> Interactive
-                    Interval Intersection
-                  </h4>
-                  <IntervalIntersectionVisualizer />
-                </div>
-              )}
-
-            {/* Linked List Visualizers */}
-            {pattern.category === "Linked List" &&
-              (section.title.includes("Reversal") ||
-                (section.title.includes("Reverse") &&
-                  !section.title.includes("k-Group"))) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-blue-400">▶</span> Interactive Linked
-                    List Reversal
-                  </h4>
-                  <LinkedListReversalVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Linked List" &&
-              (section.title.includes("Fast/Slow") ||
-                section.title.includes("Floyd") ||
-                section.title.includes("Cycle")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-green-400">▶</span> Interactive Cycle
-                    Detection
-                  </h4>
-                  <CycleDetectionVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Linked List" &&
-              (section.title.includes("Reorder") ||
-                section.title.includes("Combining")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-purple-400">▶</span> Interactive
-                    Reorder List
-                  </h4>
-                  <ReorderListVisualizer />
-                </div>
-              )}
-
-            {/* Prefix Sum Visualizers */}
-            {pattern.category === "Prefix Sum" &&
-              (section.title.includes("Building") ||
-                section.title.includes("Querying") ||
-                section.title.includes("What is")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-orange-400">▶</span> Interactive
-                    Prefix Sum
-                  </h4>
-                  <PrefixSumVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Prefix Sum" &&
-              (section.title.includes("Subarray Sum") ||
-                section.title.includes("HashMap")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-pink-400">▶</span> Interactive
-                    Subarray Sum K
-                  </h4>
-                  <SubarraySumKVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Prefix Sum" &&
-              (section.title.includes("Product") ||
-                section.title.includes("Except Self")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-violet-400">▶</span> Interactive
-                    Product Except Self
-                  </h4>
-                  <ProductExceptSelfVisualizer />
-                </div>
-              )}
-
-            {/* Sliding Window Visualizers */}
-            {pattern.category === "Sliding Window" &&
-              (section.title.includes("Fixed") ||
-                section.title.includes("Maximum Sum")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-blue-400">▶</span> Interactive Fixed
-                    Window
-                  </h4>
-                  <FixedWindowVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Sliding Window" &&
-              (section.title.includes("Longest Substring") ||
-                section.title.includes("Without Repeating")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-purple-400">▶</span> Interactive
-                    Longest Substring
-                  </h4>
-                  <LongestSubstringVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Sliding Window" &&
-              (section.title.includes("Anagram") ||
-                section.title.includes("Frequency Counter")) && (
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <span className="text-pink-400">▶</span> Interactive Find
-                    Anagrams
-                  </h4>
-                  <FindAnagramsVisualizer />
-                </div>
-              )}
-
-            {/* Stack / Monotonic Stack Visualizers */}
-            {pattern.category === "Stack / Monotonic Stack" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Valid Parentheses") && (
-                <div className="mt-8">
-                  <ValidParenthesesVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Stack / Monotonic Stack" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Next Greater") && (
-                <div className="mt-8">
-                  <NextGreaterVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Stack / Monotonic Stack" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Largest Rectangle") && (
-                <div className="mt-8">
-                  <LargestRectangleVisualizer />
-                </div>
-              )}
-
-            {/* Trees Visualizers */}
-            {pattern.category === "Trees" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("DFS") && (
-                <div className="mt-8">
-                  <TreeTraversalVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Trees" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Level Order") && (
-                <div className="mt-8">
-                  <LevelOrderVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Trees" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("BST") && (
-                <div className="mt-8">
-                  <BSTValidationVisualizer />
-                </div>
-              )}
-
-            {/* Trie Visualizers */}
-            {pattern.category === "Trie" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Insert") && (
-                <div className="mt-8">
-                  <TrieInsertVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Trie" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Search") && (
-                <div className="mt-8">
-                  <TrieSearchVisualizer />
-                </div>
-              )}
-
-            {/* Two Pointers Visualizers */}
-            {pattern.category === "Two Pointers" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Two Sum") && (
-                <div className="mt-8">
-                  <TwoSumSortedVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Two Pointers" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Container") && (
-                <div className="mt-8">
-                  <ContainerWaterVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Two Pointers" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Remove Duplicates") && (
-                <div className="mt-8">
-                  <RemoveDuplicatesVisualizer />
-                </div>
-              )}
-
-            {/* Union-Find Visualizers */}
-            {pattern.category === "Union-Find" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Union-Find") && (
-                <div className="mt-8">
-                  <UnionFindVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Union-Find" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Connected Components") && (
-                <div className="mt-8">
-                  <ConnectedComponentsVisualizer />
-                </div>
-              )}
-
-            {/* Arrays & Strings Visualizers */}
-            {pattern.category === "Arrays & Strings" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Two Sum") && (
-                <div className="mt-8">
-                  <TwoSumHashMapVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Arrays & Strings" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Kadane") && (
-                <div className="mt-8">
-                  <KadaneVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Arrays & Strings" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Prefix Sum") && (
-                <div className="mt-8">
-                  <PrefixSumArrayVisualizer />
-                </div>
-              )}
-
-            {/* Backtracking Visualizers */}
-            {pattern.category === "Backtracking" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Subsets") && (
-                <div className="mt-8">
-                  <SubsetsVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Backtracking" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Permutations") && (
-                <div className="mt-8">
-                  <PermutationsVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Backtracking" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("N-Queens") && (
-                <div className="mt-8">
-                  <NQueensVisualizer />
-                </div>
-              )}
-
-            {/* Binary Search Visualizers */}
-            {pattern.category === "Binary Search" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Binary Search Visualizer") && (
-                <div className="mt-8">
-                  <BinarySearchVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Binary Search" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Rotated Array") && (
-                <div className="mt-8">
-                  <RotatedArrayVisualizer />
-                </div>
-              )}
-
-            {pattern.category === "Binary Search" &&
-              section.title.includes("Interactive") &&
-              section.title.includes("Binary Search on Answer") && (
-                <div className="mt-8">
-                  <KokoEatingVisualizer />
-                </div>
-              )}
-          </div>
-        </article>
-      ))}
-
-      <QuizCard patternId={pattern.id} questionCount={15} />
+              <QuizCard patternId={pattern.id} questionCount={15} />
+            </div>
+          ) : (
+            <>
+              <Highlightable
+                contentType="pattern_tutorial"
+                contentId={`${pattern.id}:section-${currentSectionIndex}`}
+                onAskAI={onAskAI}
+              >
+                <TutorialSection
+                  pattern={pattern}
+                  section={currentSection!}
+                  sectionIndex={currentSectionIndex}
+                />
+              </Highlightable>
+              <CourseNavigation
+                pattern={pattern}
+                currentSectionIndex={currentSectionIndex}
+                onNavigate={handleSectionChange}
+              />
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default TutorialTab;

@@ -394,6 +394,39 @@ class ApiClient {
       body: JSON.stringify(req),
     });
   }
+
+  // Pattern Progress
+  async syncPatternProgress(
+    progress: { [key: string]: number[] }
+  ): Promise<ApiResponse<{ progress: { [key: string]: number[] } }>> {
+    return this.request<{ progress: { [key: string]: number[] } }>(
+      "/api/v1/pattern-progress/sync",
+      {
+        method: "POST",
+        body: JSON.stringify({ progress }),
+      }
+    );
+  }
+
+  async markSectionComplete(
+    patternId: string,
+    sectionIndex: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>(
+      `/api/v1/pattern-progress/${patternId}/${sectionIndex}`,
+      { method: "POST" }
+    );
+  }
+
+  async markSectionIncomplete(
+    patternId: string,
+    sectionIndex: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>(
+      `/api/v1/pattern-progress/${patternId}/${sectionIndex}`,
+      { method: "DELETE" }
+    );
+  }
 }
 
 export const apiClient = new ApiClient();

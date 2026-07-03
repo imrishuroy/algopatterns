@@ -307,7 +307,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
         className="flex flex-col flex-1 min-w-0 overflow-hidden"
       >        {header}
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto px-4 py-4 md:py-8">
+          <div className={`py-4 md:py-8 ${activeTab === "tutorial" ? "pl-0 pr-4 lg:pr-8" : "px-4 max-w-4xl mx-auto"}`}>
             {subscriptionLoading ? (
               <div className="flex items-center justify-center py-16">
                 <div className="text-gray-400">Loading...</div>
@@ -321,9 +321,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
             ) : (
               <>
                 {activeTab === "tutorial" && (
-                  <Highlightable contentType="pattern_tutorial" contentId={pattern.id} onAskAI={handleAskAI}>
-                    <TutorialTab pattern={pattern} />
-                  </Highlightable>
+                  <TutorialTab pattern={pattern} onAskAI={handleAskAI} />
                 )}
                 {activeTab === "problems" && (
                   <ProblemsTab

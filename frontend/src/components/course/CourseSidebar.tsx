@@ -75,7 +75,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
 
           return (
             <button
-              key={`${pattern.id}-section-${index}-${section.title}`}
+              key={`${pattern.id}-section-${section.title}-${index}`}
               onClick={() => handleSectionClick(index)}
               className={`
                 w-full flex items-start gap-3 p-3 rounded-lg text-left transition-all

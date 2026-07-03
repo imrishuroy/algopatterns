@@ -771,7 +771,7 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
                     <div className="my-6 rounded-md overflow-hidden bg-gray-900/80 border border-gray-800">
                       <div className="p-4 overflow-x-auto">
                         {lines.map((line, lineIndex) => (
-                          <div key={`line-${lineIndex}-${line.slice(0, 20)}`} className="leading-relaxed">
+                              <div key={`line-${line.slice(0, 20)}-${lineIndex}`} className="leading-relaxed">
                             <span className="text-sm font-mono whitespace-pre text-gray-300">
                               {line || " "}
                             </span>

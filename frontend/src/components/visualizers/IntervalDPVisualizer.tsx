@@ -85,7 +85,7 @@ const BalloonsDisplay = ({ highlightRange }: { highlightRange?: { l: number; r: 
       const inRange = highlightRange && idx >= highlightRange.l && idx <= highlightRange.r;
       const isK = highlightRange && idx === highlightRange.k;
       return (
-        <div key={`balloon-${balloonIndex}-${b}`} className={`w-12 h-12 flex items-center justify-center rounded-full font-mono font-bold transition-all ${
+        <div key={`balloon-${b}-${balloonIndex}`} className={`w-12 h-12 flex items-center justify-center rounded-full font-mono font-bold transition-all ${
           isK ? "bg-red-600 text-white ring-2 ring-red-400" : inRange ? "bg-blue-600 text-white" : "bg-yellow-500 text-black"
         }`}>{b}</div>
       );

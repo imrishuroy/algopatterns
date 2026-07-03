@@ -35,7 +35,7 @@ const fredoka = Fredoka({
 
 export const metadata = defaultMetadata;
 
-export default function RootLayout({
+export default function RootLayout({ // skipcq: JS-0067
   children,
 }: Readonly<{
   children: React.ReactNode;

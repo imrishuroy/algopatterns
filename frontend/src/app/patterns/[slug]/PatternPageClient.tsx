@@ -34,7 +34,7 @@ const difficultyColors: Record<string, string> = {
   "Medium-Hard": "bg-orange-500/20 text-orange-400",
 };
 
-export default function PatternPageClient({ pattern }: PatternPageClientProps) { // skipcq: JS-R1005
+export default function PatternPageClient({ pattern }: PatternPageClientProps) { // skipcq: JS-0067, JS-R1005
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<Tab>(

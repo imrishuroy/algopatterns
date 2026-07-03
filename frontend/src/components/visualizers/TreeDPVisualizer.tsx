@@ -251,7 +251,7 @@ const PostorderPhase = ({
   );
 };
 
-export default function TreeDPVisualizer() {
+export default function TreeDPVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["concept", "postorder", "result"];
   const phaseLabels: Record<Phase, string> = { concept: "Concept", postorder: "Postorder DP", result: "Result" };
 

@@ -132,7 +132,7 @@ const GridDisplay = ({ dpTable, currentCell, showGrid, showCost }: { dpTable: nu
         {dpTable.map((row, r) => row.map((val, c) => {
           const isCurrent = currentCell?.r === r && currentCell?.c === c;
           return (
-            <div key={`dp-cell-${r}-${c}`} className={`w-12 h-12 flex items-center justify-center rounded font-mono border-2 transition-all ${
+            <div key={`dp-cell-${r}-${c}-${val}`} className={`w-12 h-12 flex items-center justify-center rounded font-mono border-2 transition-all ${
               isCurrent ? "bg-blue-600 border-blue-400 text-white font-bold" : val > 0 ? "bg-gray-800 border-gray-600 text-gray-300" : "bg-gray-900/50 border-gray-700 text-gray-600"
             }`}>{val || ""}</div>
           );

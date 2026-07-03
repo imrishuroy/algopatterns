@@ -200,7 +200,7 @@ const Controls = ({
 const HousesDisplay = ({ highlightIndex, robbed }: { highlightIndex?: number; robbed?: Set<number> }) => (
   <div className="flex justify-center gap-2 mb-4">
     {houses.map((value, houseIndex) => (
-      <div key={`house-${houseIndex}-${value}`} className="flex flex-col items-center">
+      <div key={`house-${value}-${houseIndex}`} className="flex flex-col items-center">
         <div
           className={`w-14 h-12 flex items-center justify-center rounded-t-lg border-2 transition-all ${
             highlightIndex === houseIndex

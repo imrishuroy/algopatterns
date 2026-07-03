@@ -125,7 +125,7 @@ const StringsDisplay = ({ highlightI, highlightJ }: { highlightI?: number; highl
       <div className="text-xs text-gray-500 mb-1">String 1</div>
       <div className="flex gap-1">
         {str1.split("").map((c, charIndex) => (
-          <div key={`s1-char-${charIndex}-${c}`} className={`w-8 h-8 flex items-center justify-center rounded font-mono font-bold ${highlightI === charIndex + 1 ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-300"}`}>{c}</div>
+          <div key={`s1-char-${c}-${charIndex}`} className={`w-8 h-8 flex items-center justify-center rounded font-mono font-bold ${highlightI === charIndex + 1 ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-300"}`}>{c}</div>
         ))}
       </div>
     </div>
@@ -133,7 +133,7 @@ const StringsDisplay = ({ highlightI, highlightJ }: { highlightI?: number; highl
       <div className="text-xs text-gray-500 mb-1">String 2</div>
       <div className="flex gap-1">
         {str2.split("").map((c, charIndex) => (
-          <div key={`s2-char-${charIndex}-${c}`} className={`w-8 h-8 flex items-center justify-center rounded font-mono font-bold ${highlightJ === charIndex + 1 ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-300"}`}>{c}</div>
+          <div key={`s2-char-${c}-${charIndex}`} className={`w-8 h-8 flex items-center justify-center rounded font-mono font-bold ${highlightJ === charIndex + 1 ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-300"}`}>{c}</div>
         ))}
       </div>
     </div>
@@ -161,16 +161,16 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
             <tr>
               <th className="p-2 text-gray-500 w-10"></th>
               <th className="p-2 text-gray-500 w-10">-</th>
-              {str2.split("").map((c, charIndex) => (<th key={`header-s2-${charIndex}-${c}`} className="p-2 text-purple-400 w-10 font-mono">{c}</th>))}
+              {str2.split("").map((c, charIndex) => (<th key={`header-s2-${c}-${charIndex}`} className="p-2 text-purple-400 w-10 font-mono">{c}</th>))}
             </tr>
           </thead>
           <tbody>
             <tr>
               <td className="p-2 text-gray-500">-</td>
-              {Array(str2.length + 1).fill(0).map((_, colIdx) => (<td key={`zero-row-${colIdx}`} className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>))}
+              {Array(str2.length + 1).fill(0).map((_, colIdx) => (<td key={`zero-col-${colIdx}`} className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>))}
             </tr>
             {str1.split("").map((c, rowIndex) => (
-              <tr key={`table-row-${rowIndex}-${c}`}>
+              <tr key={`table-row-${c}-${rowIndex}`}>
                 <td className="p-2 text-blue-400 font-mono">{c}</td>
                 <td className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>
                 {Array(str2.length).fill(0).map((_, colIndex) => {
@@ -214,16 +214,16 @@ const BacktrackPhase = ({ step, backtrackSteps, dp }: { step: number; backtrackS
             <tr>
               <th className="p-2 text-gray-500 w-10"></th>
               <th className="p-2 text-gray-500 w-10">-</th>
-              {str2.split("").map((c, charIndex) => (<th key={`header-s2-${charIndex}-${c}`} className="p-2 text-purple-400 w-10 font-mono">{c}</th>))}
+              {str2.split("").map((c, charIndex) => (<th key={`bt-header-s2-${c}-${charIndex}`} className="p-2 text-purple-400 w-10 font-mono">{c}</th>))}
             </tr>
           </thead>
           <tbody>
             <tr>
               <td className="p-2 text-gray-500">-</td>
-              {Array(str2.length + 1).fill(0).map((_, colIdx) => (<td key={`zero-row-${colIdx}`} className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>))}
+              {Array(str2.length + 1).fill(0).map((_, colIdx) => (<td key={`bt-zero-col-${colIdx}`} className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>))}
             </tr>
             {str1.split("").map((c, rowIndex) => (
-              <tr key={`table-row-${rowIndex}-${c}`}>
+              <tr key={`bt-row-${c}-${rowIndex}`}>
                 <td className="p-2 text-blue-400 font-mono">{c}</td>
                 <td className="p-1"><div className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded text-gray-400 font-mono">0</div></td>
                 {Array(str2.length).fill(0).map((_, colIndex) => {

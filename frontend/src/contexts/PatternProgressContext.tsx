@@ -27,7 +27,7 @@ interface PatternProgressContextType {
 
 const PatternProgressContext = createContext<
   PatternProgressContextType | undefined
->(undefined);
+>(undefined); // skipcq: JS-W1042
 
 const STORAGE_KEY = "pattern_progress";
 

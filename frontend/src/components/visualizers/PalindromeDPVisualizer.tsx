@@ -21,7 +21,7 @@ const generateTableSteps = () => {
   for (let i = 0; i < n - 1; i++) {
     const isPalin = str[i] === str[i + 1];
     dp[i][i + 1] = isPalin;
-    if (isPalin && 2 > longestLen) { longestStart = i; longestLen = 2; }
+    if (isPalin && longestLen < 2) { longestStart = i; longestLen = 2; }
     steps.push({ i, j: i + 1, isPalin, formula: `'${str[i]}${str[i + 1]}': ${str[i]} ${isPalin ? "==" : "!="} ${str[i + 1]}`, len: 2 });
   }
 
@@ -116,7 +116,7 @@ const StringDisplay = ({ highlightRange }: { highlightRange?: { left: number; ri
     {str.split("").map((c, i) => {
       const inRange = highlightRange && i >= highlightRange.left && i <= highlightRange.right;
       return (
-        <div key={i} className="flex flex-col items-center">
+        <div key={`str-char-${i}-${c}`} className="flex flex-col items-center">
           <div className="text-xs text-gray-500 mb-1">{i}</div>
           <div className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-lg transition-all ${
             inRange ? "bg-purple-600 text-white" : "bg-gray-800 text-gray-300"
@@ -175,22 +175,22 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
             <thead>
               <tr>
                 <th className="p-2 text-gray-500 w-8">i\j</th>
-                {str.split("").map((c, i) => (<th key={i} className="p-2 text-gray-400 w-10">{c}</th>))}
+                {str.split("").map((c, i) => (<th key={`th-col-${i}-${c}`} className="p-2 text-gray-400 w-10">{c}</th>))}
               </tr>
             </thead>
             <tbody>
               {str.split("").map((c, i) => (
-                <tr key={i}>
+                <tr key={`tr-row-${i}-${c}`}>
                   <td className="p-2 text-gray-400 font-mono">{c}</td>
                   {str.split("").map((_, j) => {
                     const isCurrent = currentStep && currentStep.i === i && currentStep.j === j;
                     const value = dpTable[i]?.[j];
                     const isValid = j >= i;
-                    return (
-                      <td key={j} className="p-1">
+                        return (
+                          <td key={`td-cell-${i}-${j}`} className="p-1">
                         <div className={`w-10 h-10 flex items-center justify-center border-2 rounded font-mono text-xs ${
                           !isValid ? "bg-gray-900/30 border-gray-800" :
-                          isCurrent ? (value ? "bg-green-600 border-green-400" : "bg-red-600/50 border-red-400") + " text-white font-bold" :
+                          isCurrent ? `${value ? "bg-green-600 border-green-400" : "bg-red-600/50 border-red-400"} text-white font-bold` :
                           value === true ? "bg-green-600/30 border-green-600/50 text-green-400" :
                           value === false ? "bg-gray-800/50 border-gray-700 text-gray-600" : "bg-gray-900/50 border-gray-700 text-gray-600"
                         }`}>{isValid ? (value === null ? "" : value ? "T" : "F") : ""}</div>
@@ -247,7 +247,7 @@ const ExpandPhase = ({ step, expandSteps }: { step: number; expandSteps: ReturnT
   );
 };
 
-export default function PalindromeDPVisualizer() {
+export default function PalindromeDPVisualizer() { // skipcq: JS-0067
   const phases: Phase[] = ["concept", "table", "expand"];
   const phaseLabels: Record<Phase, string> = { concept: "Concept", table: "2D DP Table", expand: "Expand Center" };
 

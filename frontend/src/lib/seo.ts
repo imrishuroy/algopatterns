@@ -36,7 +36,7 @@ export const defaultMetadata: Metadata = {
     description: siteConfig.description,
     images: [
       {
-        url: "/og-image.png",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "AlgoPatterns - Master DSA Patterns",
@@ -47,7 +47,7 @@ export const defaultMetadata: Metadata = {
     card: "summary_large_image",
     title: "AlgoPatterns - Master DSA Patterns for FAANG Interviews",
     description: siteConfig.description,
-    images: ["/og-image.png"],
+    images: ["/opengraph-image"],
     creator: "@algopatterns",
   },
   robots: {
@@ -62,9 +62,7 @@ export const defaultMetadata: Metadata = {
     },
   },
   verification: {
-    // Add your verification codes here
-    // google: "your-google-verification-code",
-    // yandex: "your-yandex-verification-code",
+    google: "GN9sKyZeBRDfjzlfvY8mPl0NB0zbnt2gHnPbmWpK3ng",
   },
 };
 
@@ -298,6 +296,7 @@ export const patternSEO: Record<string, PatternSEO> = {
   },
 };
 
+// skipcq: JS-0067
 export function getPatternMetadata(slug: string, category: string, description: string): Metadata {
   const seo = patternSEO[slug];
   const baseUrl = siteConfig.url;
@@ -317,9 +316,11 @@ export function getPatternMetadata(slug: string, category: string, description: 
       description: metaDescription,
       type: "article",
       url: `${baseUrl}/patterns/${slug}`,
+      siteName: "AlgoPatterns",
+      locale: "en_US",
       images: [
         {
-          url: `/og-images/patterns/${slug}.png`,
+          url: "/opengraph-image",
           width: 1200,
           height: 630,
           alt: title,
@@ -330,7 +331,7 @@ export function getPatternMetadata(slug: string, category: string, description: 
       card: "summary_large_image",
       title,
       description: metaDescription,
-      images: [`/og-images/patterns/${slug}.png`],
+      images: ["/opengraph-image"],
     },
     alternates: {
       canonical: `${baseUrl}/patterns/${slug}`,

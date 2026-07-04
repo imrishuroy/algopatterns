@@ -1,23 +1,87 @@
-"use client";
-
+import { Metadata } from "next";
 import Link from "next/link";
 import { articles } from "@/content/articles";
+import { siteConfig } from "@/lib/seo";
+import { JsonLdScript } from "@/components/seo/JsonLd";
 
+const siteUrl = siteConfig.url;
+
+export const metadata: Metadata = {
+  title: "Articles - DSA Deep Dives & Algorithm Guides | AlgoPatterns",
+  description:
+    "In-depth articles on recursion, dynamic programming, graph algorithms, and interview preparation. Comprehensive guides with code examples in Java, Python, C++, and JavaScript.",
+  keywords: [
+    "dsa articles",
+    "algorithm guides",
+    "recursion tutorial",
+    "dynamic programming guide",
+    "graph algorithms article",
+    "coding interview guide",
+    "data structures deep dive",
+  ],
+  openGraph: {
+    title: "Articles - DSA Deep Dives & Algorithm Guides | AlgoPatterns",
+    description:
+      "In-depth articles on recursion, dynamic programming, graph algorithms, and more with code examples.",
+    type: "website",
+    url: `${siteUrl}/articles`,
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "AlgoPatterns Articles",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Articles - DSA Deep Dives & Algorithm Guides | AlgoPatterns",
+    description:
+      "In-depth articles on algorithms and data structures for coding interview prep.",
+    images: ["/opengraph-image"],
+  },
+  alternates: {
+    canonical: `${siteUrl}/articles`,
+  },
+};
+
+const itemListJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "AlgoPatterns Articles",
+  description:
+    "In-depth articles on data structures, algorithms, and coding interview preparation.",
+  url: `${siteUrl}/articles`,
+  numberOfItems: articles.length,
+  itemListElement: articles.map((article, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    url: `${siteUrl}/articles/${article.slug}`,
+    name: article.title,
+  })),
+};
+
+// skipcq: JS-0067
+function getDifficultyColor(difficulty: string): string {
+  switch (difficulty) {
+    case "beginner":
+      return "bg-green-500/20 text-green-400";
+    case "intermediate":
+      return "bg-yellow-500/20 text-yellow-400";
+    case "advanced":
+      return "bg-red-500/20 text-red-400";
+    default:
+      return "bg-gray-500/20 text-gray-400";
+  }
+}
+
+// skipcq: JS-0067
 export default function ArticlesPage() {
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-green-500/20 text-green-400";
-      case "intermediate":
-        return "bg-yellow-500/20 text-yellow-400";
-      case "advanced":
-        return "bg-red-500/20 text-red-400";
-      default:
-        return "bg-gray-500/20 text-gray-400";
-    }
-  };
-
+  // skipcq: JS-0415
   return (
+    <>
+      <JsonLdScript data={itemListJsonLd} />
     <div className="min-h-screen bg-gray-950">
       <div className="max-w-6xl mx-auto px-4 py-6 md:py-12">
         <header className="mb-8 md:mb-12">
@@ -133,5 +197,6 @@ export default function ArticlesPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

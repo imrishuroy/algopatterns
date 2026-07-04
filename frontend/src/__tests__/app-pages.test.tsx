@@ -214,8 +214,12 @@ vi.mock("@/components/ui/LanguageToggle", () => ({
     ),
 }));
 vi.mock("@/components/seo/JsonLd", () => ({
-  WebsiteJsonLd: () => null,
-  FAQJsonLd: () => null,
+ JsonLdScript: () => null,
+ WebsiteJsonLd: () => null,
+ OrganizationJsonLd: () => null,
+ FAQJsonLd: () => null,
+ ArticleJsonLd: () => null,
+ BreadcrumbJsonLd: () => null,
 }));
 
 // ── Data mocks ──
@@ -324,8 +328,11 @@ describe("Home page", () => {
 
   it("has correct metadata exports", async () => {
     const mod = await import("@/app/page");
-    expect(mod.metadata.title).toContain("AlgoPatterns");
-    expect(mod.metadata.description).toContain("Learn algorithms");
+    const title = typeof mod.metadata.title === "object" && mod.metadata.title !== null && "absolute" in mod.metadata.title
+      ? (mod.metadata.title as { absolute: string }).absolute
+      : String(mod.metadata.title);
+    expect(title).toContain("AlgoPatterns");
+    expect(mod.metadata.description).toContain("Master");
   });
 });
 
@@ -924,20 +931,20 @@ describe("Pricing layout", () => {
 
 describe("Interview Cheatsheet page", () => {
   it("renders the main heading and intro", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByRole("heading", { name: /interview cheat sheet/i })).toBeInTheDocument();
     expect(screen.getByText(/quick revision guide/i)).toBeInTheDocument();
   });
 
   it("renders the Golden Rule section", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/the golden rule: check constraints first/i)).toBeInTheDocument();
   });
 
   it("renders constraints table", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/n ≤ 15/)).toBeInTheDocument();
     expect(screen.getByText(/n ≤ 1,000,000/)).toBeInTheDocument();
@@ -945,7 +952,7 @@ describe("Interview Cheatsheet page", () => {
   });
 
   it("renders pattern selector table", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/quick pattern selector/i)).toBeInTheDocument();
     expect(screen.getByText(/sorted array, find pair/i)).toBeInTheDocument();
@@ -953,7 +960,7 @@ describe("Interview Cheatsheet page", () => {
   });
 
   it("renders all 14 pattern cards", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/all patterns with templates/i)).toBeInTheDocument();
     expect(screen.getByText(/1\. Two Pointers/)).toBeInTheDocument();
@@ -964,7 +971,7 @@ describe("Interview Cheatsheet page", () => {
   });
 
   it("expands a pattern card when clicked", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.queryByText(/Reduces O\(n²\) brute force/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByText(/1\. Two Pointers/));
@@ -973,7 +980,7 @@ describe("Interview Cheatsheet page", () => {
   });
 
   it("collapses a pattern card when clicked again", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     fireEvent.click(screen.getByText(/1\. Two Pointers/));
     expect(screen.getByText(/Reduces O\(n²\) brute force/)).toBeInTheDocument();
@@ -982,21 +989,21 @@ describe("Interview Cheatsheet page", () => {
   });
 
   it("renders keyword to algorithm section", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/keyword to algorithm/i)).toBeInTheDocument();
     expect(screen.getByText(/Top K \/ Kth largest/)).toBeInTheDocument();
   });
 
   it("renders decision tree section", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/quick decision tree/i)).toBeInTheDocument();
     expect(screen.getByText(/is it about ARRAYS/i)).toBeInTheDocument();
   });
 
   it("renders complexity reference table", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/complexity reference/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Two Pointers/).length).toBeGreaterThanOrEqual(1);
@@ -1004,7 +1011,7 @@ describe("Interview Cheatsheet page", () => {
   });
 
   it("renders common mistakes section", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/page")).default;
+    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/common mistakes to avoid/i)).toBeInTheDocument();
     expect(screen.getByText(/Forgetting to sort the array first/)).toBeInTheDocument();
@@ -1023,9 +1030,11 @@ describe("Interview Cheatsheet layout", () => {
   });
 
   it("has correct metadata", async () => {
-    const mod = await import("@/app/interview-cheatsheet/layout");
-    expect(mod.metadata.title).toContain("Coding Interview Cheatsheet");
-    expect(mod.metadata.description).toContain("time complexity guide");
+    // Metadata moved from layout.tsx to page.tsx for correctness (layout metadata
+    // was overridden by page metadata and caused duplicate FAQJsonLd structured data).
+    const mod = await import("@/app/interview-cheatsheet/page");
+    expect(mod.metadata.title).toContain("Interview Cheatsheet");
+    expect((mod.metadata.description as string)).toContain("cheatsheet");
   });
 });
 
@@ -1035,13 +1044,13 @@ describe("Interview Cheatsheet layout", () => {
 
 describe("Pattern Recognition page", () => {
   it("renders the main heading", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     expect(screen.getByRole("heading", { name: /pattern recognition guide/i })).toBeInTheDocument();
   });
 
   it("renders tab navigation", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     expect(screen.getByText(/quick cheatsheet/i)).toBeInTheDocument();
     expect(screen.getByText(/by constraints/i)).toBeInTheDocument();
@@ -1050,7 +1059,7 @@ describe("Pattern Recognition page", () => {
   });
 
   it("shows cheatsheet tab by default", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     expect(screen.getByText(/the golden rule: check constraints first/i)).toBeInTheDocument();
     expect(screen.getByText(/quick pattern lookup/i)).toBeInTheDocument();
@@ -1058,7 +1067,7 @@ describe("Pattern Recognition page", () => {
   });
 
   it("switches to constraints tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by constraints/i));
     expect(screen.getByText(/n ≤ 20/)).toBeInTheDocument();
@@ -1068,7 +1077,7 @@ describe("Pattern Recognition page", () => {
   });
 
   it("switches between constraint size options", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by constraints/i));
     fireEvent.click(screen.getByText(/n ≤ 3000/));
@@ -1078,7 +1087,7 @@ describe("Pattern Recognition page", () => {
   });
 
   it("switches to patterns tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by pattern/i));
     expect(screen.getByText(/two pointers/i)).toBeInTheDocument();
@@ -1087,7 +1096,7 @@ describe("Pattern Recognition page", () => {
   });
 
   it("shows pattern detail when a pattern is selected", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by pattern/i));
     fireEvent.click(screen.getByText(/two pointers/i));
@@ -1097,7 +1106,7 @@ describe("Pattern Recognition page", () => {
   });
 
   it("deselects pattern when clicked again", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by pattern/i));
     fireEvent.click(screen.getByRole("button", { name: /two pointers/i }));
@@ -1107,7 +1116,7 @@ describe("Pattern Recognition page", () => {
   });
 
   it("switches to keywords tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by keywords/i));
     expect(screen.getByText(/dynamic programming/i)).toBeInTheDocument();
@@ -1116,7 +1125,7 @@ describe("Pattern Recognition page", () => {
   });
 
   it("displays input-to-pattern mappings in cheatsheet tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     expect(screen.getAllByText(/sorted array/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/unsorted array/i)).toBeInTheDocument();
@@ -1124,14 +1133,14 @@ describe("Pattern Recognition page", () => {
   });
 
   it("displays output-to-pattern mappings in cheatsheet tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     expect(screen.getByText(/all combinations\/subsets/i)).toBeInTheDocument();
     expect(screen.getByText(/shortest path/i)).toBeInTheDocument();
   });
 
   it("displays 4-step decision flow", async () => {
-    const Page = (await import("@/app/pattern-recognition/page")).default;
+    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
     render(React.createElement(Page));
     expect(screen.getByText(/check n/i)).toBeInTheDocument();
     expect(screen.getByText(/look at input type/i)).toBeInTheDocument();
@@ -1367,13 +1376,13 @@ describe("Google callback page", () => {
 
 describe("Expand Around Center guide", () => {
   it("renders the breadcrumb", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/← back to problems/i)).toBeInTheDocument();
   });
 
   it("renders the main heading with badges", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByRole("heading", { name: /expand around center pattern/i })).toBeInTheDocument();
     expect(screen.getAllByText(/medium/i).length).toBeGreaterThanOrEqual(1);
@@ -1381,7 +1390,7 @@ describe("Expand Around Center guide", () => {
   });
 
   it("renders table of contents with all links", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/in this guide/i)).toBeInTheDocument();
     expect(screen.getAllByText(/core idea/i).length).toBeGreaterThanOrEqual(1);
@@ -1395,14 +1404,14 @@ describe("Expand Around Center guide", () => {
   });
 
   it("renders core idea section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/a palindrome reads the same forwards and backwards/i)).toBeInTheDocument();
     expect(screen.getByText(/think of it like dropping a pebble in water/i)).toBeInTheDocument();
   });
 
   it("renders key insight section with odd and even length palindromes", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/odd length palindromes/i)).toBeInTheDocument();
     expect(screen.getByText(/even length palindromes/i)).toBeInTheDocument();
@@ -1410,7 +1419,7 @@ describe("Expand Around Center guide", () => {
   });
 
   it("renders algorithm steps", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/for each index i from 0 to n-1:/i)).toBeInTheDocument();
     expect(screen.getByText(/call expand\(i, i\) for odd-length palindromes/i)).toBeInTheDocument();
@@ -1419,21 +1428,21 @@ describe("Expand Around Center guide", () => {
   });
 
   it("renders complexity analysis section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/time: O\(n²\)/i)).toBeInTheDocument();
     expect(screen.getByText(/space: O\(1\)/i)).toBeInTheDocument();
   });
 
   it("renders code template with language toggle", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByTestId("language-toggle")).toBeInTheDocument();
     expect(screen.getByTestId("code-block")).toBeInTheDocument();
   });
 
   it("renders problems to practice section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getAllByText(/palindromic substrings/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/longest palindromic substring/i).length).toBeGreaterThanOrEqual(1);
@@ -1441,7 +1450,7 @@ describe("Expand Around Center guide", () => {
   });
 
   it("renders when to use / not use section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/use this pattern/i)).toBeInTheDocument();
     expect(screen.getByText(/don't use \(use dp instead\)/i)).toBeInTheDocument();
@@ -1449,7 +1458,7 @@ describe("Expand Around Center guide", () => {
   });
 
   it("renders common mistakes section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/forgetting the even-length case/i)).toBeInTheDocument();
     expect(screen.getByText(/wrong boundary checks in expand\(\)/i)).toBeInTheDocument();
@@ -1458,7 +1467,7 @@ describe("Expand Around Center guide", () => {
   });
 
   it("renders advanced note about Manacher's algorithm", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/page")).default;
+    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/advanced: manacher's algorithm/i)).toBeInTheDocument();
   });

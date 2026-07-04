@@ -1002,7 +1002,7 @@ describe("seo", () => {
       expect(og).toHaveProperty("siteName", "AlgoPatterns");
       expect(Array.isArray(og?.images)).toBe(true);
       if (og && "images" in og && Array.isArray(og.images)) {
-        expect(og.images[0]).toHaveProperty("url", "/og-image.png");
+        expect(og.images[0]).toHaveProperty("url", "/opengraph-image");
         expect(og.images[0]).toHaveProperty("width", 1200);
         expect(og.images[0]).toHaveProperty("height", 630);
       }

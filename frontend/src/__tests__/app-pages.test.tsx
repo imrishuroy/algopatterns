@@ -214,6 +214,7 @@ vi.mock("@/components/ui/LanguageToggle", () => ({
     ),
 }));
 vi.mock("@/components/seo/JsonLd", () => ({
+ JsonLdScript: () => null,
  WebsiteJsonLd: () => null,
  OrganizationJsonLd: () => null,
  FAQJsonLd: () => null,

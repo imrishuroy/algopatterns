@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// skipcq: JS-0067
 export default function RegisterLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return children;
 }

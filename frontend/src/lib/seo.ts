@@ -296,6 +296,7 @@ export const patternSEO: Record<string, PatternSEO> = {
   },
 };
 
+// skipcq: JS-0067
 export function getPatternMetadata(slug: string, category: string, description: string): Metadata {
   const seo = patternSEO[slug];
   const baseUrl = siteConfig.url;

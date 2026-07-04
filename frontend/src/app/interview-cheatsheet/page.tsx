@@ -66,6 +66,7 @@ const faqItems = [
   { question: "When should I use Backtracking?", answer: "Use Backtracking when the problem asks for all combinations, permutations, or subset solutions. Generate solutions with the choose-explore-undo pattern." },
 ];
 
+// skipcq: JS-0067
 export default function InterviewCheatsheetPage() {
   return (
     <>

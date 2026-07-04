@@ -51,6 +51,7 @@ const breadcrumbs = [
   { name: "Pattern Recognition", url: `${siteUrl}/pattern-recognition` },
 ];
 
+// skipcq: JS-0067
 export default function PatternRecognitionPage() {
   return (
     <>

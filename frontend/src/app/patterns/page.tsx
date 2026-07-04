@@ -63,6 +63,7 @@ const breadcrumbs = [
   { name: "Patterns", url: `${siteUrl}/patterns` },
 ];
 
+// skipcq: JS-0067
 export default function PatternsPage() {
   return (
     <>

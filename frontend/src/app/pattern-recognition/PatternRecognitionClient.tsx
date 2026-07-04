@@ -7,6 +7,7 @@ import LanguageToggle from "@/components/ui/LanguageToggle";
 type Language = "java" | "python" | "javascript";
 type Tab = "cheatsheet" | "constraints" | "patterns" | "keywords";
 
+// skipcq: JS-0067
 export default function PatternRecognitionClient() {
   const [activeTab, setActiveTab] = useState<Tab>("cheatsheet");
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
@@ -67,6 +68,7 @@ export default function PatternRecognitionClient() {
   );
 }
 
+// skipcq: JS-0067
 function CheatsheetTab() {
   return (
     <div className="space-y-6">
@@ -134,9 +136,9 @@ function CheatsheetTab() {
                 { input: "2D Grid", patterns: "DFS/BFS, DP" },
                 { input: "Linked List", patterns: "Two Pointers (fast/slow)" },
                 { input: "Intervals", patterns: "Sort + Greedy" },
-              ].map((item, i) => (
+              ].map((item) => (
                 <div
-                  key={i}
+                  key={item.input}
                   className="flex items-center gap-3 p-2 bg-gray-800/50 rounded-md"
                 >
                   <span className="text-white font-medium min-w-[100px]">
@@ -170,9 +172,9 @@ function CheatsheetTab() {
                   output: "Kth largest/smallest",
                   pattern: "Heap or QuickSelect",
                 },
-              ].map((item, i) => (
+              ].map((item) => (
                 <div
-                  key={i}
+                  key={item.output}
                   className="flex items-center gap-3 p-2 bg-gray-800/50 rounded-md"
                 >
                   <span className="text-white font-medium min-w-[160px]">
@@ -248,6 +250,7 @@ function CheatsheetTab() {
   );
 }
 
+// skipcq: JS-0067
 function ConstraintsTab({
   currentLang,
   setCurrentLang,
@@ -476,9 +479,9 @@ function search(nums, target) {
             Common algorithms:
           </h3>
           <div className="flex flex-wrap gap-2">
-            {current.algos.map((algo, i) => (
+            {current.algos.map((algo) => (
               <span
-                key={i}
+                key={algo}
                 className="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-md text-sm"
               >
                 {algo}
@@ -506,6 +509,7 @@ function search(nums, target) {
   );
 }
 
+// skipcq: JS-0067
 function PatternsTab({
   selectedPattern,
   setSelectedPattern,
@@ -920,14 +924,14 @@ function longestPalindrome(s) {
               Practice:
             </h3>
             <div className="flex flex-wrap gap-2">
-              {selected.problems.map((problem, i) => {
+              {selected.problems.map((problem) => {
                 const slug = problem
                   .toLowerCase()
                   .replace(/[^a-z0-9]+/g, "-")
                   .replace(/(^-|-$)/g, "");
                 return (
                   <a
-                    key={i}
+                    key={problem}
                     href={`https://leetcode.com/problems/${slug}/`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -951,6 +955,7 @@ function longestPalindrome(s) {
   );
 }
 
+// skipcq: JS-0067
 function KeywordsTab() {
   const keywords = [
     {
@@ -1041,15 +1046,15 @@ function KeywordsTab() {
         patterns:
       </p>
 
-      {keywords.map((group, i) => (
+      {keywords.map((group) => (
         <div
-          key={i}
+          key={group.category}
           className={`p-4 rounded-md border ${colorMap[group.color]}`}
         >
           <div className="font-semibold mb-2">{group.category}</div>
           <div className="flex flex-wrap gap-2">
-            {group.words.map((word, j) => (
-              <span key={j} className="px-2 py-1 bg-black/20 rounded-md text-sm">
+            {group.words.map((word) => (
+              <span key={word} className="px-2 py-1 bg-black/20 rounded-md text-sm">
                 &quot;{word}&quot;
               </span>
             ))}

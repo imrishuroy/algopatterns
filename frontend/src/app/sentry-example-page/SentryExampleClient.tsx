@@ -2,6 +2,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+// skipcq: JS-0067
 export default function SentryExampleClient() {
   return (
     <div className="p-8">

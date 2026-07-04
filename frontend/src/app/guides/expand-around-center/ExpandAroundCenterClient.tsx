@@ -7,6 +7,175 @@ import LanguageToggle from "@/components/ui/LanguageToggle";
 
 type Language = "java" | "javascript";
 
+const javaCode = `// Expand Around Center - Core Template
+// Time: O(n²) | Space: O(1)
+
+// Count all palindromic substrings
+public int countSubstrings(String s) {
+    int count = 0;
+    for (int i = 0; i < s.length(); i++) {
+        count += expand(s, i, i);      // Odd length
+        count += expand(s, i, i + 1);  // Even length
+    }
+    return count;
+}
+
+private int expand(String s, int left, int right) {
+    int count = 0;
+    while (left >= 0 && right < s.length()
+           && s.charAt(left) == s.charAt(right)) {
+        count++;
+        left--;
+        right++;
+    }
+    return count;
+}
+
+// Longest Palindromic Substring
+public String longestPalindrome(String s) {
+    int start = 0, end = 0;
+    for (int i = 0; i < s.length(); i++) {
+        int len1 = expandLen(s, i, i);
+        int len2 = expandLen(s, i, i + 1);
+        int len = Math.max(len1, len2);
+        if (len > end - start) {
+            start = i - (len - 1) / 2;
+            end = i + len / 2;
+        }
+    }
+    return s.substring(start, end + 1);
+}
+
+private int expandLen(String s, int l, int r) {
+    while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
+        l--;
+        r++;
+    }
+    return r - l - 1;  // Length after expansion
+}
+
+// Valid Palindrome II - can remove one char
+public boolean validPalindrome(String s) {
+    int l = 0, r = s.length() - 1;
+    while (l < r) {
+        if (s.charAt(l) != s.charAt(r)) {
+            // Try skipping left OR right
+            return isPalin(s, l + 1, r) || isPalin(s, l, r - 1);
+        }
+        l++;
+        r--;
+    }
+    return true;
+}
+
+private boolean isPalin(String s, int l, int r) {
+    while (l < r) {
+        if (s.charAt(l++) != s.charAt(r--)) return false;
+    }
+    return true;
+}`;
+
+const jsCode = `// Expand Around Center - Core Template
+// Time: O(n²) | Space: O(1)
+
+// Count all palindromic substrings
+function countSubstrings(s) {
+    let count = 0;
+    for (let i = 0; i < s.length; i++) {
+        count += expand(s, i, i);      // Odd length
+        count += expand(s, i, i + 1);  // Even length
+    }
+    return count;
+}
+
+function expand(s, left, right) {
+    let count = 0;
+    while (left >= 0 && right < s.length && s[left] === s[right]) {
+        count++;
+        left--;
+        right++;
+    }
+    return count;
+}
+
+// Longest Palindromic Substring
+function longestPalindrome(s) {
+    let start = 0, end = 0;
+    for (let i = 0; i < s.length; i++) {
+        const len1 = expandLen(s, i, i);
+        const len2 = expandLen(s, i, i + 1);
+        const len = Math.max(len1, len2);
+        if (len > end - start) {
+            start = i - Math.floor((len - 1) / 2);
+            end = i + Math.floor(len / 2);
+        }
+    }
+    return s.substring(start, end + 1);
+}
+
+function expandLen(s, l, r) {
+    while (l >= 0 && r < s.length && s[l] === s[r]) {
+        l--;
+        r++;
+    }
+    return r - l - 1;  // Length after expansion
+}
+
+// Valid Palindrome II - can remove one char
+function validPalindrome(s) {
+    let l = 0, r = s.length - 1;
+    while (l < r) {
+        if (s[l] !== s[r]) {
+            // Try skipping left OR right
+            return isPalin(s, l + 1, r) || isPalin(s, l, r - 1);
+        }
+        l++;
+        r--;
+    }
+    return true;
+}
+
+function isPalin(s, l, r) {
+    while (l < r) {
+        if (s[l++] !== s[r--]) return false;
+    }
+    return true;
+}`;
+
+const problems = [
+  {
+    name: "Palindromic Substrings",
+    url: "https://leetcode.com/problems/palindromic-substrings/",
+    difficulty: "Medium",
+    hint: "Count palindromes using expand from each center",
+  },
+  {
+    name: "Longest Palindromic Substring",
+    url: "https://leetcode.com/problems/longest-palindromic-substring/",
+    difficulty: "Medium",
+    hint: "Track the longest palindrome found during expansion",
+  },
+  {
+    name: "Valid Palindrome",
+    url: "https://leetcode.com/problems/valid-palindrome/",
+    difficulty: "Easy",
+    hint: "Two pointers from both ends, skip non-alphanumeric",
+  },
+  {
+    name: "Valid Palindrome II",
+    url: "https://leetcode.com/problems/valid-palindrome-ii/",
+    difficulty: "Easy",
+    hint: "On mismatch, try skipping left OR right character",
+  },
+  {
+    name: "Palindrome Partitioning",
+    url: "https://leetcode.com/problems/palindrome-partitioning/",
+    difficulty: "Medium",
+    hint: "Backtracking + use expand for isPalindrome check",
+  },
+];
+
+// skipcq: JS-0067
 export default function ExpandAroundCenterClient() {
   const [lang, setLang] = useState<Language>("java");
 
@@ -354,9 +523,9 @@ export default function ExpandAroundCenterClient() {
             Problems to Practice
           </h2>
           <div className="space-y-3">
-            {problems.map((problem, i) => (
+            {problems.map((problem) => (
               <a
-                key={i}
+                key={problem.name}
                 href={problem.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -451,9 +620,9 @@ export default function ExpandAroundCenterClient() {
                 mistake: "Off-by-one in calculating start/end indices",
                 fix: "After expand, length = right - left - 1 (pointers are outside palindrome)",
               },
-            ].map((item, i) => (
+            ].map((item) => (
               <div
-                key={i}
+                key={item.mistake}
                 className="p-4 bg-gray-900 rounded-md border border-gray-800"
               >
                 <p className="text-red-400 font-medium">{item.mistake}</p>
@@ -480,171 +649,3 @@ export default function ExpandAroundCenterClient() {
     </div>
   );
 }
-
-const javaCode = `// Expand Around Center - Core Template
-// Time: O(n²) | Space: O(1)
-
-// Count all palindromic substrings
-public int countSubstrings(String s) {
-    int count = 0;
-    for (int i = 0; i < s.length(); i++) {
-        count += expand(s, i, i);      // Odd length
-        count += expand(s, i, i + 1);  // Even length
-    }
-    return count;
-}
-
-private int expand(String s, int left, int right) {
-    int count = 0;
-    while (left >= 0 && right < s.length()
-           && s.charAt(left) == s.charAt(right)) {
-        count++;
-        left--;
-        right++;
-    }
-    return count;
-}
-
-// Longest Palindromic Substring
-public String longestPalindrome(String s) {
-    int start = 0, end = 0;
-    for (int i = 0; i < s.length(); i++) {
-        int len1 = expandLen(s, i, i);
-        int len2 = expandLen(s, i, i + 1);
-        int len = Math.max(len1, len2);
-        if (len > end - start) {
-            start = i - (len - 1) / 2;
-            end = i + len / 2;
-        }
-    }
-    return s.substring(start, end + 1);
-}
-
-private int expandLen(String s, int l, int r) {
-    while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) {
-        l--;
-        r++;
-    }
-    return r - l - 1;  // Length after expansion
-}
-
-// Valid Palindrome II - can remove one char
-public boolean validPalindrome(String s) {
-    int l = 0, r = s.length() - 1;
-    while (l < r) {
-        if (s.charAt(l) != s.charAt(r)) {
-            // Try skipping left OR right
-            return isPalin(s, l + 1, r) || isPalin(s, l, r - 1);
-        }
-        l++;
-        r--;
-    }
-    return true;
-}
-
-private boolean isPalin(String s, int l, int r) {
-    while (l < r) {
-        if (s.charAt(l++) != s.charAt(r--)) return false;
-    }
-    return true;
-}`;
-
-const jsCode = `// Expand Around Center - Core Template
-// Time: O(n²) | Space: O(1)
-
-// Count all palindromic substrings
-function countSubstrings(s) {
-    let count = 0;
-    for (let i = 0; i < s.length; i++) {
-        count += expand(s, i, i);      // Odd length
-        count += expand(s, i, i + 1);  // Even length
-    }
-    return count;
-}
-
-function expand(s, left, right) {
-    let count = 0;
-    while (left >= 0 && right < s.length && s[left] === s[right]) {
-        count++;
-        left--;
-        right++;
-    }
-    return count;
-}
-
-// Longest Palindromic Substring
-function longestPalindrome(s) {
-    let start = 0, end = 0;
-    for (let i = 0; i < s.length; i++) {
-        const len1 = expandLen(s, i, i);
-        const len2 = expandLen(s, i, i + 1);
-        const len = Math.max(len1, len2);
-        if (len > end - start) {
-            start = i - Math.floor((len - 1) / 2);
-            end = i + Math.floor(len / 2);
-        }
-    }
-    return s.substring(start, end + 1);
-}
-
-function expandLen(s, l, r) {
-    while (l >= 0 && r < s.length && s[l] === s[r]) {
-        l--;
-        r++;
-    }
-    return r - l - 1;  // Length after expansion
-}
-
-// Valid Palindrome II - can remove one char
-function validPalindrome(s) {
-    let l = 0, r = s.length - 1;
-    while (l < r) {
-        if (s[l] !== s[r]) {
-            // Try skipping left OR right
-            return isPalin(s, l + 1, r) || isPalin(s, l, r - 1);
-        }
-        l++;
-        r--;
-    }
-    return true;
-}
-
-function isPalin(s, l, r) {
-    while (l < r) {
-        if (s[l++] !== s[r--]) return false;
-    }
-    return true;
-}`;
-
-const problems = [
-  {
-    name: "Palindromic Substrings",
-    url: "https://leetcode.com/problems/palindromic-substrings/",
-    difficulty: "Medium",
-    hint: "Count palindromes using expand from each center",
-  },
-  {
-    name: "Longest Palindromic Substring",
-    url: "https://leetcode.com/problems/longest-palindromic-substring/",
-    difficulty: "Medium",
-    hint: "Track the longest palindrome found during expansion",
-  },
-  {
-    name: "Valid Palindrome",
-    url: "https://leetcode.com/problems/valid-palindrome/",
-    difficulty: "Easy",
-    hint: "Two pointers from both ends, skip non-alphanumeric",
-  },
-  {
-    name: "Valid Palindrome II",
-    url: "https://leetcode.com/problems/valid-palindrome-ii/",
-    difficulty: "Easy",
-    hint: "On mismatch, try skipping left OR right character",
-  },
-  {
-    name: "Palindrome Partitioning",
-    url: "https://leetcode.com/problems/palindrome-partitioning/",
-    difficulty: "Medium",
-    hint: "Backtracking + use expand for isPalindrome check",
-  },
-];

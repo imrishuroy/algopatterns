@@ -53,6 +53,7 @@ const breadcrumbs = [
   { name: "Expand Around Center", url: `${siteUrl}/guides/expand-around-center` },
 ];
 
+// skipcq: JS-0067
 export default function ExpandAroundCenterPage() {
   return (
     <>

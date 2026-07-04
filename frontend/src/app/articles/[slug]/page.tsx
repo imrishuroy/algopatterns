@@ -13,6 +13,7 @@ export function generateStaticParams() {
   }));
 }
 
+// skipcq: JS-0067
 export async function generateMetadata({
   params,
 }: {
@@ -61,6 +62,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// skipcq: JS-0067
 export default async function ArticleOverviewPage({ params }: PageProps) {
   const { slug } = await params;
   const article = getArticleBySlug(slug);

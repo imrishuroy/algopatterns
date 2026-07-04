@@ -40,6 +40,7 @@ const difficultyColors: Record<
   },
 };
 
+// skipcq: JS-0067
 export default function PatternsListClient({
   patterns,
 }: PatternsListClientProps) {
@@ -56,12 +57,12 @@ export default function PatternsListClient({
   const activeQuery = urlQuery;
 
   const filteredPatterns = useMemo(() => {
-    const q = activeQuery.trim().toLowerCase();
-    if (!q) return patterns;
+    const query = activeQuery.trim().toLowerCase();
+    if (!query) return patterns;
     return patterns.filter(
       (p) =>
-        p.category.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
+        p.category.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query)
     );
   }, [patterns, activeQuery]);
 

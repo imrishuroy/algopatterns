@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { articles } from "@/content/articles";
 import { siteConfig } from "@/lib/seo";
+import { JsonLdScript } from "@/components/seo/JsonLd";
 
 const siteUrl = siteConfig.url;
 
@@ -61,6 +62,7 @@ const itemListJsonLd = {
   })),
 };
 
+// skipcq: JS-0067
 function getDifficultyColor(difficulty: string): string {
   switch (difficulty) {
     case "beginner":
@@ -74,13 +76,11 @@ function getDifficultyColor(difficulty: string): string {
   }
 }
 
+// skipcq: JS-0067
 export default function ArticlesPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
-      />
+      <JsonLdScript data={itemListJsonLd} />
     <div className="min-h-screen bg-gray-950">
       <div className="max-w-6xl mx-auto px-4 py-6 md:py-12">
         <header className="mb-8 md:mb-12">

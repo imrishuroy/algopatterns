@@ -763,6 +763,74 @@ describe("ChatMessage", () => {
     const { container } = render(<ChatMessage message={msg} />);
     expect(container.firstChild).toBeInTheDocument();
   });
+
+  // ASCII / preformatted rendering
+
+  it("renders box-drawing unicode in a font-mono <pre>", () => {
+    const msg = createMessage({
+      role: "assistant",
+      content: "root\n├── left\n│   └── leaf\n└── right",
+    });
+    const { container } = render(<ChatMessage message={msg} />);
+    // The FormattedText block containing box-drawing chars must be a <pre>
+    const pres = Array.from(container.querySelectorAll("pre"));
+    const monoPre = pres.find((p) => p.className.includes("font-mono"));
+    expect(monoPre).toBeInTheDocument();
+    expect(monoPre!.textContent).toContain("├── left");
+  });
+
+  it("renders pipe-delimited markdown table in a font-mono <pre>", () => {
+    const msg = createMessage({
+      role: "assistant",
+      content: "| Name | Age |\n|------|-----|\n| Alice | 25 |",
+    });
+    const { container } = render(<ChatMessage message={msg} />);
+    const pres = Array.from(container.querySelectorAll("pre"));
+    const monoPre = pres.find((p) => p.className.includes("font-mono"));
+    expect(monoPre).toBeInTheDocument();
+    expect(monoPre!.textContent).toContain("Name");
+    expect(monoPre!.textContent).toContain("Alice");
+  });
+
+  it("renders ASCII +---+ table in a font-mono <pre>", () => {
+    const msg = createMessage({
+      role: "assistant",
+      content: "+------+------+\n| Col1 | Col2 |\n+------+------+",
+    });
+    const { container } = render(<ChatMessage message={msg} />);
+    const pres = Array.from(container.querySelectorAll("pre"));
+    const monoPre = pres.find((p) => p.className.includes("font-mono"));
+    expect(monoPre).toBeInTheDocument();
+    expect(monoPre!.textContent).toContain("Col1");
+  });
+
+  it("renders / \\ tree branches in a font-mono <pre>", () => {
+    const msg = createMessage({
+      role: "assistant",
+      content: "     4\n    / \\\n   2   6",
+    });
+    const { container } = render(<ChatMessage message={msg} />);
+    const pres = Array.from(container.querySelectorAll("pre"));
+    const monoPre = pres.find((p) => p.className.includes("font-mono"));
+    expect(monoPre).toBeInTheDocument();
+    // All lines of the block (including digits) must be inside the same <pre>
+    expect(monoPre!.textContent).toContain("4");
+    expect(monoPre!.textContent).toContain("/ \\");
+    expect(monoPre!.textContent).toContain("2");
+    expect(monoPre!.textContent).toContain("6");
+  });
+
+  it("does NOT render plain paragraphs as font-mono <pre>", () => {
+    const msg = createMessage({
+      role: "assistant",
+      content: "This is a normal paragraph without any ASCII art.",
+    });
+    const { container } = render(<ChatMessage message={msg} />);
+    // There should be no standalone font-mono <pre> (code fences excluded)
+    const pres = Array.from(container.querySelectorAll("pre"));
+    const monoPres = pres.filter((p) => p.className.includes("font-mono"));
+    expect(monoPres.length).toBe(0);
+  });
 });
 
 // InlineAI

@@ -80,6 +80,22 @@ Backend module path: `github.com/imrishuroy/algopatterns`
 - 7 React contexts: Auth, Filter, Highlight, Language, Progress, Subscription, Theme.
 - API client in `src/lib/api.ts` — singleton `apiClient`, handles JWT refresh with dedup.
 
+### Comment style (applies to all code — frontend and backend)
+
+Use plain, simple comments. Never use decorative dividers made of box-drawing characters or repeated punctuation.
+
+```typescript
+// Bad — do not use these
+// ─── Section ─────────────────────────────────────────────────────────────────
+// ── Sub-section ──────────────────────────────────────────────────────────────
+// ==== Section ====
+// **** Section ****
+
+// Good
+// Section name
+// Sub-section description
+```
+
 ## Next.js 16 — breaking changes
 
 Read `node_modules/next/dist/docs/` before writing any code. APIs and conventions may differ from older Next.js.

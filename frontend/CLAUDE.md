@@ -167,6 +167,25 @@ Avoid `dangerouslySetInnerHTML`. If necessary, sanitize content first.
 ### JS-0456: Unsafe lifecycle methods
 Avoid deprecated lifecycle methods: `componentWillMount`, `componentWillReceiveProps`, `componentWillUpdate`.
 
+## Comment Style
+
+Use plain, simple comments. Do not use decorative dividers made of box-drawing or repeated punctuation characters.
+
+```typescript
+// Bad
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ── State (lazy-initialised from localStorage) ───────────────────────────────
+// ==== Section ====
+// **** Section ****
+
+// Good
+// Helpers
+// State — lazy-initialised from localStorage
+// Section name
+```
+
+Section headings inside a function body should be inline comments on the same line or a plain comment line above the block.
+
 ## Code Quality Rules
 
 ### JS-R1005: Cyclomatic complexity

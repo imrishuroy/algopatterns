@@ -77,11 +77,26 @@ function FormattedText({ text }: { text: string }) {
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
       const paragraphText = currentParagraph.join("\n");
-      elements.push(
-        <p key={elements.length} className="whitespace-pre-wrap">
-          {formatInlineText(paragraphText)}
-        </p>
-      );
+      // If any line looks like ASCII art / preformatted content, render the
+      // whole block in a monospace <pre> so characters stay aligned.
+      const hasPreformatted = currentParagraph.some(isPreformattedLine);
+
+      if (hasPreformatted) {
+        elements.push(
+          <pre
+            key={elements.length}
+            className="bg-gray-900 rounded-md p-2 my-1 overflow-x-auto text-xs font-mono text-gray-300 leading-relaxed"
+          >
+            {paragraphText}
+          </pre>
+        );
+      } else {
+        elements.push(
+          <p key={elements.length} className="whitespace-pre-wrap">
+            {formatInlineText(paragraphText)}
+          </p>
+        );
+      }
       currentParagraph = [];
     }
   };
@@ -228,6 +243,31 @@ function processInlineCode(text: string, startKey: number): React.ReactNode[] {
   });
 
   return parts;
+}
+
+/**
+ * Returns true when a line should be rendered in a monospace preformatted
+ * block to preserve character alignment (ASCII art, trees, tables, etc.).
+ */
+function isPreformattedLine(line: string): boolean {
+  // Box-drawing unicode characters (U+2500–U+256C range and related)
+  if (/[─━│┃┌┐└┘├┤┬┴┼═║╔╗╚╝╠╣╦╩╬┄┅┆┇┈┉┊┋┍┎┏┑┒┓┕┖┗┙┚┛]/.test(line)) {
+    return true;
+  }
+  // Pipe-delimited table rows — starts with | and has ≥2 pipe characters
+  if (/^\s*\|/.test(line) && (line.match(/\|/g) ?? []).length >= 2) {
+    return true;
+  }
+  // ASCII table separators like +---+---+ or +===+===+
+  if (/^\s*\+[-=]+/.test(line)) {
+    return true;
+  }
+  // Tree branch lines: the entire line (ignoring leading/trailing whitespace)
+  // consists only of spaces, /, \, and | characters — and has at least one / or \
+  if (/^[\s/\\|]+$/.test(line) && /[/\\]/.test(line.trim())) {
+    return true;
+  }
+  return false;
 }
 
 export const ChatMessage = memo(ChatMessageComponent);

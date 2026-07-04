@@ -21,6 +21,7 @@ import { solutions } from "@/lib/solutions";
 import type { Monaco } from "@monaco-editor/react";
 import { AIChatPanel, InlineAI } from "@/components/ai";
 import { useInlineAI } from "@/hooks/useInlineAI";
+import { useEditorPreferences } from "@/hooks/useEditorPreferences";
 import type { OnMount } from "@monaco-editor/react";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
@@ -388,12 +389,21 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
     "testcases"
   );
 
-  // UI state - three panel widths as percentages
-  const [leftPanelWidth, setLeftPanelWidth] = useState(35); // Description panel
-  const [rightPanelWidth, setRightPanelWidth] = useState(20); // AI panel (0 when closed)
-  const [editorHeight, setEditorHeight] = useState(60); // percentage of middle panel for editor
-  const [fontSize, setFontSize] = useState(14);
-  const [wordWrap, setWordWrap] = useState(false);
+  // UI state - editor preferences (persisted to localStorage)
+  const {
+    fontSize,
+    setFontSize,
+    wordWrap,
+    setWordWrap,
+    tabSize: prefTabSize,
+    setTabSize: setPrefTabSize,
+    leftPanelWidth,
+    setLeftPanelWidth,
+    rightPanelWidth,
+    setRightPanelWidth,
+    editorHeight,
+    setEditorHeight,
+  } = useEditorPreferences();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const aiDividerRef = useRef<HTMLDivElement>(null);
   const [customInput, setCustomInput] = useState("");
@@ -419,10 +429,9 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
   const [showSolution, setShowSolution] = useState(false);
 
   const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved">("saved");
-  const [tabSize, setTabSize] = useState(() => {
-    if (typeof window === "undefined") return 4;
-    return parseInt(localStorage.getItem("editor_tabSize") || "4", 10);
-  });
+  // tabSize comes from useEditorPreferences (persisted); alias to keep existing references working
+  const tabSize = prefTabSize;
+  const setTabSize = setPrefTabSize;
 
   // AI Tutor state
   const [isAIChatOpen, setIsAIChatOpen] = useState(true);
@@ -476,19 +485,56 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Format code using basic formatting
+  // Format code using indentation-aware formatting
   const formatCode = useCallback(() => {
-    if (editorInstance) {
+    if (!editorInstance) return;
+
+    const MONACO_FORMATTED_LANGS = new Set(["javascript", "typescript", "json", "html", "css"]);
+    const lang = editorInstance.getModel()?.getLanguageId() ?? "";
+
+    // For JS/TS/JSON Monaco has a built-in formatter — use it.
+    if (MONACO_FORMATTED_LANGS.has(lang)) {
       editorInstance.getAction("editor.action.formatDocument")?.run();
       return;
     }
-    let formatted = code
-      .split("\n")
-      .map((line) => line.trimEnd())
-      .join("\n");
-    formatted = formatted.replace(/\n{3,}/g, "\n\n");
+
+    // For Java / Go / Python: re-indent the code using brace/colon-based rules.
+    const indentStr = " ".repeat(tabSize);
+    const lines = code.split("\n");
+    let indentLevel = 0;
+    const formatted = lines
+      .map((raw) => {
+        const line = raw.trim();
+        if (line === "") return "";
+
+        // Decrease indent before closing braces/brackets (Java/Go)
+        if (/^[}\])]/.test(line)) indentLevel = Math.max(0, indentLevel - 1);
+
+        const result = indentStr.repeat(indentLevel) + line;
+
+        // Increase indent after lines ending with { or : (Python colons)
+        if (/[{:]$/.test(line) && !/^\s*\/\//.test(line)) indentLevel += 1;
+
+        return result;
+      })
+      .join("\n")
+      // Collapse 3+ consecutive blank lines to at most 2
+      .replace(/\n{3,}/g, "\n\n");
+
+    // Push directly into Monaco's model so it always applies,
+    // even when the formatted string equals the current React state.
+    const model = editorInstance.getModel();
+    if (model) {
+      const fullRange = model.getFullModelRange();
+      model.pushEditOperations(
+        [],
+        [{ range: fullRange, text: formatted }],
+        () => null
+      );
+      editorInstance.pushUndoStop();
+    }
     setCode(formatted);
-  }, [editorInstance, code]);
+  }, [editorInstance, code, tabSize]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -518,11 +564,18 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
           setLanguages(response.data.languages || []);
 
           if (response.data.templates?.length > 0) {
-            // Prefer Java as default, fallback to first template
+            // Restore last-used language for this problem, fall back to Java, then first
+            const savedLangId = localStorage.getItem("editor_language");
+            const savedTemplate = savedLangId
+              ? response.data.templates.find(
+                  (t) => t.languageId === parseInt(savedLangId, 10)
+                )
+              : null;
             const javaTemplate = response.data.templates.find(
               (t) => t.languageSlug === "java"
             );
-            const defaultTemplate = javaTemplate || response.data.templates[0];
+            const defaultTemplate =
+              savedTemplate ?? javaTemplate ?? response.data.templates[0];
             setSelectedLanguageId(defaultTemplate.languageId);
 
             // Compute wrapper line offset
@@ -548,17 +601,20 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
     fetchProblem();
   }, [slug]);
 
-  // Save code to localStorage on change
+  // Save code to localStorage — debounced 1 s to avoid writing on every keystroke
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (selectedLanguageId && code) {
+    if (!selectedLanguageId || !code) return;
+    setSaveStatus("unsaved");
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
       localStorage.setItem(getStorageKey(slug, selectedLanguageId), code);
       startTransition(() => setSaveStatus("saved"));
-    }
+    }, 1000);
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
   }, [code, slug, selectedLanguageId]);
-
-  useEffect(() => {
-    localStorage.setItem("editor_tabSize", tabSize.toString());
-  }, [tabSize]);
 
   const loadSubmissions = useCallback(async () => {
     if (!problem) return;
@@ -592,6 +648,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
     }
 
     setSelectedLanguageId(languageId);
+    localStorage.setItem("editor_language", languageId.toString());
 
     // Load saved code or template for new language
     const savedCode = localStorage.getItem(getStorageKey(slug, languageId));
@@ -903,6 +960,16 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
         setIsFullScreen(false);
       }
       if (e.key === "?" && !(e.metaKey || e.ctrlKey)) {
+        // Don't intercept while the user is typing in an editor, input, or textarea
+        const target = e.target as HTMLElement;
+        const tag = target.tagName;
+        if (
+          tag === "INPUT" ||
+          tag === "TEXTAREA" ||
+          target.closest(".monaco-editor") !== null
+        ) {
+          return;
+        }
         e.preventDefault();
         setShowShortcuts((s) => !s);
       }
@@ -1089,7 +1156,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
             </select>
             <div className="flex items-center gap-1 bg-gray-800 rounded-md px-3 border border-gray-700 h-8">
               <button
-                onClick={() => setFontSize((s) => Math.max(10, s - 2))}
+                onClick={() => setFontSize(Math.max(10, fontSize - 2))}
                 className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
                 data-tooltip="Decrease font size"
               >
@@ -1101,7 +1168,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
                 {fontSize}
               </span>
               <button
-                onClick={() => setFontSize((s) => Math.min(24, s + 2))}
+                onClick={() => setFontSize(Math.min(24, fontSize + 2))}
                 className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
                 data-tooltip="Increase font size"
               >
@@ -1203,10 +1270,14 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
             height="100%"
             language={monacoLanguage}
             value={code}
-            onChange={(value) => { setCode(value || ""); setSaveStatus("unsaved"); }}
+            onChange={(value) => { setCode(value || ""); }}
             theme={editorTheme}
             beforeMount={handleEditorWillMount}
-            onMount={(editor, monaco) => setupJavaValidation(editor, monaco)}
+            onMount={(editor, monaco) => {
+              setEditorInstance(editor);
+              monacoRef.current = monaco;
+              setupJavaValidation(editor, monaco);
+            }}
             options={{
               fontSize,
               tabSize,
@@ -1233,7 +1304,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
   // Mobile Layout
   if (isMobile) {
     return (
-      <div className="flex flex-col h-[calc(100vh-64px)]">
+      <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
         {/* Mobile Tab Bar */}
         <div className="flex border-b border-gray-800 bg-gray-900">
           <button
@@ -1290,7 +1361,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
         {/* Mobile Content */}
         <div className="flex-1 overflow-hidden">
           {mobileView === "problem" && (
-            <div className="h-full overflow-y-auto">
+            <div className="h-full overflow-y-auto overscroll-y-contain">
               {/* Problem Tabs */}
               <div className="flex border-b border-gray-800 bg-gray-900/50 overflow-x-auto">
                 <button
@@ -1550,15 +1621,15 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
               <div className="flex-1 min-h-0">
                 <MonacoEditor
                   height="100%"
-                  language={monacoLanguage}
-                  value={code}
-                  onChange={(value) => { setCode(value || ""); setSaveStatus("unsaved"); }}
-                  theme={editorTheme}
-                  beforeMount={handleEditorWillMount}
-                  onMount={(editor, monaco) => setupJavaValidation(editor, monaco)}
-                  options={{
-                    fontSize: 12,
-                    tabSize,
+            language={monacoLanguage}
+            value={code}
+            onChange={(value) => { setCode(value || ""); }}
+            theme={editorTheme}
+            beforeMount={handleEditorWillMount}
+            onMount={(editor, monaco) => setupJavaValidation(editor, monaco)}
+            options={{
+              fontSize,
+              tabSize,
                     fontFamily: "JetBrains Mono, monospace",
                     minimap: { enabled: false },
                     scrollBeyondLastLine: false,
@@ -1604,7 +1675,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
           )}
 
           {mobileView === "results" && (
-            <div className="h-full overflow-y-auto p-4">
+            <div className="h-full overflow-y-auto overscroll-y-contain p-4">
               {/* Result Tabs */}
               <div className="flex mb-3 border-b border-gray-800">
                 <button
@@ -1758,7 +1829,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
 
   // Desktop Layout
   return (
-    <div ref={panelRef} className="flex h-[calc(100vh-64px)]">
+    <div ref={panelRef} className="flex h-[calc(100vh-64px)] overflow-hidden">
       {/* Left Panel - Problem Description */}
       {showDescription && (
       <div
@@ -1829,7 +1900,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto overscroll-y-contain p-6">
           {activeTab === "description" ? (
             <div className="space-y-6">
               {/* Title & Difficulty */}
@@ -2187,7 +2258,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
             {/* Font size controls */}
             <div className="flex items-center gap-1 bg-gray-800 rounded-md px-3 border border-gray-700 h-8">
               <button
-                onClick={() => setFontSize((s) => Math.max(10, s - 2))}
+                onClick={() => setFontSize(Math.max(10, fontSize - 2))}
                 className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
                 data-tooltip="Decrease font size"
               >
@@ -2199,7 +2270,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
                 {fontSize}
               </span>
               <button
-                onClick={() => setFontSize((s) => Math.min(24, s + 2))}
+                onClick={() => setFontSize(Math.min(24, fontSize + 2))}
                 className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
                 data-tooltip="Increase font size"
               >
@@ -2438,7 +2509,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
             height="100%"
             language={monacoLanguage}
             value={code}
-            onChange={(value) => { setCode(value || ""); setSaveStatus("unsaved"); }}
+            onChange={(value) => { setCode(value || ""); }}
             theme={editorTheme}
             beforeMount={handleEditorWillMount}
             onMount={(editor, monaco) => {
@@ -2448,6 +2519,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
             }}
             options={{
               fontSize,
+              tabSize,
               fontFamily: "JetBrains Mono, monospace",
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
@@ -2455,6 +2527,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
               lineNumbers: "on",
               renderLineHighlight: "line",
               automaticLayout: true,
+              wordWrap: wordWrap ? "on" : "off",
             }}
           />
         </div>
@@ -2539,7 +2612,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
               </label>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 min-h-0">
+            <div className="flex-1 overflow-y-auto overscroll-y-contain p-4 min-h-0">
               {resultTab === "testcases" ? (
                 <>
                   {/* Status summary */}

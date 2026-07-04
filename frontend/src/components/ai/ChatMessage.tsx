@@ -68,6 +68,29 @@ function MessageContent({ content, isStreaming }: { content: string; isStreaming
   );
 }
 
+/**
+ * Returns true when a line should be rendered in a monospace preformatted
+ * block to preserve character alignment (ASCII art, trees, tables, etc.).
+ */
+// skipcq: JS-0067, JS-R1005
+const isPreformattedLine = (line: string): boolean => {
+  // Box-drawing unicode characters (U+2500–U+256C range and related)
+  if (/[─━│┃┌┐└┘├┤┬┴┼═║╔╗╚╝╠╣╦╩╬┄┅┆┇┈┉┊┋┍┎┏┑┒┓┕┖┗┙┚┛]/u.test(line)) {
+    return true;
+  }
+  // Pipe-delimited table rows — starts with | and has ≥2 pipe characters
+  if (/^\s*\|/u.test(line) && (line.match(/\|/gu) ?? []).length >= 2) {
+    return true;
+  }
+  // ASCII table separators like +---+---+ or +===+===+
+  if (/^\s*\+[-=]+/u.test(line)) {
+    return true;
+  }
+  // Tree branch lines: the entire line consists only of spaces, /, \, and |
+  // characters — and has at least one / or \
+  return /^[\s/\\|]+$/u.test(line) && /[/\\]/u.test(line.trim());
+};
+
 // skipcq: JS-0067
 function FormattedText({ text }: { text: string }) {
   // Process line by line for headers and lists
@@ -245,28 +268,5 @@ function processInlineCode(text: string, startKey: number): React.ReactNode[] {
 
   return parts;
 }
-
-/**
- * Returns true when a line should be rendered in a monospace preformatted
- * block to preserve character alignment (ASCII art, trees, tables, etc.).
- */
-// skipcq: JS-0067, JS-R1005
-const isPreformattedLine = (line: string): boolean => {
-  // Box-drawing unicode characters (U+2500–U+256C range and related)
-  if (/[─━│┃┌┐└┘├┤┬┴┼═║╔╗╚╝╠╣╦╩╬┄┅┆┇┈┉┊┋┍┎┏┑┒┓┕┖┗┙┚┛]/u.test(line)) {
-    return true;
-  }
-  // Pipe-delimited table rows — starts with | and has ≥2 pipe characters
-  if (/^\s*\|/u.test(line) && (line.match(/\|/gu) ?? []).length >= 2) {
-    return true;
-  }
-  // ASCII table separators like +---+---+ or +===+===+
-  if (/^\s*\+[-=]+/u.test(line)) {
-    return true;
-  }
-  // Tree branch lines: the entire line consists only of spaces, /, \, and |
-  // characters — and has at least one / or \
-  return /^[\s/\\|]+$/u.test(line) && /[/\\]/u.test(line.trim());
-};
 
 export const ChatMessage = memo(ChatMessageComponent);

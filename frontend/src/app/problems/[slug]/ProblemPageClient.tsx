@@ -604,14 +604,15 @@ export default function ProblemPageClient({ params }: PageProps) {
 
   // Save code to localStorage — debounced 1 s to avoid writing on every keystroke
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => { // skipcq: JS-0045
-    if (!selectedLanguageId || !code) return;
-    setSaveStatus("unsaved");
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
-      localStorage.setItem(getStorageKey(slug, selectedLanguageId), code);
-      startTransition(() => setSaveStatus("saved"));
-    }, 1000);
+  useEffect(() => {
+    if (selectedLanguageId && code) {
+      setSaveStatus("unsaved");
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = setTimeout(() => {
+        localStorage.setItem(getStorageKey(slug, selectedLanguageId), code);
+        startTransition(() => setSaveStatus("saved"));
+      }, 1000);
+    }
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
@@ -943,8 +944,8 @@ export default function ProblemPageClient({ params }: PageProps) {
     handleRunRef.current = handleRun;
     handleSubmitRef.current = handleSubmit;
   });
-  const handleKeyDown = useCallback( // skipcq: JS-R1005
-    (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => { // skipcq: JS-R1005
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();
         if (e.shiftKey) {
@@ -1829,6 +1830,7 @@ export default function ProblemPageClient({ params }: PageProps) {
     : 100 - effectiveLeftWidth;
 
   // Desktop Layout
+  // skipcq: JS-0415
   return (
     <div ref={panelRef} className="flex h-[calc(100vh-64px)] overflow-hidden">
       {/* Left Panel - Problem Description */}

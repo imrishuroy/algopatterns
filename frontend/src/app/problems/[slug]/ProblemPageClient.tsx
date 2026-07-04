@@ -1830,9 +1830,9 @@ export default function ProblemPageClient({ params }: PageProps) {
     : 100 - effectiveLeftWidth;
 
   // Desktop Layout
-  // skipcq: JS-0415
   return (
     <div ref={panelRef} className="flex h-[calc(100vh-64px)] overflow-hidden">
+      {/* skipcq: JS-0415 */}
       {/* Left Panel - Problem Description */}
       {showDescription && (
       <div

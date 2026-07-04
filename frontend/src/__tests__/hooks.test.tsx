@@ -6,6 +6,7 @@ import {
   useMediaQuery,
 } from "@/hooks/useMediaQuery";
 import { useTextSelection } from "@/hooks/useTextSelection";
+import { useEditorPreferences } from "@/hooks/useEditorPreferences";
 import type { ChatResponse } from "@/types/ai";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type { RefObject } from "react";
@@ -1187,5 +1188,178 @@ describe("useInlineAI", () => {
     expect(editor.getSelection).toHaveBeenCalled();
 
     unmount();
+  });
+});
+
+// ─── useEditorPreferences ────────────────────────────────────────────────────
+
+describe("useEditorPreferences", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  // ── Defaults ───────────────────────────────────────────────────────────────
+
+  it("returns defaults when localStorage is empty", () => {
+    const { result } = renderHook(() => useEditorPreferences());
+    expect(result.current.fontSize).toBe(14);
+    expect(result.current.wordWrap).toBe(false);
+    expect(result.current.tabSize).toBe(4);
+    expect(result.current.leftPanelWidth).toBe(35);
+    expect(result.current.rightPanelWidth).toBe(20);
+    expect(result.current.editorHeight).toBe(60);
+  });
+
+  it("falls back to defaults when localStorage contains invalid values", () => {
+    localStorage.setItem("editor_fontSize", "not-a-number");
+    localStorage.setItem("editor_wordWrap", "maybe");
+    localStorage.setItem("editor_tabSize", "abc");
+    const { result } = renderHook(() => useEditorPreferences());
+    expect(result.current.fontSize).toBe(14);
+    expect(result.current.wordWrap).toBe(false);
+    expect(result.current.tabSize).toBe(4);
+  });
+
+  // ── Reads existing localStorage values on mount ───────────────────────────
+
+  it("initialises fontSize from localStorage", () => {
+    localStorage.setItem("editor_fontSize", "18");
+    const { result } = renderHook(() => useEditorPreferences());
+    expect(result.current.fontSize).toBe(18);
+  });
+
+  it("initialises wordWrap=true from localStorage", () => {
+    localStorage.setItem("editor_wordWrap", "true");
+    const { result } = renderHook(() => useEditorPreferences());
+    expect(result.current.wordWrap).toBe(true);
+  });
+
+  it("initialises tabSize from localStorage", () => {
+    localStorage.setItem("editor_tabSize", "2");
+    const { result } = renderHook(() => useEditorPreferences());
+    expect(result.current.tabSize).toBe(2);
+  });
+
+  it("initialises panel widths from localStorage", () => {
+    localStorage.setItem("editor_leftPanelWidth", "40");
+    localStorage.setItem("editor_rightPanelWidth", "25");
+    localStorage.setItem("editor_editorHeight", "70");
+    const { result } = renderHook(() => useEditorPreferences());
+    expect(result.current.leftPanelWidth).toBe(40);
+    expect(result.current.rightPanelWidth).toBe(25);
+    expect(result.current.editorHeight).toBe(70);
+  });
+
+  // ── Immediate writes for discrete settings ────────────────────────────────
+
+  it("setFontSize updates state and writes to localStorage immediately", () => {
+    const { result } = renderHook(() => useEditorPreferences());
+    act(() => { result.current.setFontSize(20); });
+    expect(result.current.fontSize).toBe(20);
+    expect(localStorage.getItem("editor_fontSize")).toBe("20");
+  });
+
+  it("setWordWrap updates state and writes to localStorage immediately", () => {
+    const { result } = renderHook(() => useEditorPreferences());
+    act(() => { result.current.setWordWrap(true); });
+    expect(result.current.wordWrap).toBe(true);
+    expect(localStorage.getItem("editor_wordWrap")).toBe("true");
+  });
+
+  it("setWordWrap toggles back to false and persists", () => {
+    localStorage.setItem("editor_wordWrap", "true");
+    const { result } = renderHook(() => useEditorPreferences());
+    act(() => { result.current.setWordWrap(false); });
+    expect(result.current.wordWrap).toBe(false);
+    expect(localStorage.getItem("editor_wordWrap")).toBe("false");
+  });
+
+  it("setTabSize updates state and writes to localStorage immediately", () => {
+    const { result } = renderHook(() => useEditorPreferences());
+    act(() => { result.current.setTabSize(2); });
+    expect(result.current.tabSize).toBe(2);
+    expect(localStorage.getItem("editor_tabSize")).toBe("2");
+  });
+
+  // ── Debounced writes for panel widths ─────────────────────────────────────
+
+  it("setLeftPanelWidth updates state immediately but writes to localStorage after 500ms", () => {
+    const { result } = renderHook(() => useEditorPreferences());
+
+    // Advance past the mount debounce first
+    act(() => { vi.advanceTimersByTime(600); });
+
+    act(() => { result.current.setLeftPanelWidth(45); });
+    expect(result.current.leftPanelWidth).toBe(45);
+
+    // Not written yet
+    expect(localStorage.getItem("editor_leftPanelWidth")).not.toBe("45");
+
+    // Written after debounce
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(localStorage.getItem("editor_leftPanelWidth")).toBe("45");
+  });
+
+  it("setRightPanelWidth debounces the localStorage write", () => {
+    const { result } = renderHook(() => useEditorPreferences());
+    act(() => { vi.advanceTimersByTime(600); });
+
+    act(() => { result.current.setRightPanelWidth(30); });
+    expect(localStorage.getItem("editor_rightPanelWidth")).not.toBe("30");
+
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(localStorage.getItem("editor_rightPanelWidth")).toBe("30");
+  });
+
+  it("setEditorHeight debounces the localStorage write", () => {
+    const { result } = renderHook(() => useEditorPreferences());
+    act(() => { vi.advanceTimersByTime(600); });
+
+    act(() => { result.current.setEditorHeight(75); });
+    expect(localStorage.getItem("editor_editorHeight")).not.toBe("75");
+
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(localStorage.getItem("editor_editorHeight")).toBe("75");
+  });
+
+  it("rapid panel width changes only write the final value (debounce resets)", () => {
+    const { result } = renderHook(() => useEditorPreferences());
+    act(() => { vi.advanceTimersByTime(600); });
+
+    // Simulate dragging — multiple rapid updates
+    act(() => { result.current.setLeftPanelWidth(36); });
+    act(() => { vi.advanceTimersByTime(100); });
+    act(() => { result.current.setLeftPanelWidth(38); });
+    act(() => { vi.advanceTimersByTime(100); });
+    act(() => { result.current.setLeftPanelWidth(42); });
+
+    // Debounce not yet fired — last write wins
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(localStorage.getItem("editor_leftPanelWidth")).toBe("42");
+  });
+
+  // ── Round-trip: value survives a remount ──────────────────────────────────
+
+  it("persisted fontSize survives unmount + remount", () => {
+    const { result, unmount } = renderHook(() => useEditorPreferences());
+    act(() => { result.current.setFontSize(22); });
+    unmount();
+
+    const { result: result2 } = renderHook(() => useEditorPreferences());
+    expect(result2.current.fontSize).toBe(22);
+  });
+
+  it("persisted tabSize survives unmount + remount", () => {
+    const { result, unmount } = renderHook(() => useEditorPreferences());
+    act(() => { result.current.setTabSize(2); });
+    unmount();
+
+    const { result: result2 } = renderHook(() => useEditorPreferences());
+    expect(result2.current.tabSize).toBe(2);
   });
 });

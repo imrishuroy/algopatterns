@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/imrishuroy/algopatterns/internal/middleware"
 	"github.com/imrishuroy/algopatterns/internal/models"
@@ -50,7 +48,7 @@ func (h *PatternProgressHandler) ListAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.BulkSyncProgressResponse{Progress: progress})
+	response.OK(c, models.BulkSyncProgressResponse{Progress: progress})
 }
 
 func (h *PatternProgressHandler) ListByPattern(c *gin.Context) {
@@ -73,7 +71,7 @@ func (h *PatternProgressHandler) ListByPattern(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.PatternProgressResponse{
+	response.OK(c, models.PatternProgressResponse{
 		PatternID:         patternID,
 		CompletedSections: sections,
 	})
@@ -194,7 +192,7 @@ func (h *PatternProgressHandler) BulkSync(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.BulkSyncProgressResponse{Progress: progress})
+	response.OK(c, models.BulkSyncProgressResponse{Progress: progress})
 }
 
 func parsePositiveInt(s string) (int, error) {

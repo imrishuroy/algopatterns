@@ -7,7 +7,6 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
-  useRef,
 } from "react";
 import { useAuth } from "./AuthContext";
 import { apiClient } from "@/lib/api";
@@ -23,91 +22,57 @@ interface PatternProgressContextType {
   toggleComplete: (patternId: string, sectionIndex: number) => void;
   getCompletedCount: (patternId: string) => number;
   getProgress: (patternId: string, totalSections: number) => number;
+  isLoading: boolean;
 }
 
 const PatternProgressContext = createContext<
   PatternProgressContextType | undefined
 >(undefined); // skipcq: JS-W1042
 
-const STORAGE_KEY = "pattern_progress";
-
 export const PatternProgressProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [progress, setProgress] = useState<ProgressState>({});
-  const [isLoaded, setIsLoaded] = useState(false);
-  const hasSyncedRef = useRef(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load from localStorage on mount
+  // Load progress from DB when user changes (wait for auth to finish loading first)
   useEffect(() => {
-    requestAnimationFrame(() => {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          const converted: ProgressState = {};
-          for (const [patternId, indices] of Object.entries(parsed)) {
-            converted[patternId] = new Set(indices as number[]);
-          }
-          setProgress(converted);
-        } catch {
-          // Invalid data, start fresh
-        }
-      }
-      setIsLoaded(true);
-    });
-  }, []);
-
-  // Save to localStorage when progress changes
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    const serializable: { [key: string]: number[] } = {};
-    for (const [patternId, indices] of Object.entries(progress)) {
-      serializable[patternId] = Array.from(indices);
+    // Wait for auth to finish initializing
+    if (authLoading) {
+      return;
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
-  }, [progress, isLoaded]);
 
-  // Sync with backend when user logs in
-  useEffect(() => {
-    if (!user || !isLoaded || hasSyncedRef.current) return;
+    const loadProgress = async () => {
+      // Not logged in - no progress
+      if (!user) {
+        setProgress({});
+        setIsLoading(false);
+        return;
+      }
 
-    const syncWithBackend = async () => {
+      // Fetch from backend (DB is source of truth)
+      setIsLoading(true);
       try {
-        // Get local progress
-        const localProgress: { [key: string]: number[] } = {};
-        for (const [patternId, indices] of Object.entries(progress)) {
-          localProgress[patternId] = Array.from(indices);
-        }
-
-        // Sync with backend (sends local, gets merged result)
-        const response = await apiClient.syncPatternProgress(localProgress);
-
+        const response = await apiClient.getPatternProgress();
         if (response.success && response.data?.progress) {
-          const merged: ProgressState = {};
+          const serverProgress: ProgressState = {};
           for (const [patternId, indices] of Object.entries(response.data.progress)) {
-            merged[patternId] = new Set(indices);
+            serverProgress[patternId] = new Set(indices);
           }
-          setProgress(merged);
+          setProgress(serverProgress);
+        } else {
+          setProgress({});
         }
-
-        hasSyncedRef.current = true;
       } catch {
-        // Silently fail - local progress still works
+        setProgress({});
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    syncWithBackend();
-  }, [user, isLoaded, progress]);
-
-  // Reset sync flag when user changes
-  useEffect(() => {
-    if (!user) {
-      hasSyncedRef.current = false;
-    }
-  }, [user]);
+    loadProgress();
+  }, [user, authLoading]);
 
   const isCompleted = useCallback(
     (patternId: string, sectionIndex: number): boolean => {
@@ -117,7 +82,10 @@ export const PatternProgressProvider: React.FC<{
   );
 
   const markComplete = useCallback(
-    (patternId: string, sectionIndex: number) => {
+    async (patternId: string, sectionIndex: number) => {
+      if (!user) return;
+
+      // Optimistic update
       setProgress((prev) => {
         const updated = { ...prev };
         if (!updated[patternId]) {
@@ -128,10 +96,18 @@ export const PatternProgressProvider: React.FC<{
         return updated;
       });
 
-      // Sync to backend if user is logged in
-      if (user) {
-        apiClient.markSectionComplete(patternId, sectionIndex).catch(() => {
-          // Silently fail - local progress still works
+      // Sync to backend
+      try {
+        await apiClient.markSectionComplete(patternId, sectionIndex);
+      } catch {
+        // Revert on failure
+        setProgress((prev) => {
+          const updated = { ...prev };
+          if (updated[patternId]) {
+            updated[patternId] = new Set(updated[patternId]);
+            updated[patternId].delete(sectionIndex);
+          }
+          return updated;
         });
       }
     },
@@ -139,7 +115,10 @@ export const PatternProgressProvider: React.FC<{
   );
 
   const markIncomplete = useCallback(
-    (patternId: string, sectionIndex: number) => {
+    async (patternId: string, sectionIndex: number) => {
+      if (!user) return;
+
+      // Optimistic update
       setProgress((prev) => {
         const updated = { ...prev };
         if (updated[patternId]) {
@@ -149,10 +128,19 @@ export const PatternProgressProvider: React.FC<{
         return updated;
       });
 
-      // Sync to backend if user is logged in
-      if (user) {
-        apiClient.markSectionIncomplete(patternId, sectionIndex).catch(() => {
-          // Silently fail - local progress still works
+      // Sync to backend
+      try {
+        await apiClient.markSectionIncomplete(patternId, sectionIndex);
+      } catch {
+        // Revert on failure
+        setProgress((prev) => {
+          const updated = { ...prev };
+          if (!updated[patternId]) {
+            updated[patternId] = new Set();
+          }
+          updated[patternId] = new Set(updated[patternId]);
+          updated[patternId].add(sectionIndex);
+          return updated;
         });
       }
     },
@@ -194,6 +182,7 @@ export const PatternProgressProvider: React.FC<{
       toggleComplete,
       getCompletedCount,
       getProgress,
+      isLoading,
     }),
     [
       isCompleted,
@@ -202,6 +191,7 @@ export const PatternProgressProvider: React.FC<{
       toggleComplete,
       getCompletedCount,
       getProgress,
+      isLoading,
     ]
   );
 

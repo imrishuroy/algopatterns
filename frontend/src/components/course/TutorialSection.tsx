@@ -86,6 +86,7 @@ const IntervalDPVisualizer = dynamic(() => import("@/components/visualizers/Inte
 const PalindromeDPVisualizer = dynamic(() => import("@/components/visualizers/PalindromeDPVisualizer"), { loading: VisualizerLoading, ssr: false });
 const TreeDPVisualizer = dynamic(() => import("@/components/visualizers/TreeDPVisualizer"), { loading: VisualizerLoading, ssr: false });
 const BitmaskDPVisualizer = dynamic(() => import("@/components/visualizers/BitmaskDPVisualizer"), { loading: VisualizerLoading, ssr: false });
+const MultiStateDPVisualizer = dynamic(() => import("@/components/visualizers/MultiStateDPVisualizer"), { loading: VisualizerLoading, ssr: false });
 
 interface TutorialSectionProps {
   pattern: Pattern;
@@ -231,6 +232,15 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
             <span className="text-purple-400">▶</span> Interactive Palindrome DP
           </h4>
           <PalindromeDPVisualizer />
+        </div>
+      )}
+
+      {cat === "Dynamic Programming" && title.includes("Multi-State DP") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-pink-400">▶</span> Interactive Multi-State DP
+          </h4>
+          <MultiStateDPVisualizer />
         </div>
       )}
 

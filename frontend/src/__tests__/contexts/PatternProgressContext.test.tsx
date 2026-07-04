@@ -9,7 +9,7 @@ import type { User } from "@/types";
 
 vi.mock("@/lib/api", () => ({
   apiClient: {
-    syncPatternProgress: vi.fn(),
+    getPatternProgress: vi.fn(),
     markSectionComplete: vi.fn(),
     markSectionIncomplete: vi.fn(),
   },
@@ -33,26 +33,6 @@ const Wrapper = ({ children }: { children: ReactNode }) => (
   <PatternProgressProvider>{children}</PatternProgressProvider>
 );
 
-const mockLocalStorage = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: () => {
-      store = {};
-    },
-  };
-})();
-
-Object.defineProperty(window, "localStorage", {
-  value: mockLocalStorage,
-});
-
 const originalRAF = window.requestAnimationFrame;
 window.requestAnimationFrame = (cb: FrameRequestCallback) => {
   cb(0);
@@ -62,7 +42,6 @@ window.requestAnimationFrame = (cb: FrameRequestCallback) => {
 describe("PatternProgressContext", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLocalStorage.clear();
     vi.mocked(useAuth).mockReturnValue({
       user: null,
       isLoading: false,
@@ -74,7 +53,7 @@ describe("PatternProgressContext", () => {
       handleGoogleCallback: vi.fn(),
       refreshUser: vi.fn(),
     });
-    vi.mocked(apiClient.syncPatternProgress).mockResolvedValue({
+    vi.mocked(apiClient.getPatternProgress).mockResolvedValue({
       success: true,
       data: { progress: {} },
     });
@@ -92,80 +71,33 @@ describe("PatternProgressContext", () => {
     window.requestAnimationFrame = originalRAF;
   });
 
-  describe("initial state", () => {
-    it("should start with no completed sections", async () => {
+  describe("initial state - not logged in", () => {
+    it("should start with no completed sections when not logged in", async () => {
       const { result } = renderHook(() => usePatternProgress(), {
         wrapper: Wrapper,
       });
 
       await waitFor(() => {
-        expect(result.current.isCompleted("sliding-window", 0)).toBe(false);
-        expect(result.current.getCompletedCount("sliding-window")).toBe(0);
+        expect(result.current.isLoading).toBe(false);
       });
+
+      expect(result.current.isCompleted("sliding-window", 0)).toBe(false);
+      expect(result.current.getCompletedCount("sliding-window")).toBe(0);
     });
 
-    it("should load progress from localStorage", async () => {
-      const storedProgress = {
-        "sliding-window": [0, 1, 2],
-        "two-pointers": [0],
-      };
-      mockLocalStorage.getItem.mockReturnValue(JSON.stringify(storedProgress));
-
-      const { result } = renderHook(() => usePatternProgress(), {
+    it("should not call API when not logged in", async () => {
+      renderHook(() => usePatternProgress(), {
         wrapper: Wrapper,
       });
 
       await waitFor(() => {
-        expect(result.current.isCompleted("sliding-window", 0)).toBe(true);
-        expect(result.current.isCompleted("sliding-window", 1)).toBe(true);
-        expect(result.current.isCompleted("sliding-window", 2)).toBe(true);
-        expect(result.current.isCompleted("sliding-window", 3)).toBe(false);
-        expect(result.current.isCompleted("two-pointers", 0)).toBe(true);
-        expect(result.current.getCompletedCount("sliding-window")).toBe(3);
+        expect(apiClient.getPatternProgress).not.toHaveBeenCalled();
       });
     });
   });
 
-  describe("markComplete", () => {
-    it("should mark a section as complete", async () => {
-      const { result } = renderHook(() => usePatternProgress(), {
-        wrapper: Wrapper,
-      });
-
-      await waitFor(() => {
-        expect(result.current.isCompleted("dp-basics", 0)).toBe(false);
-      });
-
-      act(() => {
-        result.current.markComplete("dp-basics", 0);
-      });
-
-      expect(result.current.isCompleted("dp-basics", 0)).toBe(true);
-      expect(result.current.getCompletedCount("dp-basics")).toBe(1);
-    });
-
-    it("should save to localStorage when marking complete", async () => {
-      const { result } = renderHook(() => usePatternProgress(), {
-        wrapper: Wrapper,
-      });
-
-      await waitFor(() => {
-        expect(result.current.isCompleted("dp-basics", 0)).toBe(false);
-      });
-
-      act(() => {
-        result.current.markComplete("dp-basics", 2);
-      });
-
-      await waitFor(() => {
-        expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-          "pattern_progress",
-          expect.stringContaining("dp-basics")
-        );
-      });
-    });
-
-    it("should call backend API when user is logged in", async () => {
+  describe("initial state - logged in", () => {
+    beforeEach(() => {
       vi.mocked(useAuth).mockReturnValue({
         user: mockUser,
         isLoading: false,
@@ -177,13 +109,122 @@ describe("PatternProgressContext", () => {
         handleGoogleCallback: vi.fn(),
         refreshUser: vi.fn(),
       });
+    });
+
+    it("should load progress from database when logged in", async () => {
+      const serverProgress = {
+        "sliding-window": [0, 1, 2],
+        "two-pointers": [0],
+      };
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValue({
+        success: true,
+        data: { progress: serverProgress },
+      });
 
       const { result } = renderHook(() => usePatternProgress(), {
         wrapper: Wrapper,
       });
 
       await waitFor(() => {
-        expect(result.current.isCompleted("dp-basics", 0)).toBe(false);
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.isCompleted("sliding-window", 0)).toBe(true);
+      expect(result.current.isCompleted("sliding-window", 1)).toBe(true);
+      expect(result.current.isCompleted("sliding-window", 2)).toBe(true);
+      expect(result.current.isCompleted("sliding-window", 3)).toBe(false);
+      expect(result.current.isCompleted("two-pointers", 0)).toBe(true);
+      expect(result.current.getCompletedCount("sliding-window")).toBe(3);
+    });
+
+    it("should call API to fetch progress", async () => {
+      renderHook(() => usePatternProgress(), {
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => {
+        expect(apiClient.getPatternProgress).toHaveBeenCalled();
+      });
+    });
+
+    it("should handle API failure gracefully", async () => {
+      vi.mocked(apiClient.getPatternProgress).mockRejectedValue(
+        new Error("Network error")
+      );
+
+      const { result } = renderHook(() => usePatternProgress(), {
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.getCompletedCount("sliding-window")).toBe(0);
+    });
+  });
+
+  describe("auth loading state", () => {
+    it("should wait for auth to finish loading before fetching progress", () => {
+      vi.mocked(useAuth).mockReturnValue({
+        user: null,
+        isLoading: true,
+        isAuthenticated: false,
+        login: vi.fn(),
+        register: vi.fn(),
+        logout: vi.fn(),
+        loginWithGoogle: vi.fn(),
+        handleGoogleCallback: vi.fn(),
+        refreshUser: vi.fn(),
+      });
+
+      renderHook(() => usePatternProgress(), {
+        wrapper: Wrapper,
+      });
+
+      expect(apiClient.getPatternProgress).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("markComplete", () => {
+    beforeEach(() => {
+      vi.mocked(useAuth).mockReturnValue({
+        user: mockUser,
+        isLoading: false,
+        isAuthenticated: true,
+        login: vi.fn(),
+        register: vi.fn(),
+        logout: vi.fn(),
+        loginWithGoogle: vi.fn(),
+        handleGoogleCallback: vi.fn(),
+        refreshUser: vi.fn(),
+      });
+    });
+
+    it("should mark a section as complete with optimistic update", async () => {
+      const { result } = renderHook(() => usePatternProgress(), {
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.markComplete("dp-basics", 0);
+      });
+
+      expect(result.current.isCompleted("dp-basics", 0)).toBe(true);
+      expect(result.current.getCompletedCount("dp-basics")).toBe(1);
+    });
+
+    it("should call backend API when marking complete", async () => {
+      const { result } = renderHook(() => usePatternProgress(), {
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
       });
 
       act(() => {
@@ -197,12 +238,78 @@ describe("PatternProgressContext", () => {
         );
       });
     });
+
+    it("should revert optimistic update on API failure", async () => {
+      vi.mocked(apiClient.markSectionComplete).mockRejectedValue(
+        new Error("Network error")
+      );
+
+      const { result } = renderHook(() => usePatternProgress(), {
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.markComplete("dp-basics", 0);
+      });
+
+      await waitFor(() => {
+        expect(result.current.isCompleted("dp-basics", 0)).toBe(false);
+      });
+    });
+
+    it("should not call API when not logged in", async () => {
+      vi.mocked(useAuth).mockReturnValue({
+        user: null,
+        isLoading: false,
+        isAuthenticated: false,
+        login: vi.fn(),
+        register: vi.fn(),
+        logout: vi.fn(),
+        loginWithGoogle: vi.fn(),
+        handleGoogleCallback: vi.fn(),
+        refreshUser: vi.fn(),
+      });
+
+      const { result } = renderHook(() => usePatternProgress(), {
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.markComplete("dp-basics", 0);
+      });
+
+      expect(apiClient.markSectionComplete).not.toHaveBeenCalled();
+    });
   });
 
   describe("markIncomplete", () => {
-    it("should mark a section as incomplete", async () => {
-      const storedProgress = { "dp-basics": [0, 1] };
-      mockLocalStorage.getItem.mockReturnValue(JSON.stringify(storedProgress));
+    beforeEach(() => {
+      vi.mocked(useAuth).mockReturnValue({
+        user: mockUser,
+        isLoading: false,
+        isAuthenticated: true,
+        login: vi.fn(),
+        register: vi.fn(),
+        logout: vi.fn(),
+        loginWithGoogle: vi.fn(),
+        handleGoogleCallback: vi.fn(),
+        refreshUser: vi.fn(),
+      });
+    });
+
+    it("should mark a section as incomplete with optimistic update", async () => {
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValue({
+        success: true,
+        data: { progress: { "dp-basics": [0, 1] } },
+      });
 
       const { result } = renderHook(() => usePatternProgress(), {
         wrapper: Wrapper,
@@ -220,21 +327,11 @@ describe("PatternProgressContext", () => {
       expect(result.current.getCompletedCount("dp-basics")).toBe(1);
     });
 
-    it("should call backend API when user is logged in", async () => {
-      vi.mocked(useAuth).mockReturnValue({
-        user: mockUser,
-        isLoading: false,
-        isAuthenticated: true,
-        login: vi.fn(),
-        register: vi.fn(),
-        logout: vi.fn(),
-        loginWithGoogle: vi.fn(),
-        handleGoogleCallback: vi.fn(),
-        refreshUser: vi.fn(),
+    it("should call backend API when marking incomplete", async () => {
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValue({
+        success: true,
+        data: { progress: { "dp-basics": [0, 1] } },
       });
-
-      const storedProgress = { "dp-basics": [0, 1] };
-      mockLocalStorage.getItem.mockReturnValue(JSON.stringify(storedProgress));
 
       const { result } = renderHook(() => usePatternProgress(), {
         wrapper: Wrapper,
@@ -255,16 +352,56 @@ describe("PatternProgressContext", () => {
         );
       });
     });
+
+    it("should revert optimistic update on API failure", async () => {
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValue({
+        success: true,
+        data: { progress: { "dp-basics": [0, 1] } },
+      });
+      vi.mocked(apiClient.markSectionIncomplete).mockRejectedValue(
+        new Error("Network error")
+      );
+
+      const { result } = renderHook(() => usePatternProgress(), {
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => {
+        expect(result.current.isCompleted("dp-basics", 0)).toBe(true);
+      });
+
+      act(() => {
+        result.current.markIncomplete("dp-basics", 0);
+      });
+
+      await waitFor(() => {
+        expect(result.current.isCompleted("dp-basics", 0)).toBe(true);
+      });
+    });
   });
 
   describe("toggleComplete", () => {
+    beforeEach(() => {
+      vi.mocked(useAuth).mockReturnValue({
+        user: mockUser,
+        isLoading: false,
+        isAuthenticated: true,
+        login: vi.fn(),
+        register: vi.fn(),
+        logout: vi.fn(),
+        loginWithGoogle: vi.fn(),
+        handleGoogleCallback: vi.fn(),
+        refreshUser: vi.fn(),
+      });
+    });
+
     it("should toggle from incomplete to complete", async () => {
       const { result } = renderHook(() => usePatternProgress(), {
         wrapper: Wrapper,
       });
 
       await waitFor(() => {
-        expect(result.current.isCompleted("sliding-window", 0)).toBe(false);
+        expect(result.current.isLoading).toBe(false);
       });
 
       act(() => {
@@ -275,8 +412,10 @@ describe("PatternProgressContext", () => {
     });
 
     it("should toggle from complete to incomplete", async () => {
-      const storedProgress = { "sliding-window": [0] };
-      mockLocalStorage.getItem.mockReturnValue(JSON.stringify(storedProgress));
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValue({
+        success: true,
+        data: { progress: { "sliding-window": [0] } },
+      });
 
       const { result } = renderHook(() => usePatternProgress(), {
         wrapper: Wrapper,
@@ -295,9 +434,25 @@ describe("PatternProgressContext", () => {
   });
 
   describe("getProgress", () => {
+    beforeEach(() => {
+      vi.mocked(useAuth).mockReturnValue({
+        user: mockUser,
+        isLoading: false,
+        isAuthenticated: true,
+        login: vi.fn(),
+        register: vi.fn(),
+        logout: vi.fn(),
+        loginWithGoogle: vi.fn(),
+        handleGoogleCallback: vi.fn(),
+        refreshUser: vi.fn(),
+      });
+    });
+
     it("should calculate progress percentage", async () => {
-      const storedProgress = { "dp-basics": [0, 1, 2] };
-      mockLocalStorage.getItem.mockReturnValue(JSON.stringify(storedProgress));
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValue({
+        success: true,
+        data: { progress: { "dp-basics": [0, 1, 2] } },
+      });
 
       const { result } = renderHook(() => usePatternProgress(), {
         wrapper: Wrapper,
@@ -314,8 +469,10 @@ describe("PatternProgressContext", () => {
       });
 
       await waitFor(() => {
-        expect(result.current.getProgress("unknown-pattern", 10)).toBe(0);
+        expect(result.current.isLoading).toBe(false);
       });
+
+      expect(result.current.getProgress("unknown-pattern", 10)).toBe(0);
     });
 
     it("should return 0 when total sections is 0", async () => {
@@ -324,51 +481,10 @@ describe("PatternProgressContext", () => {
       });
 
       await waitFor(() => {
-        expect(result.current.getProgress("dp-basics", 0)).toBe(0);
-      });
-    });
-  });
-
-  describe("backend sync", () => {
-    it("should sync with backend when user logs in", async () => {
-      const storedProgress = { "dp-basics": [0, 1] };
-      mockLocalStorage.getItem.mockReturnValue(JSON.stringify(storedProgress));
-
-      const mergedProgress = {
-        "dp-basics": [0, 1, 2],
-        "sliding-window": [0],
-      };
-      vi.mocked(apiClient.syncPatternProgress).mockResolvedValue({
-        success: true,
-        data: { progress: mergedProgress },
+        expect(result.current.isLoading).toBe(false);
       });
 
-      vi.mocked(useAuth).mockReturnValue({
-        user: mockUser,
-        isLoading: false,
-        isAuthenticated: true,
-        login: vi.fn(),
-        register: vi.fn(),
-        logout: vi.fn(),
-        loginWithGoogle: vi.fn(),
-        handleGoogleCallback: vi.fn(),
-        refreshUser: vi.fn(),
-      });
-
-      const { result } = renderHook(() => usePatternProgress(), {
-        wrapper: Wrapper,
-      });
-
-      await waitFor(() => {
-        expect(apiClient.syncPatternProgress).toHaveBeenCalledWith({
-          "dp-basics": [0, 1],
-        });
-      });
-
-      await waitFor(() => {
-        expect(result.current.isCompleted("dp-basics", 2)).toBe(true);
-        expect(result.current.isCompleted("sliding-window", 0)).toBe(true);
-      });
+      expect(result.current.getProgress("dp-basics", 0)).toBe(0);
     });
   });
 });

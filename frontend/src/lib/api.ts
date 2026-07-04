@@ -396,6 +396,13 @@ class ApiClient {
   }
 
   // Pattern Progress
+  getPatternProgress(): Promise<ApiResponse<{ progress: { [key: string]: number[] } }>> {
+    return this.request<{ progress: { [key: string]: number[] } }>(
+      "/api/v1/pattern-progress",
+      { method: "GET" }
+    );
+  }
+
   syncPatternProgress(
     progress: { [key: string]: number[] }
   ): Promise<ApiResponse<{ progress: { [key: string]: number[] } }>> {

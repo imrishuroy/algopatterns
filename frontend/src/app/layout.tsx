@@ -12,7 +12,7 @@ import { HighlightProvider } from "@/contexts/HighlightContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { PatternProgressProvider } from "@/contexts/PatternProgressContext";
 import { defaultMetadata } from "@/lib/seo";
-import { WebsiteJsonLd } from "@/components/seo/JsonLd";
+import { WebsiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,7 +46,6 @@ export default function RootLayout({ // skipcq: JS-0067
       className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} h-full antialiased dark`}
     >
       <head>
-        <meta name="google-site-verification" content="GN9sKyZeBRDfjzlfvY8mPl0NB0zbnt2gHnPbmWpK3ng" />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-64T0261KB3"
           strategy="afterInteractive"
@@ -60,6 +59,7 @@ export default function RootLayout({ // skipcq: JS-0067
           `}
         </Script>
         <WebsiteJsonLd />
+        <OrganizationJsonLd />
       </head>
       <body
         className="min-h-full flex flex-col text-gray-100"

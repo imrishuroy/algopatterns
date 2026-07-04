@@ -3,10 +3,13 @@
 User-agent: *
 Allow: /
 
-# Block internal/admin routes
+# Block internal/admin/auth routes
 Disallow: /api/
 Disallow: /test-payment/
 Disallow: /account/
+Disallow: /auth/
+Disallow: /sentry-example-page/
+Disallow: /sentry-tunnel
 
 # Sitemap
 Sitemap: https://algopatterns.in/sitemap.xml

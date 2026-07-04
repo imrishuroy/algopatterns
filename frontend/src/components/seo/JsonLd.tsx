@@ -59,6 +59,7 @@ export function CourseJsonLd({ pattern }: { pattern: Pattern }) {
     "@type": "Course",
     name: `${pattern.category} Pattern`,
     description: pattern.description,
+    url: `${siteConfig.url}/patterns/${pattern.id}`,
     provider: {
       "@type": "Organization",
       name: siteConfig.name,
@@ -68,6 +69,11 @@ export function CourseJsonLd({ pattern }: { pattern: Pattern }) {
       "@type": "CourseInstance",
       courseMode: "online",
       courseWorkload: "PT2H",
+      courseSchedule: {
+        "@type": "Schedule",
+        repeatFrequency: "P1D",
+        startDate: "2024-01-01",
+      },
     },
     teaches: pattern.whenToUse,
     educationalLevel: pattern.difficulty,

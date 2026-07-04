@@ -290,6 +290,21 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 		MaxAge:           12 * time.Hour,
 	}))
 
+	// Root handler — returns 200 so Googlebot doesn't index a 404 for api.algopatterns.in/
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"service": "AlgoPatterns API",
+			"version": "1.0.0",
+			"docs":    "https://algopatterns.in",
+			"status":  "ok",
+		})
+	})
+
+	// Disallow search engine crawling of the API subdomain
+	router.GET("/robots.txt", func(c *gin.Context) {
+		c.String(http.StatusOK, "User-agent: *\nDisallow: /\n")
+	})
+
 	healthHandler := handlers.NewHealthHandler(db)
 	healthHandler.RegisterRoutes(&router.RouterGroup)
 

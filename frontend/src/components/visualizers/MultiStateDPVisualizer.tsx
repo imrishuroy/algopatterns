@@ -35,6 +35,89 @@ const playReducer = (state: PlayState, action: PlayAction): PlayState => {
   }
 };
 
+interface ArrayItemProps {
+  num: number;
+  isCurrent: boolean;
+  isPast: boolean;
+}
+
+const ArrayItem = ({ num, isCurrent, isPast }: ArrayItemProps) => (
+  <motion.div
+    animate={{
+      backgroundColor: isCurrent ? "#a855f7" : isPast ? "#374151" : "#1f2937",
+      scale: isCurrent ? 1.15 : 1,
+      borderColor: isCurrent ? "#a855f7" : "#374151",
+    }}
+    className="w-12 h-12 rounded-md flex items-center justify-center font-bold text-lg border-2"
+  >
+    <span className={isCurrent ? "text-white" : num < 0 ? "text-red-400" : "text-white"}>
+      {num}
+    </span>
+  </motion.div>
+);
+
+interface StatBoxProps {
+  label: string;
+  value: number;
+  colorClass: string;
+  bgClass: string;
+}
+
+const StatBox = ({ label, value, colorClass, bgClass }: StatBoxProps) => (
+  <div className={`p-3 ${bgClass} rounded-md`}>
+    <span className="text-gray-400 text-xs block mb-1">{label}</span>
+    <motion.span
+      key={value}
+      initial={{ scale: 1.2 }}
+      animate={{ scale: 1 }}
+      className={`${colorClass} font-bold text-xl`}
+    >
+      {value}
+    </motion.span>
+  </div>
+);
+
+interface ControlsProps {
+  isPlaying: boolean;
+  isDone: boolean;
+  speed: number;
+  onToggle: () => void;
+  onReset: () => void;
+  onSpeedChange: (speed: number) => void;
+}
+
+const Controls = ({ isPlaying, isDone, speed, onToggle, onReset, onSpeedChange }: ControlsProps) => (
+  <div className="flex items-center gap-2 mb-4">
+    <button
+      onClick={onToggle}
+      disabled={isDone}
+      className={`px-4 py-2 rounded-md font-medium transition ${
+        isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
+      } disabled:opacity-50`}
+    >
+      {isPlaying ? "Pause" : "Play"}
+    </button>
+    <button
+      onClick={onReset}
+      className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
+    >
+      Reset
+    </button>
+    <div className="flex items-center gap-2 ml-4">
+      <span className="text-gray-400 text-sm">Speed:</span>
+      <input
+        type="range"
+        min="500"
+        max="2000"
+        step="100"
+        value={2500 - speed}
+        onChange={(e) => onSpeedChange(2500 - Number(e.target.value))}
+        className="w-20 accent-purple-500"
+      />
+    </div>
+  </div>
+);
+
 const MultiStateDPVisualizer = () => {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
   const [speed, setSpeed] = useState(1200);
@@ -118,7 +201,7 @@ const MultiStateDPVisualizer = () => {
   }, [generateSteps]);
 
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying) return undefined;
 
     const timer = setTimeout(() => {
       if (phase === "init") {
@@ -151,6 +234,18 @@ const MultiStateDPVisualizer = () => {
   const current =
     currentStep >= 0 && currentStep < steps.length ? steps[currentStep] : null;
 
+  const decisionClass = current?.decision === "start"
+    ? "bg-blue-500/20 border border-blue-500/50 text-blue-400"
+    : current?.decision === "extendMin"
+      ? "bg-pink-500/20 border border-pink-500/50 text-pink-400"
+      : "bg-green-500/20 border border-green-500/50 text-green-400";
+
+  const decisionText = current?.decision === "start"
+    ? "🔄 Start Fresh"
+    : current?.decision === "extendMin"
+      ? "🔀 Extend via Min (Negative Flip!)"
+      : "📈 Extend via Max";
+
   return (
     <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-gray-800">
@@ -161,132 +256,67 @@ const MultiStateDPVisualizer = () => {
       </div>
 
       <div className="p-4">
-        {/* Controls */}
-        <div className="flex items-center gap-2 mb-4">
-          <button
-            onClick={() => dispatch({ type: "TOGGLE" })}
-            disabled={phase === "done"}
-            className={`px-4 py-2 rounded-md font-medium transition ${
-              isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
-            } disabled:opacity-50`}
-          >
-            {isPlaying ? "Pause" : "Play"}
-          </button>
-          <button
-            onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
-          >
-            Reset
-          </button>
-          <div className="flex items-center gap-2 ml-4">
-            <span className="text-gray-400 text-sm">Speed:</span>
-            <input
-              type="range"
-              min="500"
-              max="2000"
-              step="100"
-              value={2500 - speed}
-              onChange={(e) => setSpeed(2500 - Number(e.target.value))}
-              className="w-20 accent-purple-500"
-            />
-          </div>
-        </div>
+        <Controls
+          isPlaying={isPlaying}
+          isDone={phase === "done"}
+          speed={speed}
+          onToggle={() => dispatch({ type: "TOGGLE" })}
+          onReset={reset}
+          onSpeedChange={setSpeed}
+        />
 
-        {/* Stats - The Key Multi-State Display */}
         <div className="mb-4 grid grid-cols-3 gap-3">
-          <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-md">
-            <span className="text-gray-400 text-xs block mb-1">currMax</span>
-            <motion.span
-              key={current?.currMax}
-              initial={{ scale: 1.2 }}
-              animate={{ scale: 1 }}
-              className="text-green-400 font-bold text-xl"
-            >
-              {current?.currMax ?? nums[0]}
-            </motion.span>
-          </div>
-          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-md">
-            <span className="text-gray-400 text-xs block mb-1">currMin</span>
-            <motion.span
-              key={current?.currMin}
-              initial={{ scale: 1.2 }}
-              animate={{ scale: 1 }}
-              className="text-red-400 font-bold text-xl"
-            >
-              {current?.currMin ?? nums[0]}
-            </motion.span>
-          </div>
-          <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-md">
-            <span className="text-gray-400 text-xs block mb-1">maxProd</span>
-            <motion.span
-              key={current?.maxProd}
-              initial={{ scale: 1.2 }}
-              animate={{ scale: 1 }}
-              className="text-purple-400 font-bold text-xl"
-            >
-              {current?.maxProd ?? nums[0]}
-            </motion.span>
-          </div>
+          <StatBox
+            label="currMax"
+            value={current?.currMax ?? nums[0]}
+            colorClass="text-green-400"
+            bgClass="bg-green-500/10 border border-green-500/30"
+          />
+          <StatBox
+            label="currMin"
+            value={current?.currMin ?? nums[0]}
+            colorClass="text-red-400"
+            bgClass="bg-red-500/10 border border-red-500/30"
+          />
+          <StatBox
+            label="maxProd"
+            value={current?.maxProd ?? nums[0]}
+            colorClass="text-purple-400"
+            bgClass="bg-purple-500/10 border border-purple-500/30"
+          />
         </div>
 
-        {/* Array visualization */}
         <div className="mb-4">
           <div className="text-sm text-gray-400 mb-2">Array:</div>
           <div className="flex gap-2 justify-center flex-wrap">
-            {nums.map((num, idx) => {
-              const isCurrent = current && idx === current.index;
-              const isPast = current && idx < current.index;
-
-              return (
-                <motion.div
-                  key={`num-${idx}`}
-                  animate={{
-                    backgroundColor: isCurrent
-                      ? "#a855f7"
-                      : isPast
-                        ? "#374151"
-                        : "#1f2937",
-                    scale: isCurrent ? 1.15 : 1,
-                    borderColor: isCurrent ? "#a855f7" : "#374151",
-                  }}
-                  className="w-12 h-12 rounded-md flex items-center justify-center font-bold text-lg border-2"
-                >
-                  <span className={isCurrent ? "text-white" : num < 0 ? "text-red-400" : "text-white"}>
-                    {num}
-                  </span>
-                </motion.div>
-              );
-            })}
+            {nums.map((num, idx) => (
+              <ArrayItem
+                key={`num-${num}-${idx}`}
+                num={num}
+                isCurrent={current !== null && idx === current.index}
+                isPast={current !== null && idx < current.index}
+              />
+            ))}
           </div>
           <div className="flex gap-2 justify-center mt-1">
-            {nums.map((_, idx) => (
-              <div key={`idx-${idx}`} className="w-12 text-center text-xs text-gray-500">
+            {nums.map((num, idx) => (
+              <div key={`idx-${num}-${idx}`} className="w-12 text-center text-xs text-gray-500">
                 i={idx}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Decision indicator */}
         {current && phase === "running" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className={`mb-4 p-3 rounded-md text-center font-medium ${
-              current.decision === "start"
-                ? "bg-blue-500/20 border border-blue-500/50 text-blue-400"
-                : current.decision === "extendMin"
-                  ? "bg-pink-500/20 border border-pink-500/50 text-pink-400"
-                  : "bg-green-500/20 border border-green-500/50 text-green-400"
-            }`}
+            className={`mb-4 p-3 rounded-md text-center font-medium ${decisionClass}`}
           >
-            {current.decision === "start" && "🔄 Start Fresh"}
-            {current.decision === "extendMax" && "📈 Extend via Max"}
-            {current.decision === "extendMin" && "🔀 Extend via Min (Negative Flip!)"}
+            {decisionText}
           </motion.div>
         )}
 
-        {/* Final result */}
         {phase === "done" && current && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -299,7 +329,6 @@ const MultiStateDPVisualizer = () => {
           </motion.div>
         )}
 
-        {/* Message */}
         <motion.div
           key={message}
           initial={{ opacity: 0, y: 10 }}
@@ -313,7 +342,6 @@ const MultiStateDPVisualizer = () => {
           {message}
         </motion.div>
 
-        {/* Legend */}
         <div className="mt-4 flex flex-wrap gap-4 text-xs">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded-md bg-green-500" />
@@ -329,7 +357,6 @@ const MultiStateDPVisualizer = () => {
           </div>
         </div>
 
-        {/* Key insight */}
         <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
             <strong className="text-purple-400">Key Insight:</strong> Unlike sum,

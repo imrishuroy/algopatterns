@@ -165,7 +165,7 @@ describe("PatternProgressContext", () => {
   });
 
   describe("auth loading state", () => {
-    it("should wait for auth to finish loading before fetching progress", async () => {
+    it("should wait for auth to finish loading before fetching progress", () => {
       vi.mocked(useAuth).mockReturnValue({
         user: null,
         isLoading: true,
@@ -210,7 +210,7 @@ describe("PatternProgressContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      await act(async () => {
+      act(() => {
         result.current.markComplete("dp-basics", 0);
       });
 
@@ -227,7 +227,7 @@ describe("PatternProgressContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      await act(async () => {
+      act(() => {
         result.current.markComplete("dp-basics", 3);
       });
 
@@ -252,7 +252,7 @@ describe("PatternProgressContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      await act(async () => {
+      act(() => {
         result.current.markComplete("dp-basics", 0);
       });
 
@@ -319,7 +319,7 @@ describe("PatternProgressContext", () => {
         expect(result.current.isCompleted("dp-basics", 0)).toBe(true);
       });
 
-      await act(async () => {
+      act(() => {
         result.current.markIncomplete("dp-basics", 0);
       });
 
@@ -341,7 +341,7 @@ describe("PatternProgressContext", () => {
         expect(result.current.isCompleted("dp-basics", 0)).toBe(true);
       });
 
-      await act(async () => {
+      act(() => {
         result.current.markIncomplete("dp-basics", 0);
       });
 
@@ -370,7 +370,7 @@ describe("PatternProgressContext", () => {
         expect(result.current.isCompleted("dp-basics", 0)).toBe(true);
       });
 
-      await act(async () => {
+      act(() => {
         result.current.markIncomplete("dp-basics", 0);
       });
 
@@ -404,7 +404,7 @@ describe("PatternProgressContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      await act(async () => {
+      act(() => {
         result.current.toggleComplete("sliding-window", 0);
       });
 
@@ -425,7 +425,7 @@ describe("PatternProgressContext", () => {
         expect(result.current.isCompleted("sliding-window", 0)).toBe(true);
       });
 
-      await act(async () => {
+      act(() => {
         result.current.toggleComplete("sliding-window", 0);
       });
 

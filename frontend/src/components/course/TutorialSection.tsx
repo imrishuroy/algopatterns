@@ -94,6 +94,7 @@ interface TutorialSectionProps {
   sectionIndex: number;
 }
 
+// skipcq: JS-R1005 — Visualizer dispatch is inherently complex with many pattern/section combinations
 const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
   const cat = pattern.category;
   const title = section.title;

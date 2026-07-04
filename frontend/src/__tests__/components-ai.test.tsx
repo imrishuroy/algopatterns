@@ -776,7 +776,7 @@ describe("ChatMessage", () => {
     const pres = Array.from(container.querySelectorAll("pre"));
     const monoPre = pres.find((p) => p.className.includes("font-mono"));
     expect(monoPre).toBeInTheDocument();
-    expect(monoPre!.textContent).toContain("├── left");
+    expect(monoPre?.textContent).toContain("├── left");
   });
 
   it("renders pipe-delimited markdown table in a font-mono <pre>", () => {
@@ -788,8 +788,8 @@ describe("ChatMessage", () => {
     const pres = Array.from(container.querySelectorAll("pre"));
     const monoPre = pres.find((p) => p.className.includes("font-mono"));
     expect(monoPre).toBeInTheDocument();
-    expect(monoPre!.textContent).toContain("Name");
-    expect(monoPre!.textContent).toContain("Alice");
+    expect(monoPre?.textContent).toContain("Name");
+    expect(monoPre?.textContent).toContain("Alice");
   });
 
   it("renders ASCII +---+ table in a font-mono <pre>", () => {
@@ -801,7 +801,7 @@ describe("ChatMessage", () => {
     const pres = Array.from(container.querySelectorAll("pre"));
     const monoPre = pres.find((p) => p.className.includes("font-mono"));
     expect(monoPre).toBeInTheDocument();
-    expect(monoPre!.textContent).toContain("Col1");
+    expect(monoPre?.textContent).toContain("Col1");
   });
 
   it("renders / \\ tree branches in a font-mono <pre>", () => {
@@ -814,10 +814,10 @@ describe("ChatMessage", () => {
     const monoPre = pres.find((p) => p.className.includes("font-mono"));
     expect(monoPre).toBeInTheDocument();
     // All lines of the block (including digits) must be inside the same <pre>
-    expect(monoPre!.textContent).toContain("4");
-    expect(monoPre!.textContent).toContain("/ \\");
-    expect(monoPre!.textContent).toContain("2");
-    expect(monoPre!.textContent).toContain("6");
+    expect(monoPre?.textContent).toContain("4");
+    expect(monoPre?.textContent).toContain("/ \\");
+    expect(monoPre?.textContent).toContain("2");
+    expect(monoPre?.textContent).toContain("6");
   });
 
   it("does NOT render plain paragraphs as font-mono <pre>", () => {

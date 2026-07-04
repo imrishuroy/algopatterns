@@ -29,20 +29,20 @@ const DEFAULTS = {
 
 // Helpers
 
-function readNum(key: string, def: number): number {
+const readNum = (key: string, def: number): number => {
   if (typeof window === "undefined") return def;
   const raw = localStorage.getItem(key);
   if (!raw) return def;
   const parsed = parseFloat(raw);
   return isNaN(parsed) ? def : parsed;
-}
+};
 
-function readBool(key: string, def: boolean): boolean {
+const readBool = (key: string, def: boolean): boolean => {
   if (typeof window === "undefined") return def;
   const raw = localStorage.getItem(key);
   if (raw === null) return def;
   return raw === "true";
-}
+};
 
 /**
  * Persists editor preferences to localStorage so they survive page reloads.
@@ -51,6 +51,7 @@ function readBool(key: string, def: boolean): boolean {
  * change. Panel widths (leftPanelWidth, rightPanelWidth, editorHeight) are
  * updated continuously during drag so their writes are debounced by 500 ms.
  */
+// skipcq: JS-0067
 export function useEditorPreferences() {
   // State — lazy-initialised from localStorage
 
@@ -93,27 +94,27 @@ export function useEditorPreferences() {
   // Debounced writes for panel widths (dragged continuously)
 
   useEffect(() => {
-    const t = setTimeout(
+    const timer = setTimeout(
       () => localStorage.setItem(KEYS.leftPanelWidth, leftPanelWidth.toString()),
       500,
     );
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [leftPanelWidth]);
 
   useEffect(() => {
-    const t = setTimeout(
+    const timer = setTimeout(
       () => localStorage.setItem(KEYS.rightPanelWidth, rightPanelWidth.toString()),
       500,
     );
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [rightPanelWidth]);
 
   useEffect(() => {
-    const t = setTimeout(
+    const timer = setTimeout(
       () => localStorage.setItem(KEYS.editorHeight, editorHeight.toString()),
       500,
     );
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [editorHeight]);
 
   return {

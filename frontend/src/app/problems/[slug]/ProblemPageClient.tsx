@@ -348,7 +348,8 @@ function getStorageKey(slug: string, languageId: number) {
   return `code_${slug}_${languageId}`;
 }
 
-export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS-R1005
+// skipcq: JS-0067, JS-R1005
+export default function ProblemPageClient({ params }: PageProps) {
   const { slug } = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -552,7 +553,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
 
   // Load problem data
   useEffect(() => {
-    const fetchProblem = async () => {
+    const fetchProblem = async () => { // skipcq: JS-R1005
       setIsLoading(true);
       setError(null);
       try {
@@ -603,7 +604,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
 
   // Save code to localStorage — debounced 1 s to avoid writing on every keystroke
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
+  useEffect(() => { // skipcq: JS-0045
     if (!selectedLanguageId || !code) return;
     setSaveStatus("unsaved");
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -942,7 +943,7 @@ export default function ProblemPageClient({ params }: PageProps) { // skipcq: JS
     handleRunRef.current = handleRun;
     handleSubmitRef.current = handleSubmit;
   });
-  const handleKeyDown = useCallback(
+  const handleKeyDown = useCallback( // skipcq: JS-R1005
     (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();

@@ -70,6 +70,7 @@ export default function PatternRecognitionClient() {
 
 // skipcq: JS-0067
 function CheatsheetTab() {
+  // skipcq: JS-0415
   return (
     <div className="space-y-6">
       {/* The Golden Rule */}
@@ -450,6 +451,7 @@ function search(nums, target) {
 
   const current = data[selected];
 
+  // skipcq: JS-0415
   return (
     <div className="space-y-6">
       {/* Selector */}

@@ -179,6 +179,7 @@ const problems = [
 export default function ExpandAroundCenterClient() {
   const [lang, setLang] = useState<Language>("java");
 
+  // skipcq: JS-0415
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Breadcrumb */}

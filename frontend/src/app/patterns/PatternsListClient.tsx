@@ -79,6 +79,7 @@ export default function PatternsListClient({
     });
   };
 
+  // skipcq: JS-0415
   return (
     <div className="space-y-6">
       {/* Search */}

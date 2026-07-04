@@ -78,6 +78,7 @@ function getDifficultyColor(difficulty: string): string {
 
 // skipcq: JS-0067
 export default function ArticlesPage() {
+  // skipcq: JS-0415
   return (
     <>
       <JsonLdScript data={itemListJsonLd} />

@@ -31,6 +31,7 @@ import { aiApiClient } from "@/lib/ai-api";
 // Helpers
 
 /** Creates a minimal DOMRect-compatible object (jsdom may not expose DOMRect). */
+// skipcq: JS-0067
 function fakeRect(x = 0, y = 0, width = 0, height = 0): DOMRect {
   return {
     x,

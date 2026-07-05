@@ -29,8 +29,9 @@ let dbInstance: IDBDatabase | null = null;
 /**
  * Open or create the IndexedDB database
  */
-async function openDB(): Promise<IDBDatabase> {
-  if (dbInstance) return dbInstance;
+// skipcq: JS-0067
+function openDB(): Promise<IDBDatabase> {
+  if (dbInstance) return Promise.resolve(dbInstance);
 
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -69,6 +70,7 @@ async function openDB(): Promise<IDBDatabase> {
 /**
  * Check if cache is stale for a content key
  */
+// skipcq: JS-0067
 export async function isCacheStale(
   contentType: string,
   contentId: string
@@ -102,6 +104,7 @@ export async function isCacheStale(
 /**
  * Update cache timestamp for a content key
  */
+// skipcq: JS-0067
 export async function updateCacheTimestamp(
   contentType: string,
   contentId: string

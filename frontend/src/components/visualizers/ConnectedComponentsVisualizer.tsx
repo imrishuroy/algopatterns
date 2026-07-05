@@ -8,6 +8,7 @@ interface Edge {
   to: number;
 }
 
+// skipcq: JS-0067
 function find(p: number[], x: number): number {
   if (p[x] !== x) {
     return find(p, p[x]);

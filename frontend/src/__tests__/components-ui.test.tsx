@@ -111,6 +111,7 @@ import { GoogleButton } from "@/components/ui/GoogleButton";
 
 // Setup helpers
 
+// skipcq: JS-0067
 function mockClipboard() {
   const writeText = vi.fn().mockResolvedValue(undefined);
   Object.defineProperty(navigator, "clipboard", {

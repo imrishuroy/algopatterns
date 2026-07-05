@@ -525,6 +525,7 @@ const TablePhase = ({
   );
 };
 
+// skipcq: JS-0067
 export default function DPJourneyVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table"];

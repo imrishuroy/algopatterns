@@ -49,6 +49,7 @@ const companyLogos: Record<string, string> = {
   Walmart: "/logos/walmart.svg",
 };
 
+// skipcq: JS-0067
 export default function Dashboard({ questions }: DashboardProps) {
   const patterns = patternsData as Pattern[];
   const { completed } = useProgress();

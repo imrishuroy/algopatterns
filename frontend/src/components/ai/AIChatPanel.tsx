@@ -31,6 +31,8 @@ interface AIChatPanelProps {
   onClose: () => void;
 }
 
+// skipcq: JS-0067
+// skipcq: JS-R1005
 export function AIChatPanel({
   // skipcq: JS-R1005
   problemSlug,

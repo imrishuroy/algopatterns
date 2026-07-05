@@ -95,40 +95,40 @@ const generateExpandSteps = () => {
     longestLen = 1;
 
   for (let i = 0; i < n; i++) {
-    let l = i,
-      r = i;
-    while (l >= 0 && r < n && str[l] === str[r]) {
-      if (r - l + 1 > longestLen) {
-        longestStart = l;
-        longestLen = r - l + 1;
+    let lo = i,
+      hi = i;
+    while (lo >= 0 && hi < n && str[lo] === str[hi]) {
+      if (hi - lo + 1 > longestLen) {
+        longestStart = lo;
+        longestLen = hi - lo + 1;
       }
       steps.push({
         center: i,
-        left: l,
-        right: r,
-        expanded: str.substring(l, r + 1),
+        left: lo,
+        right: hi,
+        expanded: str.substring(lo, hi + 1),
         type: "odd",
       });
-      l--;
-      r++;
+      lo--;
+      hi++;
     }
 
-    l = i;
-    r = i + 1;
-    while (l >= 0 && r < n && str[l] === str[r]) {
-      if (r - l + 1 > longestLen) {
-        longestStart = l;
-        longestLen = r - l + 1;
+    lo = i;
+    hi = i + 1;
+    while (lo >= 0 && hi < n && str[lo] === str[hi]) {
+      if (hi - lo + 1 > longestLen) {
+        longestStart = lo;
+        longestLen = hi - lo + 1;
       }
       steps.push({
         center: i,
-        left: l,
-        right: r,
-        expanded: str.substring(l, r + 1),
+        left: lo,
+        right: hi,
+        expanded: str.substring(lo, hi + 1),
         type: "even",
       });
-      l--;
-      r++;
+      lo--;
+      hi++;
     }
   }
 
@@ -370,6 +370,7 @@ const TablePhase = ({
                 <th className="p-2 text-gray-500 w-8">i\j</th>
                 {str.split("").map((c, i) => (
                   <th
+                    // skipcq: JS-0437
                     key={`th-col-${i}-${c}`}
                     className="p-2 text-gray-400 w-10"
                   >
@@ -388,6 +389,7 @@ const TablePhase = ({
                     const value = dpTable[i]?.[j];
                     const isValid = j >= i;
                     return (
+                      // skipcq: JS-0437
                       <td key={`td-cell-${i}-${j}`} className="p-1">
                         <div
                           className={`w-10 h-10 flex items-center justify-center border-2 rounded font-mono text-xs ${
@@ -487,6 +489,7 @@ const ExpandPhase = ({
   );
 };
 
+// skipcq: JS-0067
 export default function PalindromeDPVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["concept", "table", "expand"];

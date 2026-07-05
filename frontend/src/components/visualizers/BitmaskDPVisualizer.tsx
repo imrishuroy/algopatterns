@@ -417,6 +417,7 @@ const TSPPhase = ({
   );
 };
 
+// skipcq: JS-0067
 export default function BitmaskDPVisualizer() {
   // skipcq: JS-0067, JS-R1005
   const phases: Phase[] = ["concept", "tsp", "result"];

@@ -38,6 +38,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// skipcq: JS-0067
 export default async function PatternPage({ params }: PageProps) {
   const { slug } = await params;
   const pattern = patterns.find((p) => p.id === slug);

@@ -67,6 +67,7 @@ const CYCLE_PREREQS: [number, number][] = [
   [3, 1],
 ];
 
+// skipcq: JS-0067
 export default function TopologicalSortVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,

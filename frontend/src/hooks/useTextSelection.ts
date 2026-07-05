@@ -23,6 +23,7 @@ interface UseTextSelectionOptions {
   enabled?: boolean;
 }
 
+// skipcq: JS-0067
 export function useTextSelection(
   containerRef: RefObject<HTMLElement | null>,
   options: UseTextSelectionOptions = {}

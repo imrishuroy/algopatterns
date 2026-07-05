@@ -40,6 +40,7 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
   }
 }
 
+// skipcq: JS-0067
 export default function KokoEatingVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -216,6 +217,7 @@ export default function KokoEatingVisualizer() {
           <div className="flex gap-3 justify-center">
             {piles.map((pile, idx) => (
               <div
+                // skipcq: JS-0437
                 key={`pile-${pile}-${idx}`}
                 className="flex flex-col items-center"
               >

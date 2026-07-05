@@ -294,7 +294,7 @@ describe("AuthContext", () => {
 
       const consoleSpy = vi
         .spyOn(console, "error")
-        .mockImplementation(() => {});
+        .mockImplementation(() => {}); // skipcq: JS-0321
 
       const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
 

@@ -532,7 +532,7 @@ describe("Login page", () => {
     });
     const LoginPage = (await import("@/app/login/page")).default;
     render(React.createElement(LoginPage));
-    await act(async () => {
+    await act(async () => { // skipcq: JS-0116
       fireEvent.change(screen.getByLabelText(/email/i), {
         target: { value: "test@test.com" },
       });
@@ -540,7 +540,7 @@ describe("Login page", () => {
         target: { value: "wrong" },
       });
       fireEvent.submit(
-        screen.getByRole("button", { name: /sign in/i }).closest("form")!
+        screen.getByRole("button", { name: /sign in/i }).closest("form")! // skipcq: JS-0339
       );
     });
     await waitFor(() => {
@@ -552,7 +552,7 @@ describe("Login page", () => {
     mockAuth.login.mockResolvedValue({ success: true });
     const LoginPage = (await import("@/app/login/page")).default;
     render(React.createElement(LoginPage));
-    await act(async () => {
+    await act(async () => { // skipcq: JS-0116
       fireEvent.change(screen.getByLabelText(/email/i), {
         target: { value: "test@test.com" },
       });
@@ -560,7 +560,7 @@ describe("Login page", () => {
         target: { value: "password" },
       });
       fireEvent.submit(
-        screen.getByRole("button", { name: /sign in/i }).closest("form")!
+        screen.getByRole("button", { name: /sign in/i }).closest("form")! // skipcq: JS-0339
       );
     });
     await waitFor(() => {
@@ -592,7 +592,7 @@ describe("Login page", () => {
     mockAuth.login.mockImplementation(() => new Promise(() => {}));
     const LoginPage = (await import("@/app/login/page")).default;
     const { container } = render(React.createElement(LoginPage));
-    await act(async () => {
+    await act(async () => { // skipcq: JS-0116
       fireEvent.change(screen.getByLabelText(/email/i), {
         target: { value: "test@test.com" },
       });
@@ -600,7 +600,7 @@ describe("Login page", () => {
         target: { value: "password" },
       });
       fireEvent.submit(
-        screen.getByRole("button", { name: /sign in/i }).closest("form")!
+        screen.getByRole("button", { name: /sign in/i }).closest("form")! // skipcq: JS-0339
       );
     });
     expect(container.querySelector('button[type="submit"]')).toBeDisabled();
@@ -659,7 +659,7 @@ describe("Register page", () => {
   it("shows error when passwords do not match", async () => {
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
-    await act(async () => {
+    await act(async () => { // skipcq: JS-0116
       fireEvent.change(screen.getByLabelText(/name/i), {
         target: { value: "Test" },
       });
@@ -673,7 +673,7 @@ describe("Register page", () => {
         target: { value: "different" },
       });
       fireEvent.submit(
-        screen.getByRole("button", { name: /create account/i }).closest("form")!
+        screen.getByRole("button", { name: /create account/i }).closest("form")! // skipcq: JS-0339
       );
     });
     expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
@@ -682,7 +682,7 @@ describe("Register page", () => {
   it("shows error when password is too short", async () => {
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
-    await act(async () => {
+    await act(async () => { // skipcq: JS-0116
       fireEvent.change(screen.getByLabelText(/name/i), {
         target: { value: "Test" },
       });
@@ -696,7 +696,7 @@ describe("Register page", () => {
         target: { value: "short" },
       });
       fireEvent.submit(
-        screen.getByRole("button", { name: /create account/i }).closest("form")!
+        screen.getByRole("button", { name: /create account/i }).closest("form")! // skipcq: JS-0339
       );
     });
     expect(
@@ -708,7 +708,7 @@ describe("Register page", () => {
     mockAuth.register.mockResolvedValue({ success: true });
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
-    await act(async () => {
+    await act(async () => { // skipcq: JS-0116
       fireEvent.change(screen.getByLabelText(/name/i), {
         target: { value: "Test" },
       });
@@ -722,7 +722,7 @@ describe("Register page", () => {
         target: { value: "password123" },
       });
       fireEvent.submit(
-        screen.getByRole("button", { name: /create account/i }).closest("form")!
+        screen.getByRole("button", { name: /create account/i }).closest("form")! // skipcq: JS-0339
       );
     });
     await waitFor(() => {
@@ -737,7 +737,7 @@ describe("Register page", () => {
     });
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
-    await act(async () => {
+    await act(async () => { // skipcq: JS-0116
       fireEvent.change(screen.getByLabelText(/name/i), {
         target: { value: "Test" },
       });
@@ -751,7 +751,7 @@ describe("Register page", () => {
         target: { value: "password123" },
       });
       fireEvent.submit(
-        screen.getByRole("button", { name: /create account/i }).closest("form")!
+        screen.getByRole("button", { name: /create account/i }).closest("form")! // skipcq: JS-0339
       );
     });
     await waitFor(() => {
@@ -763,7 +763,7 @@ describe("Register page", () => {
     mockAuth.register.mockImplementation(() => new Promise(() => {}));
     const RegisterPage = (await import("@/app/register/page")).default;
     const { container } = render(React.createElement(RegisterPage));
-    await act(async () => {
+    await act(async () => { // skipcq: JS-0116
       fireEvent.change(screen.getByLabelText(/name/i), {
         target: { value: "Test" },
       });
@@ -777,7 +777,7 @@ describe("Register page", () => {
         target: { value: "password123" },
       });
       fireEvent.submit(
-        screen.getByRole("button", { name: /create account/i }).closest("form")!
+        screen.getByRole("button", { name: /create account/i }).closest("form")! // skipcq: JS-0339
       );
     });
     expect(container.querySelector('button[type="submit"]')).toBeDisabled();

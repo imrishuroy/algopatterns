@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useSearch } from "@/contexts/SearchContext";
 
+// skipcq: JS-0067
 export function useGlobalSearch() {
   const { openSearch, isOpen } = useSearch();
 

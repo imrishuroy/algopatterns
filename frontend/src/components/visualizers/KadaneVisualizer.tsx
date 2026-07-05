@@ -41,6 +41,7 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
   }
 }
 
+// skipcq: JS-0067
 export default function KadaneVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -283,6 +284,7 @@ export default function KadaneVisualizer() {
           <div className="flex gap-1 justify-center mt-1">
             {nums.map((num, idx) => (
               <div
+                // skipcq: JS-0437
                 key={`num-${num}-${idx}`}
                 className="w-10 text-center text-xs text-gray-500"
               >

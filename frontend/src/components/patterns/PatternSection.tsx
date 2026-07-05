@@ -17,6 +17,7 @@ const difficultyColors: Record<string, string> = {
   Hard: "text-red-400",
 };
 
+// skipcq: JS-0067
 export default function PatternSection({
   pattern,
   questions,

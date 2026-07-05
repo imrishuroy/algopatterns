@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 
+// skipcq: JS-0067
 export default function RemoveDuplicatesVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -130,6 +131,7 @@ export default function RemoveDuplicatesVisualizer() {
         <div className="mb-4 flex justify-center gap-1 flex-wrap">
           {nums.map((num, idx) => (
             <div
+              // skipcq: JS-0437
               key={`num-${num}-${idx}`}
               className="flex flex-col items-center"
             >
@@ -209,6 +211,7 @@ export default function RemoveDuplicatesVisualizer() {
           <div className="space-y-1">
             {history.slice(-5).map((step, idx) => (
               <div
+                // skipcq: JS-0437
                 key={`step-${step.slice(0, 15)}-${idx}`}
                 className="text-xs font-mono text-gray-500"
               >

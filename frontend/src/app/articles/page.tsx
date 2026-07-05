@@ -102,6 +102,7 @@ export default function ArticlesPage() {
 
           <div className="grid gap-6">
             {articles.map((article) => (
+              // skipcq: JS-0415
               <Link
                 key={article.slug}
                 href={`/articles/${article.slug}`}

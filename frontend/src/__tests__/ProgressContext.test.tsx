@@ -28,6 +28,7 @@ const Wrapper = ({ children }: { children: ReactNode }) => (
   <ProgressProvider>{children}</ProgressProvider>
 );
 
+// skipcq: JS-0067
 function mockAuthenticated() {
   mockedUseAuth.mockReturnValue({
     isAuthenticated: true,

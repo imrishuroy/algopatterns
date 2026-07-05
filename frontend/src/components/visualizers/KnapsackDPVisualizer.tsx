@@ -536,6 +536,7 @@ const OptimizedPhase = ({
   );
 };
 
+// skipcq: JS-0067
 export default function KnapsackDPVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "optimized"];

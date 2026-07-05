@@ -51,7 +51,7 @@ describe("SearchContext", () => {
       // Suppress console.error for this test
       const consoleSpy = vi
         .spyOn(console, "error")
-        .mockImplementation(() => {});
+        .mockImplementation(() => {}); // skipcq: JS-0321
 
       expect(() => {
         renderHook(() => useSearch());

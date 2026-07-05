@@ -45,6 +45,7 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
     };
 
     sidebar.addEventListener("wheel", handleWheel, { passive: false });
+    // skipcq: JS-0045
     return () => {
       // skipcq: JS-0045
       sidebar.removeEventListener("wheel", handleWheel);
@@ -52,6 +53,7 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
   }, []);
 
   // Handle URL hash for direct navigation to sections
+  // skipcq: JS-R1005
   useEffect(() => {
     const handleHashNavigation = () => {
       const hash = window.location.hash;

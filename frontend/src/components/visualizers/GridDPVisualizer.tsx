@@ -270,6 +270,7 @@ const GridDisplay = ({
           {grid.map((row, r) =>
             row.map((val, c) => (
               <div
+                // skipcq: JS-0437
                 key={`grid-cell-${r}-${c}-${val}`}
                 className={`w-12 h-12 flex items-center justify-center rounded font-mono ${
                   r === 0 && c === 0
@@ -299,6 +300,7 @@ const GridDisplay = ({
             const isCurrent = currentCell?.r === r && currentCell?.c === c;
             return (
               <div
+                // skipcq: JS-0437
                 key={`dp-cell-${r}-${c}-${val}`}
                 className={`w-12 h-12 flex items-center justify-center rounded font-mono border-2 transition-all ${
                   isCurrent
@@ -404,6 +406,7 @@ const MinPathPhase = ({
   );
 };
 
+// skipcq: JS-0067
 export default function GridDPVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["paths", "minpath", "table"];

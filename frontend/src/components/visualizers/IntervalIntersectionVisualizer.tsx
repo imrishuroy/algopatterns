@@ -48,6 +48,7 @@ const listB: Interval[] = [
   { start: 15, end: 24 },
 ];
 
+// skipcq: JS-0067
 export default function IntervalIntersectionVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,

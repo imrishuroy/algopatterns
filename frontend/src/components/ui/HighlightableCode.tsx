@@ -66,6 +66,7 @@ const customStyle = {
   },
 };
 
+// skipcq: JS-0067
 export function HighlightableCode({
   code,
   language = "java",

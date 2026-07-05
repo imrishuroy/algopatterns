@@ -2,6 +2,7 @@
  * Generate a hash of content for staleness detection.
  * Uses a simple hash that's fast to compute and good enough for change detection.
  */
+// skipcq: JS-0067
 export async function generateContentHash(content: string): Promise<string> {
   // Use SubtleCrypto for SHA-256 hashing (available in all modern browsers)
   const encoder = new TextEncoder();

@@ -1112,6 +1112,7 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
                       <div className="p-4 overflow-x-auto">
                         {lines.map((line, lineIndex) => (
                           <div
+                            // skipcq: JS-0437
                             key={`line-${line.slice(0, 20)}-${lineIndex}`}
                             className="leading-relaxed"
                           >

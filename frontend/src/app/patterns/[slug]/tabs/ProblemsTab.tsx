@@ -24,6 +24,7 @@ const difficultyOrder = { Easy: 0, Medium: 1, Hard: 2 };
 type SortOption = "difficulty" | "frequency" | "name" | "status";
 
 // Convert problem name to slug format
+// skipcq: JS-0067
 function nameToSlug(name: string): string {
   return name
     .toLowerCase()

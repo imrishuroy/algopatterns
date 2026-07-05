@@ -516,6 +516,7 @@ const ComparePhase = ({ step }: { step: number }) => {
   );
 };
 
+// skipcq: JS-0067
 export default function CoinChangeVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "compare"];

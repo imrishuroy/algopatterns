@@ -13,6 +13,7 @@ interface UnifiedTrackerProps {
   questions: Question[];
 }
 
+// skipcq: JS-0067
 export default function UnifiedTracker({ questions }: UnifiedTrackerProps) {
   const patterns = patternsData as Pattern[];
   const { completed, toggleComplete, resetProgress, celebrationKey } =

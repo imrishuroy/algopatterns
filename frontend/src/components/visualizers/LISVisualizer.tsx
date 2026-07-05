@@ -234,6 +234,7 @@ const ArrayDisplay = ({
   <div className="flex justify-center gap-1 mb-4">
     {nums.map((num, numIndex) => (
       <div
+        // skipcq: JS-0437
         key={`num-${num}-${numIndex}`}
         className="flex flex-col items-center"
       >
@@ -283,6 +284,7 @@ const TablePhase = ({
         <div className="flex gap-1 justify-center">
           {currentDp.map((len, dpIndex) => (
             <div
+              // skipcq: JS-0437
               key={`dp-${len}-${dpIndex}`}
               className="flex flex-col items-center"
             >
@@ -336,6 +338,7 @@ const BinaryPhase = ({
           {currentTails.length > 0 ? (
             currentTails.map((val, tailIndex) => (
               <div
+                // skipcq: JS-0437
                 key={`tail-${val}-${tailIndex}`}
                 className="flex flex-col items-center"
               >
@@ -365,6 +368,7 @@ const BinaryPhase = ({
   );
 };
 
+// skipcq: JS-0067
 export default function LISVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "binary"];

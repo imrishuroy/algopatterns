@@ -398,7 +398,7 @@ describe("CheckoutModal", () => {
   });
 
   describe("reset on open", () => {
-    it("should reset state when modal opens", async () => {
+    it("should reset state when modal opens", () => {
       const { rerender } = render(
         <CheckoutModal
           plan={mockPlan}

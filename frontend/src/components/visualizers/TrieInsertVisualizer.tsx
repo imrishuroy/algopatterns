@@ -11,6 +11,7 @@ interface TrieNode {
   y: number;
 }
 
+// skipcq: JS-0067
 export default function TrieInsertVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);

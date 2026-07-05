@@ -235,7 +235,7 @@ describe("ProblemsTab", () => {
     mockSessionStorage.getItem.mockReturnValueOnce("300");
     const scrollToSpy = vi
       .spyOn(window, "scrollTo")
-      .mockImplementation(() => {});
+      .mockImplementation(() => {}); // skipcq: JS-0321
 
     render(<ProblemsTab {...defaultProps} />);
 

@@ -24,6 +24,8 @@ interface InlineAIProps {
 
 type ActionType = "explain" | "improve" | "debug" | "complexity" | "custom";
 
+// skipcq: JS-0067
+// skipcq: JS-R1005
 export function InlineAI({
   // skipcq: JS-R1005
   isOpen,

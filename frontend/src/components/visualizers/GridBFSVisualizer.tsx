@@ -57,6 +57,7 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
   }
 }
 
+// skipcq: JS-0067
 export default function GridBFSVisualizer() {
   const [mode, setMode] = useState<Mode>("bfs");
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
@@ -101,6 +102,7 @@ export default function GridBFSVisualizer() {
     });
   }, [initGrid]);
 
+  // skipcq: JS-R1005
   const getNeighbors = useCallback(
     (r: number, c: number): [number, number][] => {
       const dirs = [

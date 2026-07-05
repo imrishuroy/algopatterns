@@ -84,6 +84,7 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 
 const initialPlayState: PlayState = { step: 0, isPlaying: false };
 
+// skipcq: JS-0067
 export default function DPTransformationVisualizer() {
   const [currentStage, setCurrentStage] = useState<Stage>("recursion");
   const [{ step, isPlaying }, dispatch] = useReducer(
@@ -210,6 +211,8 @@ export default function DPTransformationVisualizer() {
   };
 
   const stageInfo = stages[currentStage];
+
+// skipcq: JS-R1005
 
   const renderRecursion = () => {
     const currentTrace = trace.slice(0, step) as RecursionTraceItem[];

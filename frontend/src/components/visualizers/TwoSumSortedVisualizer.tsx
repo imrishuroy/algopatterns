@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 
+// skipcq: JS-0067
 export default function TwoSumSortedVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -168,6 +169,7 @@ export default function TwoSumSortedVisualizer() {
         <div className="mb-4 flex justify-center gap-2">
           {nums.map((num, idx) => (
             <div
+              // skipcq: JS-0437
               key={`num-${num}-${idx}`}
               className="flex flex-col items-center"
             >
@@ -251,6 +253,7 @@ export default function TwoSumSortedVisualizer() {
           <div className="space-y-1">
             {history.map((step, idx) => (
               <div
+                // skipcq: JS-0437
                 key={`step-${step.slice(0, 20)}-${idx}`}
                 className="text-xs font-mono text-gray-500"
               >

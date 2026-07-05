@@ -572,7 +572,7 @@ describe("ChatInput", () => {
 
   it("calls onStop when stop button is clicked", () => {
     const onStop = vi.fn();
-    render(<ChatInput onSend={vi.fn()} onStop={onStop} isLoading={true} />);
+    render(<ChatInput onSend={vi.fn()} onStop={onStop} isLoading />);
     fireEvent.click(screen.getByTitle("Stop"));
     expect(onStop).toHaveBeenCalledTimes(1);
   });

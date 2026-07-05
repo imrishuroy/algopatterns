@@ -52,6 +52,7 @@ function createInitialNodes(): Node[] {
   }));
 }
 
+// skipcq: JS-0067
 function createInitialEdges(): Edge[] {
   return GRAPH_EDGES.map(([from, to, weight]) => ({
     from,

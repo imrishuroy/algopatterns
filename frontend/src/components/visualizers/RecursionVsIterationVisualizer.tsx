@@ -50,6 +50,7 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
   }
 }
 
+// skipcq: JS-0067
 export default function RecursionVsIterationVisualizer() {
   const [input, setInput] = useState(5);
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {

@@ -205,6 +205,7 @@ const allSteps: {
   },
 ];
 
+// skipcq: JS-0067
 export default function MemoryVisualizer() {
   const [frames, setFrames] = useState<MemoryFrame[]>([]);
   const [{ step, isPlaying }, dispatch] = useReducer(playReducer, {

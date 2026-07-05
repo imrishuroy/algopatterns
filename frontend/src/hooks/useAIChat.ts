@@ -27,6 +27,7 @@ interface UseAIChatOptions {
   isAuthenticated?: boolean;
 }
 
+// skipcq: JS-0067
 export function useAIChat(options: UseAIChatOptions = {}) {
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);

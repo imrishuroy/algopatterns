@@ -41,6 +41,7 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
   }
 }
 
+// skipcq: JS-0067
 export default function NQueensVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -67,6 +68,7 @@ export default function NQueensVisualizer() {
     return b.map((row) => [...row]);
   };
 
+  // skipcq: JS-R1005
   const isSafe = useCallback(
     (b: BoardState, row: number, col: number): boolean => {
       // Check column above

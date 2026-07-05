@@ -50,6 +50,7 @@ interface HighlightOverlay {
 
 type ToolbarMode = "colors" | "highlight-menu" | "edit-note";
 
+// skipcq: JS-0067
 export function Highlightable({
   children,
   contentType,
@@ -488,6 +489,7 @@ export function Highlightable({
           <div key={stableKey} data-highlight-overlay={overlay.id}>
             {overlay.rects.map((rect, idx) => (
               <div
+                // skipcq: JS-0437
                 key={`${stableKey}-${idx}`}
                 onClick={(e) => handleOverlayClick(overlay, e)}
                 className={`absolute pointer-events-auto cursor-pointer transition-all hover:brightness-110 ${

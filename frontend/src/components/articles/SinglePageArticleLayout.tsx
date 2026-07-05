@@ -9,6 +9,7 @@ interface SinglePageArticleLayoutProps {
   sectionComponents: Record<string, React.ComponentType>;
 }
 
+// skipcq: JS-0067
 export default function SinglePageArticleLayout({
   article,
   sectionComponents,

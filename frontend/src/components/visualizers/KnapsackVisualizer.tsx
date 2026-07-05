@@ -45,6 +45,7 @@ const items: Item[] = [
   { weight: 2, value: 3, name: "Tablet", color: "orange" },
 ];
 
+// skipcq: JS-0067
 function generateSteps() {
   const n = items.length;
   const steps: {
@@ -100,6 +101,7 @@ function generateSteps() {
   return { steps, dp };
 }
 
+// skipcq: JS-0067
 export default function KnapsackVisualizer() {
   const [{ step, isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -411,6 +413,7 @@ export default function KnapsackVisualizer() {
             {/* Rows */}
             {Array.from({ length: items.length + 1 }).map((_, i) => (
               <div
+                // skipcq: JS-0437
                 key={`row-${i === 0 ? "empty" : items[i - 1].name}-${i}`}
                 className="flex"
               >

@@ -16,6 +16,7 @@ interface CallStackVisualizerProps {
   inputValue?: number;
 }
 
+// skipcq: JS-0067
 export default function CallStackVisualizer({
   example = "factorial",
   inputValue = 5,

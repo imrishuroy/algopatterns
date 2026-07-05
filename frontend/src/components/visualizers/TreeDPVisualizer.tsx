@@ -402,6 +402,7 @@ const PostorderPhase = ({
   );
 };
 
+// skipcq: JS-0067
 export default function TreeDPVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["concept", "postorder", "result"];

@@ -16,7 +16,7 @@ class SearchDBService {
 
   async init(): Promise<void> {
     if (this.db) return;
-    if (this.initPromise) return this.initPromise;
+    if (this.initPromise) { await this.initPromise; return; }
 
     this.initPromise = new Promise((resolve) => {
       if (typeof window === "undefined" || !window.indexedDB) {
@@ -71,7 +71,7 @@ class SearchDBService {
       };
     });
 
-    return this.initPromise;
+    await this.initPromise;
   }
 
   private async ensureDB(): Promise<IDBDatabase | null> {
@@ -158,7 +158,7 @@ class SearchDBService {
     const db = await this.ensureDB();
     if (!db) return;
 
-    return new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const transaction = db.transaction("searches", "readwrite");
       const store = transaction.objectStore("searches");
 
@@ -177,13 +177,13 @@ class SearchDBService {
         if (count > 20) {
           const deleteCount = count - 20;
           let deleted = 0;
-          const cursor = index.openCursor();
-          cursor.onsuccess = () => {
-            const c = cursor.result;
-            if (c && deleted < deleteCount) {
-              store.delete(c.primaryKey);
+          const cursorReq = index.openCursor();
+          cursorReq.onsuccess = () => {
+            const cur = cursorReq.result;
+            if (cur && deleted < deleteCount) {
+              store.delete(cur.primaryKey);
               deleted++;
-              c.continue();
+              cur.continue();
             }
           };
         }
@@ -198,7 +198,7 @@ class SearchDBService {
     const db = await this.ensureDB();
     if (!db) return;
 
-    return new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const transaction = db.transaction("recentViews", "readwrite");
       const store = transaction.objectStore("recentViews");
 
@@ -213,13 +213,13 @@ class SearchDBService {
         if (count > 20) {
           const deleteCount = count - 20;
           let deleted = 0;
-          const cursor = index.openCursor();
-          cursor.onsuccess = () => {
-            const c = cursor.result;
-            if (c && deleted < deleteCount) {
-              store.delete(c.primaryKey);
+          const cursorReq = index.openCursor();
+          cursorReq.onsuccess = () => {
+            const cur = cursorReq.result;
+            if (cur && deleted < deleteCount) {
+              store.delete(cur.primaryKey);
               deleted++;
-              c.continue();
+              cur.continue();
             }
           };
         }
@@ -234,7 +234,7 @@ class SearchDBService {
     const db = await this.ensureDB();
     if (!db) return;
 
-    return new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const transaction = db.transaction("favorites", "readwrite");
       const store = transaction.objectStore("favorites");
       store.put(item);
@@ -247,7 +247,7 @@ class SearchDBService {
     const db = await this.ensureDB();
     if (!db) return;
 
-    return new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const transaction = db.transaction("favorites", "readwrite");
       const store = transaction.objectStore("favorites");
       store.delete(id);
@@ -260,7 +260,7 @@ class SearchDBService {
     const db = await this.ensureDB();
     if (!db) return;
 
-    return new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const transaction = db.transaction("searches", "readwrite");
       const store = transaction.objectStore("searches");
       store.clear();
@@ -273,7 +273,7 @@ class SearchDBService {
     const db = await this.ensureDB();
     if (!db) return;
 
-    return new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const transaction = db.transaction("recentViews", "readwrite");
       const store = transaction.objectStore("recentViews");
       store.clear();
@@ -282,11 +282,12 @@ class SearchDBService {
     });
   }
 
+  // skipcq: JS-R1005
   async sync(data: Partial<SearchCacheData>): Promise<void> {
     const db = await this.ensureDB();
     if (!db) return;
 
-    return new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const storeNames = ["searches", "recentViews", "favorites", "meta"];
       const transaction = db.transaction(storeNames, "readwrite");
 

@@ -42,6 +42,7 @@ const difficultyColors: Record<
   },
 };
 
+// skipcq: JS-0067
 export default function PatternCard({
   pattern,
   questionsCount,

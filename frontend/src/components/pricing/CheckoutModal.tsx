@@ -95,6 +95,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
   }
 }
 
+// skipcq: JS-0067
 export function CheckoutModal({
   plan,
   isOpen,

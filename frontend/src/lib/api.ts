@@ -488,8 +488,8 @@ class ApiClient {
     });
   }
 
-  clearSearchHistory(): Promise<ApiResponse<void>> {
-    return this.request<void>("/api/v1/search/history", {
+  clearSearchHistory(): Promise<ApiResponse<undefined>> {
+    return this.request<undefined>("/api/v1/search/history", {
       method: "DELETE",
     });
   }
@@ -506,8 +506,8 @@ class ApiClient {
     });
   }
 
-  clearRecentViews(): Promise<ApiResponse<void>> {
-    return this.request<void>("/api/v1/search/recent", {
+  clearRecentViews(): Promise<ApiResponse<undefined>> {
+    return this.request<undefined>("/api/v1/search/recent", {
       method: "DELETE",
     });
   }
@@ -526,8 +526,8 @@ class ApiClient {
     });
   }
 
-  removeFavorite(id: string): Promise<ApiResponse<void>> {
-    return this.request<void>(`/api/v1/search/favorites/${id}`, {
+  removeFavorite(id: string): Promise<ApiResponse<undefined>> {
+    return this.request<undefined>(`/api/v1/search/favorites/${id}`, {
       method: "DELETE",
     });
   }

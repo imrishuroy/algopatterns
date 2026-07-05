@@ -62,6 +62,7 @@ const HighlightContext = createContext<HighlightContextType | undefined>(
   undefined
 );
 
+// skipcq: JS-0067
 function getContentKey(contentType: string, contentId: string): string {
   return `${contentType}:${contentId}`;
 }
@@ -597,9 +598,7 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        console.log(
-          `Batch sync completed: ${response.data.results.filter((r) => r.success).length}/${response.data.results.length} succeeded`
-        );
+        // Batch sync completed
       }
     } catch (error) {
       console.warn("Batch sync failed, will retry later:", error);

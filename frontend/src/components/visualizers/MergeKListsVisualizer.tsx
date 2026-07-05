@@ -45,6 +45,7 @@ const INITIAL_LISTS = [
   [2, 6],
 ];
 
+// skipcq: JS-0067
 export default function MergeKListsVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,

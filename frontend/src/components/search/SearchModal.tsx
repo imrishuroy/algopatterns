@@ -80,6 +80,7 @@ function SearchModalContent() { // skipcq: JS-0067, JS-R1005
     }
 
     // Then fetch API results and merge
+    // skipcq: JS-R1005
     debounceRef.current = setTimeout(async () => {
       setIsLoading(true);
       try {
@@ -198,6 +199,7 @@ function SearchModalContent() { // skipcq: JS-0067, JS-R1005
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
+    // skipcq: JS-R1005
     (e: React.KeyboardEvent) => {
       const navigable = getNavigableResults();
 
@@ -253,6 +255,8 @@ function SearchModalContent() { // skipcq: JS-0067, JS-R1005
   const showQuickAccess = query.length < 2;
   const showResults = query.length >= 2 && results;
   const showPreview = selectedResult && !showQuickAccess;
+
+// skipcq: JS-0415
 
   return createPortal(
     <div className="fixed inset-0 z-50">

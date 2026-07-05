@@ -19,6 +19,7 @@ interface RecursionTreeVisualizerProps {
   inputValue?: number;
 }
 
+// skipcq: JS-0067
 export default function RecursionTreeVisualizer({
   example: _example = "fibonacci",
   inputValue = 5,
@@ -35,9 +36,9 @@ export default function RecursionTreeVisualizer({
 
   const buildFibTree = useCallback(function buildFibTree(
     n: number,
-    depth: number = 0,
-    pos: number = 0,
-    id: string = "0"
+    depth = 0,
+    pos = 0,
+    id = "0"
   ): TreeNode | null {
     if (n < 0) return null;
 

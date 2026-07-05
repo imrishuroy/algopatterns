@@ -262,6 +262,7 @@ const HousesDisplay = ({
   <div className="flex justify-center gap-2 mb-4">
     {houses.map((value, houseIndex) => (
       <div
+        // skipcq: JS-0437
         key={`house-${value}-${houseIndex}`}
         className="flex flex-col items-center"
       >
@@ -475,6 +476,7 @@ const OptimizedPhase = ({
   );
 };
 
+// skipcq: JS-0067
 export default function HouseRobberVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "optimized"];

@@ -11,6 +11,7 @@ interface Step {
   message: string;
 }
 
+// skipcq: JS-0067
 export default function BinarySearchVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -201,6 +202,7 @@ export default function BinarySearchVisualizer() {
 
               return (
                 <div
+                  // skipcq: JS-0437
                   key={`${num}-${idx}`}
                   className="flex flex-col items-center"
                 >

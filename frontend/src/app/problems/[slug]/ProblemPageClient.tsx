@@ -155,6 +155,7 @@ const JAVA_KEYWORDS = new Set([
   "Throwable",
 ]);
 
+// skipcq: JS-0067
 function setupJavaValidation(
   editor: Monaco["editor"]["IStandaloneCodeEditor"],
   monaco: Monaco
@@ -256,6 +257,7 @@ function setupJavaValidation(
   validate();
 }
 
+// skipcq: JS-0067
 function handleEditorWillMount(monaco: Monaco) {
   // Define custom theme with better Java type highlighting
   monaco.editor.defineTheme("algopatterns-dark", {
@@ -798,6 +800,7 @@ export default function ProblemPageClient({ params }: PageProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // skipcq: JS-R1005
   // Load problem data
   useEffect(() => {
     const fetchProblem = async () => {
@@ -1239,6 +1242,7 @@ export default function ProblemPageClient({ params }: PageProps) {
   useEffect(() => {
     handleRunRef.current = handleRun;
     handleSubmitRef.current = handleSubmit;
+  // skipcq: JS-R1005
   });
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {

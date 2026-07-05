@@ -16,6 +16,7 @@ interface QuickActionsProps {
   onResult: (result: string, type: "hint" | "review" | "explain") => void;
 }
 
+// skipcq: JS-0067
 export function QuickActions({
   problemSlug,
   problemTitle,

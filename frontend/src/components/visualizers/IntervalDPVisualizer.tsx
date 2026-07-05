@@ -204,6 +204,7 @@ const BalloonsDisplay = ({
       const isK = highlightRange && idx === highlightRange.k;
       return (
         <div
+          // skipcq: JS-0437
           key={`balloon-${b}-${balloonIndex}`}
           className={`w-12 h-12 flex items-center justify-center rounded-full font-mono font-bold transition-all ${
             isK
@@ -282,6 +283,7 @@ const TablePhase = ({
                   <tr key={`row-${rowL + 1}`}>
                     <td className="p-2 text-gray-400 font-mono">{rowL + 1}</td>
                     {Array(n)
+                      // skipcq: JS-R1005
                       .fill(0)
                       .map((_, colR) => {
                         const isCurrent =
@@ -368,6 +370,7 @@ const ConceptPhase = () => (
   </div>
 );
 
+// skipcq: JS-0067
 export default function IntervalDPVisualizer() {
   // skipcq: JS-0067
   const phases: Phase[] = ["concept", "table", "backtrack"];

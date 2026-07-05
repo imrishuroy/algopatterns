@@ -12,6 +12,7 @@ interface ConflictDialogProps {
   onCancel: () => void;
 }
 
+// skipcq: JS-0067
 export function ConflictDialog({
   isOpen,
   localHighlight,

@@ -805,6 +805,7 @@ describe.each(VISUALIZER_PATHS)("Smoke test: %s", (name) => {
     // Some visualizers (like RecursionTypesVisualizer) only have tab buttons,
     // most have Play/Reset, and StepByStepExecutor has Prev/Next/Reset.
     const hasControl = Array.from(buttons).some(
+      // skipcq: JS-R1005
       (b) =>
         b.textContent === "Play" ||
         b.textContent === "Reset" ||

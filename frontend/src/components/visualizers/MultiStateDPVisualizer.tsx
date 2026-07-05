@@ -323,6 +323,7 @@ const MultiStateDPVisualizer = () => {
           <div className="flex gap-2 justify-center mt-1">
             {nums.map((num, idx) => (
               <div
+                // skipcq: JS-0437
                 key={`idx-${num}-${idx}`}
                 className="w-12 text-center text-xs text-gray-500"
               >

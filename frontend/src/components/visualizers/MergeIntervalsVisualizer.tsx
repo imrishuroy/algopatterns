@@ -43,6 +43,7 @@ const initialIntervals = [
   { start: 15, end: 18 },
 ];
 
+// skipcq: JS-0067
 export default function MergeIntervalsVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,

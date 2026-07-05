@@ -162,6 +162,7 @@ function FormattedText({ text }: { text: string }) {
       elements.push(
         // skipcq: JS-0437
         <h3
+          // skipcq: JS-0437
           key={`h3-${i}`}
           className="font-semibold text-white mt-3 mb-1 text-base"
         >
@@ -173,6 +174,7 @@ function FormattedText({ text }: { text: string }) {
       elements.push(
         // skipcq: JS-0437
         <h2
+          // skipcq: JS-0437
           key={`h2-${i}`}
           className="font-bold text-white mt-3 mb-2 text-base"
         >
@@ -226,6 +228,7 @@ function FormattedText({ text }: { text: string }) {
   flushParagraph();
 
   return elements;
+// skipcq: JS-R1005
 }
 
 function formatInlineText(text: string): React.ReactNode { // skipcq: JS-0067

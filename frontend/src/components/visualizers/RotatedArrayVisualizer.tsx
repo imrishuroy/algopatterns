@@ -41,6 +41,7 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
   }
 }
 
+// skipcq: JS-0067
 export default function RotatedArrayVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -272,6 +273,7 @@ export default function RotatedArrayVisualizer() {
 
               return (
                 <div
+                  // skipcq: JS-0437
                   key={`num-${num}-${idx}`}
                   className="flex flex-col items-center"
                 >

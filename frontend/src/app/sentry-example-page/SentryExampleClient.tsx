@@ -18,7 +18,9 @@ export default function SentryExampleClient() {
       <button
         className="ml-4 rounded bg-blue-600 px-4 py-2 text-white"
         onClick={() => {
-          Sentry.captureException(new Error("Sentry Test Error via captureException"));
+          Sentry.captureException(
+            new Error("Sentry Test Error via captureException")
+          );
         }}
       >
         Sentry.captureException

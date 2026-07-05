@@ -7,7 +7,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
   loading: () => (
-    <div className="h-64 rounded-md animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+    <div
+      className="h-64 rounded-md animate-pulse"
+      style={{ background: "var(--bg-elevated)" }}
+    />
   ),
   ssr: false,
 });
@@ -23,7 +26,8 @@ const categoryColors: Record<ConceptCategory, string> = {
   "String & Character": "bg-pink-500/20 text-pink-400 border-pink-500/30",
   "Type Conversions & Math":
     "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  "Arithmetic Patterns": "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  "Arithmetic Patterns":
+    "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
   "Java Fundamentals": "bg-red-500/20 text-red-400 border-red-500/30",
   "Algorithm Idioms": "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
 };
@@ -35,7 +39,7 @@ const languageLabels: Record<SupportedLanguage, string> = {
   javascript: "JavaScript",
 };
 
-export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
+export default function ConceptPageClient({ concept }: ConceptPageClientProps) { // skipcq: JS-0067
   const { language, setLanguage } = useLanguage();
 
   const currentCode = concept.codeSnippets[language] || "";
@@ -160,10 +164,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
           >
             When to Use
           </h2>
-          <p
-            className="text-sm mb-4"
-            style={{ color: "var(--text-3)" }}
-          >
+          <p className="text-sm mb-4" style={{ color: "var(--text-3)" }}>
             Use this concept when you encounter these scenarios:
           </p>
           <div
@@ -231,11 +232,9 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
               )}
             </div>
           </div>
-          <p
-            className="text-sm mb-4"
-            style={{ color: "var(--text-3)" }}
-          >
-            Here&apos;s how to implement this in {languageLabels[language]}. The code includes common patterns and usage examples.
+          <p className="text-sm mb-4" style={{ color: "var(--text-3)" }}>
+            Here&apos;s how to implement this in {languageLabels[language]}. The
+            code includes common patterns and usage examples.
           </p>
           <CodeBlock code={currentCode} language={language} />
         </section>
@@ -249,16 +248,15 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
             >
               Key Points to Remember
             </h2>
-            <p
-              className="text-sm mb-4"
-              style={{ color: "var(--text-3)" }}
-            >
-              These are the most important things to remember about this concept:
+            <p className="text-sm mb-4" style={{ color: "var(--text-3)" }}>
+              These are the most important things to remember about this
+              concept:
             </p>
             <div
               className="rounded-md border p-5"
               style={{
-                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
+                background:
+                  "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
                 borderColor: "rgba(99, 102, 241, 0.2)",
               }}
             >
@@ -300,10 +298,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
             >
               Common Mistakes to Avoid
             </h2>
-            <p
-              className="text-sm mb-4"
-              style={{ color: "var(--text-3)" }}
-            >
+            <p className="text-sm mb-4" style={{ color: "var(--text-3)" }}>
               Watch out for these common pitfalls when using this concept:
             </p>
             <div
@@ -350,10 +345,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
             >
               Practice Problems
             </h2>
-            <p
-              className="text-sm mb-4"
-              style={{ color: "var(--text-3)" }}
-            >
+            <p className="text-sm mb-4" style={{ color: "var(--text-3)" }}>
               Practice these problems to solidify your understanding:
             </p>
             <div
@@ -391,10 +383,7 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
             >
               Related Patterns
             </h2>
-            <p
-              className="text-sm mb-4"
-              style={{ color: "var(--text-3)" }}
-            >
+            <p className="text-sm mb-4" style={{ color: "var(--text-3)" }}>
               This concept is commonly used with these algorithm patterns:
             </p>
             <div className="flex flex-wrap gap-3">
@@ -417,7 +406,6 @@ export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
             </div>
           </section>
         )}
-
       </div>
     </div>
   );

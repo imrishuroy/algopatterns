@@ -233,7 +233,9 @@ describe("ProblemsTab", () => {
 
   it("restores scroll position from sessionStorage on mount", async () => {
     mockSessionStorage.getItem.mockReturnValueOnce("300");
-    const scrollToSpy = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+    const scrollToSpy = vi
+      .spyOn(window, "scrollTo")
+      .mockImplementation(() => {}); // skipcq: JS-0321
 
     render(<ProblemsTab {...defaultProps} />);
 

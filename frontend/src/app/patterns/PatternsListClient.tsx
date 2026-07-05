@@ -83,47 +83,41 @@ export default function PatternsListClient({
   return (
     <div className="space-y-6">
       {/* Search */}
-      <div className="relative group">
-        <div
-          className="absolute inset-0 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity"
-          style={{ background: "var(--accent-gradient)" }}
-        />
-        <div className="relative">
-          <svg
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors"
-            style={{ color: "var(--text-3)" }}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search patterns..."
-            value={inputValue}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 focus:outline-none transition-all"
-            style={{
-              background: "var(--bg-surface)",
-              border: "1px solid var(--border-1)",
-              borderRadius: "var(--radius-lg)",
-              color: "var(--text-1)",
-              fontFamily: "var(--font-body)",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = "var(--accent-1)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = "var(--border-1)";
-            }}
+      <div className="relative">
+        <svg
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5"
+          style={{ color: "var(--text-3)" }}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
-        </div>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search patterns..."
+          value={inputValue}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="w-full pl-12 pr-4 py-3 focus:outline-none transition-colors"
+          style={{
+            background: "var(--bg-surface)",
+            border: "1px solid var(--border-1)",
+            borderRadius: "var(--radius-lg)",
+            color: "var(--text-1)",
+            fontFamily: "var(--font-body)",
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "var(--border-2)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "var(--border-1)";
+          }}
+        />
       </div>
 
       {/* Results count */}
@@ -223,7 +217,10 @@ export default function PatternsListClient({
             No patterns match &quot;{activeQuery}&quot;
           </p>
           <button
-            onClick={() => { setInputValue(""); handleSearch(""); }}
+            onClick={() => {
+              setInputValue("");
+              handleSearch("");
+            }}
             className="transition-colors hover:opacity-80"
             style={{ color: "var(--accent-1)" }}
           >

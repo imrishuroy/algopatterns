@@ -52,6 +52,7 @@ function createInitialNodes(): Node[] {
   }));
 }
 
+// skipcq: JS-0067
 function createInitialEdges(): Edge[] {
   return GRAPH_EDGES.map(([from, to, weight]) => ({
     from,
@@ -69,8 +70,9 @@ export default function DijkstraVisualizer() {
   const [speed, setSpeed] = useState(800);
   const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES);
   const [edges, setEdges] = useState<Edge[]>(INITIAL_EDGES);
-  const [priorityQueue, setPriorityQueue] =
-    useState<[number, number][]>([[0, DEFAULT_SOURCE]]);
+  const [priorityQueue, setPriorityQueue] = useState<[number, number][]>([
+    [0, DEFAULT_SOURCE],
+  ]);
   const [source] = useState(DEFAULT_SOURCE);
   const [target] = useState(DEFAULT_TARGET);
   const [message, setMessage] = useState(

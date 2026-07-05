@@ -8,6 +8,7 @@ interface Edge {
   to: number;
 }
 
+// skipcq: JS-0067
 function find(p: number[], x: number): number {
   if (p[x] !== x) {
     return find(p, p[x]);
@@ -53,21 +54,18 @@ export default function ConnectedComponentsVisualizer() {
     setIsPlaying(false);
   }, []);
 
-  const getComponentColor = useCallback(
-    (node: number, p: number[]): string => {
-      const root = find(p, node);
-      const colors = [
-        "#ef4444", // red
-        "#22c55e", // green
-        "#3b82f6", // blue
-        "#eab308", // yellow
-        "#a855f7", // purple
-        "#f97316", // orange
-      ];
-      return colors[root % colors.length];
-    },
-    []
-  );
+  const getComponentColor = useCallback((node: number, p: number[]): string => {
+    const root = find(p, node);
+    const colors = [
+      "#ef4444", // red
+      "#22c55e", // green
+      "#3b82f6", // blue
+      "#eab308", // yellow
+      "#a855f7", // purple
+      "#f97316", // orange
+    ];
+    return colors[root % colors.length];
+  }, []);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -124,16 +122,7 @@ export default function ConnectedComponentsVisualizer() {
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [
-    isPlaying,
-    phase,
-    edgeIndex,
-    edges,
-    parent,
-    rank,
-    componentCount,
-    speed,
-  ]);
+  }, [isPlaying, phase, edgeIndex, edges, parent, rank, componentCount, speed]);
 
   return (
     <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">

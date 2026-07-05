@@ -38,6 +38,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// skipcq: JS-0067
 export default async function PatternPage({ params }: PageProps) {
   const { slug } = await params;
   const pattern = patterns.find((p) => p.id === slug);
@@ -56,7 +57,13 @@ export default async function PatternPage({ params }: PageProps) {
     <>
       <CourseJsonLd pattern={pattern} />
       <BreadcrumbJsonLd items={breadcrumbs} />
-      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-gray-400">Loading...</div></div>}>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-gray-400">Loading...</div>
+          </div>
+        }
+      >
         <PatternPageClient pattern={pattern} />
       </Suspense>
     </>

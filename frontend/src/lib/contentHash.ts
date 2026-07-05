@@ -2,6 +2,7 @@
  * Generate a hash of content for staleness detection.
  * Uses a simple hash that's fast to compute and good enough for change detection.
  */
+// skipcq: JS-0067
 export async function generateContentHash(content: string): Promise<string> {
   // Use SubtleCrypto for SHA-256 hashing (available in all modern browsers)
   const encoder = new TextEncoder();
@@ -10,7 +11,9 @@ export async function generateContentHash(content: string): Promise<string> {
   try {
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
     return hashHex;
   } catch {
     // Fallback to simple hash for environments without SubtleCrypto

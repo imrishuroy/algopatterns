@@ -78,9 +78,7 @@ describe("LanguageContext", () => {
   });
 
   it("throws error when useLanguage is used outside provider", () => {
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(vi.fn());
+    const consoleError = vi.spyOn(console, "error").mockImplementation(vi.fn());
 
     expect(() => render(<TestComponent />)).toThrow(
       "useLanguage must be used within a LanguageProvider"
@@ -125,7 +123,9 @@ describe("LanguageContext", () => {
     act(() => {
       fireEvent.click(screen.getByText("Set JavaScript"));
     });
-    expect(screen.getByTestId("current-language")).toHaveTextContent("javascript");
+    expect(screen.getByTestId("current-language")).toHaveTextContent(
+      "javascript"
+    );
 
     act(() => {
       fireEvent.click(screen.getByText("Set Java"));

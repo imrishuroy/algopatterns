@@ -57,7 +57,9 @@ export const captureMessage = (
   });
 };
 
-export const setUser = (user: { id: string; email?: string; username?: string } | null) => {
+export const setUser = (
+  user: { id: string; email?: string; username?: string } | null
+) => {
   if (user) {
     Sentry.setUser({
       id: user.id,
@@ -111,7 +113,10 @@ export const startSpanAsync = <T>(
   );
 };
 
-export const setContext = (name: string, context: Record<string, unknown> | null) => {
+export const setContext = (
+  name: string,
+  context: Record<string, unknown> | null
+) => {
   Sentry.setContext(name, context);
 };
 
@@ -126,10 +131,12 @@ export const setTags = (tags: Record<string, string>) => {
 export const showFeedback = () => {
   const feedback = Sentry.getFeedback();
   if (feedback) {
-    feedback.createForm().then((form: { appendToDom: () => void; open: () => void }) => {
-      form.appendToDom();
-      form.open();
-    });
+    feedback
+      .createForm()
+      .then((form: { appendToDom: () => void; open: () => void }) => {
+        form.appendToDom();
+        form.open();
+      });
   }
 };
 
@@ -152,7 +159,10 @@ export const trackApiCall = (
   );
 };
 
-export const trackUserAction = (action: string, data?: Record<string, unknown>) => {
+export const trackUserAction = (
+  action: string,
+  data?: Record<string, unknown>
+) => {
   addBreadcrumb("user", action, data, "info");
 };
 
@@ -203,7 +213,12 @@ export const metrics = {
   gauge: (name: string, value: number, tags?: Record<string, string>) => {
     Sentry.metrics.gauge(name, value, { attributes: tags });
   },
-  distribution: (name: string, value: number, tags?: Record<string, string>, unit?: string) => {
+  distribution: (
+    name: string,
+    value: number,
+    tags?: Record<string, string>,
+    unit?: string
+  ) => {
     Sentry.metrics.distribution(name, value, { attributes: tags, unit });
   },
 };

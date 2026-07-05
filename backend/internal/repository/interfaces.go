@@ -59,3 +59,31 @@ type SessionRepositoryInterface interface {
 	RevokeAllUserSessions(ctx context.Context, userID uuid.UUID, reason string) (int64, error)
 	CleanupExpired(ctx context.Context) (int64, error)
 }
+
+type SearchRepositoryInterface interface {
+	// Search history
+	AddSearchHistory(ctx context.Context, h *models.SearchHistory) error
+	GetSearchHistory(ctx context.Context, userID uuid.UUID, limit int) ([]models.SearchHistory, error)
+	ClearSearchHistory(ctx context.Context, userID uuid.UUID) error
+
+	// Recent views
+	UpsertRecentView(ctx context.Context, view *models.UserRecentView) error
+	GetRecentViews(ctx context.Context, userID uuid.UUID, limit int) ([]models.UserRecentView, error)
+	ClearRecentViews(ctx context.Context, userID uuid.UUID) error
+
+	// Favorites
+	AddFavorite(ctx context.Context, f *models.UserFavorite) error
+	GetFavorites(ctx context.Context, userID uuid.UUID, limit int) ([]models.UserFavorite, error)
+	GetFavorite(ctx context.Context, userID uuid.UUID, contentType, contentID string) (*models.UserFavorite, error)
+	DeleteFavorite(ctx context.Context, id, userID uuid.UUID) error
+	IsFavorite(ctx context.Context, userID uuid.UUID, contentType, contentID string) (bool, error)
+
+	// Full-text search
+	SearchPatterns(ctx context.Context, query string, limit int) ([]models.PatternSearchResult, error)
+	SearchProblems(ctx context.Context, query string, limit int) ([]models.ProblemSearchResult, error)
+	SearchHighlights(ctx context.Context, query string, userID uuid.UUID, limit int) ([]models.HighlightSearchResult, error)
+
+	// Prefix search (for autocomplete)
+	SearchPatternsPrefix(ctx context.Context, query string, limit int) ([]models.PatternSearchResult, error)
+	SearchProblemsPrefix(ctx context.Context, query string, limit int) ([]models.ProblemSearchResult, error)
+}

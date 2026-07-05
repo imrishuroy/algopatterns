@@ -11,6 +11,7 @@ interface TrieNode {
   y: number;
 }
 
+// skipcq: JS-0067
 export default function TrieInsertVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -40,30 +41,27 @@ export default function TrieInsertVisualizer() {
     setIsPlaying(false);
   }, []);
 
-  const calculatePositions = useCallback(
-    function calculatePositions(
-      node: TrieNode,
-      depth: number,
-      leftBound: number,
-      rightBound: number
-    ): void {
-      const children = Array.from(node.children.values());
-      const width = rightBound - leftBound;
-      const childWidth = width / (children.length || 1);
+  const calculatePositions = useCallback(function calculatePositions(
+    node: TrieNode,
+    depth: number,
+    leftBound: number,
+    rightBound: number
+  ): void {
+    const children = Array.from(node.children.values());
+    const width = rightBound - leftBound;
+    const childWidth = width / (children.length || 1);
 
-      children.forEach((child, idx) => {
-        child.x = leftBound + childWidth * idx + childWidth / 2;
-        child.y = 30 + depth * 60;
-        calculatePositions(
-          child,
-          depth + 1,
-          leftBound + childWidth * idx,
-          leftBound + childWidth * (idx + 1)
-        );
-      });
-    },
-    []
-  );
+    children.forEach((child, idx) => {
+      child.x = leftBound + childWidth * idx + childWidth / 2;
+      child.y = 30 + depth * 60;
+      calculatePositions(
+        child,
+        depth + 1,
+        leftBound + childWidth * idx,
+        leftBound + childWidth * (idx + 1)
+      );
+    });
+  }, []);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -346,7 +344,8 @@ export default function TrieInsertVisualizer() {
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
             <strong className="text-violet-400">Key Insight:</strong> Shared
-            prefixes share nodes. &ldquo;cat&rdquo;, &ldquo;car&rdquo;, &ldquo;card&rdquo; all share &ldquo;ca&rdquo; prefix.
+            prefixes share nodes. &ldquo;cat&rdquo;, &ldquo;car&rdquo;,
+            &ldquo;card&rdquo; all share &ldquo;ca&rdquo; prefix.
           </p>
         </div>
       </div>

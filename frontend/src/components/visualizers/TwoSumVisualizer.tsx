@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// skipcq: JS-0067
 export default function TwoSumVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -169,7 +170,9 @@ export default function TwoSumVisualizer() {
                 }}
                 className={`w-10 h-10 md:w-14 md:h-14 rounded-md border-2 flex flex-col items-center justify-center transition-colors ${getArrayCellStyle(idx)}`}
               >
-                <span className="text-[10px] md:text-xs text-gray-400">i={idx}</span>
+                <span className="text-[10px] md:text-xs text-gray-400">
+                  i={idx}
+                </span>
                 <span className="text-sm md:text-lg font-bold">{num}</span>
               </motion.div>
             ))}

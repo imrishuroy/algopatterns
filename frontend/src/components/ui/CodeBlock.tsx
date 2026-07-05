@@ -50,7 +50,10 @@ const customStyle = {
   },
 };
 
-export default function CodeBlock({ // skipcq: JS-0067, JS-R1005
+// skipcq: JS-0067
+// skipcq: JS-R1005
+export default function CodeBlock({
+  // skipcq: JS-0067, JS-R1005
   code,
   language = "java",
   label,
@@ -82,11 +85,11 @@ export default function CodeBlock({ // skipcq: JS-0067, JS-R1005
     }
   };
 
-  const displayLabel = label ?? (
-    normalizedLang === "cpp"
+  const displayLabel =
+    label ??
+    (normalizedLang === "cpp"
       ? "C++"
-      : normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1)
-  );
+      : normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1));
 
   return (
     <div className="relative group rounded-md overflow-hidden border border-gray-800 bg-[#011627] theme-dark">

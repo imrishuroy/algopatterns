@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// skipcq: JS-0067
 export default function FindAnagramsVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(900);
@@ -191,7 +192,9 @@ export default function FindAnagramsVisualizer() {
 
         {/* String visualization */}
         <div className="mb-4">
-          <div className="text-sm text-gray-400 mb-2">String: &quot;{s}&quot;</div>
+          <div className="text-sm text-gray-400 mb-2">
+            String: &quot;{s}&quot;
+          </div>
           <div className="flex gap-1">
             {s.split("").map((char, position) => {
               const inWindow =
@@ -216,7 +219,6 @@ export default function FindAnagramsVisualizer() {
                           : "bg-pink-500 text-white"
                         : "bg-gray-700 text-gray-300"
                   }`}
-
                 >
                   <span className="text-base font-bold">{char}</span>
                   <span className="text-xs opacity-70">{position}</span>
@@ -303,7 +305,10 @@ export default function FindAnagramsVisualizer() {
             <div className="text-sm text-green-400">
               Anagrams found at indices: [{foundIndices.join(", ")}]
               {foundIndices.map((idx) => (
-                <span key={`found-${idx}-${s.slice(idx, idx + p.length)}`} className="ml-2 font-mono">
+                <span
+                  key={`found-${idx}-${s.slice(idx, idx + p.length)}`}
+                  className="ml-2 font-mono"
+                >
                   &ldquo;{s.slice(idx, idx + p.length)}&rdquo;
                 </span>
               ))}

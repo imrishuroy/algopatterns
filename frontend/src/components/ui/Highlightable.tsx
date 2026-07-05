@@ -1,9 +1,19 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback, type ReactNode } from "react";
+import {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { useHighlights } from "@/contexts/HighlightContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { generateContentHash, isHighlightStale, getContentText } from "@/lib/contentHash";
+import {
+  generateContentHash,
+  isHighlightStale,
+  getContentText,
+} from "@/lib/contentHash";
 import type { Highlight, HighlightColor } from "@/types";
 
 interface HighlightableProps {
@@ -40,6 +50,7 @@ interface HighlightOverlay {
 
 type ToolbarMode = "colors" | "highlight-menu" | "edit-note";
 
+// skipcq: JS-0067
 export function Highlightable({
   children,
   contentType,
@@ -65,9 +76,13 @@ export function Highlightable({
     endOffset: number;
   } | null>(null);
 
-  const [toolbar, setToolbar] = useState<{ top: number; left: number } | null>(null);
+  const [toolbar, setToolbar] = useState<{ top: number; left: number } | null>(
+    null
+  );
   const [toolbarMode, setToolbarMode] = useState<ToolbarMode>("colors");
-  const [activeHighlight, setActiveHighlight] = useState<Highlight | null>(null);
+  const [activeHighlight, setActiveHighlight] = useState<Highlight | null>(
+    null
+  );
   const [overlays, setOverlays] = useState<HighlightOverlay[]>([]);
   const [noteText, setNoteText] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -118,7 +133,9 @@ export function Highlightable({
     const containerRect = content.getBoundingClientRect();
     const newOverlays: HighlightOverlay[] = [];
 
-    const getTextNodesWithOffsets = (node: Node): { node: Text; start: number; end: number }[] => {
+    const getTextNodesWithOffsets = (
+      node: Node
+    ): { node: Text; start: number; end: number }[] => {
       const result: { node: Text; start: number; end: number }[] = [];
       const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
       let offset = 0;
@@ -138,18 +155,30 @@ export function Highlightable({
     highlights.forEach((highlight) => {
       try {
         const overlappingNodes = textNodesInfo.filter(
-          (info) => info.end > highlight.startOffset && info.start < highlight.endOffset
+          (info) =>
+            info.end > highlight.startOffset && info.start < highlight.endOffset
         );
 
         if (overlappingNodes.length === 0) return;
 
-        const allRawRects: { top: number; left: number; width: number; height: number }[] = [];
+        const allRawRects: {
+          top: number;
+          left: number;
+          width: number;
+          height: number;
+        }[] = [];
 
         overlappingNodes.forEach((nodeInfo) => {
           const { node: textNode, start: nodeStart } = nodeInfo;
 
-          const highlightStartInNode = Math.max(0, highlight.startOffset - nodeStart);
-          const highlightEndInNode = Math.min(textNode.length, highlight.endOffset - nodeStart);
+          const highlightStartInNode = Math.max(
+            0,
+            highlight.startOffset - nodeStart
+          );
+          const highlightEndInNode = Math.min(
+            textNode.length,
+            highlight.endOffset - nodeStart
+          );
 
           if (highlightStartInNode >= highlightEndInNode) return;
 
@@ -169,14 +198,24 @@ export function Highlightable({
           }
         });
 
-        const rects: { top: number; left: number; width: number; height: number }[] = [];
+        const rects: {
+          top: number;
+          left: number;
+          width: number;
+          height: number;
+        }[] = [];
         allRawRects.forEach((rect) => {
           const existing = rects.find(
-            (r) => Math.abs(r.top - rect.top) < 3 && Math.abs(r.height - rect.height) < 3
+            (r) =>
+              Math.abs(r.top - rect.top) < 3 &&
+              Math.abs(r.height - rect.height) < 3
           );
           if (existing) {
             const newLeft = Math.min(existing.left, rect.left);
-            const newRight = Math.max(existing.left + existing.width, rect.left + rect.width);
+            const newRight = Math.max(
+              existing.left + existing.width,
+              rect.left + rect.width
+            );
             existing.left = newLeft;
             existing.width = newRight - newLeft;
           } else {
@@ -188,13 +227,19 @@ export function Highlightable({
           newOverlays.push({
             id: highlight.id,
             rects,
-            color: HIGHLIGHT_COLORS[highlight.color as HighlightColor] || HIGHLIGHT_COLORS.yellow,
+            color:
+              HIGHLIGHT_COLORS[highlight.color as HighlightColor] ||
+              HIGHLIGHT_COLORS.yellow,
             highlight,
             isStale: isHighlightStale(highlight.contentHash, contentHash),
           });
         }
       } catch (error) {
-        console.warn("Could not calculate overlay for highlight:", highlight.id, error);
+        console.warn(
+          "Could not calculate overlay for highlight:",
+          highlight.id,
+          error
+        );
       }
     });
 
@@ -271,7 +316,10 @@ export function Highlightable({
         setSelection({ text, startOffset, endOffset });
         setToolbar({
           top: rect.top - containerRect.top - 50,
-          left: Math.max(10, rect.left - containerRect.left + rect.width / 2 - 100),
+          left: Math.max(
+            10,
+            rect.left - containerRect.left + rect.width / 2 - 100
+          ),
         });
         setToolbarMode("colors");
         setActiveHighlight(null);
@@ -304,7 +352,10 @@ export function Highlightable({
     };
   }, []);
 
-  const handleOverlayClick = (overlay: HighlightOverlay, e: React.MouseEvent) => {
+  const handleOverlayClick = (
+    overlay: HighlightOverlay,
+    e: React.MouseEvent
+  ) => {
     e.stopPropagation();
     const container = containerRef.current;
     if (!container) return;
@@ -416,7 +467,12 @@ export function Highlightable({
     } else {
       setCanRelocate(false);
     }
-  }, [activeHighlight, activeHighlight?.id, activeHighlight?.selectedText, contentHash]);
+  }, [
+    activeHighlight,
+    activeHighlight?.id,
+    activeHighlight?.selectedText,
+    contentHash,
+  ]);
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -430,29 +486,37 @@ export function Highlightable({
         // Use stable key based on position to avoid re-animation when temp ID → server ID
         const stableKey = `${overlay.highlight.startOffset}-${overlay.highlight.endOffset}`;
         return (
-        <div key={stableKey} data-highlight-overlay={overlay.id}>
-          {overlay.rects.map((rect, idx) => (
-            <div
-              key={`${stableKey}-${idx}`}
-              onClick={(e) => handleOverlayClick(overlay, e)}
-              className={`absolute pointer-events-auto cursor-pointer transition-all hover:brightness-110 ${
-                overlay.isStale ? "border-2 border-dashed border-yellow-500/70" : ""
-              }`}
-              style={{
-                top: rect.top - 2,
-                left: rect.left - 3,
-                width: rect.width + 6,
-                height: rect.height + 4,
-                backgroundColor: overlay.isStale ? `${overlay.color.replace("0.4", "0.25")}` : overlay.color,
-                borderRadius: "6px",
-                animation: "highlightFadeIn 250ms cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-              title={overlay.isStale
-                ? "⚠️ Content may have changed - click to review"
-                : (overlay.highlight.note || "Click to manage")}
-            />
-          ))}
-        </div>
+          <div key={stableKey} data-highlight-overlay={overlay.id}>
+            {overlay.rects.map((rect, idx) => (
+              <div
+                // skipcq: JS-0437
+                key={`${stableKey}-${idx}`}
+                onClick={(e) => handleOverlayClick(overlay, e)}
+                className={`absolute pointer-events-auto cursor-pointer transition-all hover:brightness-110 ${
+                  overlay.isStale
+                    ? "border-2 border-dashed border-yellow-500/70"
+                    : ""
+                }`}
+                style={{
+                  top: rect.top - 2,
+                  left: rect.left - 3,
+                  width: rect.width + 6,
+                  height: rect.height + 4,
+                  backgroundColor: overlay.isStale
+                    ? `${overlay.color.replace("0.4", "0.25")}`
+                    : overlay.color,
+                  borderRadius: "6px",
+                  animation:
+                    "highlightFadeIn 250ms cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+                title={
+                  overlay.isStale
+                    ? "⚠️ Content may have changed - click to review"
+                    : overlay.highlight.note || "Click to manage"
+                }
+              />
+            ))}
+          </div>
         );
       })}
 
@@ -470,14 +534,17 @@ export function Highlightable({
           {toolbarMode === "colors" && (
             <div className="absolute -bottom-[6px] left-8 w-3 h-3 bg-gray-800 border-r border-b border-gray-700 transform rotate-45" />
           )}
-          {(toolbarMode === "highlight-menu" || toolbarMode === "edit-note") && (
+          {(toolbarMode === "highlight-menu" ||
+            toolbarMode === "edit-note") && (
             <div className="absolute -top-[6px] left-8 w-3 h-3 bg-gray-800 border-l border-t border-gray-700 transform rotate-45" />
           )}
 
           <div className="bg-gray-800 rounded-md shadow-xl border border-gray-700 overflow-hidden">
             {!isAuthenticated ? (
               <div className="px-3 py-2">
-                <span className="text-sm text-gray-400">Sign in to highlight</span>
+                <span className="text-sm text-gray-400">
+                  Sign in to highlight
+                </span>
               </div>
             ) : toolbarMode === "colors" && selection ? (
               /* Color Selection - click to highlight instantly */
@@ -504,8 +571,18 @@ export function Highlightable({
                         className="flex items-center gap-1 px-2 h-7 text-[11px] font-medium text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-md transition-colors border border-indigo-500/30"
                         title="Ask Thor AI about this text"
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                          />
                         </svg>
                         Ask Thor AI
                       </button>
@@ -520,14 +597,28 @@ export function Highlightable({
                 {isHighlightStale(activeHighlight.contentHash, contentHash) && (
                   <div className="px-4 py-3 bg-yellow-900/30 border-b border-yellow-700/50">
                     <p className="text-xs text-yellow-400 flex items-center gap-1.5 mb-2">
-                      <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      <svg
+                        className="w-3.5 h-3.5 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
                       </svg>
                       Content may have changed
                     </p>
-                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Original text</p>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">
+                      Original text
+                    </p>
                     <p className="text-xs text-gray-400 italic line-clamp-3 mb-2">
-                      &ldquo;{activeHighlight.selectedText.slice(0, 150)}{activeHighlight.selectedText.length > 150 ? "..." : ""}&rdquo;
+                      &ldquo;{activeHighlight.selectedText.slice(0, 150)}
+                      {activeHighlight.selectedText.length > 150 ? "..." : ""}
+                      &rdquo;
                     </p>
                     {canRelocate && (
                       <button
@@ -535,8 +626,18 @@ export function Highlightable({
                         disabled={isSaving}
                         className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 rounded-md transition-colors disabled:opacity-50"
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                          />
                         </svg>
                         {isSaving ? "Relocating..." : "Relocate highlight"}
                       </button>
@@ -547,14 +648,20 @@ export function Highlightable({
                 {/* Note section */}
                 {activeHighlight.note && (
                   <div className="px-4 py-3 border-b border-gray-700/50">
-                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1.5">Note</p>
-                    <p className="text-sm text-gray-200 leading-relaxed">{activeHighlight.note}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1.5">
+                      Note
+                    </p>
+                    <p className="text-sm text-gray-200 leading-relaxed">
+                      {activeHighlight.note}
+                    </p>
                   </div>
                 )}
 
                 {/* Color picker section */}
                 <div className="px-4 py-3 border-b border-gray-700/50">
-                  <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-2.5">Color</p>
+                  <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-2.5">
+                    Color
+                  </p>
                   <div className="flex items-center gap-2">
                     {COLOR_OPTIONS.map(({ color, bg }) => (
                       <button
@@ -578,8 +685,18 @@ export function Highlightable({
                     onClick={handleEditNote}
                     className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 hover:bg-gray-700/50 rounded-md transition-colors"
                   >
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
                     </svg>
                     {activeHighlight.note ? "Edit Note" : "Add Note"}
                   </button>
@@ -587,8 +704,18 @@ export function Highlightable({
                     onClick={handleDelete}
                     className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
                     </svg>
                     Delete
                   </button>

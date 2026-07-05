@@ -32,6 +32,15 @@ import type {
   CancelSubscriptionResponse,
   GoogleAuthURLResponse,
   GoogleCallbackRequest,
+  SearchResults,
+  SearchMode,
+  SearchHistoryResponse,
+  RecentViewsResponse,
+  FavoritesResponse,
+  AddFavoriteRequest,
+  AddFavoriteResponse,
+  TrackViewRequest,
+  SearchContentType,
 } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -81,8 +90,12 @@ class ApiClient {
         success: false,
         error: {
           code: "VERSION_CONFLICT",
-          message: errorData.error?.message || "Resource was modified by another client",
-          details: errorData.data ? { serverVersion: JSON.stringify(errorData.data) } : undefined,
+          message:
+            errorData.error?.message ||
+            "Resource was modified by another client",
+          details: errorData.data
+            ? { serverVersion: JSON.stringify(errorData.data) }
+            : undefined,
         },
         data: errorData.data as T,
       };
@@ -183,11 +196,16 @@ class ApiClient {
     return this.request<GoogleAuthURLResponse>("/api/v1/auth/google/url");
   }
 
-  async googleCallback(req: GoogleCallbackRequest): Promise<ApiResponse<AuthResponse>> {
-    const response = await this.request<AuthResponse>("/api/v1/auth/google/callback", {
-      method: "POST",
-      body: JSON.stringify(req),
-    });
+  async googleCallback(
+    req: GoogleCallbackRequest
+  ): Promise<ApiResponse<AuthResponse>> {
+    const response = await this.request<AuthResponse>(
+      "/api/v1/auth/google/callback",
+      {
+        method: "POST",
+        body: JSON.stringify(req),
+      }
+    );
     if (response.success && response.data.accessToken) {
       this.accessToken = response.data.accessToken;
     }
@@ -213,9 +231,7 @@ class ApiClient {
     });
   }
 
-  syncProgress(
-    questionIds: string[]
-  ): Promise<ApiResponse<ProgressResponse>> {
+  syncProgress(questionIds: string[]): Promise<ApiResponse<ProgressResponse>> {
     return this.request<ProgressResponse>("/api/v1/progress/sync", {
       method: "POST",
       body: JSON.stringify({ questionIds }),
@@ -242,9 +258,7 @@ class ApiClient {
     );
   }
 
-  getProblemBySlug(
-    slug: string
-  ): Promise<ApiResponse<ProblemDetailResponse>> {
+  getProblemBySlug(slug: string): Promise<ApiResponse<ProblemDetailResponse>> {
     return this.request<ProblemDetailResponse>(`/api/v1/problems/${slug}`);
   }
 
@@ -396,16 +410,18 @@ class ApiClient {
   }
 
   // Pattern Progress
-  getPatternProgress(): Promise<ApiResponse<{ progress: { [key: string]: number[] } }>> {
+  getPatternProgress(): Promise<
+    ApiResponse<{ progress: { [key: string]: number[] } }>
+  > {
     return this.request<{ progress: { [key: string]: number[] } }>(
       "/api/v1/pattern-progress",
       { method: "GET" }
     );
   }
 
-  syncPatternProgress(
-    progress: { [key: string]: number[] }
-  ): Promise<ApiResponse<{ progress: { [key: string]: number[] } }>> {
+  syncPatternProgress(progress: {
+    [key: string]: number[];
+  }): Promise<ApiResponse<{ progress: { [key: string]: number[] } }>> {
     return this.request<{ progress: { [key: string]: number[] } }>(
       "/api/v1/pattern-progress/sync",
       {
@@ -432,6 +448,96 @@ class ApiClient {
     return this.request<{ message: string }>(
       `/api/v1/pattern-progress/${patternId}/${sectionIndex}`,
       { method: "DELETE" }
+    );
+  }
+
+  // Search
+  search(
+    query: string,
+    mode: SearchMode = "keyword",
+    types?: string[],
+    limit?: number
+  ): Promise<ApiResponse<SearchResults>> {
+    const params = new URLSearchParams({ q: query, mode });
+    if (types && types.length > 0) {
+      params.set("types", types.join(","));
+    }
+    if (limit) {
+      params.set("limit", String(limit));
+    }
+    return this.request<SearchResults>(`/api/v1/search?${params.toString()}`);
+  }
+
+  getSearchHistory(
+    limit?: number
+  ): Promise<ApiResponse<SearchHistoryResponse>> {
+    const params = limit ? `?limit=${limit}` : "";
+    return this.request<SearchHistoryResponse>(
+      `/api/v1/search/history${params}`
+    );
+  }
+
+  addToSearchHistory(
+    query: string,
+    mode: SearchMode,
+    resultCount: number
+  ): Promise<ApiResponse<{ added: boolean }>> {
+    return this.request<{ added: boolean }>("/api/v1/search/history", {
+      method: "POST",
+      body: JSON.stringify({ query, mode, resultCount }),
+    });
+  }
+
+  clearSearchHistory(): Promise<ApiResponse<undefined>> {
+    return this.request<undefined>("/api/v1/search/history", {
+      method: "DELETE",
+    });
+  }
+
+  getRecentViews(limit?: number): Promise<ApiResponse<RecentViewsResponse>> {
+    const params = limit ? `?limit=${limit}` : "";
+    return this.request<RecentViewsResponse>(`/api/v1/search/recent${params}`);
+  }
+
+  trackView(req: TrackViewRequest): Promise<ApiResponse<{ tracked: boolean }>> {
+    return this.request<{ tracked: boolean }>("/api/v1/search/track-view", {
+      method: "POST",
+      body: JSON.stringify(req),
+    });
+  }
+
+  clearRecentViews(): Promise<ApiResponse<undefined>> {
+    return this.request<undefined>("/api/v1/search/recent", {
+      method: "DELETE",
+    });
+  }
+
+  getFavorites(limit?: number): Promise<ApiResponse<FavoritesResponse>> {
+    const params = limit ? `?limit=${limit}` : "";
+    return this.request<FavoritesResponse>(`/api/v1/search/favorites${params}`);
+  }
+
+  addFavorite(
+    req: AddFavoriteRequest
+  ): Promise<ApiResponse<AddFavoriteResponse>> {
+    return this.request<AddFavoriteResponse>("/api/v1/search/favorites", {
+      method: "POST",
+      body: JSON.stringify(req),
+    });
+  }
+
+  removeFavorite(id: string): Promise<ApiResponse<undefined>> {
+    return this.request<undefined>(`/api/v1/search/favorites/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  checkFavorite(
+    contentType: SearchContentType,
+    contentId: string
+  ): Promise<ApiResponse<{ isFavorite: boolean }>> {
+    return this.request<{ isFavorite: boolean }>(
+      `/api/v1/search/favorites/check?contentType=${contentType}&contentId=${contentId}`
     );
   }
 }

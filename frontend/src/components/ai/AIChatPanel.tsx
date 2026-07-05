@@ -31,7 +31,10 @@ interface AIChatPanelProps {
   onClose: () => void;
 }
 
-export function AIChatPanel({ // skipcq: JS-R1005
+// skipcq: JS-0067
+// skipcq: JS-R1005
+export function AIChatPanel({
+  // skipcq: JS-R1005
   problemSlug,
   problemTitle,
   problemDescription,
@@ -94,12 +97,9 @@ export function AIChatPanel({ // skipcq: JS-R1005
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const handleQuickActionResult = useCallback(
-    () => {
-      sendMessage('[Received AI response]', false);
-    },
-    [sendMessage]
-  );
+  const handleQuickActionResult = useCallback(() => {
+    sendMessage("[Received AI response]", false);
+  }, [sendMessage]);
 
   const handlePatternQuickAction = useCallback(
     (_action: PatternQuickAction, message: string) => {
@@ -115,7 +115,11 @@ export function AIChatPanel({ // skipcq: JS-R1005
   const initialMessageRef = useRef<number>(0);
 
   useEffect(() => {
-    if (initialMessage && (initialMessageKey ?? 0) > initialMessageRef.current && isOpen) {
+    if (
+      initialMessage &&
+      (initialMessageKey ?? 0) > initialMessageRef.current &&
+      isOpen
+    ) {
       initialMessageRef.current = initialMessageKey ?? 0;
       sendMessage(initialMessage);
     }
@@ -123,13 +127,20 @@ export function AIChatPanel({ // skipcq: JS-R1005
 
   if (!isOpen) return null;
 
-  return ( // skipcq: JS-0415
+  return (
+    // skipcq: JS-0415
     <div className="flex flex-col h-full bg-gray-900 border-l border-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 bg-gray-900 border-b border-gray-800">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden">
-            <Image src="/thor_ai_icon.png" alt="Thor AI" width={16} height={16} className="object-cover rounded-full" />
+            <Image
+              src="/thor_ai_icon.png"
+              alt="Thor AI"
+              width={16}
+              height={16}
+              className="object-cover rounded-full"
+            />
           </div>
           <span className="text-sm font-medium text-white">Thor AI</span>
         </div>
@@ -138,12 +149,24 @@ export function AIChatPanel({ // skipcq: JS-R1005
           <button
             onClick={() => setShowHistory(!showHistory)}
             className={`p-1.5 rounded-md transition-colors ${
-              showHistory ? "text-indigo-400 bg-indigo-900/30" : "text-gray-500 hover:text-white hover:bg-gray-800"
+              showHistory
+                ? "text-indigo-400 bg-indigo-900/30"
+                : "text-gray-500 hover:text-white hover:bg-gray-800"
             }`}
             title="Chat history"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </button>
           {/* New chat button */}
@@ -153,8 +176,18 @@ export function AIChatPanel({ // skipcq: JS-R1005
               className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
               title="New chat"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
             </button>
           )}
@@ -165,8 +198,18 @@ export function AIChatPanel({ // skipcq: JS-R1005
               className="p-1.5 text-indigo-400 hover:text-indigo-300 hover:bg-gray-800 rounded-md transition-colors"
               title="Back to active chat"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
             </button>
           )}
@@ -176,7 +219,12 @@ export function AIChatPanel({ // skipcq: JS-R1005
               className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
               title="Clear"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -191,7 +239,12 @@ export function AIChatPanel({ // skipcq: JS-R1005
             className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
             title="Close"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -208,7 +261,9 @@ export function AIChatPanel({ // skipcq: JS-R1005
         <div className="border-b border-gray-800 bg-gray-900/50 max-h-32 overflow-y-auto">
           {archivedSessions.length > 0 ? (
             <>
-              <div className="px-3 py-1.5 text-[10px] text-gray-500 uppercase tracking-wide">Previous Chats</div>
+              <div className="px-3 py-1.5 text-[10px] text-gray-500 uppercase tracking-wide">
+                Previous Chats
+              </div>
               {archivedSessions.map((session) => (
                 <button
                   key={session.id}
@@ -222,21 +277,26 @@ export function AIChatPanel({ // skipcq: JS-R1005
                     {session.title || "Untitled chat"}
                   </div>
                   <div className="text-[10px] text-gray-500">
-                    {new Date(session.last_message_at).toLocaleDateString()} · {session.message_count} messages
+                    {new Date(session.last_message_at).toLocaleDateString()} ·{" "}
+                    {session.message_count} messages
                   </div>
                 </button>
               ))}
             </>
           ) : (
             <div className="px-3 py-3 text-center text-xs text-gray-500">
-              No saved chats yet. Click <span className="text-gray-400">+</span> to save the current one.
+              No saved chats yet. Click <span className="text-gray-400">+</span>{" "}
+              to save the current one.
             </div>
           )}
         </div>
       )}
 
       {/* Quick Actions */}
-      {isAuthenticated && contextType === "pattern" && patternId && patternName ? (
+      {isAuthenticated &&
+      contextType === "pattern" &&
+      patternId &&
+      patternName ? (
         <PatternQuickActions
           patternId={patternId}
           patternName={patternName}
@@ -293,7 +353,9 @@ export function AIChatPanel({ // skipcq: JS-R1005
                 ? "Ask about the pattern or use quick actions above"
                 : "Ask about the problem or use quick actions above"}
             </p>
-            <p className="text-xs text-gray-500">I guide with questions, not answers</p>
+            <p className="text-xs text-gray-500">
+              I guide with questions, not answers
+            </p>
           </div>
         ) : (
           <>

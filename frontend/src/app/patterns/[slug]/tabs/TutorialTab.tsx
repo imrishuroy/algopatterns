@@ -45,25 +45,40 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
     };
 
     sidebar.addEventListener("wheel", handleWheel, { passive: false });
-    return () => { // skipcq: JS-0045
+    // skipcq: JS-0045
+    return () => {
+      // skipcq: JS-0045
       sidebar.removeEventListener("wheel", handleWheel);
     };
   }, []);
 
+  // Handle URL hash for direct navigation to sections
+  // skipcq: JS-R1005
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash === "#quiz") {
-      requestAnimationFrame(() => {
-        setCurrentSectionIndex(sections.length);
-      });
-    } else if (hash?.startsWith("#section-")) {
-      const index = parseInt(hash.replace("#section-", ""), 10);
-      if (!isNaN(index) && index >= 0 && index < sections.length) {
+    const handleHashNavigation = () => {
+      const hash = window.location.hash;
+      if (hash === "#quiz") {
         requestAnimationFrame(() => {
-          setCurrentSectionIndex(index);
+          setCurrentSectionIndex(sections.length);
         });
+      } else if (hash?.startsWith("#section-")) {
+        const index = parseInt(hash.replace("#section-", ""), 10);
+        if (!isNaN(index) && index >= 0 && index < sections.length) {
+          requestAnimationFrame(() => {
+            setCurrentSectionIndex(index);
+          });
+        }
       }
-    }
+    };
+
+    // Run on mount
+    handleHashNavigation();
+
+    // Listen for hash changes (for client-side navigation)
+    window.addEventListener("hashchange", handleHashNavigation);
+    return () => {
+      window.removeEventListener("hashchange", handleHashNavigation);
+    };
   }, [sections.length]);
 
   if (!hasTutorial) {

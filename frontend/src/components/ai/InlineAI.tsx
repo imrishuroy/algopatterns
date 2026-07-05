@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, startTransition } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  startTransition,
+} from "react";
 import { aiApiClient } from "@/lib/ai-api";
 import Image from "next/image";
 
@@ -18,7 +24,10 @@ interface InlineAIProps {
 
 type ActionType = "explain" | "improve" | "debug" | "complexity" | "custom";
 
-export function InlineAI({ // skipcq: JS-R1005
+// skipcq: JS-0067
+// skipcq: JS-R1005
+export function InlineAI({
+  // skipcq: JS-R1005
   isOpen,
   onClose,
   position,
@@ -51,7 +60,10 @@ export function InlineAI({ // skipcq: JS-R1005
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         onClose();
       }
     };
@@ -128,7 +140,8 @@ export function InlineAI({ // skipcq: JS-R1005
 
   if (!isOpen) return null;
 
-  return ( // skipcq: JS-0415
+  return (
+    // skipcq: JS-0415
     <div
       ref={containerRef}
       className="fixed z-50 bg-gray-900 border border-gray-700 rounded-md shadow-2xl overflow-hidden"
@@ -143,7 +156,13 @@ export function InlineAI({ // skipcq: JS-R1005
       <div className="flex items-center justify-between px-3 py-2 bg-gray-800 border-b border-gray-700">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden">
-            <Image src="/thor_ai_icon.png" alt="Thor AI" width={16} height={16} className="object-cover rounded-full" />
+            <Image
+              src="/thor_ai_icon.png"
+              alt="Thor AI"
+              width={16}
+              height={16}
+              className="object-cover rounded-full"
+            />
           </div>
           <span className="text-sm font-medium text-white">Thor AI</span>
           <span className="text-xs text-gray-500">⌘K</span>
@@ -152,8 +171,18 @@ export function InlineAI({ // skipcq: JS-R1005
           onClick={onClose}
           className="p-1 text-gray-400 hover:text-white rounded-md transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -161,10 +190,26 @@ export function InlineAI({ // skipcq: JS-R1005
       {/* Quick Actions */}
       {!response && !isLoading && selectedCode && (
         <div className="flex flex-wrap gap-1.5 p-2 border-b border-gray-800">
-          <ActionButton icon="💡" label="Explain" onClick={() => handleAction("explain")} />
-          <ActionButton icon="✨" label="Improve" onClick={() => handleAction("improve")} />
-          <ActionButton icon="🐛" label="Debug" onClick={() => handleAction("debug")} />
-          <ActionButton icon="⏱️" label="Complexity" onClick={() => handleAction("complexity")} />
+          <ActionButton
+            icon="💡"
+            label="Explain"
+            onClick={() => handleAction("explain")}
+          />
+          <ActionButton
+            icon="✨"
+            label="Improve"
+            onClick={() => handleAction("improve")}
+          />
+          <ActionButton
+            icon="🐛"
+            label="Debug"
+            onClick={() => handleAction("debug")}
+          />
+          <ActionButton
+            icon="⏱️"
+            label="Complexity"
+            onClick={() => handleAction("complexity")}
+          />
         </div>
       )}
 
@@ -173,9 +218,24 @@ export function InlineAI({ // skipcq: JS-R1005
         <div className="p-3 max-h-[200px] overflow-y-auto">
           {isLoading && !response && (
             <div className="flex items-center gap-2 text-gray-400 text-sm">
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              <svg
+                className="w-4 h-4 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
               </svg>
               Thinking...
             </div>
@@ -183,7 +243,9 @@ export function InlineAI({ // skipcq: JS-R1005
           {response && (
             <div className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">
               {response}
-              {isLoading && <span className="inline-block w-1.5 h-4 ml-0.5 bg-blue-400 animate-pulse" />}
+              {isLoading && (
+                <span className="inline-block w-1.5 h-4 ml-0.5 bg-blue-400 animate-pulse" />
+              )}
             </div>
           )}
         </div>
@@ -197,7 +259,9 @@ export function InlineAI({ // skipcq: JS-R1005
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={selectedCode ? "Ask about this code..." : "Ask anything..."}
+            placeholder={
+              selectedCode ? "Ask about this code..." : "Ask anything..."
+            }
             className="flex-1 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-md text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
             disabled={isLoading}
           />
@@ -206,8 +270,18 @@ export function InlineAI({ // skipcq: JS-R1005
             disabled={!input.trim() || isLoading}
             className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-md text-sm transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+              />
             </svg>
           </button>
         </div>

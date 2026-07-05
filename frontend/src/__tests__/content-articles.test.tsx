@@ -179,9 +179,7 @@ describe("content/articles/index.ts - article registry", () => {
     });
 
     it("returns undefined for invalid section slug", () => {
-      expect(
-        getSection("algorithm-paradigms", "fake-section")
-      ).toBeUndefined();
+      expect(getSection("algorithm-paradigms", "fake-section")).toBeUndefined();
     });
   });
 });
@@ -267,11 +265,7 @@ describe("recursion/sections/index.ts", () => {
 
 const algoSectionComponents: [string, React.ComponentType, string][] = [
   ["QuickComparisonSection", QuickComparisonSection, "Quick Comparison Table"],
-  [
-    "KeyDifferencesSection",
-    KeyDifferencesSection,
-    "Key Differences Explained",
-  ],
+  ["KeyDifferencesSection", KeyDifferencesSection, "Key Differences Explained"],
   [
     "HowToIdentifySection",
     HowToIdentifySection,
@@ -282,11 +276,7 @@ const algoSectionComponents: [string, React.ComponentType, string][] = [
     ConstraintsGuideSection,
     "Constraints-Based Selection",
   ],
-  [
-    "CommonPitfallsSection",
-    CommonPitfallsSection,
-    "Common Pitfalls & Traps",
-  ],
+  ["CommonPitfallsSection", CommonPitfallsSection, "Common Pitfalls & Traps"],
 ];
 
 const recursionSectionComponents: [string, React.ComponentType, string][] = [
@@ -341,16 +331,16 @@ describe("Algorithm Paradigms section rendering", () => {
 
     it("renders keyword recognition guide", () => {
       render(<HowToIdentifySection />);
-      expect(
-        screen.getByText("Keyword Recognition Guide")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Keyword Recognition Guide")).toBeInTheDocument();
     });
   });
 
   describe("CommonPitfallsSection - specific content", () => {
     it("renders greedy trap section", () => {
       render(<CommonPitfallsSection />);
-      expect(screen.getByText("Pitfall 1: The Greedy Trap")).toBeInTheDocument();
+      expect(
+        screen.getByText("Pitfall 1: The Greedy Trap")
+      ).toBeInTheDocument();
     });
 
     it("renders CodeBlock elements", () => {
@@ -386,9 +376,7 @@ describe("Algorithm Paradigms section rendering", () => {
   describe("QuickComparisonSection - specific content", () => {
     it("renders one-liner definitions", () => {
       render(<QuickComparisonSection />);
-      expect(
-        screen.getByText("One-Liner Definitions")
-      ).toBeInTheDocument();
+      expect(screen.getByText("One-Liner Definitions")).toBeInTheDocument();
     });
 
     it("renders how they relate", () => {
@@ -413,12 +401,8 @@ describe("Recursion section rendering", () => {
 
     it("renders visualizer components", () => {
       render(<FundamentalsSection />);
-      expect(
-        screen.getByTestId("call-stack-visualizer")
-      ).toBeInTheDocument();
-      expect(
-        screen.getByTestId("step-by-step-executor")
-      ).toBeInTheDocument();
+      expect(screen.getByTestId("call-stack-visualizer")).toBeInTheDocument();
+      expect(screen.getByTestId("step-by-step-executor")).toBeInTheDocument();
       expect(screen.getByTestId("memory-visualizer")).toBeInTheDocument();
     });
   });
@@ -461,9 +445,7 @@ describe("Recursion section rendering", () => {
 
     it("renders step-by-step executor", () => {
       render(<StringsSection />);
-      expect(
-        screen.getByTestId("step-by-step-executor")
-      ).toBeInTheDocument();
+      expect(screen.getByTestId("step-by-step-executor")).toBeInTheDocument();
     });
   });
 
@@ -487,9 +469,7 @@ describe("Recursion section rendering", () => {
   describe("DataStructuresSection - specific content", () => {
     it("renders linked list operations", () => {
       render(<DataStructuresSection />);
-      expect(
-        screen.getByText("Linked List Operations")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Linked List Operations")).toBeInTheDocument();
     });
 
     it("renders BST operations", () => {

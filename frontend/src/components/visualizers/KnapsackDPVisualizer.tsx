@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Item {
@@ -135,8 +141,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Back"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
 
@@ -158,7 +174,11 @@ const Controls = ({
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-green-600/20"
           title="Play"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -170,8 +190,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Forward"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
 
@@ -180,15 +210,27 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-all ml-2"
         title="Reset"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </button>
     </div>
 
     <div className="flex items-center justify-center gap-4">
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Speed</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Speed
+        </span>
         <div className="flex gap-1">
           {[
             { value: 1000, label: "0.5x" },
@@ -211,7 +253,9 @@ const Controls = ({
       </div>
 
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Step</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Step
+        </span>
         <span className="text-sm font-mono text-white">
           {step} <span className="text-gray-500">/</span> {total}
         </span>
@@ -254,23 +298,36 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
       <div className="bg-gray-800/30 rounded-lg p-6 w-full">
         <div className="text-center mb-4">
           <div className="text-sm text-gray-400 mb-2">
-            At item {items[currentItemIdx]?.name} ({items[currentItemIdx]?.weight}kg, ${items[currentItemIdx]?.value}):
+            At item {items[currentItemIdx]?.name} (
+            {items[currentItemIdx]?.weight}kg, ${items[currentItemIdx]?.value}):
           </div>
           <div className="flex justify-center gap-8">
             <div className="flex flex-col items-center">
-              <div className={`w-24 h-20 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
-                isDecisionStep ? "bg-green-600/30 border-green-500" : "bg-gray-800 border-gray-600"
-              }`}>
+              <div
+                className={`w-24 h-20 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
+                  isDecisionStep
+                    ? "bg-green-600/30 border-green-500"
+                    : "bg-gray-800 border-gray-600"
+                }`}
+              >
                 <span className="text-xs text-green-400">TAKE</span>
-                <span className="text-lg font-bold text-green-300">+${items[currentItemIdx]?.value}</span>
-                <span className="text-xs text-gray-400">-{items[currentItemIdx]?.weight}kg</span>
+                <span className="text-lg font-bold text-green-300">
+                  +${items[currentItemIdx]?.value}
+                </span>
+                <span className="text-xs text-gray-400">
+                  -{items[currentItemIdx]?.weight}kg
+                </span>
               </div>
             </div>
             <div className="flex items-center text-gray-500 text-2xl">or</div>
             <div className="flex flex-col items-center">
-              <div className={`w-24 h-20 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
-                !isDecisionStep && step > 0 ? "bg-red-600/30 border-red-500" : "bg-gray-800 border-gray-600"
-              }`}>
+              <div
+                className={`w-24 h-20 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
+                  !isDecisionStep && step > 0
+                    ? "bg-red-600/30 border-red-500"
+                    : "bg-gray-800 border-gray-600"
+                }`}
+              >
                 <span className="text-xs text-red-400">SKIP</span>
                 <span className="text-lg font-bold text-red-300">+$0</span>
                 <span className="text-xs text-gray-400">same cap</span>
@@ -286,10 +343,12 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
       <div className="flex gap-6 text-sm text-gray-400">
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-green-500 rounded-full" /> take (add value, reduce capacity)
+          <span className="w-3 h-3 bg-green-500 rounded-full" /> take (add
+          value, reduce capacity)
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-red-500 rounded-full" /> skip (keep capacity)
+          <span className="w-3 h-3 bg-red-500 rounded-full" /> skip (keep
+          capacity)
         </span>
         {showMemo && (
           <span className="flex items-center gap-2">
@@ -301,7 +360,13 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
   );
 };
 
-const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType<typeof generateTableSteps> }) => {
+const TablePhase = ({
+  step,
+  tableSteps,
+}: {
+  step: number;
+  tableSteps: ReturnType<typeof generateTableSteps>;
+}) => {
   const currentDp = useMemo(() => {
     const dp: (number | null)[][] = Array(items.length + 1)
       .fill(null)
@@ -317,7 +382,8 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
     return dp;
   }, [step, tableSteps]);
 
-  const currentStep = step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -327,9 +393,16 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
         <table className="border-collapse text-sm">
           <thead>
             <tr>
-              <th className="p-2 text-gray-500 w-16 text-center font-medium">Item</th>
+              <th className="p-2 text-gray-500 w-16 text-center font-medium">
+                Item
+              </th>
               {Array.from({ length: capacity + 1 }, (_, w) => (
-                <th key={w} className="p-2 text-gray-400 w-12 text-center font-medium">{w}kg</th>
+                <th
+                  key={w}
+                  className="p-2 text-gray-400 w-12 text-center font-medium"
+                >
+                  {w}kg
+                </th>
               ))}
             </tr>
           </thead>
@@ -340,9 +413,14 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
                   {i === 0 ? "-" : items[i - 1].name}
                 </td>
                 {Array.from({ length: capacity + 1 }, (_, w) => {
-                  const isCurrent = currentStep && currentStep.i === i && currentStep.w === w;
+                  const isCurrent =
+                    currentStep && currentStep.i === i && currentStep.w === w;
                   const value = currentDp[i][w];
-                  const wasTaken = currentStep && currentStep.i === i && currentStep.w === w && currentStep.take;
+                  const wasTaken =
+                    currentStep &&
+                    currentStep.i === i &&
+                    currentStep.w === w &&
+                    currentStep.take;
 
                   return (
                     <td
@@ -353,12 +431,14 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
                             ? "bg-green-600 border-green-400"
                             : "bg-blue-600 border-blue-400"
                           : value !== null
-                          ? "bg-gray-800 border-gray-600"
-                          : "bg-gray-900/50 border-gray-700"
+                            ? "bg-gray-800 border-gray-600"
+                            : "bg-gray-900/50 border-gray-700"
                       }`}
                     >
                       {value !== null && (
-                        <span className={`font-mono ${isCurrent ? "text-white font-bold" : "text-gray-300"}`}>
+                        <span
+                          className={`font-mono ${isCurrent ? "text-white font-bold" : "text-gray-300"}`}
+                        >
                           {value}
                         </span>
                       )}
@@ -372,11 +452,13 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
       </div>
 
       {currentStep && (
-        <div className={`text-base text-center font-mono px-6 py-3 rounded-lg ${
-          currentStep.take
-            ? "bg-green-600/20 text-green-400"
-            : "bg-gray-800/50 text-gray-400"
-        }`}>
+        <div
+          className={`text-base text-center font-mono px-6 py-3 rounded-lg ${
+            currentStep.take
+              ? "bg-green-600/20 text-green-400"
+              : "bg-gray-800/50 text-gray-400"
+          }`}
+        >
           {currentStep.formula}
         </div>
       )}
@@ -388,7 +470,13 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
   );
 };
 
-const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps: ReturnType<typeof generateOptimizedSteps> }) => {
+const OptimizedPhase = ({
+  step,
+  optimizedSteps,
+}: {
+  step: number;
+  optimizedSteps: ReturnType<typeof generateOptimizedSteps>;
+}) => {
   const currentDp = useMemo(() => {
     const dp: number[] = Array(capacity + 1).fill(0);
     for (let s = 0; s < Math.min(step, optimizedSteps.length); s++) {
@@ -398,14 +486,17 @@ const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps
     return dp;
   }, [step, optimizedSteps]);
 
-  const currentStep = step > 0 && step <= optimizedSteps.length ? optimizedSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= optimizedSteps.length ? optimizedSteps[step - 1] : null;
 
   return (
     <div className="flex flex-col items-center gap-6">
       <ItemsDisplay currentItem={currentStep?.itemIdx} />
 
       <div className="text-center">
-        <div className="text-sm text-gray-500 mb-3">1D dp[] array (REVERSE iteration)</div>
+        <div className="text-sm text-gray-500 mb-3">
+          1D dp[] array (REVERSE iteration)
+        </div>
         <div className="flex gap-1 justify-center">
           {Array.from({ length: capacity + 1 }, (_, w) => {
             const isCurrent = currentStep && currentStep.w === w;
@@ -435,14 +526,19 @@ const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps
       )}
 
       <div className="text-sm text-gray-500 text-center max-w-md">
-        <span className="text-yellow-400">REVERSE loop (w = capacity down to weight)</span> ensures each item is used only once.
-        Forward loop would allow reusing items.
+        <span className="text-yellow-400">
+          REVERSE loop (w = capacity down to weight)
+        </span>{" "}
+        ensures each item is used only once. Forward loop would allow reusing
+        items.
       </div>
     </div>
   );
 };
 
-export default function KnapsackDPVisualizer() { // skipcq: JS-0067
+// skipcq: JS-0067
+export default function KnapsackDPVisualizer() {
+  // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "optimized"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Decision Tree",
@@ -496,7 +592,8 @@ export default function KnapsackDPVisualizer() { // skipcq: JS-0067
       <div className="text-center mb-4">
         <div className="text-lg font-medium text-white">0/1 Knapsack</div>
         <div className="text-sm text-gray-400">
-          Maximize value without exceeding capacity (each item used at most once)
+          Maximize value without exceeding capacity (each item used at most
+          once)
         </div>
       </div>
 
@@ -513,9 +610,11 @@ export default function KnapsackDPVisualizer() { // skipcq: JS-0067
               }`}
             >
               <span className="flex items-center gap-2">
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
-                  currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
-                }`}>
+                <span
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
+                    currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
+                  }`}
+                >
                   {index + 1}
                 </span>
                 {phaseLabels[phase]}
@@ -550,15 +649,22 @@ export default function KnapsackDPVisualizer() { // skipcq: JS-0067
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
+          {currentPhase === "tree" && (
+            <TreePhase step={step} showMemo={false} />
+          )}
           {currentPhase === "memo" && <TreePhase step={step} showMemo />}
-          {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
-          {currentPhase === "optimized" && <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />}
+          {currentPhase === "table" && (
+            <TablePhase step={step} tableSteps={tableSteps} />
+          )}
+          {currentPhase === "optimized" && (
+            <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />
+          )}
         </motion.div>
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        Items: A(1kg,$1), B(3kg,$4), C(4kg,$5) | Capacity: {capacity}kg | Answer: $9 (B+C)
+        Items: A(1kg,$1), B(3kg,$4), C(4kg,$5) | Capacity: {capacity}kg |
+        Answer: $9 (B+C)
       </div>
     </div>
   );

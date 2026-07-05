@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, use, useCallback, useRef, startTransition } from "react";
+import {
+  useState,
+  useEffect,
+  use,
+  useCallback,
+  useRef,
+  startTransition,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { apiClient } from "@/lib/api";
@@ -48,26 +55,110 @@ const JAVA_INTERFACE_PATTERN =
   /\bnew\s+(Queue|List|Map|Set|Deque|Collection|Iterable|Iterator|NavigableMap|NavigableSet|SortedMap|SortedSet)\s*([<(])/;
 
 const JAVA_KEYWORDS = new Set([
-  "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char",
-  "class", "continue", "default", "do", "double", "else", "enum", "extends",
-  "final", "finally", "float", "for", "if", "implements", "import",
-  "instanceof", "int", "interface", "long", "native", "new", "package",
-  "private", "protected", "public", "return", "short", "static", "strictfp",
-  "super", "switch", "synchronized", "this", "throw", "throws", "transient",
-  "try", "void", "volatile", "while", "true", "false", "null", "var",
-  "String", "Integer", "Long", "Double", "Float", "Boolean", "Character",
-  "Object", "Class", "System", "Math", "StringBuilder", "StringBuffer",
-  "List", "ArrayList", "LinkedList", "Map", "HashMap", "TreeMap",
-  "LinkedHashMap", "Set", "HashSet", "TreeSet", "LinkedHashSet", "Queue",
-  "Deque", "Stack", "ArrayDeque", "PriorityQueue", "Vector", "Arrays",
-  "Collections", "Optional", "Stream", "Collectors", "Iterator",
-  "Comparable", "Comparator", "Exception", "RuntimeException", "Scanner",
-  "Random", "Pattern", "Matcher", "Error", "Throwable",
+  "abstract",
+  "assert",
+  "boolean",
+  "break",
+  "byte",
+  "case",
+  "catch",
+  "char",
+  "class",
+  "continue",
+  "default",
+  "do",
+  "double",
+  "else",
+  "enum",
+  "extends",
+  "final",
+  "finally",
+  "float",
+  "for",
+  "if",
+  "implements",
+  "import",
+  "instanceof",
+  "int",
+  "interface",
+  "long",
+  "native",
+  "new",
+  "package",
+  "private",
+  "protected",
+  "public",
+  "return",
+  "short",
+  "static",
+  "strictfp",
+  "super",
+  "switch",
+  "synchronized",
+  "this",
+  "throw",
+  "throws",
+  "transient",
+  "try",
+  "void",
+  "volatile",
+  "while",
+  "true",
+  "false",
+  "null",
+  "var",
+  "String",
+  "Integer",
+  "Long",
+  "Double",
+  "Float",
+  "Boolean",
+  "Character",
+  "Object",
+  "Class",
+  "System",
+  "Math",
+  "StringBuilder",
+  "StringBuffer",
+  "List",
+  "ArrayList",
+  "LinkedList",
+  "Map",
+  "HashMap",
+  "TreeMap",
+  "LinkedHashMap",
+  "Set",
+  "HashSet",
+  "TreeSet",
+  "LinkedHashSet",
+  "Queue",
+  "Deque",
+  "Stack",
+  "ArrayDeque",
+  "PriorityQueue",
+  "Vector",
+  "Arrays",
+  "Collections",
+  "Optional",
+  "Stream",
+  "Collectors",
+  "Iterator",
+  "Comparable",
+  "Comparator",
+  "Exception",
+  "RuntimeException",
+  "Scanner",
+  "Random",
+  "Pattern",
+  "Matcher",
+  "Error",
+  "Throwable",
 ]);
 
+// skipcq: JS-0067
 function setupJavaValidation(
-  editor: Monaco['editor']['IStandaloneCodeEditor'],
-  monaco: Monaco,
+  editor: Monaco["editor"]["IStandaloneCodeEditor"],
+  monaco: Monaco
 ) {
   const model = editor.getModel();
   if (!model || model.getLanguageId() !== "java") return;
@@ -76,13 +167,20 @@ function setupJavaValidation(
   const validate = () => {
     clearTimeout(timer);
     timer = setTimeout(() => {
-      const markers: Parameters<(typeof monaco.editor)['setModelMarkers']>[2] = [];
+      const markers: Parameters<(typeof monaco.editor)["setModelMarkers"]>[2] =
+        [];
       const lines = model.getValue().split("\n");
       for (let i = 0; i < lines.length; i++) {
         const trimmed = lines[i].trim();
-        if (!trimmed || trimmed.startsWith("//") || trimmed.startsWith("/*") ||
-            trimmed.startsWith("*") || trimmed.startsWith("import ") ||
-            trimmed.startsWith("package ")) continue;
+        if (
+          !trimmed ||
+          trimmed.startsWith("//") ||
+          trimmed.startsWith("/*") ||
+          trimmed.startsWith("*") ||
+          trimmed.startsWith("import ") ||
+          trimmed.startsWith("package ")
+        )
+          continue;
 
         const match = trimmed.match(/^\s*([a-zA-Z_$][\w$]*)\s*;?\s*$/);
         if (match && !JAVA_KEYWORDS.has(match[1])) {
@@ -99,7 +197,8 @@ function setupJavaValidation(
 
         const interfaceMatch = trimmed.match(JAVA_INTERFACE_PATTERN);
         if (interfaceMatch) {
-          const typeName = interfaceMatch[1] as keyof typeof ABSTRACT_JAVA_TYPES;
+          const typeName =
+            interfaceMatch[1] as keyof typeof ABSTRACT_JAVA_TYPES;
           const nameCol = trimmed.indexOf(interfaceMatch[1]) + 1;
           markers.push({
             severity: monaco.MarkerSeverity.Error,
@@ -120,7 +219,10 @@ function setupJavaValidation(
             parenStack.push({ char: ch, line: i, col: j });
           } else if (ch === ")" || ch === "]" || ch === "}") {
             const expected = ch === ")" ? "(" : ch === "]" ? "[" : "{";
-            if (parenStack.length === 0 || parenStack[parenStack.length - 1].char !== expected) {
+            if (
+              parenStack.length === 0 ||
+              parenStack[parenStack.length - 1].char !== expected
+            ) {
               markers.push({
                 severity: monaco.MarkerSeverity.Error,
                 message: `unexpected '${ch}'`,
@@ -155,6 +257,7 @@ function setupJavaValidation(
   validate();
 }
 
+// skipcq: JS-0067
 function handleEditorWillMount(monaco: Monaco) {
   // Define custom theme with better Java type highlighting
   monaco.editor.defineTheme("algopatterns-dark", {
@@ -183,58 +286,189 @@ function handleEditorWillMount(monaco: Monaco) {
     tokenPostfix: ".java",
 
     keywords: [
-      "abstract", "continue", "for", "new", "switch", "assert", "default",
-      "goto", "package", "synchronized", "boolean", "do", "if", "private",
-      "this", "break", "double", "implements", "protected", "throw", "byte",
-      "else", "import", "public", "throws", "case", "enum", "instanceof",
-      "return", "transient", "catch", "extends", "int", "short", "try",
-      "char", "final", "interface", "static", "void", "class", "finally",
-      "long", "strictfp", "volatile", "const", "float", "native", "super",
-      "while", "true", "false", "null",
+      "abstract",
+      "continue",
+      "for",
+      "new",
+      "switch",
+      "assert",
+      "default",
+      "goto",
+      "package",
+      "synchronized",
+      "boolean",
+      "do",
+      "if",
+      "private",
+      "this",
+      "break",
+      "double",
+      "implements",
+      "protected",
+      "throw",
+      "byte",
+      "else",
+      "import",
+      "public",
+      "throws",
+      "case",
+      "enum",
+      "instanceof",
+      "return",
+      "transient",
+      "catch",
+      "extends",
+      "int",
+      "short",
+      "try",
+      "char",
+      "final",
+      "interface",
+      "static",
+      "void",
+      "class",
+      "finally",
+      "long",
+      "strictfp",
+      "volatile",
+      "const",
+      "float",
+      "native",
+      "super",
+      "while",
+      "true",
+      "false",
+      "null",
     ],
 
     typeKeywords: [
-      "boolean", "byte", "char", "double", "float", "int", "long", "short", "void",
+      "boolean",
+      "byte",
+      "char",
+      "double",
+      "float",
+      "int",
+      "long",
+      "short",
+      "void",
     ],
 
     // Common Java types that should be highlighted
     builtinTypes: [
-      "String", "Integer", "Long", "Double", "Float", "Boolean", "Character",
-      "Object", "Class", "System", "Math", "StringBuilder", "StringBuffer",
-      "List", "ArrayList", "LinkedList", "Map", "HashMap", "TreeMap", "LinkedHashMap",
-      "Set", "HashSet", "TreeSet", "LinkedHashSet", "Queue", "Deque", "Stack",
-      "ArrayDeque", "PriorityQueue", "Vector", "Arrays", "Collections", "Optional",
-      "Stream", "Collectors", "Iterator", "Comparable", "Comparator", "Exception",
-      "RuntimeException", "Scanner", "Random", "Pattern", "Matcher",
+      "String",
+      "Integer",
+      "Long",
+      "Double",
+      "Float",
+      "Boolean",
+      "Character",
+      "Object",
+      "Class",
+      "System",
+      "Math",
+      "StringBuilder",
+      "StringBuffer",
+      "List",
+      "ArrayList",
+      "LinkedList",
+      "Map",
+      "HashMap",
+      "TreeMap",
+      "LinkedHashMap",
+      "Set",
+      "HashSet",
+      "TreeSet",
+      "LinkedHashSet",
+      "Queue",
+      "Deque",
+      "Stack",
+      "ArrayDeque",
+      "PriorityQueue",
+      "Vector",
+      "Arrays",
+      "Collections",
+      "Optional",
+      "Stream",
+      "Collectors",
+      "Iterator",
+      "Comparable",
+      "Comparator",
+      "Exception",
+      "RuntimeException",
+      "Scanner",
+      "Random",
+      "Pattern",
+      "Matcher",
     ],
 
     operators: [
-      "=", ">", "<", "!", "~", "?", ":", "==", "<=", ">=", "!=", "&&", "||",
-      "++", "--", "+", "-", "*", "/", "&", "|", "^", "%", "<<", ">>", ">>>",
-      "+=", "-=", "*=", "/=", "&=", "|=", "^=", "%=", "<<=", ">>=", ">>>=",
+      "=",
+      ">",
+      "<",
+      "!",
+      "~",
+      "?",
+      ":",
+      "==",
+      "<=",
+      ">=",
+      "!=",
+      "&&",
+      "||",
+      "++",
+      "--",
+      "+",
+      "-",
+      "*",
+      "/",
+      "&",
+      "|",
+      "^",
+      "%",
+      "<<",
+      ">>",
+      ">>>",
+      "+=",
+      "-=",
+      "*=",
+      "/=",
+      "&=",
+      "|=",
+      "^=",
+      "%=",
+      "<<=",
+      ">>=",
+      ">>>=",
     ],
 
     symbols: /[=><!~?:&|+\-*/^%]+/,
-    escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
+    escapes:
+      /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
     digits: /\d+(_+\d+)*/,
 
     tokenizer: {
       root: [
         // Type identifiers (capitalized words)
-        [/[A-Z][\w$]*/, {
-          cases: {
-            "@builtinTypes": "type.identifier",
-            "@default": "type.identifier",
+        [
+          /[A-Z][\w$]*/,
+          {
+            cases: {
+              "@builtinTypes": "type.identifier",
+              "@default": "type.identifier",
+            },
           },
-        }],
+        ],
 
         // Identifiers and keywords
-        [/[a-z_$][\w$]*/, {
-          cases: {
-            "@keywords": "keyword",
-            "@default": "identifier",
+        [
+          /[a-z_$][\w$]*/,
+          {
+            cases: {
+              "@keywords": "keyword",
+              "@default": "identifier",
+            },
           },
-        }],
+        ],
 
         // Whitespace
         { include: "@whitespace" },
@@ -242,12 +476,15 @@ function handleEditorWillMount(monaco: Monaco) {
         // Delimiters and operators
         [/[{}()\[\]]/, "@brackets"],
         [/[<>](?!@symbols)/, "@brackets"],
-        [/@symbols/, {
-          cases: {
-            "@operators": "operator",
-            "@default": "",
+        [
+          /@symbols/,
+          {
+            cases: {
+              "@operators": "operator",
+              "@default": "",
+            },
           },
-        }],
+        ],
 
         // Annotations
         [/@\s*[a-zA-Z_$][\w$]*/, "annotation"],
@@ -356,7 +593,8 @@ export default function ProblemPageClient({ params }: PageProps) {
   const fromPattern = searchParams.get("from");
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { theme } = useTheme();
-  const editorTheme = theme === "dark" ? "algopatterns-dark" : "algopatterns-light";
+  const editorTheme =
+    theme === "dark" ? "algopatterns-dark" : "algopatterns-light";
   const panelRef = useRef<HTMLDivElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
 
@@ -421,7 +659,9 @@ export default function ProblemPageClient({ params }: PageProps) {
 
   // Mobile state
   const isMobile = useIsMobile();
-  const [mobileView, setMobileView] = useState<"problem" | "code" | "results">("problem");
+  const [mobileView, setMobileView] = useState<"problem" | "code" | "results">(
+    "problem"
+  );
 
   // Timer state
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -429,7 +669,8 @@ export default function ProblemPageClient({ params }: PageProps) {
   const [problemSolved, setProblemSolved] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
 
-  const [saveStatus, setSaveStatus] = useState<"saved" | "unsaved">("saved");
+  // Track last saved code to derive save status
+  const [lastSavedCode, setLastSavedCode] = useState<string | null>(null);
   // tabSize comes from useEditorPreferences (persisted); alias to keep existing references working
   const tabSize = prefTabSize;
   const setTabSize = setPrefTabSize;
@@ -439,7 +680,9 @@ export default function ProblemPageClient({ params }: PageProps) {
   const [errorForAI, setErrorForAI] = useState<string>();
 
   // Editor instance for inline AI
-  const [editorInstance, setEditorInstance] = useState<Parameters<OnMount>[0] | null>(null);
+  const [editorInstance, setEditorInstance] = useState<
+    Parameters<OnMount>[0] | null
+  >(null);
   const inlineAI = useInlineAI(editorInstance);
 
   // Monaco ref for error markers/decorations
@@ -490,7 +733,13 @@ export default function ProblemPageClient({ params }: PageProps) {
   const formatCode = useCallback(() => {
     if (!editorInstance) return;
 
-    const MONACO_FORMATTED_LANGS = new Set(["javascript", "typescript", "json", "html", "css"]);
+    const MONACO_FORMATTED_LANGS = new Set([
+      "javascript",
+      "typescript",
+      "json",
+      "html",
+      "css",
+    ]);
     const lang = editorInstance.getModel()?.getLanguageId() ?? "";
 
     // For JS/TS/JSON Monaco has a built-in formatter — use it.
@@ -551,9 +800,11 @@ export default function ProblemPageClient({ params }: PageProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // skipcq: JS-R1005
   // Load problem data
   useEffect(() => {
-    const fetchProblem = async () => { // skipcq: JS-R1005
+    const fetchProblem = async () => {
+      // skipcq: JS-R1005
       setIsLoading(true);
       setError(null);
       try {
@@ -604,13 +855,16 @@ export default function ProblemPageClient({ params }: PageProps) {
 
   // Save code to localStorage — debounced 1 s to avoid writing on every keystroke
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Derive save status from whether current code matches last saved code
+  const saveStatus = lastSavedCode === code ? "saved" : "unsaved";
+
   useEffect(() => {
     if (selectedLanguageId && code) {
-      setSaveStatus("unsaved");
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(() => {
         localStorage.setItem(getStorageKey(slug, selectedLanguageId), code);
-        startTransition(() => setSaveStatus("saved"));
+        startTransition(() => setLastSavedCode(code));
       }, 1000);
     }
     return () => {
@@ -680,101 +934,106 @@ export default function ProblemPageClient({ params }: PageProps) {
     (errorText: string): { line: number; message: string }[] => {
       const results: { line: number; message: string }[] = [];
       const offset = wrapperLineOffsetRef.current;
-    const lines = errorText.split("\n");
-    const seen = new Set<number>();
+      const lines = errorText.split("\n");
+      const seen = new Set<number>();
 
-    for (const [, line] of lines.entries()) {
+      for (const [, line] of lines.entries()) {
+        // Java/C/C++/C#: Main.java:21: error: message
+        const compiledMatch = line.match(
+          /(?:Main|Solution|main)\.(?:java|cpp|cc|c|cxx|c\+\+|cs):(\d+):(?:\d+:)?\s*(?:error|warning):\s*(.+)/
+        );
+        if (compiledMatch) {
+          const rawLine = parseInt(compiledMatch[1], 10);
+          const editorLine = rawLine - offset;
+          const fullTail = compiledMatch[2];
 
-      // Java/C/C++/C#: Main.java:21: error: message
-      const compiledMatch = line.match(
-        /(?:Main|Solution|main)\.(?:java|cpp|cc|c|cxx|c\+\+|cs):(\d+):(?:\d+:)?\s*(?:error|warning):\s*(.+)/
-      );
-      if (compiledMatch) {
-        const rawLine = parseInt(compiledMatch[1], 10);
-        const editorLine = rawLine - offset;
-        const fullTail = compiledMatch[2];
+          if (editorLine < 1 || seen.has(editorLine)) continue;
+          seen.add(editorLine);
 
-        if (editorLine < 1 || seen.has(editorLine)) continue;
-        seen.add(editorLine);
+          // Extract clean message
+          let message = fullTail
+            .replace(/\s+\^.*?\d+\s+error(s?)\s*$/g, "")
+            .trim();
+          if (!message) message = fullTail.trim();
 
-        // Extract clean message
-        let message = fullTail.replace(/\s+\^.*?\d+\s+error(s?)\s*$/g, "").trim();
-        if (!message) message = fullTail.trim();
+          results.push({ line: editorLine, message });
+          continue;
+        }
 
-        results.push({ line: editorLine, message });
-        continue;
+        // Python: File "main.py", line 21
+        const pythonMatch = line.match(
+          /(?:File\s+".+",\s*)?line\s+(\d+)(?:,?\s+in\s+.+)?/
+        );
+        if (
+          pythonMatch &&
+          (line.includes("error") ||
+            line.includes("Error") ||
+            line.includes("Traceback") ||
+            line.includes("SyntaxError"))
+        ) {
+          const editorLine = parseInt(pythonMatch[1], 10);
+          if (editorLine < 1 || seen.has(editorLine)) continue;
+          seen.add(editorLine);
+          results.push({ line: editorLine, message: line.trim() });
+          continue;
+        }
+
+        // JavaScript: main.js:21
+        const jsMatch = line.match(/main\.js:(\d+)(?::\d+)?/);
+        if (jsMatch) {
+          const editorLine = parseInt(jsMatch[1], 10);
+          if (editorLine < 1 || seen.has(editorLine)) continue;
+          seen.add(editorLine);
+          results.push({ line: editorLine, message: line.trim() });
+          continue;
+        }
       }
 
-      // Python: File "main.py", line 21
-      const pythonMatch = line.match(
-        /(?:File\s+".+",\s*)?line\s+(\d+)(?:,?\s+in\s+.+)?/
-      );
-      if (
-        pythonMatch &&
-        (line.includes("error") ||
-          line.includes("Error") ||
-          line.includes("Traceback") ||
-          line.includes("SyntaxError"))
-      ) {
-        const editorLine = parseInt(pythonMatch[1], 10);
-        if (editorLine < 1 || seen.has(editorLine)) continue;
-        seen.add(editorLine);
-        results.push({ line: editorLine, message: line.trim() });
-        continue;
-      }
-
-      // JavaScript: main.js:21
-      const jsMatch = line.match(/main\.js:(\d+)(?::\d+)?/);
-      if (jsMatch) {
-        const editorLine = parseInt(jsMatch[1], 10);
-        if (editorLine < 1 || seen.has(editorLine)) continue;
-        seen.add(editorLine);
-        results.push({ line: editorLine, message: line.trim() });
-        continue;
-      }
-    }
-
-    return results;
-  }, []);
+      return results;
+    },
+    []
+  );
 
   // Apply error highlights to the Monaco editor (full-line squiggly underline)
   const applyEditorErrors = useCallback(
     (errors: { line: number; message: string }[]) => {
-    const editor = editorInstance;
-    const monaco = monacoRef.current;
-    if (!editor || !monaco || errors.length === 0) return;
+      const editor = editorInstance;
+      const monaco = monacoRef.current;
+      if (!editor || !monaco || errors.length === 0) return;
 
-    const model = editor.getModel();
-    if (!model) return;
+      const model = editor.getModel();
+      if (!model) return;
 
-    // Set markers with full-line squiggly underlines
-    const markers = errors.map((err) => ({
-      severity: monaco.MarkerSeverity.Error,
-      message: err.message,
-      startLineNumber: err.line,
-      startColumn: 1,
-      endLineNumber: err.line,
-      endColumn: model.getLineMaxColumn(err.line),
-    }));
-    monaco.editor.setModelMarkers(model, "compilation-error", markers);
+      // Set markers with full-line squiggly underlines
+      const markers = errors.map((err) => ({
+        severity: monaco.MarkerSeverity.Error,
+        message: err.message,
+        startLineNumber: err.line,
+        startColumn: 1,
+        endLineNumber: err.line,
+        endColumn: model.getLineMaxColumn(err.line),
+      }));
+      monaco.editor.setModelMarkers(model, "compilation-error", markers);
 
-    // Set decorations (red tint + left gutter marker)
-    const decorations = errors.map((err) => ({
-      range: new monaco.Range(err.line, 1, err.line, 1),
-      options: {
-        isWholeLine: true,
-        className: "monaco-error-line",
-        glyphMarginClassName: "monaco-error-glyph",
-      },
-    }));
-    errorDecorationsRef.current = editor.deltaDecorations(
-      errorDecorationsRef.current,
-      decorations
-    );
+      // Set decorations (red tint + left gutter marker)
+      const decorations = errors.map((err) => ({
+        range: new monaco.Range(err.line, 1, err.line, 1),
+        options: {
+          isWholeLine: true,
+          className: "monaco-error-line",
+          glyphMarginClassName: "monaco-error-glyph",
+        },
+      }));
+      errorDecorationsRef.current = editor.deltaDecorations(
+        errorDecorationsRef.current,
+        decorations
+      );
 
-    // Reveal the first error line
-    editor.revealLineInCenter(errors[0].line);
-  }, [editorInstance]);
+      // Reveal the first error line
+      editor.revealLineInCenter(errors[0].line);
+    },
+    [editorInstance]
+  );
 
   // Clear all error highlights from the editor
   const clearEditorErrors = useCallback(() => {
@@ -835,12 +1094,21 @@ export default function ProblemPageClient({ params }: PageProps) {
           applyEditorErrors(parseErrorLines(stderr));
         }
         // Build detailed error context for AI tutor
-        const failedTests = response.data.results.filter(r => r.status !== "accepted");
+        const failedTests = response.data.results.filter(
+          (r) => r.status !== "accepted"
+        );
         if (failedTests.length > 0) {
-          const errorContext = failedTests.map((t) =>
-            `Test ${t.testCaseIndex + 1}: ${t.status.replace(/_/g, " ")}\n  Input: ${t.input}\n  Expected: ${t.expectedOutput}\n  Got: ${t.actualOutput || "(no output)"}\n${t.errorMessage ? `  Error: ${t.errorMessage}` : ""}`
-          ).join("\n\n");
-          setErrorForAI(stderr ? `${stderr}\n\nFailed Tests:\n${errorContext}` : `Failed Tests:\n${errorContext}`);
+          const errorContext = failedTests
+            .map(
+              (t) =>
+                `Test ${t.testCaseIndex + 1}: ${t.status.replace(/_/g, " ")}\n  Input: ${t.input}\n  Expected: ${t.expectedOutput}\n  Got: ${t.actualOutput || "(no output)"}\n${t.errorMessage ? `  Error: ${t.errorMessage}` : ""}`
+            )
+            .join("\n\n");
+          setErrorForAI(
+            stderr
+              ? `${stderr}\n\nFailed Tests:\n${errorContext}`
+              : `Failed Tests:\n${errorContext}`
+          );
         } else {
           setErrorForAI(undefined); // skipcq: JS-W1042
         }
@@ -858,7 +1126,18 @@ export default function ProblemPageClient({ params }: PageProps) {
     } finally {
       setIsRunning(false);
     }
-  }, [isAuthenticated, problem, selectedLanguageId, code, useCustomInput, customInput, applyEditorErrors, clearEditorErrors, parseErrorLines, router]);
+  }, [
+    isAuthenticated,
+    problem,
+    selectedLanguageId,
+    code,
+    useCustomInput,
+    customInput,
+    applyEditorErrors,
+    clearEditorErrors,
+    parseErrorLines,
+    router,
+  ]);
 
   // Submit code
   const handleSubmit = useCallback(async () => {
@@ -912,12 +1191,22 @@ export default function ProblemPageClient({ params }: PageProps) {
             applyEditorErrors(parseErrorLines(stderr));
           }
           // Build detailed error context for AI tutor
-          const failedTests = response.data.results.filter(r => r.status !== "accepted");
+          const failedTests = response.data.results.filter(
+            (r) => r.status !== "accepted"
+          );
           if (failedTests.length > 0 && response.data.status !== "accepted") {
-            const errorContext = failedTests.slice(0, 3).map((t, i) =>
-              `Test ${i + 1}: ${t.status.replace(/_/g, " ")}\n  Input: ${t.input}\n  Expected: ${t.expectedOutput}\n  Got: ${t.actualOutput || "(no output)"}\n${t.errorMessage ? `  Error: ${t.errorMessage}` : ""}`
-            ).join("\n\n");
-            setErrorForAI(stderr ? `${stderr}\n\nFailed Tests:\n${errorContext}` : `Failed Tests:\n${errorContext}`);
+            const errorContext = failedTests
+              .slice(0, 3)
+              .map(
+                (t, i) =>
+                  `Test ${i + 1}: ${t.status.replace(/_/g, " ")}\n  Input: ${t.input}\n  Expected: ${t.expectedOutput}\n  Got: ${t.actualOutput || "(no output)"}\n${t.errorMessage ? `  Error: ${t.errorMessage}` : ""}`
+              )
+              .join("\n\n");
+            setErrorForAI(
+              stderr
+                ? `${stderr}\n\nFailed Tests:\n${errorContext}`
+                : `Failed Tests:\n${errorContext}`
+            );
           }
         }
       } else {
@@ -935,7 +1224,17 @@ export default function ProblemPageClient({ params }: PageProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [isAuthenticated, problem, selectedLanguageId, code, loadSubmissions, applyEditorErrors, clearEditorErrors, parseErrorLines, router]);
+  }, [
+    isAuthenticated,
+    problem,
+    selectedLanguageId,
+    code,
+    loadSubmissions,
+    applyEditorErrors,
+    clearEditorErrors,
+    parseErrorLines,
+    router,
+  ]);
 
   // Keyboard shortcuts
   const handleRunRef = useRef(handleRun);
@@ -943,9 +1242,11 @@ export default function ProblemPageClient({ params }: PageProps) {
   useEffect(() => {
     handleRunRef.current = handleRun;
     handleSubmitRef.current = handleSubmit;
+  // skipcq: JS-R1005
   });
   const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => { // skipcq: JS-R1005
+    (e: KeyboardEvent) => {
+      // skipcq: JS-R1005
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();
         if (e.shiftKey) {
@@ -1162,8 +1463,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                 className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
                 data-tooltip="Decrease font size"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 12H4"
+                  />
                 </svg>
               </button>
               <span className="text-gray-400 text-sm w-6 text-center font-mono">
@@ -1174,8 +1485,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                 className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
                 data-tooltip="Increase font size"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
               </button>
             </div>
@@ -1233,9 +1554,24 @@ export default function ProblemPageClient({ params }: PageProps) {
             >
               {isRunning ? (
                 <span className="flex items-center gap-1.5">
-                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="animate-spin w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Run
                 </span>
@@ -1254,9 +1590,24 @@ export default function ProblemPageClient({ params }: PageProps) {
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-1.5">
-                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="animate-spin w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Submit
                 </span>
@@ -1272,7 +1623,9 @@ export default function ProblemPageClient({ params }: PageProps) {
             height="100%"
             language={monacoLanguage}
             value={code}
-            onChange={(value) => { setCode(value || ""); }}
+            onChange={(value) => {
+              setCode(value || "");
+            }}
             theme={editorTheme}
             beforeMount={handleEditorWillMount}
             onMount={(editor, monaco) => {
@@ -1416,7 +1769,9 @@ export default function ProblemPageClient({ params }: PageProps) {
                       <h1 className="text-xl font-bold text-white mb-1">
                         {problem.title}
                       </h1>
-                      <span className={`text-sm font-medium ${difficultyColors[problem.difficulty]}`}>
+                      <span
+                        className={`text-sm font-medium ${difficultyColors[problem.difficulty]}`}
+                      >
                         {problem.difficulty}
                       </span>
                     </div>
@@ -1425,11 +1780,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                     </div>
                     {testCases.length > 0 && (
                       <div>
-                        <h3 className="text-base font-semibold text-white mb-2">Examples</h3>
+                        <h3 className="text-base font-semibold text-white mb-2">
+                          Examples
+                        </h3>
                         <div className="space-y-3">
                           {testCases.map((tc, i) => (
-                            <div key={tc.id} className="bg-gray-900 rounded-md p-3 border border-gray-800 text-sm">
-                              <div className="text-gray-400 mb-1">Example {i + 1}</div>
+                            <div
+                              key={tc.id}
+                              className="bg-gray-900 rounded-md p-3 border border-gray-800 text-sm"
+                            >
+                              <div className="text-gray-400 mb-1">
+                                Example {i + 1}
+                              </div>
                               <div className="space-y-1">
                                 <div>
                                   <span className="text-gray-400">Input: </span>
@@ -1438,7 +1800,9 @@ export default function ProblemPageClient({ params }: PageProps) {
                                   </code>
                                 </div>
                                 <div>
-                                  <span className="text-gray-400">Output: </span>
+                                  <span className="text-gray-400">
+                                    Output:{" "}
+                                  </span>
                                   <code className="text-white font-mono bg-gray-800 px-1.5 py-0.5 rounded-md text-xs">
                                     {tc.expectedOutput}
                                   </code>
@@ -1451,7 +1815,9 @@ export default function ProblemPageClient({ params }: PageProps) {
                     )}
                     {problem.constraints && (
                       <div>
-                        <h3 className="text-base font-semibold text-white mb-2">Constraints</h3>
+                        <h3 className="text-base font-semibold text-white mb-2">
+                          Constraints
+                        </h3>
                         <div className="text-gray-300 whitespace-pre-wrap font-mono text-xs bg-gray-900 rounded-md p-3 border border-gray-800">
                           {problem.constraints}
                         </div>
@@ -1471,9 +1837,13 @@ export default function ProblemPageClient({ params }: PageProps) {
                         </button>
                       </div>
                     ) : loadingSubmissions ? (
-                      <div className="text-center py-8 text-gray-400">Loading...</div>
+                      <div className="text-center py-8 text-gray-400">
+                        Loading...
+                      </div>
                     ) : submissions.length === 0 ? (
-                      <div className="text-center py-8 text-gray-400">No submissions yet</div>
+                      <div className="text-center py-8 text-gray-400">
+                        No submissions yet
+                      </div>
                     ) : (
                       submissions.map((sub) => (
                         <div
@@ -1485,7 +1855,9 @@ export default function ProblemPageClient({ params }: PageProps) {
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className={`font-medium ${statusColors[sub.status]}`}>
+                            <span
+                              className={`font-medium ${statusColors[sub.status]}`}
+                            >
                               {statusLabels[sub.status]}
                             </span>
                             <span className="text-gray-500 text-xs">
@@ -1502,19 +1874,29 @@ export default function ProblemPageClient({ params }: PageProps) {
                       <div className="text-gray-500">No hints available.</div>
                     ) : (
                       hints.map((hint, i) => (
-                        <div key={i} className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
+                        <div
+                          key={hint.slice(0, 40)}
+                          className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden"
+                        >
                           <button
                             onClick={() => toggleHint(i)}
                             className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-800/50 transition"
                           >
-                            <span className="text-white font-medium text-sm">Hint {i + 1}</span>
+                            <span className="text-white font-medium text-sm">
+                              Hint {i + 1}
+                            </span>
                             <svg
                               className={`w-4 h-4 text-gray-400 transition-transform ${revealedHints.has(i) ? "rotate-180" : ""}`}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
                             >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
                             </svg>
                           </button>
                           {revealedHints.has(i) && (
@@ -1529,10 +1911,14 @@ export default function ProblemPageClient({ params }: PageProps) {
                 ) : (
                   <div className="space-y-3">
                     {!solutions[slug] ? (
-                      <div className="text-center py-8 text-gray-400">Solution coming soon!</div>
+                      <div className="text-center py-8 text-gray-400">
+                        Solution coming soon!
+                      </div>
                     ) : !problemSolved && !showSolution ? (
                       <div className="text-center py-8">
-                        <div className="text-gray-400 mb-4 text-sm">Solve the problem to unlock the solution</div>
+                        <div className="text-gray-400 mb-4 text-sm">
+                          Solve the problem to unlock the solution
+                        </div>
                         <button
                           onClick={() => setShowSolution(true)}
                           className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-md text-sm"
@@ -1543,13 +1929,23 @@ export default function ProblemPageClient({ params }: PageProps) {
                     ) : (
                       <div className="space-y-3">
                         <div className="bg-gray-900 rounded-md border border-gray-800 p-3">
-                          <h4 className="text-white font-medium text-sm mb-2">Approach</h4>
-                          <p className="text-gray-300 text-sm">{solutions[slug].approach}</p>
+                          <h4 className="text-white font-medium text-sm mb-2">
+                            Approach
+                          </h4>
+                          <p className="text-gray-300 text-sm">
+                            {solutions[slug].approach}
+                          </p>
                         </div>
                         <div className="bg-gray-900 rounded-md border border-gray-800 p-3">
-                          <h4 className="text-white font-medium text-sm mb-2">Complexity</h4>
-                          <p className="text-gray-400 text-xs">Time: {solutions[slug].timeComplexity}</p>
-                          <p className="text-gray-400 text-xs">Space: {solutions[slug].spaceComplexity}</p>
+                          <h4 className="text-white font-medium text-sm mb-2">
+                            Complexity
+                          </h4>
+                          <p className="text-gray-400 text-xs">
+                            Time: {solutions[slug].timeComplexity}
+                          </p>
+                          <p className="text-gray-400 text-xs">
+                            Space: {solutions[slug].spaceComplexity}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -1569,8 +1965,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                     className="flex items-center gap-1 px-2 py-1 bg-gray-800 border border-gray-700 rounded-md text-white text-xs"
                   >
                     <span>{selectedLanguage?.name || "Language"}</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </button>
                   {showLangDropdown && (
@@ -1583,7 +1989,9 @@ export default function ProblemPageClient({ params }: PageProps) {
                             setShowLangDropdown(false);
                           }}
                           className={`w-full px-3 py-2 text-xs text-left hover:bg-gray-700 ${
-                            selectedLanguageId === t.languageId ? "text-indigo-400" : "text-white"
+                            selectedLanguageId === t.languageId
+                              ? "text-indigo-400"
+                              : "text-white"
                           }`}
                         >
                           {t.languageName}
@@ -1594,7 +2002,9 @@ export default function ProblemPageClient({ params }: PageProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs font-mono ${problemSolved ? "text-emerald-400" : "text-white"}`}>
+                  <span
+                    className={`text-xs font-mono ${problemSolved ? "text-emerald-400" : "text-white"}`}
+                  >
                     {formatTime(timerSeconds)}
                   </span>
                   <button
@@ -1623,15 +2033,19 @@ export default function ProblemPageClient({ params }: PageProps) {
               <div className="flex-1 min-h-0">
                 <MonacoEditor
                   height="100%"
-            language={monacoLanguage}
-            value={code}
-            onChange={(value) => { setCode(value || ""); }}
-            theme={editorTheme}
-            beforeMount={handleEditorWillMount}
-            onMount={(editor, monaco) => setupJavaValidation(editor, monaco)}
-            options={{
-              fontSize,
-              tabSize,
+                  language={monacoLanguage}
+                  value={code}
+                  onChange={(value) => {
+                    setCode(value || "");
+                  }}
+                  theme={editorTheme}
+                  beforeMount={handleEditorWillMount}
+                  onMount={(editor, monaco) =>
+                    setupJavaValidation(editor, monaco)
+                  }
+                  options={{
+                    fontSize,
+                    tabSize,
                     fontFamily: "JetBrains Mono, monospace",
                     minimap: { enabled: false },
                     scrollBeyondLastLine: false,
@@ -1706,47 +2120,72 @@ export default function ProblemPageClient({ params }: PageProps) {
                 <div className="space-y-2">
                   {submission && (
                     <div className="flex items-center justify-between mb-3 p-2 rounded-md bg-gray-900">
-                      <span className={`font-semibold text-sm ${statusColors[submission.status]}`}>
+                      <span
+                        className={`font-semibold text-sm ${statusColors[submission.status]}`}
+                      >
                         {statusLabels[submission.status]}
                       </span>
                       <span className="text-gray-400 text-xs">
-                        {submission.testCasesPassed}/{submission.testCasesTotal} passed
+                        {submission.testCasesPassed}/{submission.testCasesTotal}{" "}
+                        passed
                       </span>
                     </div>
                   )}
 
                   {runResults && (
                     <div className="flex items-center justify-between mb-3 p-2 rounded-md bg-gray-900">
-                      <span className="font-semibold text-sm text-blue-400">Run Results</span>
+                      <span className="font-semibold text-sm text-blue-400">
+                        Run Results
+                      </span>
                       <span className="text-gray-400 text-xs">
-                        {runResults.filter((r) => r.status === "accepted").length}/{runResults.length} passed
+                        {
+                          runResults.filter((r) => r.status === "accepted")
+                            .length
+                        }
+                        /{runResults.length} passed
                       </span>
                     </div>
                   )}
 
-                  {submission?.results?.map((result: SubmissionResult, i: number) => (
-                    <div
-                      key={result.id}
-                      className={`p-2 rounded-md border text-sm ${
-                        result.status === "accepted"
-                          ? "bg-emerald-500/10 border-emerald-500/30"
-                          : "bg-red-500/10 border-red-500/30"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-white text-xs">Test {i + 1}</span>
-                        <span className={`text-xs ${statusColors[result.status]}`}>
-                          {statusLabels[result.status]}
-                        </span>
-                      </div>
-                      {result.status !== "accepted" && (
-                        <div className="text-xs space-y-0.5">
-                          <div><span className="text-gray-400">Expected:</span> <code className="text-emerald-400">{result.expectedOutput}</code></div>
-                          <div><span className="text-gray-400">Got:</span> <code className="text-red-400">{result.actualOutput || "No output"}</code></div>
+                  {submission?.results?.map(
+                    (result: SubmissionResult, i: number) => (
+                      <div
+                        key={result.id}
+                        className={`p-2 rounded-md border text-sm ${
+                          result.status === "accepted"
+                            ? "bg-emerald-500/10 border-emerald-500/30"
+                            : "bg-red-500/10 border-red-500/30"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-white text-xs">
+                            Test {i + 1}
+                          </span>
+                          <span
+                            className={`text-xs ${statusColors[result.status]}`}
+                          >
+                            {statusLabels[result.status]}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        {result.status !== "accepted" && (
+                          <div className="text-xs space-y-0.5">
+                            <div>
+                              <span className="text-gray-400">Expected:</span>{" "}
+                              <code className="text-emerald-400">
+                                {result.expectedOutput}
+                              </code>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Got:</span>{" "}
+                              <code className="text-red-400">
+                                {result.actualOutput || "No output"}
+                              </code>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  )}
 
                   {runResults?.map((result: RunCodeResult, i: number) => (
                     <div
@@ -1758,27 +2197,64 @@ export default function ProblemPageClient({ params }: PageProps) {
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-white text-xs">Test {i + 1}</span>
-                        <span className={`text-xs ${statusColors[result.status]}`}>
+                        <span className="font-medium text-white text-xs">
+                          Test {i + 1}
+                        </span>
+                        <span
+                          className={`text-xs ${statusColors[result.status]}`}
+                        >
                           {statusLabels[result.status]}
                         </span>
                       </div>
                       <div className="text-xs space-y-0.5">
-                        <div><span className="text-gray-400">Expected:</span> <code className="text-emerald-400">{result.expectedOutput}</code></div>
-                        <div><span className="text-gray-400">Output:</span> <code className={result.status === "accepted" ? "text-emerald-400" : "text-red-400"}>{result.actualOutput || "No output"}</code></div>
+                        <div>
+                          <span className="text-gray-400">Expected:</span>{" "}
+                          <code className="text-emerald-400">
+                            {result.expectedOutput}
+                          </code>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Output:</span>{" "}
+                          <code
+                            className={
+                              result.status === "accepted"
+                                ? "text-emerald-400"
+                                : "text-red-400"
+                            }
+                          >
+                            {result.actualOutput || "No output"}
+                          </code>
+                        </div>
                       </div>
                     </div>
                   ))}
 
-                  {!submission && !runResults && testCases.map((tc, i) => (
-                    <div key={tc.id} className="p-2 rounded-md border bg-gray-800/50 border-gray-700 text-sm">
-                      <div className="font-medium text-white text-xs mb-1">Case {i + 1}</div>
-                      <div className="text-xs space-y-0.5">
-                        <div><span className="text-gray-400">Input:</span> <code className="text-white">{tc.input.replace(/\n/g, ", ")}</code></div>
-                        <div><span className="text-gray-400">Expected:</span> <code className="text-emerald-400">{tc.expectedOutput}</code></div>
+                  {!submission &&
+                    !runResults &&
+                    testCases.map((tc, i) => (
+                      <div
+                        key={tc.id}
+                        className="p-2 rounded-md border bg-gray-800/50 border-gray-700 text-sm"
+                      >
+                        <div className="font-medium text-white text-xs mb-1">
+                          Case {i + 1}
+                        </div>
+                        <div className="text-xs space-y-0.5">
+                          <div>
+                            <span className="text-gray-400">Input:</span>{" "}
+                            <code className="text-white">
+                              {tc.input.replace(/\n/g, ", ")}
+                            </code>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Expected:</span>{" "}
+                            <code className="text-emerald-400">
+                              {tc.expectedOutput}
+                            </code>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : (
                 <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
@@ -1796,8 +2272,18 @@ export default function ProblemPageClient({ params }: PageProps) {
             className="fixed bottom-4 right-4 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md shadow-lg transition-colors z-40 tooltip-wrap"
             data-tooltip="Open Thor AI"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
             </svg>
           </button>
         )}
@@ -1809,7 +2295,10 @@ export default function ProblemPageClient({ params }: PageProps) {
               problemTitle={problem.title}
               problemDescription={problem.description}
               code={code}
-              language={languages.find((l) => l.id === selectedLanguageId)?.slug || "java"}
+              language={
+                languages.find((l) => l.id === selectedLanguageId)?.slug ||
+                "java"
+              }
               errorMessage={errorForAI}
               isOpen={isAIChatOpen}
               onClose={() => setIsAIChatOpen(false)}
@@ -1821,7 +2310,8 @@ export default function ProblemPageClient({ params }: PageProps) {
   }
 
   // Get current language name for AI
-  const currentLanguageName = languages.find((l) => l.id === selectedLanguageId)?.slug || "java";
+  const currentLanguageName =
+    languages.find((l) => l.id === selectedLanguageId)?.slug || "java";
 
   // Calculate middle panel width
   const effectiveLeftWidth = showDescription ? leftPanelWidth : 0;
@@ -1835,361 +2325,363 @@ export default function ProblemPageClient({ params }: PageProps) {
       {/* skipcq: JS-0415 */}
       {/* Left Panel - Problem Description */}
       {showDescription && (
-      <div
-        className="flex flex-col h-full overflow-hidden"
-        style={{ width: `${leftPanelWidth}%` }}
-      >
-        {/* Tabs */}
-        <div className="flex items-center border-b border-gray-800">
-          <button
-            onClick={handleBack}
-            className="px-3 py-3 text-gray-500 hover:text-white transition"
-            title="Back to problems"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        <div
+          className="flex flex-col h-full overflow-hidden"
+          style={{ width: `${leftPanelWidth}%` }}
+        >
+          {/* Tabs */}
+          <div className="flex items-center border-b border-gray-800">
+            <button
+              onClick={handleBack}
+              className="px-3 py-3 text-gray-500 hover:text-white transition"
+              title="Back to problems"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() => setActiveTab("description")}
-            className={`px-6 py-3 font-medium transition ${
-              activeTab === "description"
-                ? "text-white border-b-2 border-indigo-500"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Description
-          </button>
-          <button
-            onClick={() => setActiveTab("submissions")}
-            className={`px-6 py-3 font-medium transition ${
-              activeTab === "submissions"
-                ? "text-white border-b-2 border-indigo-500"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Submissions
-          </button>
-          <button
-            onClick={() => setActiveTab("hints")}
-            className={`px-6 py-3 font-medium transition ${
-              activeTab === "hints"
-                ? "text-white border-b-2 border-indigo-500"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Hints
-          </button>
-          <button
-            onClick={() => setActiveTab("solution")}
-            className={`px-6 py-3 font-medium transition ${
-              activeTab === "solution"
-                ? "text-white border-b-2 border-indigo-500"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
-            Solution
-          </button>
-        </div>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={() => setActiveTab("description")}
+              className={`px-6 py-3 font-medium transition ${
+                activeTab === "description"
+                  ? "text-white border-b-2 border-indigo-500"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              Description
+            </button>
+            <button
+              onClick={() => setActiveTab("submissions")}
+              className={`px-6 py-3 font-medium transition ${
+                activeTab === "submissions"
+                  ? "text-white border-b-2 border-indigo-500"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              Submissions
+            </button>
+            <button
+              onClick={() => setActiveTab("hints")}
+              className={`px-6 py-3 font-medium transition ${
+                activeTab === "hints"
+                  ? "text-white border-b-2 border-indigo-500"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              Hints
+            </button>
+            <button
+              onClick={() => setActiveTab("solution")}
+              className={`px-6 py-3 font-medium transition ${
+                activeTab === "solution"
+                  ? "text-white border-b-2 border-indigo-500"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              Solution
+            </button>
+          </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto overscroll-y-contain p-6">
-          {activeTab === "description" ? (
-            <div className="space-y-6">
-              {/* Title & Difficulty */}
-              <div>
-                <h1 className="text-2xl font-bold text-white mb-2">
-                  {problem.title}
-                </h1>
-                <span
-                  className={`text-sm font-medium ${difficultyColors[problem.difficulty]}`}
-                >
-                  {problem.difficulty}
-                </span>
-              </div>
-
-              {/* Description */}
-              <div className="prose prose-invert max-w-none">
-                <div className="text-gray-300 whitespace-pre-wrap">
-                  {problem.description}
-                </div>
-              </div>
-
-              {/* Examples */}
-              {testCases.length > 0 && (
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto overscroll-y-contain p-6">
+            {activeTab === "description" ? (
+              <div className="space-y-6">
+                {/* Title & Difficulty */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">
-                    Examples
-                  </h3>
-                  <div className="space-y-4">
-                    {testCases.map((tc, i) => (
-                      <div
-                        key={tc.id}
-                        className="bg-gray-900 rounded-md p-4 border border-gray-800"
-                      >
-                        <div className="text-sm text-gray-400 mb-2">
-                          Example {i + 1}
-                        </div>
-                        <div className="space-y-2">
-                          <div>
-                            <span className="text-gray-400">Input: </span>
-                            <code className="text-white font-mono bg-gray-800 px-2 py-0.5 rounded-md">
-                              {tc.input.replace(/\n/g, ", ")}
-                            </code>
-                          </div>
-                          <div>
-                            <span className="text-gray-400">Output: </span>
-                            <code className="text-white font-mono bg-gray-800 px-2 py-0.5 rounded-md">
-                              {tc.expectedOutput}
-                            </code>
-                          </div>
-                          {tc.explanation && (
-                            <div className="text-gray-400 text-sm mt-2">
-                              {tc.explanation}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                  <h1 className="text-2xl font-bold text-white mb-2">
+                    {problem.title}
+                  </h1>
+                  <span
+                    className={`text-sm font-medium ${difficultyColors[problem.difficulty]}`}
+                  >
+                    {problem.difficulty}
+                  </span>
+                </div>
+
+                {/* Description */}
+                <div className="prose prose-invert max-w-none">
+                  <div className="text-gray-300 whitespace-pre-wrap">
+                    {problem.description}
                   </div>
                 </div>
-              )}
 
-              {/* Constraints */}
-              {problem.constraints && (
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-3">
-                    Constraints
-                  </h3>
-                  <div className="text-gray-300 whitespace-pre-wrap font-mono text-sm bg-gray-900 rounded-md p-4 border border-gray-800">
-                    {problem.constraints}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : activeTab === "submissions" ? (
-            <div className="space-y-4">
-              {!isAuthenticated ? (
-                <div className="text-center py-8 text-gray-400">
-                  <p>Sign in to view your submissions</p>
-                  <button
-                    onClick={() => router.push("/login")}
-                    className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md"
-                  >
-                    Sign in
-                  </button>
-                </div>
-              ) : loadingSubmissions ? (
-                <div className="text-center py-8 text-gray-400">
-                  Loading submissions...
-                </div>
-              ) : submissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  No submissions yet
-                </div>
-              ) : (
-                submissions.map((sub) => (
-                  <div
-                    key={sub.id}
-                    className={`p-4 rounded-md border ${
-                      sub.status === "accepted"
-                        ? "bg-emerald-500/10 border-emerald-500/30"
-                        : "bg-gray-900 border-gray-800"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`font-medium ${statusColors[sub.status]}`}
+                {/* Examples */}
+                {testCases.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">
+                      Examples
+                    </h3>
+                    <div className="space-y-4">
+                      {testCases.map((tc, i) => (
+                        <div
+                          key={tc.id}
+                          className="bg-gray-900 rounded-md p-4 border border-gray-800"
                         >
-                          {statusLabels[sub.status]}
-                        </span>
-                        <span className="text-gray-500 text-sm">
-                          {sub.testCasesPassed}/{sub.testCasesTotal} passed
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        {sub.runtimeMs && <span>{sub.runtimeMs}ms</span>}
-                        <span>
-                          {new Date(sub.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
+                          <div className="text-sm text-gray-400 mb-2">
+                            Example {i + 1}
+                          </div>
+                          <div className="space-y-2">
+                            <div>
+                              <span className="text-gray-400">Input: </span>
+                              <code className="text-white font-mono bg-gray-800 px-2 py-0.5 rounded-md">
+                                {tc.input.replace(/\n/g, ", ")}
+                              </code>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Output: </span>
+                              <code className="text-white font-mono bg-gray-800 px-2 py-0.5 rounded-md">
+                                {tc.expectedOutput}
+                              </code>
+                            </div>
+                            {tc.explanation && (
+                              <div className="text-gray-400 text-sm mt-2">
+                                {tc.explanation}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          ) : activeTab === "hints" ? (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white mb-4">
-                Progressive Hints
-              </h3>
-              <p className="text-gray-400 text-sm mb-4">
-                Try to solve the problem on your own first. Click to reveal
-                hints one at a time.
-              </p>
-              {hints.length === 0 ? (
-                <div className="text-gray-500">
-                  No hints available for this problem.
-                </div>
-              ) : (
-                hints.map((hint, i) => (
-                  <div
-                    key={i}
-                    className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden"
-                  >
+                )}
+
+                {/* Constraints */}
+                {problem.constraints && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-3">
+                      Constraints
+                    </h3>
+                    <div className="text-gray-300 whitespace-pre-wrap font-mono text-sm bg-gray-900 rounded-md p-4 border border-gray-800">
+                      {problem.constraints}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : activeTab === "submissions" ? (
+              <div className="space-y-4">
+                {!isAuthenticated ? (
+                  <div className="text-center py-8 text-gray-400">
+                    <p>Sign in to view your submissions</p>
                     <button
-                      onClick={() => toggleHint(i)}
-                      className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-800/50 transition"
+                      onClick={() => router.push("/login")}
+                      className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md"
                     >
-                      <span className="text-white font-medium">
-                        Hint {i + 1}
-                      </span>
-                      <svg
-                        className={`w-5 h-5 text-gray-400 transition-transform ${revealedHints.has(i) ? "rotate-180" : ""}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
+                      Sign in
                     </button>
-                    {revealedHints.has(i) && (
-                      <div className="px-4 pb-4 text-gray-300 border-t border-gray-800 pt-3">
-                        {hint}
+                  </div>
+                ) : loadingSubmissions ? (
+                  <div className="text-center py-8 text-gray-400">
+                    Loading submissions...
+                  </div>
+                ) : submissions.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400">
+                    No submissions yet
+                  </div>
+                ) : (
+                  submissions.map((sub) => (
+                    <div
+                      key={sub.id}
+                      className={`p-4 rounded-md border ${
+                        sub.status === "accepted"
+                          ? "bg-emerald-500/10 border-emerald-500/30"
+                          : "bg-gray-900 border-gray-800"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`font-medium ${statusColors[sub.status]}`}
+                          >
+                            {statusLabels[sub.status]}
+                          </span>
+                          <span className="text-gray-500 text-sm">
+                            {sub.testCasesPassed}/{sub.testCasesTotal} passed
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          {sub.runtimeMs && <span>{sub.runtimeMs}ms</span>}
+                          <span>
+                            {new Date(sub.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          ) : activeTab === "solution" ? (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white mb-4">
-                Solution
-              </h3>
-              {!solutions[slug] ? (
-                <div className="text-center py-12">
-                  <svg
-                    className="w-16 h-16 mx-auto text-gray-600 mb-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
-                  </svg>
-                  <div className="text-gray-400 mb-2">
-                    Solution coming soon!
-                  </div>
-                  <p className="text-gray-500 text-sm">
-                    We&apos;re working on adding detailed solutions for all
-                    problems.
-                  </p>
-                </div>
-              ) : !problemSolved && !showSolution ? (
-                <div className="text-center py-8">
-                  <div className="text-gray-400 mb-4">
-                    Solve the problem first to unlock the solution, or click
-                    below to reveal it.
-                  </div>
-                  <button
-                    onClick={() => setShowSolution(true)}
-                    className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-md transition"
-                  >
-                    Reveal Solution
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="bg-gray-900 rounded-md border border-gray-800 p-4">
-                    <h4 className="text-white font-medium mb-3">Approach</h4>
-                    <div className="text-gray-300 text-sm space-y-2">
-                      <p>{solutions[slug].approach}</p>
-                      <ol className="list-decimal list-inside space-y-1 text-gray-400 mt-3">
-                        {solutions[slug].steps.map((step, i) => (
-                          <li key={i}>{step}</li>
-                        ))}
-                      </ol>
                     </div>
+                  ))
+                )}
+              </div>
+            ) : activeTab === "hints" ? (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Progressive Hints
+                </h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Try to solve the problem on your own first. Click to reveal
+                  hints one at a time.
+                </p>
+                {hints.length === 0 ? (
+                  <div className="text-gray-500">
+                    No hints available for this problem.
                   </div>
-                  <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
-                      <h4 className="text-white font-medium">Solution Code</h4>
-                      <span className="text-xs text-gray-500 capitalize">
-                        {solutions[slug].language}
-                      </span>
+                ) : (
+                  hints.map((hint, i) => (
+                    <div
+                      key={hint.slice(0, 40)}
+                      className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden"
+                    >
+                      <button
+                        onClick={() => toggleHint(i)}
+                        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-800/50 transition"
+                      >
+                        <span className="text-white font-medium">
+                          Hint {i + 1}
+                        </span>
+                        <svg
+                          className={`w-5 h-5 text-gray-400 transition-transform ${revealedHints.has(i) ? "rotate-180" : ""}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </button>
+                      {revealedHints.has(i) && (
+                        <div className="px-4 pb-4 text-gray-300 border-t border-gray-800 pt-3">
+                          {hint}
+                        </div>
+                      )}
                     </div>
-                    <div className="h-72">
-                      <MonacoEditor
-                        height="100%"
-                        language={solutions[slug].language}
-                        value={solutions[slug].code}
-                        theme={editorTheme}
-            beforeMount={handleEditorWillMount}
-                        options={{
-                          readOnly: true,
-                          minimap: { enabled: false },
-                          scrollBeyondLastLine: false,
-                          fontSize: 13,
-                          lineNumbers: "on",
-                          folding: false,
-                          padding: { top: 12 },
-                          bracketPairColorization: { enabled: true },
-                          renderIndentGuides: "always" as const,
-                        }}
+                  ))
+                )}
+              </div>
+            ) : activeTab === "solution" ? (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Solution
+                </h3>
+                {!solutions[slug] ? (
+                  <div className="text-center py-12">
+                    <svg
+                      className="w-16 h-16 mx-auto text-gray-600 mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                       />
+                    </svg>
+                    <div className="text-gray-400 mb-2">
+                      Solution coming soon!
+                    </div>
+                    <p className="text-gray-500 text-sm">
+                      We&apos;re working on adding detailed solutions for all
+                      problems.
+                    </p>
+                  </div>
+                ) : !problemSolved && !showSolution ? (
+                  <div className="text-center py-8">
+                    <div className="text-gray-400 mb-4">
+                      Solve the problem first to unlock the solution, or click
+                      below to reveal it.
+                    </div>
+                    <button
+                      onClick={() => setShowSolution(true)}
+                      className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-md transition"
+                    >
+                      Reveal Solution
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-gray-900 rounded-md border border-gray-800 p-4">
+                      <h4 className="text-white font-medium mb-3">Approach</h4>
+                      <div className="text-gray-300 text-sm space-y-2">
+                        <p>{solutions[slug].approach}</p>
+                        <ol className="list-decimal list-inside space-y-1 text-gray-400 mt-3">
+                          {solutions[slug].steps.map((step) => (
+                                <li key={step}>{step}</li>
+                              ))}
+                        </ol>
+                      </div>
+                    </div>
+                    <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                        <h4 className="text-white font-medium">
+                          Solution Code
+                        </h4>
+                        <span className="text-xs text-gray-500 capitalize">
+                          {solutions[slug].language}
+                        </span>
+                      </div>
+                      <div className="h-72">
+                        <MonacoEditor
+                          height="100%"
+                          language={solutions[slug].language}
+                          value={solutions[slug].code}
+                          theme={editorTheme}
+                          beforeMount={handleEditorWillMount}
+                          options={{
+                            readOnly: true,
+                            minimap: { enabled: false },
+                            scrollBeyondLastLine: false,
+                            fontSize: 13,
+                            lineNumbers: "on",
+                            folding: false,
+                            padding: { top: 12 },
+                            bracketPairColorization: { enabled: true },
+                            renderIndentGuides: "always" as const,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="bg-gray-900 rounded-md border border-gray-800 p-4">
+                      <h4 className="text-white font-medium mb-2">
+                        Complexity Analysis
+                      </h4>
+                      <div className="text-sm text-gray-400 space-y-1">
+                        <p>
+                          <span className="text-gray-300">Time:</span>{" "}
+                          {solutions[slug].timeComplexity}
+                        </p>
+                        <p>
+                          <span className="text-gray-300">Space:</span>{" "}
+                          {solutions[slug].spaceComplexity}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="bg-gray-900 rounded-md border border-gray-800 p-4">
-                    <h4 className="text-white font-medium mb-2">
-                      Complexity Analysis
-                    </h4>
-                    <div className="text-sm text-gray-400 space-y-1">
-                      <p>
-                        <span className="text-gray-300">Time:</span>{" "}
-                        {solutions[slug].timeComplexity}
-                      </p>
-                      <p>
-                        <span className="text-gray-300">Space:</span>{" "}
-                        {solutions[slug].spaceComplexity}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : null}
+                )}
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
       )}
 
       {/* Resizer */}
       {showDescription && (
-      <div
-        ref={dividerRef}
-        onMouseDown={handleLeftResize}
-        className="w-1 bg-gray-800 hover:bg-indigo-500 cursor-col-resize transition-colors flex-shrink-0"
-      />
+        <div
+          ref={dividerRef}
+          onMouseDown={handleLeftResize}
+          className="w-1 bg-gray-800 hover:bg-indigo-500 cursor-col-resize transition-colors flex-shrink-0"
+        />
       )}
 
       {/* Middle Panel - Code Editor */}
@@ -2265,8 +2757,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                 className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
                 data-tooltip="Decrease font size"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 12H4"
+                  />
                 </svg>
               </button>
               <span className="text-gray-400 text-sm w-6 text-center font-mono">
@@ -2277,8 +2779,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                 className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
                 data-tooltip="Increase font size"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
               </button>
             </div>
@@ -2331,8 +2843,18 @@ export default function ProblemPageClient({ params }: PageProps) {
               className="p-1.5 text-gray-400 hover:text-white transition tooltip-wrap"
               data-tooltip="Format code"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16m-7 6h7"
+                />
               </svg>
             </button>
 
@@ -2342,8 +2864,18 @@ export default function ProblemPageClient({ params }: PageProps) {
               className={`p-1.5 transition tooltip-wrap ${wordWrap ? "text-indigo-400" : "text-gray-400 hover:text-white"}`}
               data-tooltip="Toggle word wrap"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h10" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h10"
+                />
               </svg>
             </button>
 
@@ -2351,19 +2883,43 @@ export default function ProblemPageClient({ params }: PageProps) {
             <button
               onClick={() => setShowDescription(!showDescription)}
               className={`p-1.5 transition tooltip-wrap ${showDescription ? "text-gray-400 hover:text-white" : "text-indigo-400"}`}
-              data-tooltip={showDescription ? "Hide description" : "Show description"}
+              data-tooltip={
+                showDescription ? "Hide description" : "Show description"
+              }
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
             </button>
 
             {/* Save indicator */}
-            <span className={`text-xs ${saveStatus === "saved" ? "text-emerald-400" : "text-amber-400"}`}>
+            <span
+              className={`text-xs ${saveStatus === "saved" ? "text-emerald-400" : "text-amber-400"}`}
+            >
               {saveStatus === "saved" ? (
                 <span className="flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   Saved
                 </span>
@@ -2468,9 +3024,24 @@ export default function ProblemPageClient({ params }: PageProps) {
             >
               {isRunning ? (
                 <span className="flex items-center gap-1.5">
-                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="animate-spin w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Run
                 </span>
@@ -2490,9 +3061,24 @@ export default function ProblemPageClient({ params }: PageProps) {
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-1.5">
-                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="animate-spin w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Submit
                 </span>
@@ -2512,7 +3098,9 @@ export default function ProblemPageClient({ params }: PageProps) {
             height="100%"
             language={monacoLanguage}
             value={code}
-            onChange={(value) => { setCode(value || ""); }}
+            onChange={(value) => {
+              setCode(value || "");
+            }}
             theme={editorTheme}
             beforeMount={handleEditorWillMount}
             onMount={(editor, monaco) => {
@@ -2579,15 +3167,17 @@ export default function ProblemPageClient({ params }: PageProps) {
                 >
                   Test Cases
                   {(submission || runResults) && (
-                    <span className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
-                      (submission?.status === "accepted" || runResults?.every(r => r.status === "accepted"))
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}>
+                    <span
+                      className={`ml-2 px-1.5 py-0.5 text-xs rounded-full ${
+                        submission?.status === "accepted" ||
+                        runResults?.every((r) => r.status === "accepted")
+                          ? "bg-emerald-500/20 text-emerald-400"
+                          : "bg-red-500/20 text-red-400"
+                      }`}
+                    >
                       {submission
                         ? `${submission.testCasesPassed}/${submission.testCasesTotal}`
-                        : `${runResults?.filter(r => r.status === "accepted").length || 0}/${runResults?.length || 0}`
-                      }
+                        : `${runResults?.filter((r) => r.status === "accepted").length || 0}/${runResults?.length || 0}`}
                     </span>
                   )}
                 </button>
@@ -2688,15 +3278,24 @@ export default function ProblemPageClient({ params }: PageProps) {
                             }`}
                           >
                             <button
-                              onClick={() => setExpandedTestCase(isExpanded ? null : i)}
+                              onClick={() =>
+                                setExpandedTestCase(isExpanded ? null : i)
+                              }
                               className="w-full flex items-center justify-between p-3 text-left"
                             >
                               <div className="flex items-center gap-2 min-w-0">
                                 <svg
                                   className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
-                                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
                                 >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 5l7 7-7 7"
+                                  />
                                 </svg>
                                 <span className="font-medium text-white text-sm">
                                   Case {i + 1} {result.isSample && "(Sample)"}
@@ -2704,9 +3303,13 @@ export default function ProblemPageClient({ params }: PageProps) {
                               </div>
                               <div className="flex items-center gap-3 flex-shrink-0">
                                 {result.runtimeMs && (
-                                  <span className="text-xs text-gray-400">{result.runtimeMs}ms</span>
+                                  <span className="text-xs text-gray-400">
+                                    {result.runtimeMs}ms
+                                  </span>
                                 )}
-                                <span className={`text-xs font-medium ${statusColors[result.status]}`}>
+                                <span
+                                  className={`text-xs font-medium ${statusColors[result.status]}`}
+                                >
                                   {statusLabels[result.status]}
                                 </span>
                               </div>
@@ -2716,24 +3319,36 @@ export default function ProblemPageClient({ params }: PageProps) {
                                 {!isPassed && (
                                   <>
                                     <div>
-                                      <span className="text-gray-400">Input: </span>
+                                      <span className="text-gray-400">
+                                        Input:{" "}
+                                      </span>
                                       <code className="text-white font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md">
                                         {result.input}
                                       </code>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                       <div>
-                                        <span className="text-gray-400">Expected:</span>
-                                        <code className="text-emerald-400 font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md">{result.expectedOutput}</code>
+                                        <span className="text-gray-400">
+                                          Expected:
+                                        </span>
+                                        <code className="text-emerald-400 font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md">
+                                          {result.expectedOutput}
+                                        </code>
                                       </div>
                                       <div>
-                                        <span className="text-gray-400">Got:</span>
-                                        <code className="text-red-400 font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md">{result.actualOutput || "No output"}</code>
+                                        <span className="text-gray-400">
+                                          Got:
+                                        </span>
+                                        <code className="text-red-400 font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md">
+                                          {result.actualOutput || "No output"}
+                                        </code>
                                       </div>
                                     </div>
                                     {result.errorMessage && (
                                       <div>
-                                        <span className="text-gray-400">Error: </span>
+                                        <span className="text-gray-400">
+                                          Error:{" "}
+                                        </span>
                                         <code className="text-red-400 font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md whitespace-pre-wrap">
                                           {result.errorMessage}
                                         </code>
@@ -2743,8 +3358,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                                 )}
                                 {isPassed && (
                                   <div className="text-emerald-400 text-xs flex items-center gap-1">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M5 13l4 4L19 7"
+                                      />
                                     </svg>
                                     All checks passed
                                   </div>
@@ -2758,7 +3383,9 @@ export default function ProblemPageClient({ params }: PageProps) {
 
                     {/* Show run results */}
                     {runResults?.map((result: RunCodeResult, i: number) => {
-                      const isExpanded = expandedTestCase === i + (submission?.results?.length || 0);
+                      const isExpanded =
+                        expandedTestCase ===
+                        i + (submission?.results?.length || 0);
                       const isPassed = result.status === "accepted";
                       return (
                         <div
@@ -2770,15 +3397,28 @@ export default function ProblemPageClient({ params }: PageProps) {
                           }`}
                         >
                           <button
-                            onClick={() => setExpandedTestCase(isExpanded ? null : i + (submission?.results?.length || 0))}
+                            onClick={() =>
+                              setExpandedTestCase(
+                                isExpanded
+                                  ? null
+                                  : i + (submission?.results?.length || 0)
+                              )
+                            }
                             className="w-full flex items-center justify-between p-3 text-left"
                           >
                             <div className="flex items-center gap-2 min-w-0">
                               <svg
                                 className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`}
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
                               >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
                               </svg>
                               <span className="font-medium text-white text-sm">
                                 Case {i + 1} {result.isCustom && "(Custom)"}
@@ -2786,9 +3426,13 @@ export default function ProblemPageClient({ params }: PageProps) {
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0">
                               {result.runtimeMs && (
-                                <span className="text-xs text-gray-400">{result.runtimeMs}ms</span>
+                                <span className="text-xs text-gray-400">
+                                  {result.runtimeMs}ms
+                                </span>
                               )}
-                              <span className={`text-xs font-medium ${statusColors[result.status]}`}>
+                              <span
+                                className={`text-xs font-medium ${statusColors[result.status]}`}
+                              >
                                 {statusLabels[result.status]}
                               </span>
                             </div>
@@ -2803,12 +3447,20 @@ export default function ProblemPageClient({ params }: PageProps) {
                               </div>
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <span className="text-gray-400">Expected:</span>
-                                  <code className="text-emerald-400 font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md">{result.expectedOutput}</code>
+                                  <span className="text-gray-400">
+                                    Expected:
+                                  </span>
+                                  <code className="text-emerald-400 font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md">
+                                    {result.expectedOutput}
+                                  </code>
                                 </div>
                                 <div>
                                   <span className="text-gray-400">Output:</span>
-                                  <code className={`font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md ${isPassed ? "text-emerald-400" : "text-red-400"}`}>{result.actualOutput || "No output"}</code>
+                                  <code
+                                    className={`font-mono text-xs block mt-1 bg-gray-800/50 p-2 rounded-md ${isPassed ? "text-emerald-400" : "text-red-400"}`}
+                                  >
+                                    {result.actualOutput || "No output"}
+                                  </code>
                                 </div>
                               </div>
                               {result.errorMessage && (
@@ -2821,8 +3473,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                               )}
                               {isPassed && !result.errorMessage && (
                                 <div className="text-emerald-400 text-xs flex items-center gap-1">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M5 13l4 4L19 7"
+                                    />
                                   </svg>
                                   All checks passed
                                 </div>
@@ -2911,8 +3573,18 @@ export default function ProblemPageClient({ params }: PageProps) {
           className="fixed bottom-4 right-4 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md shadow-lg transition-colors z-40"
           title="Open Thor AI (Ctrl+Shift+A)"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
           </svg>
         </button>
       )}
@@ -2920,14 +3592,35 @@ export default function ProblemPageClient({ params }: PageProps) {
       {/* Keyboard shortcuts modal */}
       {/* skipcq: JS-0415 */}
       {showShortcuts && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={() => setShowShortcuts(false)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          onClick={() => setShowShortcuts(false)}
+        >
           <div className="absolute inset-0 bg-black/60" />
-          <div className="relative bg-gray-900 border border-gray-700 rounded-md p-6 w-full max-w-sm shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="relative bg-gray-900 border border-gray-700 rounded-md p-6 w-full max-w-sm shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-semibold text-lg">Keyboard Shortcuts</h3>
-              <button onClick={() => setShowShortcuts(false)} className="text-gray-400 hover:text-white">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <h3 className="text-white font-semibold text-lg">
+                Keyboard Shortcuts
+              </h3>
+              <button
+                onClick={() => setShowShortcuts(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -2940,8 +3633,13 @@ export default function ProblemPageClient({ params }: PageProps) {
                 ["Esc", "Exit fullscreen"],
                 ["?", "Toggle this menu"],
               ].map(([key, desc]) => (
-                <div key={key} className="flex items-center justify-between py-1.5">
-                  <kbd className="px-2 py-0.5 bg-gray-800 border border-gray-600 rounded-md text-xs text-gray-300 font-mono">{key}</kbd>
+                <div
+                  key={key}
+                  className="flex items-center justify-between py-1.5"
+                >
+                  <kbd className="px-2 py-0.5 bg-gray-800 border border-gray-600 rounded-md text-xs text-gray-300 font-mono">
+                    {key}
+                  </kbd>
                   <span className="text-gray-400">{desc}</span>
                 </div>
               ))}

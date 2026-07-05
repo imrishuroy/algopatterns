@@ -7,7 +7,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
   loading: () => (
-    <div className="h-64 rounded-md animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+    <div
+      className="h-64 rounded-md animate-pulse"
+      style={{ background: "var(--bg-elevated)" }}
+    />
   ),
   ssr: false,
 });

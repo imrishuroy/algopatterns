@@ -84,6 +84,7 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 
 const initialPlayState: PlayState = { step: 0, isPlaying: false };
 
+// skipcq: JS-0067
 export default function DPTransformationVisualizer() {
   const [currentStage, setCurrentStage] = useState<Stage>("recursion");
   const [{ step, isPlaying }, dispatch] = useReducer(
@@ -211,6 +212,8 @@ export default function DPTransformationVisualizer() {
 
   const stageInfo = stages[currentStage];
 
+// skipcq: JS-R1005
+
   const renderRecursion = () => {
     const currentTrace = trace.slice(0, step) as RecursionTraceItem[];
     const callStack: string[] = [];
@@ -222,7 +225,11 @@ export default function DPTransformationVisualizer() {
         callStack.push(traceItem.call);
       } else if (traceItem.action === "exit") {
         callStack.pop();
-        completed.push({ call: traceItem.call, result: traceItem.result!, stepIdx: idx });
+        completed.push({
+          call: traceItem.call,
+          result: traceItem.result ?? 0,
+          stepIdx: idx,
+        });
       }
     }
 
@@ -268,7 +275,8 @@ export default function DPTransformationVisualizer() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={`p-2 mb-2 rounded-md font-mono text-sm ${
-                    (currentTrace[step - 1] as { duplicate?: boolean })?.duplicate
+                    (currentTrace[step - 1] as { duplicate?: boolean })
+                      ?.duplicate
                       ? "bg-red-500/20 border border-red-500 text-red-400"
                       : "bg-green-500/20 text-green-400"
                   }`}
@@ -288,7 +296,7 @@ export default function DPTransformationVisualizer() {
           >
             <span className="text-red-400 font-medium">Duplicate work!</span>
             <span className="text-red-300 ml-2">
-              {currentStep!.call} is being computed again {/* skipcq: JS-0339 */}
+              {currentStep?.call} is being computed again{" "}
             </span>
           </motion.div>
         )}
@@ -309,7 +317,7 @@ export default function DPTransformationVisualizer() {
             <AnimatePresence>
               {currentTrace.slice(-6).map((t) => (
                 <motion.div
-                  key={`trace-${t.call}-${t.action}-${t.result ?? 'pending'}`}
+                  key={`trace-${t.call}-${t.action}-${t.result ?? "pending"}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   className={`p-2 rounded-md font-mono text-sm ${
@@ -414,7 +422,7 @@ export default function DPTransformationVisualizer() {
           <div className="grid grid-cols-5 gap-2">
             {dp.map((val, position) => (
               <motion.div
-                key={`tab-dp-pos${position}-${val ?? 'null'}`} // skipcq: JS-0437
+                key={`tab-dp-pos${position}-${val ?? "null"}`} // skipcq: JS-0437
                 animate={{
                   scale: currentI === position ? 1.1 : 1,
                   borderColor:
@@ -654,7 +662,9 @@ export default function DPTransformationVisualizer() {
             {isPlaying ? "Pause" : "Play"}
           </button>
           <button
-            onClick={() => { if (step < trace.length) dispatch({ type: "ADVANCE" }); }}
+            onClick={() => {
+              if (step < trace.length) dispatch({ type: "ADVANCE" });
+            }}
             disabled={step >= trace.length}
             className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 transition disabled:opacity-50"
           >

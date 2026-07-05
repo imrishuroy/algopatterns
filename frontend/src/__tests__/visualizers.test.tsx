@@ -1,12 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, act, cleanup } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  cleanup,
+} from "@testing-library/react";
 import type { ReactNode, Ref, ComponentType } from "react";
 
 vi.mock("framer-motion", async () => {
   const { createElement, Fragment, forwardRef } = await import("react");
   const motionTag = (tag: string) =>
-    forwardRef(({ children, ...props }: { children?: ReactNode; [key: string]: unknown }, ref: Ref<unknown>) =>
-      createElement(tag, { ...props, ref }, children)
+    forwardRef(
+      (
+        {
+          children,
+          ...props
+        }: { children?: ReactNode; [key: string]: unknown },
+        ref: Ref<unknown>
+      ) => createElement(tag, { ...props, ref }, children)
     );
   return {
     motion: {
@@ -152,9 +164,7 @@ describe("Shared visualizer UI pattern", () => {
 
   it("StepByStepExecutor renders heading and navigation", () => {
     render(<StepByStepExecutor />);
-    expect(
-      screen.getByText("Step-by-Step Execution")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Step-by-Step Execution")).toBeInTheDocument();
     expect(screen.getByText("Prev")).toBeInTheDocument();
     expect(screen.getByText("Next")).toBeInTheDocument();
     expect(screen.getByText("Reset")).toBeInTheDocument();
@@ -186,9 +196,15 @@ describe("TwoSumVisualizer", () => {
     vi.useFakeTimers();
     render(<TwoSumVisualizer />);
     fireEvent.click(screen.getByText("Play"));
-    act(() => { vi.advanceTimersByTime(800); });
-    act(() => { vi.advanceTimersByTime(800); });
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     expect(document.body.textContent).toContain("2");
     vi.useRealTimers();
   });
@@ -198,7 +214,9 @@ describe("TwoSumVisualizer", () => {
     render(<TwoSumVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     for (let i = 0; i < 4; i++) {
-      act(() => { vi.advanceTimersByTime(800); });
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
     }
     expect(document.body.textContent).toContain("Found");
     expect(screen.getByText("Play").closest("button")).toBeDisabled();
@@ -209,7 +227,9 @@ describe("TwoSumVisualizer", () => {
     vi.useFakeTimers();
     render(<TwoSumVisualizer />);
     fireEvent.click(screen.getByText("Play"));
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     fireEvent.click(screen.getByText("Reset"));
     expect(screen.getByText("Play")).toBeInTheDocument();
     expect(
@@ -235,7 +255,9 @@ describe("BinarySearchVisualizer", () => {
     vi.useFakeTimers();
     render(<BinarySearchVisualizer />);
     fireEvent.click(screen.getByText("Play"));
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     expect(screen.getByText("L")).toBeInTheDocument();
     expect(screen.getByText("M")).toBeInTheDocument();
     expect(screen.getByText("R")).toBeInTheDocument();
@@ -247,7 +269,9 @@ describe("BinarySearchVisualizer", () => {
     render(<BinarySearchVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     for (let i = 0; i < 4; i++) {
-      act(() => { vi.advanceTimersByTime(800); });
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
     }
     expect(screen.getByText(/Found 11 at index/)).toBeInTheDocument();
     vi.useRealTimers();
@@ -257,7 +281,9 @@ describe("BinarySearchVisualizer", () => {
     vi.useFakeTimers();
     render(<BinarySearchVisualizer />);
     fireEvent.click(screen.getByText("Play"));
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     fireEvent.click(screen.getByText("Reset"));
     expect(screen.getByText("Play")).toBeInTheDocument();
     expect(screen.getByText(/Click Play to search/)).toBeInTheDocument();
@@ -269,7 +295,9 @@ describe("BinarySearchVisualizer", () => {
 describe("MergeIntervalsVisualizer", () => {
   it("renders input intervals placeholder", () => {
     render(<MergeIntervalsVisualizer />);
-    expect(screen.getByText("Input Intervals (on timeline):")).toBeInTheDocument();
+    expect(
+      screen.getByText("Input Intervals (on timeline):")
+    ).toBeInTheDocument();
   });
 
   it("renders merged result placeholder", () => {
@@ -288,9 +316,13 @@ describe("MergeIntervalsVisualizer", () => {
     vi.useFakeTimers();
     render(<MergeIntervalsVisualizer />);
     fireEvent.click(screen.getByText("Play"));
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(document.body.textContent).toContain("Step 1");
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(document.body.textContent).toContain("Sorted");
     vi.useRealTimers();
   });
@@ -300,7 +332,9 @@ describe("MergeIntervalsVisualizer", () => {
     render(<MergeIntervalsVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     for (let i = 0; i < 7; i++) {
-      act(() => { vi.advanceTimersByTime(1000); });
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
     }
     expect(screen.getByText(/Done/)).toBeInTheDocument();
     vi.useRealTimers();
@@ -482,7 +516,9 @@ describe("TrieInsertVisualizer", () => {
     vi.useFakeTimers();
     render(<TrieInsertVisualizer />);
     fireEvent.click(screen.getByText("Play"));
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     expect(document.body.textContent).toMatch(/Inserting "cat"/);
     vi.useRealTimers();
   });
@@ -492,9 +528,13 @@ describe("TrieInsertVisualizer", () => {
     render(<TrieInsertVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     // First timer: init → inserting, charIndex=0, message="Inserting cat"
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     // Second timer: inserting, charIndex=0 < len, process char 'c', create node
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     expect(document.body.textContent).toContain("Create node 'c'");
     vi.useRealTimers();
   });
@@ -504,11 +544,17 @@ describe("TrieInsertVisualizer", () => {
     render(<TrieInsertVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     // Timer 0: init → inserting
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     // Timer 1: process char 'c'
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     // Timer 2: process char 'a'
-    act(() => { vi.advanceTimersByTime(800); });
+    act(() => {
+      vi.advanceTimersByTime(800);
+    });
     expect(document.body.textContent).toContain("Create node 'a'");
     vi.useRealTimers();
   });
@@ -518,7 +564,9 @@ describe("TrieInsertVisualizer", () => {
     render(<TrieInsertVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     for (let i = 0; i < 25; i++) {
-      act(() => { vi.advanceTimersByTime(800); });
+      act(() => {
+        vi.advanceTimersByTime(800);
+      });
     }
     expect(document.body.textContent).toContain("Done");
     vi.useRealTimers();
@@ -561,9 +609,13 @@ describe("LinkedListReversalVisualizer", () => {
     render(<LinkedListReversalVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     // Timer 0: init → save-next
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     // Timer 1: save-next → reverse-link + set message to "Step 1: Save next = node 2"
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(document.body.textContent).toMatch(/Step 1: Save next/);
     vi.useRealTimers();
   });
@@ -573,11 +625,17 @@ describe("LinkedListReversalVisualizer", () => {
     render(<LinkedListReversalVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     // Timer 0: init → save-next
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     // Timer 1: save-next → reverse-link (sets Step 1)
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     // Timer 2: reverse-link → move-prev (sets Step 2)
-    act(() => { vi.advanceTimersByTime(1000); });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(document.body.textContent).toMatch(/Step 2: Reverse link/);
     vi.useRealTimers();
   });
@@ -587,7 +645,9 @@ describe("LinkedListReversalVisualizer", () => {
     render(<LinkedListReversalVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     for (let i = 0; i < 20; i++) {
-      act(() => { vi.advanceTimersByTime(1000); });
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
     }
     expect(screen.getByText(/Done/)).toBeInTheDocument();
     vi.useRealTimers();
@@ -632,7 +692,9 @@ describe("GridBFSVisualizer", () => {
 
   it("renders queue/stack display", () => {
     render(<GridBFSVisualizer />);
-    expect(screen.getByText(/Queue \(FIFO\)|Stack \(LIFO\)/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Queue \(FIFO\)|Stack \(LIFO\)/)
+    ).toBeInTheDocument();
   });
 
   it("shows Empty queue initially", () => {
@@ -644,7 +706,9 @@ describe("GridBFSVisualizer", () => {
     vi.useFakeTimers();
     render(<GridBFSVisualizer />);
     fireEvent.click(screen.getByText("Play"));
-    act(() => { vi.advanceTimersByTime(300); });
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
     expect(document.body.textContent).toMatch(/Found new island|Exploring/);
     vi.useRealTimers();
   });
@@ -654,7 +718,9 @@ describe("GridBFSVisualizer", () => {
     render(<GridBFSVisualizer />);
     fireEvent.click(screen.getByText("Play"));
     for (let i = 0; i < 30; i++) {
-      act(() => { vi.advanceTimersByTime(300); });
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
     }
     const body = document.body.textContent || "";
     expect(body.includes("islands") || body.includes("Exploring")).toBe(true);
@@ -738,22 +804,22 @@ describe.each(VISUALIZER_PATHS)("Smoke test: %s", (name) => {
 
     // Some visualizers (like RecursionTypesVisualizer) only have tab buttons,
     // most have Play/Reset, and StepByStepExecutor has Prev/Next/Reset.
-    const hasControl =
-      Array.from(buttons).some(
-        (b) =>
-          b.textContent === "Play" ||
-          b.textContent === "Reset" ||
-          b.textContent === "Next" ||
-          b.textContent === "Prev" ||
-          b.textContent === "Step" ||
-          b.textContent?.includes("BFS") ||
-          b.textContent?.includes("DFS") ||
-          b.textContent === "Factorial" ||
-          b.textContent === "Fibonacci" ||
-          b.textContent === "Reverse String" ||
-          b.textContent === "Direct Recursion" ||
-          b.textContent === "Indirect Recursion"
-      );
+    const hasControl = Array.from(buttons).some(
+      // skipcq: JS-R1005
+      (b) =>
+        b.textContent === "Play" ||
+        b.textContent === "Reset" ||
+        b.textContent === "Next" ||
+        b.textContent === "Prev" ||
+        b.textContent === "Step" ||
+        b.textContent?.includes("BFS") ||
+        b.textContent?.includes("DFS") ||
+        b.textContent === "Factorial" ||
+        b.textContent === "Fibonacci" ||
+        b.textContent === "Reverse String" ||
+        b.textContent === "Direct Recursion" ||
+        b.textContent === "Indirect Recursion"
+    );
     expect(hasControl).toBe(true);
   });
 });

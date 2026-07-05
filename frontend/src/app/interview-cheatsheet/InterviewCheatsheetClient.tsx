@@ -5,36 +5,164 @@ import dynamic from "next/dynamic";
 
 const CodeBlock = dynamic(() => import("@/components/ui/CodeBlock"), {
   loading: () => (
-    <div className="h-32 rounded-md animate-pulse" style={{ background: "var(--bg-elevated)" }} />
+    <div
+      className="h-32 rounded-md animate-pulse"
+      style={{ background: "var(--bg-elevated)" }}
+    />
   ),
 });
 
 const CONSTRAINTS = [
-  { id: "c1", size: "n ≤ 15", complexity: "O(n!) or O(2^n)", what: "Brute force, backtracking, all permutations" },
-  { id: "c2", size: "n ≤ 20", complexity: "O(2^n)", what: "Backtracking, recursion, bitmask DP" },
-  { id: "c3", size: "n ≤ 100", complexity: "O(n³)", what: "Triple nested loops, Floyd-Warshall" },
-  { id: "c4", size: "n ≤ 1,000", complexity: "O(n²)", what: "Nested loops, simple DP" },
-  { id: "c5", size: "n ≤ 100,000", complexity: "O(n log n)", what: "Sorting, heap, binary search" },
-  { id: "c6", size: "n ≤ 1,000,000", complexity: "O(n)", what: "Single pass, two pointers, sliding window" },
-  { id: "c7", size: "n > 10^7", complexity: "O(log n) or O(1)", what: "Binary search, math formula" },
+  {
+    id: "c1",
+    size: "n ≤ 15",
+    complexity: "O(n!) or O(2^n)",
+    what: "Brute force, backtracking, all permutations",
+  },
+  {
+    id: "c2",
+    size: "n ≤ 20",
+    complexity: "O(2^n)",
+    what: "Backtracking, recursion, bitmask DP",
+  },
+  {
+    id: "c3",
+    size: "n ≤ 100",
+    complexity: "O(n³)",
+    what: "Triple nested loops, Floyd-Warshall",
+  },
+  {
+    id: "c4",
+    size: "n ≤ 1,000",
+    complexity: "O(n²)",
+    what: "Nested loops, simple DP",
+  },
+  {
+    id: "c5",
+    size: "n ≤ 100,000",
+    complexity: "O(n log n)",
+    what: "Sorting, heap, binary search",
+  },
+  {
+    id: "c6",
+    size: "n ≤ 1,000,000",
+    complexity: "O(n)",
+    what: "Single pass, two pointers, sliding window",
+  },
+  {
+    id: "c7",
+    size: "n > 10^7",
+    complexity: "O(log n) or O(1)",
+    what: "Binary search, math formula",
+  },
 ];
 
 const PATTERN_MAPPINGS = [
-  { id: "m1", problem: "Sorted array, find pair", pattern: "Two Pointers", time: "O(n)", space: "O(1)" },
-  { id: "m2", problem: "Contiguous subarray/substring", pattern: "Sliding Window", time: "O(n)", space: "O(k)" },
-  { id: "m3", problem: "Range sum queries", pattern: "Prefix Sum", time: "O(1) query", space: "O(n)" },
-  { id: "m4", problem: "Find complement/duplicates", pattern: "Hash Map", time: "O(n)", space: "O(n)" },
-  { id: "m5", problem: "Search sorted/find boundary", pattern: "Binary Search", time: "O(log n)", space: "O(1)" },
-  { id: "m6", problem: "Matching brackets/NGE", pattern: "Stack", time: "O(n)", space: "O(n)" },
-  { id: "m7", problem: "In-place reversal/cycle", pattern: "Linked List", time: "O(n)", space: "O(1)" },
-  { id: "m8", problem: "Tree traversal/path", pattern: "DFS/BFS", time: "O(n)", space: "O(h)" },
-  { id: "m9", problem: "Connectivity/shortest path", pattern: "Graphs", time: "O(V+E)", space: "O(V+E)" },
-  { id: "m10", problem: "Top K/streaming median", pattern: "Heap", time: "O(n log k)", space: "O(k)" },
-  { id: "m11", problem: "Counting ways/optimization", pattern: "DP", time: "O(n*m)", space: "O(n)" },
-  { id: "m12", problem: "Generate all combinations", pattern: "Backtracking", time: "O(2^n)", space: "O(n)" },
-  { id: "m13", problem: "Merge/schedule ranges", pattern: "Intervals", time: "O(n log n)", space: "O(n)" },
-  { id: "m14", problem: "Prefix search/autocomplete", pattern: "Trie", time: "O(L)", space: "O(N*L)" },
-  { id: "m15", problem: "Dynamic connectivity", pattern: "Union-Find", time: "O(1)", space: "O(n)" },
+  {
+    id: "m1",
+    problem: "Sorted array, find pair",
+    pattern: "Two Pointers",
+    time: "O(n)",
+    space: "O(1)",
+  },
+  {
+    id: "m2",
+    problem: "Contiguous subarray/substring",
+    pattern: "Sliding Window",
+    time: "O(n)",
+    space: "O(k)",
+  },
+  {
+    id: "m3",
+    problem: "Range sum queries",
+    pattern: "Prefix Sum",
+    time: "O(1) query",
+    space: "O(n)",
+  },
+  {
+    id: "m4",
+    problem: "Find complement/duplicates",
+    pattern: "Hash Map",
+    time: "O(n)",
+    space: "O(n)",
+  },
+  {
+    id: "m5",
+    problem: "Search sorted/find boundary",
+    pattern: "Binary Search",
+    time: "O(log n)",
+    space: "O(1)",
+  },
+  {
+    id: "m6",
+    problem: "Matching brackets/NGE",
+    pattern: "Stack",
+    time: "O(n)",
+    space: "O(n)",
+  },
+  {
+    id: "m7",
+    problem: "In-place reversal/cycle",
+    pattern: "Linked List",
+    time: "O(n)",
+    space: "O(1)",
+  },
+  {
+    id: "m8",
+    problem: "Tree traversal/path",
+    pattern: "DFS/BFS",
+    time: "O(n)",
+    space: "O(h)",
+  },
+  {
+    id: "m9",
+    problem: "Connectivity/shortest path",
+    pattern: "Graphs",
+    time: "O(V+E)",
+    space: "O(V+E)",
+  },
+  {
+    id: "m10",
+    problem: "Top K/streaming median",
+    pattern: "Heap",
+    time: "O(n log k)",
+    space: "O(k)",
+  },
+  {
+    id: "m11",
+    problem: "Counting ways/optimization",
+    pattern: "DP",
+    time: "O(n*m)",
+    space: "O(n)",
+  },
+  {
+    id: "m12",
+    problem: "Generate all combinations",
+    pattern: "Backtracking",
+    time: "O(2^n)",
+    space: "O(n)",
+  },
+  {
+    id: "m13",
+    problem: "Merge/schedule ranges",
+    pattern: "Intervals",
+    time: "O(n log n)",
+    space: "O(n)",
+  },
+  {
+    id: "m14",
+    problem: "Prefix search/autocomplete",
+    pattern: "Trie",
+    time: "O(L)",
+    space: "O(N*L)",
+  },
+  {
+    id: "m15",
+    problem: "Dynamic connectivity",
+    pattern: "Union-Find",
+    time: "O(1)",
+    space: "O(n)",
+  },
 ];
 
 const PATTERNS = [
@@ -48,7 +176,13 @@ const PATTERNS = [
       "Same direction (fast/slow): for in-place modifications",
       "For 3Sum: fix one element, use two pointers for the rest",
     ],
-    problems: ["Two Sum II", "3Sum", "Container With Most Water", "Valid Palindrome", "Remove Duplicates"],
+    problems: [
+      "Two Sum II",
+      "3Sum",
+      "Container With Most Water",
+      "Valid Palindrome",
+      "Remove Duplicates",
+    ],
     code: `// OPPOSITE DIRECTION - find pair with target sum
 int left = 0, right = arr.length - 1;
 while (left < right) {
@@ -86,7 +220,12 @@ while (fast != null && fast.next != null) {
       "For MAXIMUM length: update AFTER shrinking (valid window)",
       "For MINIMUM length: update WHILE shrinking (valid window)",
     ],
-    problems: ["Longest Substring Without Repeating", "Minimum Window Substring", "Find All Anagrams", "Max Consecutive Ones III"],
+    problems: [
+      "Longest Substring Without Repeating",
+      "Minimum Window Substring",
+      "Find All Anagrams",
+      "Max Consecutive Ones III",
+    ],
     code: `// VARIABLE SIZE - longest substring with at most K distinct
 int left = 0, maxLen = 0;
 Map<Character, Integer> freq = new HashMap<>();
@@ -128,7 +267,12 @@ for (int i = 0; i < arr.length; i++) {
       "Subarray sum = k: use HashMap to find complement (sum - k)",
       "MUST initialize map with {0: 1} for subarrays starting at index 0",
     ],
-    problems: ["Subarray Sum Equals K", "Product Except Self", "Range Sum Query", "Contiguous Array"],
+    problems: [
+      "Subarray Sum Equals K",
+      "Product Except Self",
+      "Range Sum Query",
+      "Contiguous Array",
+    ],
     code: `// BUILD PREFIX SUM ARRAY
 int[] prefix = new int[arr.length + 1];
 for (int i = 0; i < arr.length; i++) {
@@ -159,7 +303,13 @@ return count;`,
       "Binary search on answer: find min/max value satisfying condition",
       "Rotated array: one half is ALWAYS sorted",
     ],
-    problems: ["Binary Search", "Search in Rotated Array", "Find First and Last Position", "Koko Eating Bananas", "Capacity to Ship Packages"],
+    problems: [
+      "Binary Search",
+      "Search in Rotated Array",
+      "Find First and Last Position",
+      "Koko Eating Bananas",
+      "Capacity to Ship Packages",
+    ],
     code: `// EXACT MATCH
 int left = 0, right = arr.length - 1;
 while (left <= right) {
@@ -199,7 +349,12 @@ return left;`,
       "Store INDICES not values for position-based problems",
       "For circular arrays: iterate 2*n, use i % n",
     ],
-    problems: ["Valid Parentheses", "Daily Temperatures", "Largest Rectangle in Histogram", "Next Greater Element"],
+    problems: [
+      "Valid Parentheses",
+      "Daily Temperatures",
+      "Largest Rectangle in Histogram",
+      "Next Greater Element",
+    ],
     code: `// VALID PARENTHESES
 Deque<Character> stack = new ArrayDeque<>();
 Map<Character, Character> pairs = Map.of(')', '(', ']', '[', '}', '{');
@@ -235,7 +390,13 @@ for (int i = 0; i < n; i++) {
       "BFS: level order traversal, find minimum depth",
       "For BST validation: pass min/max bounds down",
     ],
-    problems: ["Maximum Depth", "Validate BST", "Lowest Common Ancestor", "Level Order Traversal", "Diameter of Binary Tree"],
+    problems: [
+      "Maximum Depth",
+      "Validate BST",
+      "Lowest Common Ancestor",
+      "Level Order Traversal",
+      "Diameter of Binary Tree",
+    ],
     code: `// DFS - MAX DEPTH (postorder)
 int maxDepth(TreeNode node) {
     if (node == null) return 0;
@@ -279,7 +440,13 @@ while (!queue.isEmpty()) {
       "Topological sort: only for DAG, use indegree (Kahn's) or DFS",
       "Cycle detection: use 3 colors (white/gray/black) in DFS",
     ],
-    problems: ["Number of Islands", "Course Schedule", "Clone Graph", "Word Ladder", "Pacific Atlantic Water Flow"],
+    problems: [
+      "Number of Islands",
+      "Course Schedule",
+      "Clone Graph",
+      "Word Ladder",
+      "Pacific Atlantic Water Flow",
+    ],
     code: `// BFS - SHORTEST PATH (unweighted)
 int bfs(int start, int end, List<List<Integer>> graph) {
     Queue<int[]> queue = new LinkedList<>();
@@ -339,7 +506,12 @@ while (!queue.isEmpty()) {
       "Streaming median: two heaps (max-heap for lower, min-heap for upper)",
       "Merge K sorted: heap of K elements, always pop min",
     ],
-    problems: ["Kth Largest Element", "Top K Frequent Elements", "Find Median from Data Stream", "Merge K Sorted Lists"],
+    problems: [
+      "Kth Largest Element",
+      "Top K Frequent Elements",
+      "Find Median from Data Stream",
+      "Merge K Sorted Lists",
+    ],
     code: `// KTH LARGEST (min-heap of size K)
 PriorityQueue<Integer> minHeap = new PriorityQueue<>();
 for (int num : nums) {
@@ -378,7 +550,14 @@ double findMedian() {
       "LCS/Edit Distance: 2D DP, compare characters",
       "Space optimization: if only need previous row, use 1D array",
     ],
-    problems: ["Climbing Stairs", "House Robber", "Coin Change", "Longest Common Subsequence", "Edit Distance", "Longest Increasing Subsequence"],
+    problems: [
+      "Climbing Stairs",
+      "House Robber",
+      "Coin Change",
+      "Longest Common Subsequence",
+      "Edit Distance",
+      "Longest Increasing Subsequence",
+    ],
     code: `// CLIMBING STAIRS (Fibonacci pattern)
 int[] dp = new int[n + 1];
 dp[0] = dp[1] = 1;
@@ -428,7 +607,14 @@ for (int i = 1; i < n; i++) {
       "For duplicates: sort first, skip if nums[i] == nums[i-1] && !used[i-1]",
       "Prune early: check constraints before recursing",
     ],
-    problems: ["Subsets", "Permutations", "Combination Sum", "N-Queens", "Word Search", "Palindrome Partitioning"],
+    problems: [
+      "Subsets",
+      "Permutations",
+      "Combination Sum",
+      "N-Queens",
+      "Word Search",
+      "Palindrome Partitioning",
+    ],
     code: `// SUBSETS
 void backtrack(int[] nums, int start, List<Integer> path,
                List<List<Integer>> result) {
@@ -483,7 +669,13 @@ void backtrack(int[] candidates, int start, int target,
       "Meeting rooms: use min-heap or line sweep",
       "Overlap condition: curr.start <= prev.end",
     ],
-    problems: ["Merge Intervals", "Insert Interval", "Meeting Rooms", "Meeting Rooms II", "Non-overlapping Intervals"],
+    problems: [
+      "Merge Intervals",
+      "Insert Interval",
+      "Meeting Rooms",
+      "Meeting Rooms II",
+      "Non-overlapping Intervals",
+    ],
     code: `// MERGE INTERVALS
 Arrays.sort(intervals, (a, b) -> a[0] - b[0]);  // sort by start
 List<int[]> result = new ArrayList<>();
@@ -526,7 +718,12 @@ for (int start : starts) {
       "For wildcards: use DFS, try all children for '.'",
       "Word Search II: build Trie of words, DFS on grid",
     ],
-    problems: ["Implement Trie", "Word Search II", "Design Add and Search Words", "Search Suggestions System"],
+    problems: [
+      "Implement Trie",
+      "Word Search II",
+      "Design Add and Search Words",
+      "Search Suggestions System",
+    ],
     code: `class TrieNode {
     TrieNode[] children = new TrieNode[26];
     boolean isEnd = false;
@@ -578,7 +775,12 @@ class Trie {
       "Both optimizations → O(α(n)) ≈ O(1) amortized",
       "For 2D grids: flatten index as i * cols + j",
     ],
-    problems: ["Number of Provinces", "Redundant Connection", "Accounts Merge", "Longest Consecutive Sequence"],
+    problems: [
+      "Number of Provinces",
+      "Redundant Connection",
+      "Accounts Merge",
+      "Longest Consecutive Sequence",
+    ],
     code: `class UnionFind {
     int[] parent, rank;
     int count;  // number of connected components
@@ -625,7 +827,13 @@ class Trie {
       "Merge two sorted: use dummy, compare and link",
       "Draw diagrams! Pointer manipulation is error-prone",
     ],
-    problems: ["Reverse Linked List", "Linked List Cycle", "Merge Two Sorted Lists", "Reorder List", "Remove Nth Node From End"],
+    problems: [
+      "Reverse Linked List",
+      "Linked List Cycle",
+      "Merge Two Sorted Lists",
+      "Reorder List",
+      "Remove Nth Node From End",
+    ],
     code: `// REVERSE LINKED LIST
 ListNode reverse(ListNode head) {
     ListNode prev = null, curr = head;
@@ -687,22 +895,102 @@ ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 ];
 
 const KEYWORDS = [
-  { id: "k1", keyword: "Top K / Kth largest", algo: "Heap", reason: "Min-heap of size K → O(n log K)" },
-  { id: "k2", keyword: "Sorted array", algo: "Binary Search / Two Pointers", reason: "O(log n) search or O(n) pairs" },
-  { id: "k3", keyword: "How many ways", algo: "DP", reason: "Count with overlapping subproblems" },
-  { id: "k4", keyword: "Substring / subarray", algo: "Sliding Window", reason: "Contiguous elements, O(n)" },
-  { id: "k5", keyword: "Prefix / autocomplete", algo: "Trie", reason: "O(word length) prefix lookup" },
-  { id: "k6", keyword: "Palindrome", algo: "Two Pointers / DP", reason: "Verify O(n) or count O(n²)" },
-  { id: "k7", keyword: "Parentheses / valid", algo: "Stack", reason: "LIFO matches nested pairs" },
-  { id: "k8", keyword: "Next greater/smaller", algo: "Monotonic Stack", reason: "O(n) with stack ordering" },
-  { id: "k9", keyword: "Subarray sum = k", algo: "Prefix Sum + HashMap", reason: "Find complement in O(1)" },
-  { id: "k10", keyword: "Shortest path", algo: "BFS / Dijkstra", reason: "Unweighted O(V+E) vs weighted" },
-  { id: "k11", keyword: "All combinations", algo: "Backtracking", reason: "Generate with choose-explore-undo" },
-  { id: "k12", keyword: "Course schedule", algo: "Topological Sort", reason: "DAG ordering via indegree" },
-  { id: "k13", keyword: "Connected components", algo: "Union-Find / DFS", reason: "Dynamic vs static graph" },
-  { id: "k14", keyword: "Merge intervals", algo: "Sort + Greedy", reason: "Sort by start, extend end" },
-  { id: "k15", keyword: "Maximum/minimum", algo: "DP / Greedy", reason: "Optimal substructure" },
-  { id: "k16", keyword: "In-place / O(1) space", algo: "Two Pointers", reason: "Modify array without extra space" },
+  {
+    id: "k1",
+    keyword: "Top K / Kth largest",
+    algo: "Heap",
+    reason: "Min-heap of size K → O(n log K)",
+  },
+  {
+    id: "k2",
+    keyword: "Sorted array",
+    algo: "Binary Search / Two Pointers",
+    reason: "O(log n) search or O(n) pairs",
+  },
+  {
+    id: "k3",
+    keyword: "How many ways",
+    algo: "DP",
+    reason: "Count with overlapping subproblems",
+  },
+  {
+    id: "k4",
+    keyword: "Substring / subarray",
+    algo: "Sliding Window",
+    reason: "Contiguous elements, O(n)",
+  },
+  {
+    id: "k5",
+    keyword: "Prefix / autocomplete",
+    algo: "Trie",
+    reason: "O(word length) prefix lookup",
+  },
+  {
+    id: "k6",
+    keyword: "Palindrome",
+    algo: "Two Pointers / DP",
+    reason: "Verify O(n) or count O(n²)",
+  },
+  {
+    id: "k7",
+    keyword: "Parentheses / valid",
+    algo: "Stack",
+    reason: "LIFO matches nested pairs",
+  },
+  {
+    id: "k8",
+    keyword: "Next greater/smaller",
+    algo: "Monotonic Stack",
+    reason: "O(n) with stack ordering",
+  },
+  {
+    id: "k9",
+    keyword: "Subarray sum = k",
+    algo: "Prefix Sum + HashMap",
+    reason: "Find complement in O(1)",
+  },
+  {
+    id: "k10",
+    keyword: "Shortest path",
+    algo: "BFS / Dijkstra",
+    reason: "Unweighted O(V+E) vs weighted",
+  },
+  {
+    id: "k11",
+    keyword: "All combinations",
+    algo: "Backtracking",
+    reason: "Generate with choose-explore-undo",
+  },
+  {
+    id: "k12",
+    keyword: "Course schedule",
+    algo: "Topological Sort",
+    reason: "DAG ordering via indegree",
+  },
+  {
+    id: "k13",
+    keyword: "Connected components",
+    algo: "Union-Find / DFS",
+    reason: "Dynamic vs static graph",
+  },
+  {
+    id: "k14",
+    keyword: "Merge intervals",
+    algo: "Sort + Greedy",
+    reason: "Sort by start, extend end",
+  },
+  {
+    id: "k15",
+    keyword: "Maximum/minimum",
+    algo: "DP / Greedy",
+    reason: "Optimal substructure",
+  },
+  {
+    id: "k16",
+    keyword: "In-place / O(1) space",
+    algo: "Two Pointers",
+    reason: "Modify array without extra space",
+  },
 ];
 
 const DECISIONS = [
@@ -711,9 +999,18 @@ const DECISIONS = [
     question: "Is it about ARRAYS?",
     options: [
       { id: "d1-o1", text: "Sorted? → Binary Search or Two Pointers" },
-      { id: "d1-o2", text: "Find pair/complement? → HashMap O(n) or Two Pointers O(n)" },
-      { id: "d1-o3", text: "Subarray/substring? → Sliding Window or Prefix Sum" },
-      { id: "d1-o4", text: "In-place modification? → Two Pointers (fast/slow)" },
+      {
+        id: "d1-o2",
+        text: "Find pair/complement? → HashMap O(n) or Two Pointers O(n)",
+      },
+      {
+        id: "d1-o3",
+        text: "Subarray/substring? → Sliding Window or Prefix Sum",
+      },
+      {
+        id: "d1-o4",
+        text: "In-place modification? → Two Pointers (fast/slow)",
+      },
     ],
   },
   {
@@ -783,33 +1080,102 @@ const COMPLEXITIES = [
   { id: "cx11", pattern: "Top K (Heap)", time: "O(n log k)", space: "O(k)" },
   { id: "cx12", pattern: "DP 1D", time: "O(n)", space: "O(n) or O(1)" },
   { id: "cx13", pattern: "DP 2D", time: "O(n*m)", space: "O(n*m)" },
-  { id: "cx14", pattern: "Backtracking (subsets)", time: "O(2^n)", space: "O(n)" },
+  {
+    id: "cx14",
+    pattern: "Backtracking (subsets)",
+    time: "O(2^n)",
+    space: "O(n)",
+  },
   { id: "cx15", pattern: "Backtracking (perms)", time: "O(n!)", space: "O(n)" },
   { id: "cx16", pattern: "Trie", time: "O(L) per op", space: "O(N*L)" },
   { id: "cx17", pattern: "Union-Find", time: "O(α(n)) ≈ O(1)", space: "O(n)" },
 ];
 
 const MISTAKES = [
-  { id: "ms1", pattern: "Two Pointers", mistake: "Forgetting to sort the array first" },
-  { id: "ms2", pattern: "Sliding Window", mistake: "Update result INSIDE while for min, AFTER for max" },
-  { id: "ms3", pattern: "Prefix Sum", mistake: "Must initialize map.put(0, 1) for subarrays from index 0" },
-  { id: "ms4", pattern: "Binary Search", mistake: "Use left + (right-left)/2 to avoid integer overflow" },
-  { id: "ms5", pattern: "Stack", mistake: "Decreasing stack for next greater, increasing for next smaller" },
-  { id: "ms6", pattern: "Linked List", mistake: "Always use dummy node when head might change" },
-  { id: "ms7", pattern: "Trees", mistake: "BST inorder = sorted; validate with min/max bounds" },
-  { id: "ms8", pattern: "Graphs", mistake: "BFS for shortest path, not DFS (DFS gives A path)" },
-  { id: "ms9", pattern: "Heap", mistake: "K largest = min-heap, K smallest = max-heap" },
-  { id: "ms10", pattern: "DP Knapsack", mistake: "0/1: reverse loop, Unbounded: forward loop" },
-  { id: "ms11", pattern: "Backtracking", mistake: "Must undo choice after recursive call returns" },
-  { id: "ms12", pattern: "Intervals", mistake: "Sort by start to merge, by end to maximize non-overlap" },
-  { id: "ms13", pattern: "Union-Find", mistake: "Must use path compression for O(1) amortized" },
-  { id: "ms14", pattern: "Trie", mistake: "isEnd flag distinguishes complete words from prefixes" },
+  {
+    id: "ms1",
+    pattern: "Two Pointers",
+    mistake: "Forgetting to sort the array first",
+  },
+  {
+    id: "ms2",
+    pattern: "Sliding Window",
+    mistake: "Update result INSIDE while for min, AFTER for max",
+  },
+  {
+    id: "ms3",
+    pattern: "Prefix Sum",
+    mistake: "Must initialize map.put(0, 1) for subarrays from index 0",
+  },
+  {
+    id: "ms4",
+    pattern: "Binary Search",
+    mistake: "Use left + (right-left)/2 to avoid integer overflow",
+  },
+  {
+    id: "ms5",
+    pattern: "Stack",
+    mistake: "Decreasing stack for next greater, increasing for next smaller",
+  },
+  {
+    id: "ms6",
+    pattern: "Linked List",
+    mistake: "Always use dummy node when head might change",
+  },
+  {
+    id: "ms7",
+    pattern: "Trees",
+    mistake: "BST inorder = sorted; validate with min/max bounds",
+  },
+  {
+    id: "ms8",
+    pattern: "Graphs",
+    mistake: "BFS for shortest path, not DFS (DFS gives A path)",
+  },
+  {
+    id: "ms9",
+    pattern: "Heap",
+    mistake: "K largest = min-heap, K smallest = max-heap",
+  },
+  {
+    id: "ms10",
+    pattern: "DP Knapsack",
+    mistake: "0/1: reverse loop, Unbounded: forward loop",
+  },
+  {
+    id: "ms11",
+    pattern: "Backtracking",
+    mistake: "Must undo choice after recursive call returns",
+  },
+  {
+    id: "ms12",
+    pattern: "Intervals",
+    mistake: "Sort by start to merge, by end to maximize non-overlap",
+  },
+  {
+    id: "ms13",
+    pattern: "Union-Find",
+    mistake: "Must use path compression for O(1) amortized",
+  },
+  {
+    id: "ms14",
+    pattern: "Trie",
+    mistake: "isEnd flag distinguishes complete words from prefixes",
+  },
 ];
 
-const ConstraintRow = ({ constraint }: { constraint: typeof CONSTRAINTS[number] }) => (
+const ConstraintRow = ({
+  constraint,
+}: {
+  constraint: (typeof CONSTRAINTS)[number];
+}) => (
   <tr className="border-b border-gray-800">
-    <td className="py-2.5 px-3 font-mono font-semibold text-indigo-400">{constraint.size}</td>
-    <td className="py-2.5 px-3 font-mono text-green-400">{constraint.complexity}</td>
+    <td className="py-2.5 px-3 font-mono font-semibold text-indigo-400">
+      {constraint.size}
+    </td>
+    <td className="py-2.5 px-3 font-mono text-green-400">
+      {constraint.complexity}
+    </td>
     <td className="py-2.5 px-3 text-gray-300">{constraint.what}</td>
   </tr>
 );
@@ -818,9 +1184,15 @@ const ConstraintsTable = () => (
   <table className="w-full text-sm">
     <thead>
       <tr className="border-b border-gray-700">
-        <th className="text-left py-2 px-3 text-gray-400 font-medium">Input Size</th>
-        <th className="text-left py-2 px-3 text-gray-400 font-medium">Complexity</th>
-        <th className="text-left py-2 px-3 text-gray-400 font-medium">What Works</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">
+          Input Size
+        </th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">
+          Complexity
+        </th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">
+          What Works
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -831,12 +1203,20 @@ const ConstraintsTable = () => (
   </table>
 );
 
-const MappingRow = ({ mapping }: { mapping: typeof PATTERN_MAPPINGS[number] }) => (
+const MappingRow = ({
+  mapping,
+}: {
+  mapping: (typeof PATTERN_MAPPINGS)[number];
+}) => (
   <tr className="border-b border-gray-800 hover:bg-gray-900/50">
     <td className="py-2 px-3 text-gray-300">{mapping.problem}</td>
     <td className="py-2 px-3 text-indigo-400 font-medium">{mapping.pattern}</td>
-    <td className="py-2 px-3 text-green-400 font-mono text-xs">{mapping.time}</td>
-    <td className="py-2 px-3 text-blue-400 font-mono text-xs">{mapping.space}</td>
+    <td className="py-2 px-3 text-green-400 font-mono text-xs">
+      {mapping.time}
+    </td>
+    <td className="py-2 px-3 text-blue-400 font-mono text-xs">
+      {mapping.space}
+    </td>
   </tr>
 );
 
@@ -844,8 +1224,12 @@ const PatternSelectorTable = () => (
   <table className="w-full text-sm">
     <thead>
       <tr className="border-b border-gray-700">
-        <th className="text-left py-2 px-3 text-gray-400 font-medium">Problem Type</th>
-        <th className="text-left py-2 px-3 text-gray-400 font-medium">Pattern</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">
+          Problem Type
+        </th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">
+          Pattern
+        </th>
         <th className="text-left py-2 px-3 text-gray-400 font-medium">Time</th>
         <th className="text-left py-2 px-3 text-gray-400 font-medium">Space</th>
       </tr>
@@ -887,7 +1271,7 @@ const PatternCard = ({
   isExpanded,
   onToggle,
 }: {
-  pattern: typeof PATTERNS[number];
+  pattern: (typeof PATTERNS)[number];
   isExpanded: boolean;
   onToggle: () => void;
 }) => (
@@ -906,13 +1290,20 @@ const PatternCard = ({
         stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 9l-7 7-7-7"
+        />
       </svg>
     </button>
     {isExpanded && (
       <div className="p-4 pt-3 border-t border-gray-800">
         <div className="mb-4">
-          <h4 className="text-sm font-semibold text-gray-400 mb-2">Key Points:</h4>
+          <h4 className="text-sm font-semibold text-gray-400 mb-2">
+            Key Points:
+          </h4>
           <ul className="space-y-1">
             {pattern.keyPoints.map((point) => (
               <KeyPointItem key={point} point={point} />
@@ -920,11 +1311,15 @@ const PatternCard = ({
           </ul>
         </div>
         <div className="mb-4">
-          <h4 className="text-sm font-semibold text-gray-400 mb-2">Template:</h4>
+          <h4 className="text-sm font-semibold text-gray-400 mb-2">
+            Template:
+          </h4>
           <CodeBlock code={pattern.code} language="java" />
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-gray-400 mb-2">Practice:</h4>
+          <h4 className="text-sm font-semibold text-gray-400 mb-2">
+            Practice:
+          </h4>
           <div className="flex flex-wrap gap-2">
             {pattern.problems.map((problem) => (
               <ProblemLink key={problem} problem={problem} />
@@ -936,7 +1331,7 @@ const PatternCard = ({
   </div>
 );
 
-const KeywordCard = ({ item }: { item: typeof KEYWORDS[number] }) => (
+const KeywordCard = ({ item }: { item: (typeof KEYWORDS)[number] }) => (
   <div className="p-3 bg-gray-900 rounded-md border border-gray-800 hover:border-gray-700 transition">
     <div className="flex items-center justify-between mb-1">
       <span className="text-white font-medium">{item.keyword}</span>
@@ -946,14 +1341,22 @@ const KeywordCard = ({ item }: { item: typeof KEYWORDS[number] }) => (
   </div>
 );
 
-const DecisionOption = ({ option }: { option: { id: string; text: string } }) => (
+const DecisionOption = ({
+  option,
+}: {
+  option: { id: string; text: string };
+}) => (
   <li className="text-sm text-gray-300 flex items-start gap-2">
     <span className="text-gray-500">├</span>
     {option.text}
   </li>
 );
 
-const DecisionCard = ({ decision }: { decision: typeof DECISIONS[number] }) => (
+const DecisionCard = ({
+  decision,
+}: {
+  decision: (typeof DECISIONS)[number];
+}) => (
   <div className="p-4 bg-gray-900 rounded-md border border-gray-800">
     <h3 className="font-semibold text-indigo-400 mb-2">{decision.question}</h3>
     <ul className="space-y-1">
@@ -964,7 +1367,7 @@ const DecisionCard = ({ decision }: { decision: typeof DECISIONS[number] }) => (
   </div>
 );
 
-const ComplexityRow = ({ item }: { item: typeof COMPLEXITIES[number] }) => (
+const ComplexityRow = ({ item }: { item: (typeof COMPLEXITIES)[number] }) => (
   <tr className="border-b border-gray-800">
     <td className="py-2 px-3 text-gray-300">{item.pattern}</td>
     <td className="py-2 px-3 text-green-400 font-mono text-xs">{item.time}</td>
@@ -976,7 +1379,9 @@ const ComplexityTable = () => (
   <table className="w-full text-sm">
     <thead>
       <tr className="border-b border-gray-700">
-        <th className="text-left py-2 px-3 text-gray-400 font-medium">Pattern</th>
+        <th className="text-left py-2 px-3 text-gray-400 font-medium">
+          Pattern
+        </th>
         <th className="text-left py-2 px-3 text-gray-400 font-medium">Time</th>
         <th className="text-left py-2 px-3 text-gray-400 font-medium">Space</th>
       </tr>
@@ -989,9 +1394,11 @@ const ComplexityTable = () => (
   </table>
 );
 
-const MistakeCard = ({ item }: { item: typeof MISTAKES[number] }) => (
+const MistakeCard = ({ item }: { item: (typeof MISTAKES)[number] }) => (
   <div className="p-3 bg-red-900/20 border border-red-500/30 rounded-md flex items-start gap-3">
-    <span className="text-red-400 font-medium min-w-[110px]">{item.pattern}</span>
+    <span className="text-red-400 font-medium min-w-[110px]">
+      {item.pattern}
+    </span>
     <span className="text-gray-300 text-sm">{item.mistake}</span>
   </div>
 );
@@ -1002,15 +1409,22 @@ const InterviewCheatsheetPage = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-4 md:py-8">
       <div className="text-center mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Interview Cheat Sheet</h1>
-        <p className="text-gray-400 text-sm md:text-base">Quick revision guide - scan this before your interview</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+          Interview Cheat Sheet
+        </h1>
+        <p className="text-gray-400 text-sm md:text-base">
+          Quick revision guide - scan this before your interview
+        </p>
       </div>
 
       <section className="mb-8 md:mb-10">
         <div className="p-4 md:p-6 bg-gray-900 rounded-md border border-gray-800">
-          <h2 className="text-lg md:text-xl font-bold text-white mb-2">The Golden Rule: Check Constraints First</h2>
+          <h2 className="text-lg md:text-xl font-bold text-white mb-2">
+            The Golden Rule: Check Constraints First
+          </h2>
           <p className="text-gray-400 mb-5">
-            Before anything else, look at the input size. This tells you which algorithms are even possible.
+            Before anything else, look at the input size. This tells you which
+            algorithms are even possible.
           </p>
           <div className="overflow-x-auto">
             <ConstraintsTable />
@@ -1019,30 +1433,41 @@ const InterviewCheatsheetPage = () => {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-white mb-4">Quick Pattern Selector</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          Quick Pattern Selector
+        </h2>
         <div className="overflow-x-auto">
           <PatternSelectorTable />
         </div>
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-white mb-4">All Patterns with Templates</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          All Patterns with Templates
+        </h2>
         <div className="space-y-3">
           {PATTERNS.map((pattern) => (
             <PatternCard
               key={pattern.id}
               pattern={pattern}
               isExpanded={expandedPattern === pattern.id}
-              onToggle={() => setExpandedPattern(expandedPattern === pattern.id ? null : pattern.id)}
+              onToggle={() =>
+                setExpandedPattern(
+                  expandedPattern === pattern.id ? null : pattern.id
+                )
+              }
             />
           ))}
         </div>
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-white mb-2">Keyword to Algorithm</h2>
+        <h2 className="text-xl font-bold text-white mb-2">
+          Keyword to Algorithm
+        </h2>
         <p className="text-gray-400 mb-5 text-sm">
-          Problems rarely tell you which algorithm to use, but the wording usually leaks it.
+          Problems rarely tell you which algorithm to use, but the wording
+          usually leaks it.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {KEYWORDS.map((k) => (
@@ -1052,7 +1477,9 @@ const InterviewCheatsheetPage = () => {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-white mb-4">Quick Decision Tree</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          Quick Decision Tree
+        </h2>
         <div className="grid md:grid-cols-2 gap-4">
           {DECISIONS.map((d) => (
             <DecisionCard key={d.id} decision={d} />
@@ -1061,14 +1488,18 @@ const InterviewCheatsheetPage = () => {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-white mb-4">Complexity Reference</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          Complexity Reference
+        </h2>
         <div className="overflow-x-auto">
           <ComplexityTable />
         </div>
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-bold text-white mb-4">Common Mistakes to Avoid</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          Common Mistakes to Avoid
+        </h2>
         <div className="grid md:grid-cols-2 gap-2">
           {MISTAKES.map((m) => (
             <MistakeCard key={m.id} item={m} />

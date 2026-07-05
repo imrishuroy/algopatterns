@@ -24,6 +24,7 @@ const difficultyOrder = { Easy: 0, Medium: 1, Hard: 2 };
 type SortOption = "difficulty" | "frequency" | "name" | "status";
 
 // Convert problem name to slug format
+// skipcq: JS-0067
 function nameToSlug(name: string): string {
   return name
     .toLowerCase()
@@ -45,7 +46,9 @@ export default function ProblemsTab({
   const [sortBy, setSortBy] = useState<SortOption>("difficulty");
   // Restore scroll position when returning from problem page
   useEffect(() => {
-    const savedScroll = sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`);
+    const savedScroll = sessionStorage.getItem(
+      `${SCROLL_STORAGE_KEY}_${patternId}`
+    );
     if (savedScroll) {
       const scrollTop = parseInt(savedScroll, 10);
       // Use requestAnimationFrame to ensure DOM is ready
@@ -58,7 +61,10 @@ export default function ProblemsTab({
 
   // Save scroll position before navigating to problem
   const saveScrollPosition = () => {
-    sessionStorage.setItem(`${SCROLL_STORAGE_KEY}_${patternId}`, window.scrollY.toString());
+    sessionStorage.setItem(
+      `${SCROLL_STORAGE_KEY}_${patternId}`,
+      window.scrollY.toString()
+    );
   };
 
   const filteredAndSorted = useMemo(() => {

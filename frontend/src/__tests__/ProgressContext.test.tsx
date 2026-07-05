@@ -28,10 +28,16 @@ const Wrapper = ({ children }: { children: ReactNode }) => (
   <ProgressProvider>{children}</ProgressProvider>
 );
 
+// skipcq: JS-0067
 function mockAuthenticated() {
   mockedUseAuth.mockReturnValue({
     isAuthenticated: true,
-    user: { id: "user-123", email: "test@test.com", name: "Test", emailVerified: true },
+    user: {
+      id: "user-123",
+      email: "test@test.com",
+      name: "Test",
+      emailVerified: true,
+    },
     isLoading: false,
     login: vi.fn(),
     logout: vi.fn(),
@@ -68,12 +74,10 @@ describe("ProgressContext", () => {
       data: { questionIds: ["q1", "q2"] },
     });
 
-    mockedApiClient.syncProgress.mockImplementation(
-      async (ids: string[]) => ({
-        success: true,
-        data: { questionIds: ids },
-      })
-    );
+    mockedApiClient.syncProgress.mockImplementation(async (ids: string[]) => ({
+      success: true,
+      data: { questionIds: ids },
+    }));
 
     mockedApiClient.toggleProgress.mockImplementation(
       async (_id: string, _completed: boolean) => ({
@@ -465,9 +469,7 @@ describe("ProgressContext", () => {
         data: { questionIds: [] },
       });
 
-      mockedApiClient.syncProgress.mockRejectedValue(
-        new Error("Sync failed")
-      );
+      mockedApiClient.syncProgress.mockRejectedValue(new Error("Sync failed"));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(["local-q1"]));
 
       const { result } = renderHook(() => useProgress(), {
@@ -648,9 +650,7 @@ describe("ProgressContext", () => {
     it("should keep localStorage if auto-sync fails", async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(["local-q1"]));
 
-      mockedApiClient.syncProgress.mockRejectedValue(
-        new Error("Sync failed")
-      );
+      mockedApiClient.syncProgress.mockRejectedValue(new Error("Sync failed"));
 
       const { result } = renderHook(() => useProgress(), {
         wrapper: Wrapper,

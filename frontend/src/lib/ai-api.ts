@@ -78,24 +78,25 @@ class AIApiClient {
   ): () => void {
     const controller = new AbortController();
 
-    const buildBody = () => JSON.stringify({
-      message: req.message,
-      problem_slug: req.problemSlug,
-      problem_title: req.problemTitle,
-      problem_description: req.problemDescription,
-      pattern_id: req.patternId,
-      pattern_name: req.patternName,
-      pattern_difficulty: req.patternDifficulty,
-      time_complexity: req.timeComplexity,
-      space_complexity: req.spaceComplexity,
-      section_content: req.sectionContent,
-      active_section: req.activeSection,
-      context_type: req.contextType,
-      code: req.code,
-      language: req.language,
-      history: req.history,
-      error_message: req.errorMessage,
-    });
+    const buildBody = () =>
+      JSON.stringify({
+        message: req.message,
+        problem_slug: req.problemSlug,
+        problem_title: req.problemTitle,
+        problem_description: req.problemDescription,
+        pattern_id: req.patternId,
+        pattern_name: req.patternName,
+        pattern_difficulty: req.patternDifficulty,
+        time_complexity: req.timeComplexity,
+        space_complexity: req.spaceComplexity,
+        section_content: req.sectionContent,
+        active_section: req.activeSection,
+        context_type: req.contextType,
+        code: req.code,
+        language: req.language,
+        history: req.history,
+        error_message: req.errorMessage,
+      });
 
     (async () => {
       try {
@@ -116,16 +117,24 @@ class AIApiClient {
             const newToken = await apiClient.refreshToken();
             if (newToken) {
               const retryHeaders = this.getHeaders();
-              const retryResponse = await fetch(`${API_BASE_URL}/api/v1/ai/chat/stream`, {
-                method: "POST",
-                headers: retryHeaders,
-                credentials: "include",
-                body: buildBody(),
-                signal: controller.signal,
-              });
+              const retryResponse = await fetch(
+                `${API_BASE_URL}/api/v1/ai/chat/stream`,
+                {
+                  method: "POST",
+                  headers: retryHeaders,
+                  credentials: "include",
+                  body: buildBody(),
+                  signal: controller.signal,
+                }
+              );
 
               if (retryResponse.ok) {
-                await this.processStream(retryResponse, onChunk, onError, onDone);
+                await this.processStream(
+                  retryResponse,
+                  onChunk,
+                  onError,
+                  onDone
+                );
                 return;
               }
             }
@@ -175,7 +184,9 @@ class AIApiClient {
       for (const line of lines) {
         // Handle both "data: {...}" and "data:{...}" formats
         if (line.startsWith("data:")) {
-          const data = line.startsWith("data: ") ? line.slice(6) : line.slice(5);
+          const data = line.startsWith("data: ")
+            ? line.slice(6)
+            : line.slice(5);
           if (data === "[DONE]") {
             onDone();
             return;
@@ -245,7 +256,9 @@ class AIApiClient {
     return response.json();
   }
 
-  async explainError(req: ExplainRequest): Promise<ApiResponse<ExplainResponse>> {
+  async explainError(
+    req: ExplainRequest
+  ): Promise<ApiResponse<ExplainResponse>> {
     const headers = await this.refreshAndGetHeaders();
     const response = await fetch(`${API_BASE_URL}/api/v1/ai/explain`, {
       method: "POST",
@@ -272,47 +285,69 @@ class AIApiClient {
     return response.json();
   }
 
-  async getSessionMessages(sessionId: string): Promise<ApiResponse<{ messages: AIMessageData[] }>> {
+  async getSessionMessages(
+    sessionId: string
+  ): Promise<ApiResponse<{ messages: AIMessageData[] }>> {
     const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/messages`, {
-      method: "GET",
-      headers,
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/messages`,
+      {
+        method: "GET",
+        headers,
+        credentials: "include",
+      }
+    );
     return response.json();
   }
 
-  async clearSession(sessionId: string): Promise<ApiResponse<{ cleared: boolean }>> {
+  async clearSession(
+    sessionId: string
+  ): Promise<ApiResponse<{ cleared: boolean }>> {
     const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions/${sessionId}`, {
-      method: "DELETE",
-      headers,
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}`,
+      {
+        method: "DELETE",
+        headers,
+        credentials: "include",
+      }
+    );
     return response.json();
   }
 
-  async archiveSession(sessionId: string, title?: string): Promise<ApiResponse<{ archived: boolean }>> {
+  async archiveSession(
+    sessionId: string,
+    title?: string
+  ): Promise<ApiResponse<{ archived: boolean }>> {
     const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/archive`, {
-      method: "POST",
-      headers,
-      credentials: "include",
-      body: JSON.stringify({ title }),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/archive`,
+      {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ title }),
+      }
+    );
     return response.json();
   }
 
-  async getArchivedSessions(problemSlug?: string, patternId?: string): Promise<ApiResponse<{ sessions: AISessionData[] }>> {
+  async getArchivedSessions(
+    problemSlug?: string,
+    patternId?: string
+  ): Promise<ApiResponse<{ sessions: AISessionData[] }>> {
     const headers = await this.refreshAndGetHeaders();
     const params = new URLSearchParams();
     if (problemSlug) params.set("problem_slug", problemSlug);
     if (patternId) params.set("pattern_id", patternId);
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions/archived?${params.toString()}`, {
-      method: "GET",
-      headers,
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/ai/sessions/archived?${params.toString()}`,
+      {
+        method: "GET",
+        headers,
+        credentials: "include",
+      }
+    );
     return response.json();
   }
 }

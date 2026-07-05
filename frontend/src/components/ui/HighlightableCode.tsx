@@ -66,6 +66,7 @@ const customStyle = {
   },
 };
 
+// skipcq: JS-0067
 export function HighlightableCode({
   code,
   language = "java",
@@ -115,23 +116,19 @@ export function HighlightableCode({
           10,
           Math.min(
             containerRect.width - 180,
-            selection.rect.left - containerRect.left + selection.rect.width / 2 - 80
+            selection.rect.left -
+              containerRect.left +
+              selection.rect.width / 2 -
+              80
           )
         ),
       };
-      console.log("[Highlight] Selection detected:", selection.text.substring(0, 50));
-      console.log("[Highlight] Toolbar position:", newPosition);
       setToolbarPosition(newPosition);
       setActiveHighlight(null);
     } else if (!activeHighlight) {
       setToolbarPosition(null);
     }
   }, [selection, activeHighlight]);
-
-  // Debug: Log auth state
-  useEffect(() => {
-    console.log("[Highlight] isAuthenticated:", isAuthenticated);
-  }, [isAuthenticated]);
 
   const handleCreateHighlight = async (color: HighlightColor) => {
     if (!selection) return;

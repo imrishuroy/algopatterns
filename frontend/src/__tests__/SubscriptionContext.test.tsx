@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { SubscriptionProvider, useSubscription } from "@/contexts/SubscriptionContext";
+import {
+  SubscriptionProvider,
+  useSubscription,
+} from "@/contexts/SubscriptionContext";
 import type { ReactNode } from "react";
 import type { Subscription, Plan, PlanFeatures } from "@/types";
 
@@ -8,7 +11,12 @@ import type { Subscription, Plan, PlanFeatures } from "@/types";
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: vi.fn(() => ({
     isAuthenticated: true,
-    user: { id: "user-123", email: "test@test.com", name: "Test", emailVerified: true },
+    user: {
+      id: "user-123",
+      email: "test@test.com",
+      name: "Test",
+      emailVerified: true,
+    },
     isLoading: false,
     login: vi.fn(),
     logout: vi.fn(),
@@ -106,7 +114,12 @@ describe("SubscriptionContext", () => {
     vi.clearAllMocks();
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
-      user: { id: "user-123", email: "test@test.com", name: "Test", emailVerified: true },
+      user: {
+        id: "user-123",
+        email: "test@test.com",
+        name: "Test",
+        emailVerified: true,
+      },
       isLoading: false,
       login: vi.fn(),
       logout: vi.fn(),
@@ -128,7 +141,9 @@ describe("SubscriptionContext", () => {
         data: mockProSubscription,
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       // Initial loading state
       expect(result.current.isLoading).toBe(true);
@@ -144,7 +159,9 @@ describe("SubscriptionContext", () => {
         data: mockProSubscription,
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.subscription).toEqual(mockProSubscription);
@@ -165,7 +182,9 @@ describe("SubscriptionContext", () => {
         handleGoogleCallback: vi.fn(),
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.subscription).toBeNull();
@@ -182,7 +201,9 @@ describe("SubscriptionContext", () => {
         data: mockProSubscription,
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isPro).toBe(true);
@@ -195,7 +216,9 @@ describe("SubscriptionContext", () => {
         data: mockFreeSubscription,
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isPro).toBe(false);
@@ -208,7 +231,9 @@ describe("SubscriptionContext", () => {
         data: { ...mockProSubscription, status: "cancelled" },
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isPro).toBe(false);
@@ -223,7 +248,9 @@ describe("SubscriptionContext", () => {
         data: mockProSubscription,
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.features.max_patterns).toBe(-1);
@@ -238,7 +265,9 @@ describe("SubscriptionContext", () => {
         data: mockFreeSubscription,
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.features.max_patterns).toBe(3);
@@ -255,7 +284,9 @@ describe("SubscriptionContext", () => {
         data: mockFreeSubscription,
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.plans).toHaveLength(2);
@@ -277,7 +308,11 @@ describe("SubscriptionContext", () => {
           order_id: "order-123",
           razorpay_order_id: "rzp_order_123",
           razorpay_key_id: "rzp_key_123",
-          plan: { id: "pro_yearly", name: "Pro Yearly", billing_period: "yearly" },
+          plan: {
+            id: "pro_yearly",
+            name: "Pro Yearly",
+            billing_period: "yearly",
+          },
           pricing: {
             subtotal: 120000,
             discount_amount: 0,
@@ -289,13 +324,21 @@ describe("SubscriptionContext", () => {
         },
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let orderResult: { success: boolean; error?: string; data?: { razorpay_order_id: string } } | undefined;
+      let orderResult:
+        | {
+            success: boolean;
+            error?: string;
+            data?: { razorpay_order_id: string };
+          }
+        | undefined;
       await act(async () => {
         orderResult = await result.current.createOrder("pro_yearly");
       });
@@ -311,17 +354,38 @@ describe("SubscriptionContext", () => {
       });
       vi.mocked(apiClient.createOrder).mockResolvedValue({
         success: false,
-        data: { order_id: "", razorpay_order_id: "", razorpay_key_id: "", plan: { id: "", name: "", billing_period: "" }, pricing: { subtotal: 0, discount_amount: 0, gst_rate: 0, gst_amount: 0, total: 0, currency: "INR" } },
+        data: {
+          order_id: "",
+          razorpay_order_id: "",
+          razorpay_key_id: "",
+          plan: { id: "", name: "", billing_period: "" },
+          pricing: {
+            subtotal: 0,
+            discount_amount: 0,
+            gst_rate: 0,
+            gst_amount: 0,
+            total: 0,
+            currency: "INR",
+          },
+        },
         error: { code: "ERROR", message: "Plan not found" },
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let orderResult: { success: boolean; error?: string; data?: { razorpay_order_id: string } } | undefined;
+      let orderResult:
+        | {
+            success: boolean;
+            error?: string;
+            data?: { razorpay_order_id: string };
+          }
+        | undefined;
       await act(async () => {
         orderResult = await result.current.createOrder("invalid_plan");
       });
@@ -348,15 +412,26 @@ describe("SubscriptionContext", () => {
         },
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let discountResult: { success: boolean; error?: string; data?: { discount_amount: number } } | undefined;
+      let discountResult:
+        | {
+            success: boolean;
+            error?: string;
+            data?: { discount_amount: number };
+          }
+        | undefined;
       await act(async () => {
-        discountResult = await result.current.validateDiscount("SAVE50", "pro_yearly");
+        discountResult = await result.current.validateDiscount(
+          "SAVE50",
+          "pro_yearly"
+        );
       });
 
       expect(discountResult!.success).toBe(true);
@@ -370,19 +445,36 @@ describe("SubscriptionContext", () => {
       });
       vi.mocked(apiClient.validateDiscount).mockResolvedValue({
         success: false,
-        data: { code: "", discount_type: "", discount_value: 0, discount_amount: 0, message: "" },
+        data: {
+          code: "",
+          discount_type: "",
+          discount_value: 0,
+          discount_amount: 0,
+          message: "",
+        },
         error: { code: "INVALID", message: "Invalid discount code" },
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let discountResult: { success: boolean; error?: string; data?: { discount_amount: number } } | undefined;
+      let discountResult:
+        | {
+            success: boolean;
+            error?: string;
+            data?: { discount_amount: number };
+          }
+        | undefined;
       await act(async () => {
-        discountResult = await result.current.validateDiscount("INVALID", "pro_yearly");
+        discountResult = await result.current.validateDiscount(
+          "INVALID",
+          "pro_yearly"
+        );
       });
 
       expect(discountResult!.success).toBe(false);
@@ -404,15 +496,27 @@ describe("SubscriptionContext", () => {
         },
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let verifyResult: { success: boolean; error?: string; data?: { payment_id: string; subscription: Subscription } } | undefined;
+      let verifyResult:
+        | {
+            success: boolean;
+            error?: string;
+            data?: { payment_id: string; subscription: Subscription };
+          }
+        | undefined;
       await act(async () => {
-        verifyResult = await result.current.verifyPayment("pay_123", "order_123", "sig_123");
+        verifyResult = await result.current.verifyPayment(
+          "pay_123",
+          "order_123",
+          "sig_123"
+        );
       });
 
       expect(verifyResult!.success).toBe(true);
@@ -425,7 +529,10 @@ describe("SubscriptionContext", () => {
     it("should cancel subscription and refresh", async () => {
       vi.mocked(apiClient.getSubscription)
         .mockResolvedValueOnce({ success: true, data: mockProSubscription })
-        .mockResolvedValueOnce({ success: true, data: { ...mockProSubscription, cancel_at_period_end: true } });
+        .mockResolvedValueOnce({
+          success: true,
+          data: { ...mockProSubscription, cancel_at_period_end: true },
+        });
       vi.mocked(apiClient.cancelSubscription).mockResolvedValue({
         success: true,
         data: {
@@ -435,7 +542,9 @@ describe("SubscriptionContext", () => {
         },
       });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -443,7 +552,10 @@ describe("SubscriptionContext", () => {
 
       let cancelResult: { success: boolean; error?: string } | undefined;
       await act(async () => {
-        cancelResult = await result.current.cancelSubscription("too_expensive", "Just testing");
+        cancelResult = await result.current.cancelSubscription(
+          "too_expensive",
+          "Just testing"
+        );
       });
 
       expect(cancelResult!.success).toBe(true);
@@ -456,7 +568,9 @@ describe("SubscriptionContext", () => {
         .mockResolvedValueOnce({ success: true, data: mockFreeSubscription })
         .mockResolvedValueOnce({ success: true, data: mockProSubscription });
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.subscription?.plan_id).toBe("free");
@@ -472,9 +586,13 @@ describe("SubscriptionContext", () => {
 
   describe("error handling", () => {
     it("should handle API errors gracefully", async () => {
-      vi.mocked(apiClient.getSubscription).mockRejectedValue(new Error("Network error"));
+      vi.mocked(apiClient.getSubscription).mockRejectedValue(
+        new Error("Network error")
+      );
 
-      const { result } = renderHook(() => useSubscription(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSubscription(), {
+        wrapper: Wrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);

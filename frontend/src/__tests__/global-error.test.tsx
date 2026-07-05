@@ -43,7 +43,11 @@ describe("GlobalError", () => {
     const error = new Error("test error");
     render(<GlobalError error={error} reset={mockReset} />);
 
-    expect(screen.getByText("An unexpected error occurred. Our team has been notified.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "An unexpected error occurred. Our team has been notified."
+      )
+    ).toBeInTheDocument();
   });
 
   it("calls Sentry.withScope and captureException with the error", () => {

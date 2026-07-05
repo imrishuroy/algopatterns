@@ -22,7 +22,10 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   loginWithGoogle: () => Promise<void>;
-  handleGoogleCallback: (code: string, state: string) => Promise<{ success: boolean; error?: string }>;
+  handleGoogleCallback: (
+    code: string,
+    state: string
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +33,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const ACCESS_TOKEN_KEY = "algopatterns_access_token";
 const OAUTH_STATE_KEY = "algopatterns_oauth_state";
 
+// skipcq: JS-0067
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -126,28 +130,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const handleGoogleCallback = useCallback(async (code: string, state: string) => {
-    try {
-      const savedState = localStorage.getItem(OAUTH_STATE_KEY);
-      if (state !== savedState) {
-        return { success: false, error: "Invalid OAuth state. Please try again." };
-      }
-      localStorage.removeItem(OAUTH_STATE_KEY);
+  const handleGoogleCallback = useCallback(
+    async (code: string, state: string) => {
+      try {
+        const savedState = localStorage.getItem(OAUTH_STATE_KEY);
+        if (state !== savedState) {
+          return {
+            success: false,
+            error: "Invalid OAuth state. Please try again.",
+          };
+        }
+        localStorage.removeItem(OAUTH_STATE_KEY);
 
-      const response = await apiClient.googleCallback({ code, state });
-      if (response.success) {
-        setUser(response.data.user);
-        localStorage.setItem(ACCESS_TOKEN_KEY, response.data.accessToken);
-        return { success: true };
+        const response = await apiClient.googleCallback({ code, state });
+        if (response.success) {
+          setUser(response.data.user);
+          localStorage.setItem(ACCESS_TOKEN_KEY, response.data.accessToken);
+          return { success: true };
+        }
+        return {
+          success: false,
+          error: response.error?.message || "Google login failed",
+        };
+      } catch {
+        return {
+          success: false,
+          error: "An error occurred during Google login",
+        };
       }
-      return {
-        success: false,
-        error: response.error?.message || "Google login failed",
-      };
-    } catch {
-      return { success: false, error: "An error occurred during Google login" };
-    }
-  }, []);
+    },
+    []
+  );
 
   return (
     <AuthContext.Provider

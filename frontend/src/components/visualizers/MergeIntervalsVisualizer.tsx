@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Interval {
@@ -37,8 +43,12 @@ const initialIntervals = [
   { start: 15, end: 18 },
 ];
 
+// skipcq: JS-0067
 export default function MergeIntervalsVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(1000);
   const [intervals, setIntervals] = useState<Interval[]>([]);
   const [result, setResult] = useState<Interval[]>([]);

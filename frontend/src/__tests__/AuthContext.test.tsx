@@ -97,7 +97,9 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let loginResult: Awaited<ReturnType<typeof result.current.login>> = { success: false };
+      let loginResult: Awaited<ReturnType<typeof result.current.login>> = {
+        success: false,
+      };
       await act(async () => {
         loginResult = await result.current.login({
           email: "test@test.com",
@@ -126,7 +128,9 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let loginResult: Awaited<ReturnType<typeof result.current.login>> = { success: false };
+      let loginResult: Awaited<ReturnType<typeof result.current.login>> = {
+        success: false,
+      };
       await act(async () => {
         loginResult = await result.current.login({
           email: "test@test.com",
@@ -157,7 +161,8 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let registerResult: Awaited<ReturnType<typeof result.current.register>> = { success: false };
+      let registerResult: Awaited<ReturnType<typeof result.current.register>> =
+        { success: false };
       await act(async () => {
         registerResult = await result.current.register({
           email: "test@test.com",
@@ -182,7 +187,8 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let registerResult: Awaited<ReturnType<typeof result.current.register>> = { success: false };
+      let registerResult: Awaited<ReturnType<typeof result.current.register>> =
+        { success: false };
       await act(async () => {
         registerResult = await result.current.register({
           email: "existing@test.com",
@@ -206,7 +212,10 @@ describe("AuthContext", () => {
           expiresIn: 900,
         },
       });
-      vi.mocked(apiClient.logout).mockResolvedValue({ success: true, data: { message: "Logged out" } });
+      vi.mocked(apiClient.logout).mockResolvedValue({
+        success: true,
+        data: { message: "Logged out" },
+      });
 
       const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
 
@@ -283,7 +292,9 @@ describe("AuthContext", () => {
         new Error("Network error")
       );
 
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {}); // skipcq: JS-0321
 
       const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
 
@@ -322,7 +333,9 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>> = { success: false };
+      let callbackResult: Awaited<
+        ReturnType<typeof result.current.handleGoogleCallback>
+      > = { success: false };
       await act(async () => {
         callbackResult = await result.current.handleGoogleCallback(
           mockCode,
@@ -351,7 +364,9 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>> = { success: false };
+      let callbackResult: Awaited<
+        ReturnType<typeof result.current.handleGoogleCallback>
+      > = { success: false };
       await act(async () => {
         callbackResult = await result.current.handleGoogleCallback(
           mockCode,
@@ -386,7 +401,9 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>> = { success: false };
+      let callbackResult: Awaited<
+        ReturnType<typeof result.current.handleGoogleCallback>
+      > = { success: false };
       await act(async () => {
         callbackResult = await result.current.handleGoogleCallback(
           mockCode,
@@ -415,7 +432,9 @@ describe("AuthContext", () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      let callbackResult: Awaited<ReturnType<typeof result.current.handleGoogleCallback>> = { success: false };
+      let callbackResult: Awaited<
+        ReturnType<typeof result.current.handleGoogleCallback>
+      > = { success: false };
       await act(async () => {
         callbackResult = await result.current.handleGoogleCallback(
           mockCode,

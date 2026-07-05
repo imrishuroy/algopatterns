@@ -34,7 +34,7 @@ function hasFeatureAccess(
 /**
  * Returns a human-readable description for each feature.
  */
-function getFeatureDescription(feature: keyof PlanFeatures): string {
+function getFeatureDescription(feature: keyof PlanFeatures): string { // skipcq: JS-0067
   const descriptions: Record<keyof PlanFeatures, string> = {
     max_patterns: "Access all algorithm patterns and their detailed tutorials.",
     max_visualizers:
@@ -45,8 +45,7 @@ function getFeatureDescription(feature: keyof PlanFeatures): string {
     has_code_playground:
       "Practice coding with our interactive code playground.",
     has_progress_sync: "Sync your learning progress across all devices.",
-    has_highlighting:
-      "Highlight and annotate content for better note-taking.",
+    has_highlighting: "Highlight and annotate content for better note-taking.",
     has_solutions_access:
       "Get detailed solutions and explanations for all problems.",
     has_offline_export: "Export content for offline learning.",
@@ -58,7 +57,7 @@ function getFeatureDescription(feature: keyof PlanFeatures): string {
  * PaymentGuard component wraps premium content and shows a blurred overlay
  * with an upgrade prompt for users who don't have access to the feature.
  */
-export function PaymentGuard({
+export function PaymentGuard({ // skipcq: JS-0067
   feature,
   children,
   fallback,
@@ -70,11 +69,7 @@ export function PaymentGuard({
     return (
       <div className="flex items-center justify-center p-8">
         <div className="flex items-center gap-3 text-gray-400">
-          <svg
-            className="w-5 h-5 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle
               className="opacity-25"
               cx="12"
@@ -109,7 +104,10 @@ export function PaymentGuard({
   return (
     <div className="relative">
       {/* Blurred content */}
-      <div className="blur-sm pointer-events-none select-none" aria-hidden="true">
+      <div
+        className="blur-sm pointer-events-none select-none"
+        aria-hidden="true"
+      >
         {children}
       </div>
 

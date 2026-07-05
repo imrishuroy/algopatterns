@@ -36,7 +36,9 @@ describe("Problem Page Navigation - handleBack", () => {
 
     handleBack();
 
-    expect(mockPush).toHaveBeenCalledWith("/patterns/binary-search?tab=problems");
+    expect(mockPush).toHaveBeenCalledWith(
+      "/patterns/binary-search?tab=problems"
+    );
     expect(mockBack).not.toHaveBeenCalled();
   });
 
@@ -100,7 +102,10 @@ describe("Solve button link generation", () => {
     const testCases = [
       { name: "Two Sum", expected: "two-sum" },
       { name: "Binary Search", expected: "binary-search" },
-      { name: "Median of Two Sorted Arrays", expected: "median-of-two-sorted-arrays" },
+      {
+        name: "Median of Two Sorted Arrays",
+        expected: "median-of-two-sorted-arrays",
+      },
       { name: "3Sum", expected: "3sum" },
       { name: "Valid Parentheses", expected: "valid-parentheses" },
     ];
@@ -129,26 +134,37 @@ describe("Scroll position persistence", () => {
     const patternId = "binary-search";
     const scrollY = 500;
 
-    sessionStorage.setItem(`${SCROLL_STORAGE_KEY}_${patternId}`, scrollY.toString());
+    sessionStorage.setItem(
+      `${SCROLL_STORAGE_KEY}_${patternId}`,
+      scrollY.toString()
+    );
 
-    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`)).toBe("500");
+    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`)).toBe(
+      "500"
+    );
   });
 
   it("retrieves and removes scroll position from sessionStorage", () => {
     const patternId = "binary-search";
     sessionStorage.setItem(`${SCROLL_STORAGE_KEY}_${patternId}`, "300");
 
-    const savedScroll = sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`);
+    const savedScroll = sessionStorage.getItem(
+      `${SCROLL_STORAGE_KEY}_${patternId}`
+    );
     expect(savedScroll).toBe("300");
 
     sessionStorage.removeItem(`${SCROLL_STORAGE_KEY}_${patternId}`);
-    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`)).toBeNull();
+    expect(
+      sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`)
+    ).toBeNull();
   });
 
   it("handles missing scroll position gracefully", () => {
     const patternId = "nonexistent-pattern";
 
-    const savedScroll = sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`);
+    const savedScroll = sessionStorage.getItem(
+      `${SCROLL_STORAGE_KEY}_${patternId}`
+    );
     expect(savedScroll).toBeNull();
   });
 
@@ -157,9 +173,15 @@ describe("Scroll position persistence", () => {
     sessionStorage.setItem(`${SCROLL_STORAGE_KEY}_sliding-window`, "200");
     sessionStorage.setItem(`${SCROLL_STORAGE_KEY}_two-pointers`, "300");
 
-    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_binary-search`)).toBe("100");
-    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_sliding-window`)).toBe("200");
-    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_two-pointers`)).toBe("300");
+    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_binary-search`)).toBe(
+      "100"
+    );
+    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_sliding-window`)).toBe(
+      "200"
+    );
+    expect(sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_two-pointers`)).toBe(
+      "300"
+    );
   });
 });
 
@@ -175,8 +197,7 @@ describe("URL tab parameter handling", () => {
 
     testCases.forEach(({ param, expected }) => {
       const validTabs = ["tutorial", "problems", "cheatsheet"];
-      const activeTab =
-        param && validTabs.includes(param) ? param : "tutorial";
+      const activeTab = param && validTabs.includes(param) ? param : "tutorial";
 
       expect(activeTab).toBe(expected);
     });

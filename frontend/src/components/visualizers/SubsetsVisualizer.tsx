@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type PlayState = { step: number; isPlaying: boolean };
@@ -25,8 +31,12 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
   }
 }
 
+// skipcq: JS-0067
 export default function SubsetsVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(800);
   const [nums] = useState([1, 2, 3]);
   const [currentPath, setCurrentPath] = useState<number[]>([]);
@@ -218,7 +228,7 @@ export default function SubsetsVisualizer() {
             <AnimatePresence>
               {results.map((subset, idx) => (
                 <motion.div
-                  key={`[${subset.join(',')}]-${idx}`}
+                  key={`[${subset.join(",")}]-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-md text-green-400 font-mono text-sm"

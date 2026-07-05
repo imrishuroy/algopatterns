@@ -14,7 +14,9 @@ vi.mock("@sentry/nextjs", () => {
   });
   const mockSetUser = vi.fn();
   const mockAddBreadcrumb = vi.fn();
-  const mockStartSpan = vi.fn((_options: unknown, callback: () => unknown) => callback());
+  const mockStartSpan = vi.fn((_options: unknown, callback: () => unknown) =>
+    callback()
+  );
   const mockSetContext = vi.fn();
   const mockSetTag = vi.fn();
   const mockSetTags = vi.fn();
@@ -212,7 +214,11 @@ describe("startSpan", () => {
 describe("startSpanAsync", () => {
   it("starts span and executes async callback", async () => {
     const callback = vi.fn(() => Promise.resolve("async result"));
-    const result = await startSpanAsync("async-span", "async.operation", callback);
+    const result = await startSpanAsync(
+      "async-span",
+      "async.operation",
+      callback
+    );
 
     expect(mockSentry.startSpan).toHaveBeenCalledWith(
       { name: "async-span", op: "async.operation" },
@@ -226,7 +232,10 @@ describe("setContext", () => {
   it("sets context", () => {
     setContext("order", { id: "123", total: 99.99 });
 
-    expect(mockSentry.setContext).toHaveBeenCalledWith("order", { id: "123", total: 99.99 });
+    expect(mockSentry.setContext).toHaveBeenCalledWith("order", {
+      id: "123",
+      total: 99.99,
+    });
   });
 
   it("clears context with null", () => {
@@ -248,7 +257,10 @@ describe("setTags", () => {
   it("sets multiple tags", () => {
     setTags({ environment: "production", version: "1.0.0" });
 
-    expect(mockSentry.setTags).toHaveBeenCalledWith({ environment: "production", version: "1.0.0" });
+    expect(mockSentry.setTags).toHaveBeenCalledWith({
+      environment: "production",
+      version: "1.0.0",
+    });
   });
 });
 
@@ -259,7 +271,9 @@ describe("showFeedback", () => {
       open: vi.fn(),
     };
     const mockCreateForm = vi.fn().mockResolvedValue(mockForm);
-    vi.mocked(mockSentry.getFeedback).mockReturnValue({ createForm: mockCreateForm } as unknown as ReturnType<typeof Sentry.getFeedback>);
+    vi.mocked(mockSentry.getFeedback).mockReturnValue({
+      createForm: mockCreateForm,
+    } as unknown as ReturnType<typeof Sentry.getFeedback>);
 
     showFeedback();
 
@@ -351,7 +365,9 @@ describe("logger", () => {
   it("logs debug message", () => {
     logger.debug("debug message", { key: "value" });
 
-    expect(mockSentry.logger.debug).toHaveBeenCalledWith("debug message", { key: "value" });
+    expect(mockSentry.logger.debug).toHaveBeenCalledWith("debug message", {
+      key: "value",
+    });
   });
 
   it("logs info message", () => {
@@ -369,7 +385,9 @@ describe("logger", () => {
   it("logs error message", () => {
     logger.error("error message", { errorCode: "E001" });
 
-    expect(mockSentry.logger.error).toHaveBeenCalledWith("error message", { errorCode: "E001" });
+    expect(mockSentry.logger.error).toHaveBeenCalledWith("error message", {
+      errorCode: "E001",
+    });
   });
 });
 
@@ -377,30 +395,49 @@ describe("metrics", () => {
   it("counts events", () => {
     metrics.count("button_clicks", 1, { page: "home" });
 
-    expect(mockSentry.metrics.count).toHaveBeenCalledWith("button_clicks", 1, { attributes: { page: "home" } });
+    expect(mockSentry.metrics.count).toHaveBeenCalledWith("button_clicks", 1, {
+      attributes: { page: "home" },
+    });
   });
 
   it("counts with default value", () => {
     metrics.count("page_views");
 
-    expect(mockSentry.metrics.count).toHaveBeenCalledWith("page_views", 1, { attributes: undefined });
+    expect(mockSentry.metrics.count).toHaveBeenCalledWith("page_views", 1, {
+      attributes: undefined,
+    });
   });
 
   it("sets gauge", () => {
     metrics.gauge("queue_size", 42, { queue: "main" });
 
-    expect(mockSentry.metrics.gauge).toHaveBeenCalledWith("queue_size", 42, { attributes: { queue: "main" } });
+    expect(mockSentry.metrics.gauge).toHaveBeenCalledWith("queue_size", 42, {
+      attributes: { queue: "main" },
+    });
   });
 
   it("records distribution", () => {
     metrics.distribution("response_time", 150.5, { endpoint: "/api" });
 
-    expect(mockSentry.metrics.distribution).toHaveBeenCalledWith("response_time", 150.5, { attributes: { endpoint: "/api" }, unit: undefined });
+    expect(mockSentry.metrics.distribution).toHaveBeenCalledWith(
+      "response_time",
+      150.5,
+      { attributes: { endpoint: "/api" }, unit: undefined }
+    );
   });
 
   it("records distribution with unit", () => {
-    metrics.distribution("api_latency", 200, { endpoint: "/api" }, "millisecond");
+    metrics.distribution(
+      "api_latency",
+      200,
+      { endpoint: "/api" },
+      "millisecond"
+    );
 
-    expect(mockSentry.metrics.distribution).toHaveBeenCalledWith("api_latency", 200, { attributes: { endpoint: "/api" }, unit: "millisecond" });
+    expect(mockSentry.metrics.distribution).toHaveBeenCalledWith(
+      "api_latency",
+      200,
+      { attributes: { endpoint: "/api" }, unit: "millisecond" }
+    );
   });
 });

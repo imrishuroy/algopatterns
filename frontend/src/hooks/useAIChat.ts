@@ -2,7 +2,12 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { aiApiClient, type AISessionData } from "@/lib/ai-api";
-import type { AIMessage, ChatRequest, ConversationMessage, ContextType } from "@/types/ai";
+import type {
+  AIMessage,
+  ChatRequest,
+  ConversationMessage,
+  ContextType,
+} from "@/types/ai";
 
 interface UseAIChatOptions {
   problemSlug?: string;
@@ -22,6 +27,7 @@ interface UseAIChatOptions {
   isAuthenticated?: boolean;
 }
 
+// skipcq: JS-0067
 export function useAIChat(options: UseAIChatOptions = {}) {
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,29 +55,36 @@ export function useAIChat(options: UseAIChatOptions = {}) {
         // Load active session and archived sessions in parallel
         const [sessionsRes, archivedRes] = await Promise.all([
           aiApiClient.getSessions(),
-          aiApiClient.getArchivedSessions(options.problemSlug, options.patternId),
+          aiApiClient.getArchivedSessions(
+            options.problemSlug,
+            options.patternId
+          ),
         ]);
 
         if (sessionsRes.success && sessionsRes.data.sessions) {
           // Find active session for this context
-          const session = sessionsRes.data.sessions.find(
-            s => {
-              if (options.problemSlug) return s.problem_slug === options.problemSlug && !s.is_archived;
-              if (options.patternId) return s.pattern_id === options.patternId && !s.is_archived;
-              return false;
-            }
-          );
+          const session = sessionsRes.data.sessions.find((s) => {
+            if (options.problemSlug)
+              return s.problem_slug === options.problemSlug && !s.is_archived;
+            if (options.patternId)
+              return s.pattern_id === options.patternId && !s.is_archived;
+            return false;
+          });
 
           if (session) {
             setSessionId(session.id);
-            const messagesRes = await aiApiClient.getSessionMessages(session.id);
+            const messagesRes = await aiApiClient.getSessionMessages(
+              session.id
+            );
             if (messagesRes.success && messagesRes.data.messages) {
-              const loadedMessages: AIMessage[] = messagesRes.data.messages.map(m => ({
-                id: m.id,
-                role: m.role,
-                content: m.content,
-                timestamp: new Date(m.created_at),
-              }));
+              const loadedMessages: AIMessage[] = messagesRes.data.messages.map(
+                (m) => ({
+                  id: m.id,
+                  role: m.role,
+                  content: m.content,
+                  timestamp: new Date(m.created_at),
+                })
+              );
               setMessages(loadedMessages);
             }
           }
@@ -123,8 +136,8 @@ export function useAIChat(options: UseAIChatOptions = {}) {
       // Get current messages state to build history
       const currentMessages = [...messages, userMessage];
       const history: ConversationMessage[] = currentMessages
-        .filter(msg => !msg.isStreaming && msg.content)
-        .map(msg => ({
+        .filter((msg) => !msg.isStreaming && msg.content)
+        .map((msg) => ({
           role: msg.role,
           content: msg.content,
         }));
@@ -165,7 +178,11 @@ export function useAIChat(options: UseAIChatOptions = {}) {
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
-                  ? { ...msg, isStreaming: false, content: msg.content || "Sorry, an error occurred." }
+                  ? {
+                      ...msg,
+                      isStreaming: false,
+                      content: msg.content || "Sorry, an error occurred.",
+                    }
                   : msg
               )
             );
@@ -192,7 +209,11 @@ export function useAIChat(options: UseAIChatOptions = {}) {
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
-                  ? { ...msg, content: response.data.content, isStreaming: false }
+                  ? {
+                      ...msg,
+                      content: response.data.content,
+                      isStreaming: false,
+                    }
                   : msg
               )
             );
@@ -201,7 +222,11 @@ export function useAIChat(options: UseAIChatOptions = {}) {
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
-                  ? { ...msg, content: "Sorry, an error occurred.", isStreaming: false }
+                  ? {
+                      ...msg,
+                      content: "Sorry, an error occurred.",
+                      isStreaming: false,
+                    }
                   : msg
               )
             );
@@ -211,7 +236,11 @@ export function useAIChat(options: UseAIChatOptions = {}) {
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === assistantMessageId
-                ? { ...msg, content: "Sorry, an error occurred.", isStreaming: false }
+                ? {
+                    ...msg,
+                    content: "Sorry, an error occurred.",
+                    isStreaming: false,
+                  }
                 : msg
             )
           );
@@ -219,7 +248,23 @@ export function useAIChat(options: UseAIChatOptions = {}) {
         setIsLoading(false);
       }
     },
-    [options.problemSlug, options.problemTitle, options.problemDescription, options.patternId, options.patternName, options.patternDifficulty, options.timeComplexity, options.spaceComplexity, options.sectionContent, options.activeSection, options.contextType, options.code, options.language, options.errorMessage, messages]
+    [
+      options.problemSlug,
+      options.problemTitle,
+      options.problemDescription,
+      options.patternId,
+      options.patternName,
+      options.patternDifficulty,
+      options.timeComplexity,
+      options.spaceComplexity,
+      options.sectionContent,
+      options.activeSection,
+      options.contextType,
+      options.code,
+      options.language,
+      options.errorMessage,
+      messages,
+    ]
   );
 
   const stopStreaming = useCallback(() => {
@@ -261,14 +306,17 @@ export function useAIChat(options: UseAIChatOptions = {}) {
 
     try {
       // Generate title from first user message
-      const firstUserMsg = messages.find(m => m.role === "user");
+      const firstUserMsg = messages.find((m) => m.role === "user");
       const title = firstUserMsg?.content.slice(0, 100) || "Chat";
 
       await aiApiClient.archiveSession(sessionId, title);
 
       // Add to archived sessions list
       if (options.problemSlug || options.patternId) {
-        const archivedRes = await aiApiClient.getArchivedSessions(options.problemSlug, options.patternId);
+        const archivedRes = await aiApiClient.getArchivedSessions(
+          options.problemSlug,
+          options.patternId
+        );
         if (archivedRes.success && archivedRes.data.sessions) {
           setArchivedSessions(archivedRes.data.sessions);
         }
@@ -286,14 +334,17 @@ export function useAIChat(options: UseAIChatOptions = {}) {
   const loadArchivedSession = useCallback(async (archivedSessionId: string) => {
     setIsLoadingHistory(true);
     try {
-      const messagesRes = await aiApiClient.getSessionMessages(archivedSessionId);
+      const messagesRes =
+        await aiApiClient.getSessionMessages(archivedSessionId);
       if (messagesRes.success && messagesRes.data.messages) {
-        const loadedMessages: AIMessage[] = messagesRes.data.messages.map(m => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-          timestamp: new Date(m.created_at),
-        }));
+        const loadedMessages: AIMessage[] = messagesRes.data.messages.map(
+          (m) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            timestamp: new Date(m.created_at),
+          })
+        );
         setMessages(loadedMessages);
         setSessionId(archivedSessionId);
       }
@@ -306,7 +357,9 @@ export function useAIChat(options: UseAIChatOptions = {}) {
   }, []);
 
   // Check if current session is archived (read-only)
-  const isViewingArchived = sessionId ? archivedSessions.some(s => s.id === sessionId) : false;
+  const isViewingArchived = sessionId
+    ? archivedSessions.some((s) => s.id === sessionId)
+    : false;
 
   return {
     messages,

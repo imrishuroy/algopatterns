@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useReducer } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useReducer,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TreeNode {
@@ -177,58 +183,58 @@ export default function DPTreeVisualizer({
 
   const buildRobberTree = useCallback(
     function buildRobberTree(
-    nums: number[],
-    i = 0,
-    depth = 0,
-    id = "0",
-    memo: Set<number> = new Set()
-  ): TreeNode | null {
-    if (i >= nums.length) {
-      return {
+      nums: number[],
+      i = 0,
+      depth = 0,
+      id = "0",
+      memo: Set<number> = new Set()
+    ): TreeNode | null {
+      if (i >= nums.length) {
+        return {
+          id,
+          label: `rob(${i})`,
+          value: i,
+          result: 0,
+          depth,
+          children: [],
+        };
+      }
+
+      const isCacheHit = showMemo && memo.has(i);
+
+      const node: TreeNode = {
         id,
         label: `rob(${i})`,
         value: i,
-        result: 0,
         depth,
         children: [],
+        isCacheHit,
       };
-    }
 
-    const isCacheHit = showMemo && memo.has(i);
+      if (isCacheHit) {
+        return node;
+      }
 
-    const node: TreeNode = {
-      id,
-      label: `rob(${i})`,
-      value: i,
-      depth,
-      children: [],
-      isCacheHit,
-    };
+      if (showMemo) {
+        memo.add(i);
+      }
 
-    if (isCacheHit) {
+      const robChild = buildRobberTree(nums, i + 2, depth + 1, `${id}R`, memo);
+      const skipChild = buildRobberTree(nums, i + 1, depth + 1, `${id}S`, memo);
+
+      if (robChild) {
+        robChild.choice = `ROB $${nums[i]}`;
+        node.children.push(robChild);
+      }
+      if (skipChild) {
+        skipChild.choice = "SKIP";
+        node.children.push(skipChild);
+      }
+
       return node;
-    }
-
-    if (showMemo) {
-      memo.add(i);
-    }
-
-    const robChild = buildRobberTree(nums, i + 2, depth + 1, `${id}R`, memo);
-    const skipChild = buildRobberTree(nums, i + 1, depth + 1, `${id}S`, memo);
-
-    if (robChild) {
-      robChild.choice = `ROB $${nums[i]}`;
-      node.children.push(robChild);
-    }
-    if (skipChild) {
-      skipChild.choice = "SKIP";
-      node.children.push(skipChild);
-    }
-
-    return node;
-  },
-  [showMemo]
-);
+    },
+    [showMemo]
+  );
 
   const tree = useMemo(() => {
     const config = problemConfigs[problem];

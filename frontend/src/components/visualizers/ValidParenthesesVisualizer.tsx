@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// skipcq: JS-0067
 export default function ValidParenthesesVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -13,7 +14,10 @@ export default function ValidParenthesesVisualizer() {
   const [message, setMessage] = useState("Click Play to validate parentheses");
 
   const input = "([{}])";
-  const pairs: Record<string, string> = useMemo(() => ({ ")": "(", "]": "[", "}": "{" }), []);
+  const pairs: Record<string, string> = useMemo(
+    () => ({ ")": "(", "]": "[", "}": "{" }),
+    []
+  );
 
   const reset = useCallback(() => {
     setCurrentIdx(-1);

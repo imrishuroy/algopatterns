@@ -40,6 +40,7 @@ Object.defineProperty(globalThis, "crypto", {
         return hashArray.buffer;
       },
     },
-    randomUUID: () => `test-uuid-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    randomUUID: () =>
+      `test-uuid-${Date.now()}-${Math.random().toString(36).slice(2)}`,
   },
 });

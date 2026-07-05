@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface HeapNode {
@@ -39,8 +45,12 @@ const INITIAL_LISTS = [
   [2, 6],
 ];
 
+// skipcq: JS-0067
 export default function MergeKListsVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(800);
   const [, setLists] = useState<number[][]>([]);
   const [pointers, setPointers] = useState<number[]>([]);

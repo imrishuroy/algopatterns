@@ -9,7 +9,7 @@ interface UpgradePromptProps {
   compact?: boolean;
 }
 
-export function UpgradePrompt({
+export function UpgradePrompt({ // skipcq: JS-0067
   feature = "this content",
   title,
   description,
@@ -50,9 +50,7 @@ export function UpgradePrompt({
       >
         Upgrade to Pro
       </Link>
-      <p className="mt-4 text-gray-500 text-sm">
-        Starting at just ₹299/month
-      </p>
+      <p className="mt-4 text-gray-500 text-sm">Starting at just ₹299/month</p>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// skipcq: JS-0067
 export default function LongestSubstringVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -141,7 +142,9 @@ export default function LongestSubstringVisualizer() {
 
         {/* String visualization */}
         <div className="mb-4">
-          <div className="text-sm text-gray-400 mb-2">String: &quot;{str}&quot;</div>
+          <div className="text-sm text-gray-400 mb-2">
+            String: &quot;{str}&quot;
+          </div>
           <div className="flex gap-1">
             {str.split("").map((char, idx) => {
               const inWindow =

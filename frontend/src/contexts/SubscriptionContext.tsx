@@ -29,7 +29,11 @@ interface SubscriptionContextType {
   createOrder: (
     planId: string,
     discountCode?: string
-  ) => Promise<{ success: boolean; data?: CreateOrderResponse; error?: string }>;
+  ) => Promise<{
+    success: boolean;
+    data?: CreateOrderResponse;
+    error?: string;
+  }>;
   verifyPayment: (
     razorpayPaymentId: string,
     razorpayOrderId: string,
@@ -38,7 +42,11 @@ interface SubscriptionContextType {
   validateDiscount: (
     code: string,
     planId: string
-  ) => Promise<{ success: boolean; data?: ValidateDiscountResponse; error?: string }>;
+  ) => Promise<{
+    success: boolean;
+    data?: ValidateDiscountResponse;
+    error?: string;
+  }>;
   cancelSubscription: (
     reason?: string,
     feedback?: string
@@ -157,31 +165,31 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     []
   );
 
-  const validateDiscount = useCallback(
-    async (code: string, planId: string) => {
-      try {
-        const response = await apiClient.validateDiscount({
-          code,
-          plan_id: planId,
-        });
-        if (response.success) {
-          return { success: true, data: response.data };
-        }
-        return {
-          success: false,
-          error: response.error?.message || "Invalid discount code",
-        };
-      } catch {
-        return { success: false, error: "An error occurred" };
+  const validateDiscount = useCallback(async (code: string, planId: string) => {
+    try {
+      const response = await apiClient.validateDiscount({
+        code,
+        plan_id: planId,
+      });
+      if (response.success) {
+        return { success: true, data: response.data };
       }
-    },
-    []
-  );
+      return {
+        success: false,
+        error: response.error?.message || "Invalid discount code",
+      };
+    } catch {
+      return { success: false, error: "An error occurred" };
+    }
+  }, []);
 
   const cancelSubscription = useCallback(
     async (reason?: string, feedback?: string) => {
       try {
-        const response = await apiClient.cancelSubscription({ reason, feedback });
+        const response = await apiClient.cancelSubscription({
+          reason,
+          feedback,
+        });
         if (response.success) {
           await refreshSubscription();
           return { success: true };

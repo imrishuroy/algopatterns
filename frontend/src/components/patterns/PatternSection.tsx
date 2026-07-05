@@ -17,6 +17,7 @@ const difficultyColors: Record<string, string> = {
   Hard: "text-red-400",
 };
 
+// skipcq: JS-0067
 export default function PatternSection({
   pattern,
   questions,
@@ -100,7 +101,10 @@ export default function PatternSection({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <a
-                  href={`/problems/${q.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                  href={`/problems/${q.name
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/(^-|-$)/g, "")}`}
                   className="text-white hover:text-indigo-400 font-medium transition"
                 >
                   {q.name}

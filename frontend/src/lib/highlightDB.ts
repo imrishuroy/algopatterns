@@ -29,8 +29,9 @@ let dbInstance: IDBDatabase | null = null;
 /**
  * Open or create the IndexedDB database
  */
-async function openDB(): Promise<IDBDatabase> {
-  if (dbInstance) return dbInstance;
+// skipcq: JS-0067
+function openDB(): Promise<IDBDatabase> {
+  if (dbInstance) return Promise.resolve(dbInstance);
 
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -47,9 +48,15 @@ async function openDB(): Promise<IDBDatabase> {
 
       // Highlights store
       if (!db.objectStoreNames.contains(HIGHLIGHTS_STORE)) {
-        const highlightStore = db.createObjectStore(HIGHLIGHTS_STORE, { keyPath: "id" });
-        highlightStore.createIndex("contentKey", "contentKey", { unique: false });
-        highlightStore.createIndex("syncStatus", "syncStatus", { unique: false });
+        const highlightStore = db.createObjectStore(HIGHLIGHTS_STORE, {
+          keyPath: "id",
+        });
+        highlightStore.createIndex("contentKey", "contentKey", {
+          unique: false,
+        });
+        highlightStore.createIndex("syncStatus", "syncStatus", {
+          unique: false,
+        });
       }
 
       // Meta store for tracking fetch timestamps
@@ -63,7 +70,11 @@ async function openDB(): Promise<IDBDatabase> {
 /**
  * Check if cache is stale for a content key
  */
-export async function isCacheStale(contentType: string, contentId: string): Promise<boolean> {
+// skipcq: JS-0067
+export async function isCacheStale(
+  contentType: string,
+  contentId: string
+): Promise<boolean> {
   try {
     const db = await openDB();
     const key = `${contentType}:${contentId}`;
@@ -93,7 +104,11 @@ export async function isCacheStale(contentType: string, contentId: string): Prom
 /**
  * Update cache timestamp for a content key
  */
-export async function updateCacheTimestamp(contentType: string, contentId: string): Promise<void> {
+// skipcq: JS-0067
+export async function updateCacheTimestamp(
+  contentType: string,
+  contentId: string
+): Promise<void> {
   try {
     const db = await openDB();
     const key = `${contentType}:${contentId}`;

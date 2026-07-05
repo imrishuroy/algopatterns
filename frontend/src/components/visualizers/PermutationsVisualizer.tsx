@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type PlayState = { step: number; isPlaying: boolean };
@@ -25,8 +31,12 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
   }
 }
 
+// skipcq: JS-0067
 export default function PermutationsVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(700);
   const [nums] = useState([1, 2, 3]);
   const [currentPath, setCurrentPath] = useState<number[]>([]);

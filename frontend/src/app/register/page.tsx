@@ -6,9 +6,14 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { GoogleButton } from "@/components/ui/GoogleButton";
 
-export default function RegisterPage() {
+export default function RegisterPage() { // skipcq: JS-0067
   const router = useRouter();
-  const { register, loginWithGoogle, isAuthenticated, isLoading: authLoading } = useAuth();
+  const {
+    register,
+    loginWithGoogle,
+    isAuthenticated,
+    isLoading: authLoading,
+  } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -98,7 +103,9 @@ export default function RegisterPage() {
           />
 
           <div className="my-6 flex justify-center">
-            <span className="text-sm text-gray-400">or continue with email</span>
+            <span className="text-sm text-gray-400">
+              or continue with email
+            </span>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

@@ -31,13 +31,18 @@ import { aiApiClient } from "@/lib/ai-api";
 // Helpers
 
 /** Creates a minimal DOMRect-compatible object (jsdom may not expose DOMRect). */
-function fakeRect(
-  x = 0,
-  y = 0,
-  width = 0,
-  height = 0
-): DOMRect {
-  return { x, y, width, height, top: y, right: x + width, bottom: y + height, left: x } as DOMRect;
+// skipcq: JS-0067
+function fakeRect(x = 0, y = 0, width = 0, height = 0): DOMRect {
+  return {
+    x,
+    y,
+    width,
+    height,
+    top: y,
+    right: x + width,
+    bottom: y + height,
+    left: x,
+  } as DOMRect;
 }
 
 /** Creates a mock Monaco editor instance for useInlineAI tests. */
@@ -46,22 +51,24 @@ function createMockEditor(overrides: Record<string, unknown> = {}) {
     isEmpty: () => false,
     startLineNumber: 1,
     endLineNumber: 3,
-    ...(overrides.selection as Record<string, unknown> || {}),
+    ...((overrides.selection as Record<string, unknown>) || {}),
   };
 
   const model = {
     getValueInRange: vi.fn(() => "selected code"),
-    ...(overrides.model as Record<string, unknown> || {}),
+    ...((overrides.model as Record<string, unknown>) || {}),
   };
 
   const position = {
     lineNumber: 3,
     column: 1,
-    ...(overrides.position as Record<string, unknown> || {}),
+    ...((overrides.position as Record<string, unknown>) || {}),
   };
 
   const domNode = document.createElement("div");
-  vi.spyOn(domNode, "getBoundingClientRect").mockReturnValue(fakeRect(0, 0, 800, 600));
+  vi.spyOn(domNode, "getBoundingClientRect").mockReturnValue(
+    fakeRect(0, 0, 800, 600)
+  );
 
   return {
     getSelection: vi.fn(() => selection),
@@ -94,9 +101,11 @@ describe("useMediaQuery", () => {
   function createMql(matches: boolean) {
     return {
       matches,
-      addEventListener: vi.fn((event: string, listener: (e: { matches: boolean }) => void) => {
-        listeners[event] = listener;
-      }),
+      addEventListener: vi.fn(
+        (event: string, listener: (e: { matches: boolean }) => void) => {
+          listeners[event] = listener;
+        }
+      ),
       removeEventListener: vi.fn(),
     };
   }
@@ -135,7 +144,10 @@ describe("useMediaQuery", () => {
     matchMediaMock.mockReturnValue(mql);
     const { unmount } = renderHook(() => useMediaQuery("(min-width: 1024px)"));
     unmount();
-    expect(mql.removeEventListener).toHaveBeenCalledWith("change", expect.any(Function));
+    expect(mql.removeEventListener).toHaveBeenCalledWith(
+      "change",
+      expect.any(Function)
+    );
   });
 
   it("useIsMobile should return true when viewport is narrow", () => {
@@ -155,12 +167,11 @@ describe("useMediaQuery", () => {
   // violating the Rules of Hooks. This is a known issue in the production code.
   // Instead, we verify the individual media queries that comprise it.
   it("useIsTablet tablet range: min-width:768px matches and min-width:1024px does not", async () => {
-    matchMediaMock
-      .mockImplementation((query: string) => {
-        if (query === "(min-width: 768px)") return createMql(true);
-        if (query === "(min-width: 1024px)") return createMql(false);
-        return createMql(false);
-      });
+    matchMediaMock.mockImplementation((query: string) => {
+      if (query === "(min-width: 768px)") return createMql(true);
+      if (query === "(min-width: 1024px)") return createMql(false);
+      return createMql(false);
+    });
     const w768 = renderHook(() => useMediaQuery("(min-width: 768px)"));
     const w1024 = renderHook(() => useMediaQuery("(min-width: 1024px)"));
     await waitFor(() => expect(w768.result.current).toBe(true));
@@ -180,14 +191,17 @@ describe("useTextSelection", () => {
   let container: HTMLElement;
   let containerRef: RefObject<HTMLElement | null>;
 
-  const containerText = "This is some text content for testing selection features";
+  const containerText =
+    "This is some text content for testing selection features";
 
-  function setupSelectionMocks(overrides: {
-    selectedText?: string;
-    isCollapsed?: boolean;
-    inContainer?: boolean;
-    startOffset?: number;
-  } = {}) {
+  function setupSelectionMocks(
+    overrides: {
+      selectedText?: string;
+      isCollapsed?: boolean;
+      inContainer?: boolean;
+      startOffset?: number;
+    } = {}
+  ) {
     const {
       selectedText = "text",
       isCollapsed = false,
@@ -212,7 +226,9 @@ describe("useTextSelection", () => {
       removeAllRanges: vi.fn(),
     };
 
-    vi.spyOn(window, "getSelection").mockReturnValue(mockSelection as unknown as Selection);
+    vi.spyOn(window, "getSelection").mockReturnValue(
+      mockSelection as unknown as Selection
+    );
     vi.spyOn(document, "createRange").mockImplementation(() => {
       let selectNodeContentsCalled = false;
       let setEndOffset = 0;
@@ -246,10 +262,12 @@ describe("useTextSelection", () => {
     document.body.appendChild(container);
     containerRef = { current: container };
 
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb: FrameRequestCallback) => {
-      cb(0);
-      return 0;
-    });
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
+      (cb: FrameRequestCallback) => {
+        cb(0);
+        return 0;
+      }
+    );
   });
 
   afterEach(() => {
@@ -304,7 +322,9 @@ describe("useTextSelection", () => {
 
   it("should respect the minLength option", () => {
     setupSelectionMocks({ selectedText: "ab" });
-    const { result } = renderHook(() => useTextSelection(containerRef, { minLength: 3 }));
+    const { result } = renderHook(() =>
+      useTextSelection(containerRef, { minLength: 3 })
+    );
 
     act(() => {
       fireMouseUp();
@@ -316,7 +336,9 @@ describe("useTextSelection", () => {
   it("should respect the maxLength option", () => {
     const longText = "a".repeat(5001);
     setupSelectionMocks({ selectedText: longText });
-    const { result } = renderHook(() => useTextSelection(containerRef, { maxLength: 5000 }));
+    const { result } = renderHook(() =>
+      useTextSelection(containerRef, { maxLength: 5000 })
+    );
 
     act(() => {
       fireMouseUp();
@@ -382,7 +404,9 @@ describe("useTextSelection", () => {
 
   it("should not capture selection when enabled is false", () => {
     setupSelectionMocks();
-    const { result } = renderHook(() => useTextSelection(containerRef, { enabled: false }));
+    const { result } = renderHook(() =>
+      useTextSelection(containerRef, { enabled: false })
+    );
 
     act(() => {
       fireMouseUp();
@@ -496,7 +520,9 @@ describe("useAIChat", () => {
 
     expect(result.current.error).toBe("Stream error occurred");
     expect(result.current.isLoading).toBe(false);
-    const assistantMsg = result.current.messages.find((m) => m.role === "assistant");
+    const assistantMsg = result.current.messages.find(
+      (m) => m.role === "assistant"
+    );
     expect(assistantMsg?.isStreaming).toBe(false);
     expect(assistantMsg?.content).toBe("Sorry, an error occurred.");
   });
@@ -542,7 +568,9 @@ describe("useAIChat", () => {
     });
 
     expect(result.current.error).toBe("Model unavailable");
-    expect(result.current.messages[1].content).toBe("Sorry, an error occurred.");
+    expect(result.current.messages[1].content).toBe(
+      "Sorry, an error occurred."
+    );
     expect(result.current.isLoading).toBe(false);
   });
 
@@ -556,7 +584,9 @@ describe("useAIChat", () => {
     });
 
     expect(result.current.error).toBe("Network failure");
-    expect(result.current.messages[1].content).toBe("Sorry, an error occurred.");
+    expect(result.current.messages[1].content).toBe(
+      "Sorry, an error occurred."
+    );
     expect(result.current.isLoading).toBe(false);
   });
 
@@ -714,7 +744,10 @@ describe("useAIChat", () => {
       await result.current.startNewChat();
     });
 
-    expect(aiApiClient.archiveSession).toHaveBeenCalledWith("session-arch", expect.any(String));
+    expect(aiApiClient.archiveSession).toHaveBeenCalledWith(
+      "session-arch",
+      expect.any(String)
+    );
     expect(result.current.messages).toEqual([]);
     expect(result.current.sessionId).toBeNull();
     expect(result.current.archivedSessions).toHaveLength(1);
@@ -773,7 +806,9 @@ describe("useAIChat", () => {
   });
 
   it("should handle error when loading an archived session fails", async () => {
-    vi.mocked(aiApiClient.getSessionMessages).mockRejectedValue(new Error("Not found"));
+    vi.mocked(aiApiClient.getSessionMessages).mockRejectedValue(
+      new Error("Not found")
+    );
 
     const { result } = renderHook(() => useAIChat());
 
@@ -821,7 +856,9 @@ describe("useAIChat", () => {
       },
     });
 
-    const { result } = renderHook(() => useAIChat({ problemSlug: "two-sum", isAuthenticated: true }));
+    const { result } = renderHook(() =>
+      useAIChat({ problemSlug: "two-sum", isAuthenticated: true })
+    );
 
     await waitFor(() => {
       expect(result.current.isLoadingHistory).toBe(false);
@@ -1177,7 +1214,10 @@ describe("useInlineAI", () => {
     const { unmount } = renderHook(() => useInlineAI(editor));
 
     // 2048 (CtrlCmd) | 41 (KeyK)
-    expect(editor.addCommand).toHaveBeenCalledWith(2048 | 41, expect.any(Function));
+    expect(editor.addCommand).toHaveBeenCalledWith(
+      2048 | 41,
+      expect.any(Function)
+    );
 
     // Verify the handler opens the panel
     const handler = vi.mocked(editor.addCommand).mock.calls[0][1];
@@ -1259,14 +1299,18 @@ describe("useEditorPreferences", () => {
 
   it("setFontSize updates state and writes to localStorage immediately", () => {
     const { result } = renderHook(() => useEditorPreferences());
-    act(() => { result.current.setFontSize(20); });
+    act(() => {
+      result.current.setFontSize(20);
+    });
     expect(result.current.fontSize).toBe(20);
     expect(localStorage.getItem("editor_fontSize")).toBe("20");
   });
 
   it("setWordWrap updates state and writes to localStorage immediately", () => {
     const { result } = renderHook(() => useEditorPreferences());
-    act(() => { result.current.setWordWrap(true); });
+    act(() => {
+      result.current.setWordWrap(true);
+    });
     expect(result.current.wordWrap).toBe(true);
     expect(localStorage.getItem("editor_wordWrap")).toBe("true");
   });
@@ -1274,14 +1318,18 @@ describe("useEditorPreferences", () => {
   it("setWordWrap toggles back to false and persists", () => {
     localStorage.setItem("editor_wordWrap", "true");
     const { result } = renderHook(() => useEditorPreferences());
-    act(() => { result.current.setWordWrap(false); });
+    act(() => {
+      result.current.setWordWrap(false);
+    });
     expect(result.current.wordWrap).toBe(false);
     expect(localStorage.getItem("editor_wordWrap")).toBe("false");
   });
 
   it("setTabSize updates state and writes to localStorage immediately", () => {
     const { result } = renderHook(() => useEditorPreferences());
-    act(() => { result.current.setTabSize(2); });
+    act(() => {
+      result.current.setTabSize(2);
+    });
     expect(result.current.tabSize).toBe(2);
     expect(localStorage.getItem("editor_tabSize")).toBe("2");
   });
@@ -1292,54 +1340,86 @@ describe("useEditorPreferences", () => {
     const { result } = renderHook(() => useEditorPreferences());
 
     // Advance past the mount debounce first
-    act(() => { vi.advanceTimersByTime(600); });
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
 
-    act(() => { result.current.setLeftPanelWidth(45); });
+    act(() => {
+      result.current.setLeftPanelWidth(45);
+    });
     expect(result.current.leftPanelWidth).toBe(45);
 
     // Not written yet
     expect(localStorage.getItem("editor_leftPanelWidth")).not.toBe("45");
 
     // Written after debounce
-    act(() => { vi.advanceTimersByTime(500); });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
     expect(localStorage.getItem("editor_leftPanelWidth")).toBe("45");
   });
 
   it("setRightPanelWidth debounces the localStorage write", () => {
     const { result } = renderHook(() => useEditorPreferences());
-    act(() => { vi.advanceTimersByTime(600); });
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
 
-    act(() => { result.current.setRightPanelWidth(30); });
+    act(() => {
+      result.current.setRightPanelWidth(30);
+    });
     expect(localStorage.getItem("editor_rightPanelWidth")).not.toBe("30");
 
-    act(() => { vi.advanceTimersByTime(500); });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
     expect(localStorage.getItem("editor_rightPanelWidth")).toBe("30");
   });
 
   it("setEditorHeight debounces the localStorage write", () => {
     const { result } = renderHook(() => useEditorPreferences());
-    act(() => { vi.advanceTimersByTime(600); });
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
 
-    act(() => { result.current.setEditorHeight(75); });
+    act(() => {
+      result.current.setEditorHeight(75);
+    });
     expect(localStorage.getItem("editor_editorHeight")).not.toBe("75");
 
-    act(() => { vi.advanceTimersByTime(500); });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
     expect(localStorage.getItem("editor_editorHeight")).toBe("75");
   });
 
   it("rapid panel width changes only write the final value (debounce resets)", () => {
     const { result } = renderHook(() => useEditorPreferences());
-    act(() => { vi.advanceTimersByTime(600); });
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
 
     // Simulate dragging — multiple rapid updates
-    act(() => { result.current.setLeftPanelWidth(36); });
-    act(() => { vi.advanceTimersByTime(100); });
-    act(() => { result.current.setLeftPanelWidth(38); });
-    act(() => { vi.advanceTimersByTime(100); });
-    act(() => { result.current.setLeftPanelWidth(42); });
+    act(() => {
+      result.current.setLeftPanelWidth(36);
+    });
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    act(() => {
+      result.current.setLeftPanelWidth(38);
+    });
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    act(() => {
+      result.current.setLeftPanelWidth(42);
+    });
 
     // Debounce not yet fired — last write wins
-    act(() => { vi.advanceTimersByTime(500); });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
     expect(localStorage.getItem("editor_leftPanelWidth")).toBe("42");
   });
 
@@ -1347,7 +1427,9 @@ describe("useEditorPreferences", () => {
 
   it("persisted fontSize survives unmount + remount", () => {
     const { result, unmount } = renderHook(() => useEditorPreferences());
-    act(() => { result.current.setFontSize(22); });
+    act(() => {
+      result.current.setFontSize(22);
+    });
     unmount();
 
     const { result: result2 } = renderHook(() => useEditorPreferences());
@@ -1356,7 +1438,9 @@ describe("useEditorPreferences", () => {
 
   it("persisted tabSize survives unmount + remount", () => {
     const { result, unmount } = renderHook(() => useEditorPreferences());
-    act(() => { result.current.setTabSize(2); });
+    act(() => {
+      result.current.setTabSize(2);
+    });
     unmount();
 
     const { result: result2 } = renderHook(() => useEditorPreferences());

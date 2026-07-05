@@ -11,8 +11,10 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { HighlightProvider } from "@/contexts/HighlightContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { PatternProgressProvider } from "@/contexts/PatternProgressContext";
+import { SearchProvider } from "@/contexts/SearchContext";
 import { defaultMetadata } from "@/lib/seo";
 import { WebsiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
+import { GlobalSearchHandler } from "@/components/search/GlobalSearchHandler";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,11 +37,14 @@ const fredoka = Fredoka({
 
 export const metadata = defaultMetadata;
 
-export default function RootLayout({ // skipcq: JS-0067
+// skipcq: JS-0067
+export default function RootLayout({
+  // skipcq: JS-0067
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // skipcq: JS-0415
   return (
     <html
       lang="en"
@@ -73,9 +78,12 @@ export default function RootLayout({ // skipcq: JS-0067
                   <ProgressProvider>
                     <PatternProgressProvider>
                       <FilterProvider>
-                        <Header />
-                        <main className="flex-1">{children}</main>
-                        {/* <Footer /> */}
+                        <SearchProvider>
+                          <GlobalSearchHandler />
+                          <Header />
+                          <main className="flex-1">{children}</main>
+                          {/* <Footer /> */}
+                        </SearchProvider>
                       </FilterProvider>
                     </PatternProgressProvider>
                   </ProgressProvider>

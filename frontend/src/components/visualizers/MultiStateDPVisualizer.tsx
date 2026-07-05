@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion } from "framer-motion";
 
 interface Step {
@@ -50,7 +56,11 @@ const ArrayItem = ({ num, isCurrent, isPast }: ArrayItemProps) => (
     }}
     className="w-12 h-12 rounded-md flex items-center justify-center font-bold text-lg border-2"
   >
-    <span className={isCurrent ? "text-white" : num < 0 ? "text-red-400" : "text-white"}>
+    <span
+      className={
+        isCurrent ? "text-white" : num < 0 ? "text-red-400" : "text-white"
+      }
+    >
       {num}
     </span>
   </motion.div>
@@ -86,7 +96,14 @@ interface ControlsProps {
   onSpeedChange: (speed: number) => void;
 }
 
-const Controls = ({ isPlaying, isDone, speed, onToggle, onReset, onSpeedChange }: ControlsProps) => (
+const Controls = ({
+  isPlaying,
+  isDone,
+  speed,
+  onToggle,
+  onReset,
+  onSpeedChange,
+}: ControlsProps) => (
   <div className="flex items-center gap-2 mb-4">
     <button
       onClick={onToggle}
@@ -119,7 +136,10 @@ const Controls = ({ isPlaying, isDone, speed, onToggle, onReset, onSpeedChange }
 );
 
 const MultiStateDPVisualizer = () => {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(1200);
   const [nums] = useState([2, 3, -2, 4, -1]);
   const [currentStep, setCurrentStep] = useState(-1);
@@ -216,9 +236,7 @@ const MultiStateDPVisualizer = () => {
       if (nextStep >= steps.length) {
         setPhase("done");
         const finalStep = steps[steps.length - 1];
-        setMessage(
-          `Done! Maximum product = ${finalStep.maxProd}`
-        );
+        setMessage(`Done! Maximum product = ${finalStep.maxProd}`);
         dispatch({ type: "STOP" });
         return;
       }
@@ -234,22 +252,26 @@ const MultiStateDPVisualizer = () => {
   const current =
     currentStep >= 0 && currentStep < steps.length ? steps[currentStep] : null;
 
-  const decisionClass = current?.decision === "start"
-    ? "bg-blue-500/20 border border-blue-500/50 text-blue-400"
-    : current?.decision === "extendMin"
-      ? "bg-pink-500/20 border border-pink-500/50 text-pink-400"
-      : "bg-green-500/20 border border-green-500/50 text-green-400";
+  const decisionClass =
+    current?.decision === "start"
+      ? "bg-blue-500/20 border border-blue-500/50 text-blue-400"
+      : current?.decision === "extendMin"
+        ? "bg-pink-500/20 border border-pink-500/50 text-pink-400"
+        : "bg-green-500/20 border border-green-500/50 text-green-400";
 
-  const decisionText = current?.decision === "start"
-    ? "🔄 Start Fresh"
-    : current?.decision === "extendMin"
-      ? "🔀 Extend via Min (Negative Flip!)"
-      : "📈 Extend via Max";
+  const decisionText =
+    current?.decision === "start"
+      ? "🔄 Start Fresh"
+      : current?.decision === "extendMin"
+        ? "🔀 Extend via Min (Negative Flip!)"
+        : "📈 Extend via Max";
 
   return (
     <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-gray-800">
-        <h3 className="text-lg font-semibold text-white">Maximum Product Subarray</h3>
+        <h3 className="text-lg font-semibold text-white">
+          Maximum Product Subarray
+        </h3>
         <p className="text-gray-400 text-sm mt-1">
           Track both max AND min at each position (negatives can flip!)
         </p>
@@ -300,7 +322,11 @@ const MultiStateDPVisualizer = () => {
           </div>
           <div className="flex gap-2 justify-center mt-1">
             {nums.map((num, idx) => (
-              <div key={`idx-${num}-${idx}`} className="w-12 text-center text-xs text-gray-500">
+              <div
+                // skipcq: JS-0437
+                key={`idx-${num}-${idx}`}
+                className="w-12 text-center text-xs text-gray-500"
+              >
                 i={idx}
               </div>
             ))}
@@ -359,9 +385,10 @@ const MultiStateDPVisualizer = () => {
 
         <div className="mt-4 p-3 bg-gray-800/30 rounded-md text-sm text-gray-400">
           <p>
-            <strong className="text-purple-400">Key Insight:</strong> Unlike sum,
-            products can flip sign! A large negative (currMin) times another negative
-            becomes the new maximum. That&apos;s why we track BOTH max and min.
+            <strong className="text-purple-400">Key Insight:</strong> Unlike
+            sum, products can flip sign! A large negative (currMin) times
+            another negative becomes the new maximum. That&apos;s why we track
+            BOTH max and min.
           </p>
         </div>
       </div>

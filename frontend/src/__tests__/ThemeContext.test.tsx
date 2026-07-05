@@ -109,8 +109,8 @@ describe("ThemeContext", () => {
 
   describe("localStorage restore", () => {
     it("should restore theme from localStorage when saved", () => {
-      globalThis.localStorage.getItem = vi.fn(
-        (key: string) => (key === "theme" ? "light" : null)
+      globalThis.localStorage.getItem = vi.fn((key: string) =>
+        key === "theme" ? "light" : null
       );
 
       const { result } = renderHook(() => useTheme(), { wrapper: Wrapper });

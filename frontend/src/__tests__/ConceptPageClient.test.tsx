@@ -15,7 +15,13 @@ vi.mock("next/link", () => ({
 
 vi.mock("next/dynamic", () => ({
   default: () => {
-    const Component = ({ code, language }: { code: string; language: string }) => (
+    const Component = ({
+      code,
+      language,
+    }: {
+      code: string;
+      language: string;
+    }) => (
       <div data-testid="code-block">
         <span data-testid="code-language">{language}</span>
         <pre data-testid="code-content">{code}</pre>
@@ -37,7 +43,8 @@ const mockConcept: Concept = {
   name: "Priority Queue & Heap",
   slug: "priority-queue-heap",
   category: "Data Structures",
-  description: "A Priority Queue is an abstract data type where each element has a priority.",
+  description:
+    "A Priority Queue is an abstract data type where each element has a priority.",
   timeComplexity: "O(log n) insert/delete, O(1) peek",
   spaceComplexity: "O(n)",
   whenToUse: [
@@ -85,7 +92,9 @@ describe("ConceptPageClient", () => {
   it("renders time complexity", () => {
     render(<ConceptPageClient concept={mockConcept} />);
 
-    expect(screen.getByText("O(log n) insert/delete, O(1) peek")).toBeInTheDocument();
+    expect(
+      screen.getByText("O(log n) insert/delete, O(1) peek")
+    ).toBeInTheDocument();
   });
 
   it("renders space complexity", () => {
@@ -107,7 +116,9 @@ describe("ConceptPageClient", () => {
     render(<ConceptPageClient concept={mockConcept} />);
 
     expect(screen.getByText("When to Use")).toBeInTheDocument();
-    expect(screen.getByText("Finding K largest/smallest elements")).toBeInTheDocument();
+    expect(
+      screen.getByText("Finding K largest/smallest elements")
+    ).toBeInTheDocument();
     expect(screen.getByText("Merge K sorted lists/arrays")).toBeInTheDocument();
     expect(screen.getByText("Task scheduling by priority")).toBeInTheDocument();
   });
@@ -116,7 +127,9 @@ describe("ConceptPageClient", () => {
     render(<ConceptPageClient concept={mockConcept} />);
 
     expect(screen.getByText("Key Points to Remember")).toBeInTheDocument();
-    expect(screen.getByText("Java PriorityQueue is a MIN heap by default")).toBeInTheDocument();
+    expect(
+      screen.getByText("Java PriorityQueue is a MIN heap by default")
+    ).toBeInTheDocument();
   });
 
   it("renders Common Mistakes section", () => {
@@ -187,8 +200,12 @@ describe("ConceptPageClient - minimal concept", () => {
     render(<ConceptPageClient concept={minimalConcept} />);
 
     expect(screen.getByText("Test Concept")).toBeInTheDocument();
-    expect(screen.queryByText("Key Points to Remember")).not.toBeInTheDocument();
-    expect(screen.queryByText("Common Mistakes to Avoid")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Key Points to Remember")
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Common Mistakes to Avoid")
+    ).not.toBeInTheDocument();
     expect(screen.queryByText("Practice Problems")).not.toBeInTheDocument();
     expect(screen.queryByText("Related Patterns")).not.toBeInTheDocument();
   });

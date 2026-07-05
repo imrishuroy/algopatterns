@@ -9,7 +9,7 @@ interface TrueFalseProps {
   disabled: boolean;
 }
 
-export default function TrueFalse({
+export default function TrueFalse({ // skipcq: JS-0067
   question,
   answer,
   onAnswer,
@@ -41,7 +41,8 @@ export default function TrueFalse({
           const isSelected = answer?.selected === value;
           const isCorrect = answer?.correctAnswer === value;
 
-          let borderClass = "border-gray-800 hover:border-gray-600 hover:bg-gray-800/50";
+          let borderClass =
+            "border-gray-800 hover:border-gray-600 hover:bg-gray-800/50";
           let bgClass = "";
 
           if (showResult) {

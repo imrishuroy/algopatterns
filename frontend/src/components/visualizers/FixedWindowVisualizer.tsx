@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 
+// skipcq: JS-0067
 export default function FixedWindowVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -164,7 +165,9 @@ export default function FixedWindowVisualizer() {
             {arr.map((val, position) => {
               const inWindow = position >= winLeft && position <= winRight;
               const isMaxWindow =
-                maxWindow && position >= maxWindow[0] && position <= maxWindow[1];
+                maxWindow &&
+                position >= maxWindow[0] &&
+                position <= maxWindow[1];
 
               return (
                 <motion.div

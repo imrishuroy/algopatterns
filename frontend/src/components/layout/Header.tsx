@@ -9,6 +9,7 @@ import { useFilter } from "@/contexts/FilterContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { questions } from "@/lib/questions";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useSearch } from "@/contexts/SearchContext";
 
 const SunIcon = () => (
   <svg
@@ -42,7 +43,13 @@ const MoonIcon = () => (
   </svg>
 );
 
-const ThemeToggle = ({ theme, onToggle }: { theme: string; onToggle: () => void }) => (
+const ThemeToggle = ({
+  theme,
+  onToggle,
+}: {
+  theme: string;
+  onToggle: () => void;
+}) => (
   <button
     onClick={onToggle}
     className="p-2 rounded-md transition-colors hover:bg-white/10"
@@ -52,7 +59,10 @@ const ThemeToggle = ({ theme, onToggle }: { theme: string; onToggle: () => void 
   </button>
 );
 
-const getInitials = (name: string | undefined, email: string | undefined): string => {
+const getInitials = (
+  name: string | undefined,
+  email: string | undefined
+): string => {
   const displayName = name || email?.split("@")[0] || "U";
   const parts = displayName.split(" ");
   if (parts.length >= 2) {
@@ -171,15 +181,72 @@ const AuthSection = ({
 };
 
 const MenuIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M4 6h16M4 12h16M4 18h16"
+    />
   </svg>
 );
 
 const CloseIcon = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  <svg
+    className="w-6 h-6"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
+    />
   </svg>
+);
+
+const SearchButton = ({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="flex items-center gap-2 px-3 py-1.5 text-sm transition-colors rounded-md border"
+    style={{
+      background: "var(--bg-elevated)",
+      borderColor: "var(--border-1)",
+      color: "var(--text-3)",
+    }}
+    title="Search (Cmd+K)"
+  >
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+    <span className="hidden sm:inline">Search</span>
+    <kbd
+      className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-xs rounded"
+      style={{
+        background: "var(--bg-surface)",
+        color: "var(--text-3)",
+      }}
+    >
+      <span className="text-xs">⌘</span>K
+    </kbd>
+  </button>
 );
 
 const Header = () => {
@@ -187,6 +254,7 @@ const Header = () => {
   const { completed } = useProgress();
   const { companyFilter } = useFilter();
   const { theme, toggleTheme } = useTheme();
+  const { openSearch } = useSearch();
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -224,7 +292,11 @@ const Header = () => {
   const navLinks = [
     { href: "/dsa-fundamentals", label: "Fundamentals", free: true },
     { href: "/pattern-recognition", label: "Pattern Recognition", free: true },
-    { href: "/interview-cheatsheet", label: "Interview Cheat Sheet", free: true },
+    {
+      href: "/interview-cheatsheet",
+      label: "Interview Cheat Sheet",
+      free: true,
+    },
     { href: "/articles", label: "Articles", free: true },
   ];
 
@@ -253,7 +325,7 @@ const Header = () => {
                 backgroundImage: "var(--accent-gradient)",
                 fontFamily: "var(--font-geist-mono), monospace",
                 fontWeight: 500,
-                wordSpacing: "-0.35em"
+                wordSpacing: "-0.35em",
               }}
             >
               algo patterns
@@ -341,6 +413,8 @@ const Header = () => {
                 {completedCount}/{total}
               </span>
             </div>
+
+            <SearchButton onClick={openSearch} />
 
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
 

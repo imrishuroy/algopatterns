@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Course {
@@ -61,8 +67,12 @@ const CYCLE_PREREQS: [number, number][] = [
   [3, 1],
 ];
 
+// skipcq: JS-0067
 export default function TopologicalSortVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(800);
   const [courses, setCourses] = useState<Course[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -397,7 +407,7 @@ export default function TopologicalSortVisualizer() {
                   key={`order-${id}-${i}`}
                   className="px-2 py-1 rounded-md text-xs font-medium bg-green-500/50 text-green-200"
                 >
-                    {i + 1}. {COURSE_NAMES[id]}
+                  {i + 1}. {COURSE_NAMES[id]}
                 </span>
               ))}
               {order.length === 0 && (

@@ -35,10 +35,14 @@ vi.mock("react-syntax-highlighter", () => ({
         >
           {lines.map((line: string, i: number) => {
             const lineNumber = i + 1;
-            const lp = (lineProps as (n: number) => Record<string, unknown>)(lineNumber);
+            const lp = (lineProps as (n: number) => Record<string, unknown>)(
+              lineNumber
+            );
             return (
               <div key={i} {...lp} data-line-number={lineNumber}>
-                {showLineNumbers as boolean && <span className="line-number">{lineNumber}</span>}
+                {(showLineNumbers as boolean) && (
+                  <span className="line-number">{lineNumber}</span>
+                )}
                 {line}
               </div>
             );
@@ -54,7 +58,12 @@ vi.mock("react-syntax-highlighter", () => ({
         style={customStyle as React.CSSProperties}
         {...rest}
       >
-        <code style={((codeTagProps as Record<string, unknown>)?.style as React.CSSProperties) || {}}>
+        <code
+          style={
+            ((codeTagProps as Record<string, unknown>)
+              ?.style as React.CSSProperties) || {}
+          }
+        >
           {code}
         </code>
       </pre>
@@ -84,7 +93,9 @@ vi.mock("@/hooks/useTextSelection", () => ({
 vi.mock("@/lib/contentHash", () => ({
   generateContentHash: vi.fn().mockResolvedValue("mock-hash-abc"),
   isHighlightStale: vi.fn().mockReturnValue(false),
-  getContentText: vi.fn().mockImplementation((el: HTMLElement) => el.textContent || ""),
+  getContentText: vi
+    .fn()
+    .mockImplementation((el: HTMLElement) => el.textContent || ""),
 }));
 
 // Component imports (after mocks)
@@ -100,6 +111,7 @@ import { GoogleButton } from "@/components/ui/GoogleButton";
 
 // Setup helpers
 
+// skipcq: JS-0067
 function mockClipboard() {
   const writeText = vi.fn().mockResolvedValue(undefined);
   Object.defineProperty(navigator, "clipboard", {
@@ -111,12 +123,16 @@ function mockClipboard() {
 
 function mockDialogMethods() {
   if (!HTMLDialogElement.prototype.showModal) {
-    HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
+    HTMLDialogElement.prototype.showModal = vi.fn(function (
+      this: HTMLDialogElement
+    ) {
       (this as unknown as Record<string, unknown>).open = true;
     });
   }
   if (!HTMLDialogElement.prototype.close) {
-    HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+    HTMLDialogElement.prototype.close = vi.fn(function (
+      this: HTMLDialogElement
+    ) {
       (this as unknown as Record<string, unknown>).open = false;
     });
   }
@@ -324,7 +340,9 @@ describe("Confetti", () => {
     render(<Confetti />);
     const container = document.querySelector(".fixed.inset-0");
     expect(container).toBeInTheDocument();
-    expect(container?.querySelectorAll(".will-change-transform").length).toBe(200);
+    expect(container?.querySelectorAll(".will-change-transform").length).toBe(
+      200
+    );
   });
 
   it("does not render when not active (after timeout)", () => {
@@ -428,7 +446,9 @@ describe("ConflictDialog", () => {
         onCancel={vi.fn()}
       />
     );
-    expect(screen.queryByText("Sync Conflict Detected")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Sync Conflict Detected")
+    ).not.toBeInTheDocument();
   });
 
   it("shows description text", () => {
@@ -605,7 +625,12 @@ describe("Dropdown", () => {
 
   it("renders trigger button with placeholder", () => {
     render(
-      <Dropdown value="" onChange={vi.fn()} options={options} placeholder="Select language" />
+      <Dropdown
+        value=""
+        onChange={vi.fn()}
+        options={options}
+        placeholder="Select language"
+      />
     );
     expect(screen.getByText("Select language")).toBeInTheDocument();
   });
@@ -671,7 +696,9 @@ describe("Dropdown", () => {
 
   it("renders icons when provided via icon prop", () => {
     const icon = <span data-testid="custom-icon">🔤</span>;
-    render(<Dropdown value="" onChange={vi.fn()} options={options} icon={icon} />);
+    render(
+      <Dropdown value="" onChange={vi.fn()} options={options} icon={icon} />
+    );
     expect(screen.getByTestId("custom-icon")).toBeInTheDocument();
   });
 
@@ -700,11 +727,15 @@ describe("Highlightable", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal("ResizeObserver", MockResizeObserver);
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb: FrameRequestCallback) => {
-      cb(0);
-      return 0;
-    });
-    Range.prototype.getClientRects = vi.fn(() => [{ top: 0, left: 0, width: 100, height: 20 }]) as unknown as () => DOMRectList;
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
+      (cb: FrameRequestCallback) => {
+        cb(0);
+        return 0;
+      }
+    );
+    Range.prototype.getClientRects = vi.fn(() => [
+      { top: 0, left: 0, width: 100, height: 20 },
+    ]) as unknown as () => DOMRectList;
 
     mockCreateHighlight.mockResolvedValue({ id: "new-hl" });
     mockDeleteHighlight.mockResolvedValue(true);
@@ -742,7 +773,10 @@ describe("Highlightable", () => {
       </Highlightable>
     );
     await act(async () => {});
-    expect(mockFetchHighlights).toHaveBeenCalledWith("pattern_tutorial", "two-pointers");
+    expect(mockFetchHighlights).toHaveBeenCalledWith(
+      "pattern_tutorial",
+      "two-pointers"
+    );
   });
 
   it("does not fetch highlights when not authenticated", async () => {
@@ -774,12 +808,19 @@ describe("Highlightable", () => {
       </Highlightable>
     );
     await act(async () => {});
-    expect(mockGetHighlights).toHaveBeenCalledWith("pattern_tutorial", "two-pointers");
+    expect(mockGetHighlights).toHaveBeenCalledWith(
+      "pattern_tutorial",
+      "two-pointers"
+    );
   });
 
   it("applies custom className", async () => {
     const { container } = render(
-      <Highlightable contentType="test" contentId="test" className="custom-class">
+      <Highlightable
+        contentType="test"
+        contentId="test"
+        className="custom-class"
+      >
         <p>Content</p>
       </Highlightable>
     );
@@ -917,7 +958,16 @@ describe("HighlightableCode", () => {
         endOffset: 14,
         startLine: 1,
         endLine: 1,
-        rect: { top: 100, left: 50, width: 50, height: 20, x: 50, y: 100, right: 100, bottom: 120 },
+        rect: {
+          top: 100,
+          left: 50,
+          width: 50,
+          height: 20,
+          x: 50,
+          y: 100,
+          right: 100,
+          bottom: 120,
+        },
       },
       clearSelection: vi.fn(),
     });
@@ -946,7 +996,16 @@ describe("HighlightableCode", () => {
         endOffset: 14,
         startLine: 1,
         endLine: 1,
-        rect: { top: 100, left: 50, width: 50, height: 20, x: 50, y: 100, right: 100, bottom: 120 },
+        rect: {
+          top: 100,
+          left: 50,
+          width: 50,
+          height: 20,
+          x: 50,
+          y: 100,
+          right: 100,
+          bottom: 120,
+        },
       },
       clearSelection: vi.fn(),
     });
@@ -982,7 +1041,16 @@ describe("HighlightableCode", () => {
         endOffset: 14,
         startLine: 1,
         endLine: 1,
-        rect: { top: 100, left: 50, width: 50, height: 20, x: 50, y: 100, right: 100, bottom: 120 },
+        rect: {
+          top: 100,
+          left: 50,
+          width: 50,
+          height: 20,
+          x: 50,
+          y: 100,
+          right: 100,
+          bottom: 120,
+        },
       },
       clearSelection: vi.fn(),
     });
@@ -1026,7 +1094,10 @@ describe("HighlightableCode", () => {
         contentId="two-pointers"
       />
     );
-    expect(fetchHighlights).toHaveBeenCalledWith("pattern_tutorial", "two-pointers");
+    expect(fetchHighlights).toHaveBeenCalledWith(
+      "pattern_tutorial",
+      "two-pointers"
+    );
   });
 
   it("renders highlighted lines from context highlights", () => {
@@ -1077,7 +1148,11 @@ describe("HighlightableCode", () => {
 describe("LanguageToggle", () => {
   it("renders buttons for each language", () => {
     render(
-      <LanguageToggle currentLang="java" onChange={vi.fn()} languages={["java", "python"]} />
+      <LanguageToggle
+        currentLang="java"
+        onChange={vi.fn()}
+        languages={["java", "python"]}
+      />
     );
     expect(screen.getByText("Java")).toBeInTheDocument();
     expect(screen.getByText("Python")).toBeInTheDocument();
@@ -1085,7 +1160,11 @@ describe("LanguageToggle", () => {
 
   it("highlights the current language with indigo class", () => {
     render(
-      <LanguageToggle currentLang="java" onChange={vi.fn()} languages={["java", "python"]} />
+      <LanguageToggle
+        currentLang="java"
+        onChange={vi.fn()}
+        languages={["java", "python"]}
+      />
     );
     const javaBtn = screen.getByText("Java");
     expect(javaBtn.className).toContain("bg-indigo-500");
@@ -1093,7 +1172,11 @@ describe("LanguageToggle", () => {
 
   it("does not highlight non-selected languages", () => {
     render(
-      <LanguageToggle currentLang="java" onChange={vi.fn()} languages={["java", "python"]} />
+      <LanguageToggle
+        currentLang="java"
+        onChange={vi.fn()}
+        languages={["java", "python"]}
+      />
     );
     const pythonBtn = screen.getByText("Python");
     expect(pythonBtn.className).not.toContain("bg-indigo-500");
@@ -1102,7 +1185,11 @@ describe("LanguageToggle", () => {
   it("calls onChange when a language button is clicked", () => {
     const onChange = vi.fn();
     render(
-      <LanguageToggle currentLang="java" onChange={onChange} languages={["java", "python"]} />
+      <LanguageToggle
+        currentLang="java"
+        onChange={onChange}
+        languages={["java", "python"]}
+      />
     );
     fireEvent.click(screen.getByText("Python"));
     expect(onChange).toHaveBeenCalledWith("python");
@@ -1111,7 +1198,11 @@ describe("LanguageToggle", () => {
   it("calls onChange when the currently selected language is clicked", () => {
     const onChange = vi.fn();
     render(
-      <LanguageToggle currentLang="java" onChange={onChange} languages={["java", "python"]} />
+      <LanguageToggle
+        currentLang="java"
+        onChange={onChange}
+        languages={["java", "python"]}
+      />
     );
     fireEvent.click(screen.getByText("Java"));
     expect(onChange).toHaveBeenCalledWith("java");
@@ -1173,7 +1264,11 @@ describe("LanguageToggle", () => {
 
   it("renders buttons inside a flex container with bg-gray-800", () => {
     const { container } = render(
-      <LanguageToggle currentLang="java" onChange={vi.fn()} languages={["java"]} />
+      <LanguageToggle
+        currentLang="java"
+        onChange={vi.fn()}
+        languages={["java"]}
+      />
     );
     const flexContainer = container.querySelector(".flex");
     expect(flexContainer).toHaveClass("bg-gray-800");

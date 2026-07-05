@@ -30,7 +30,8 @@ const VALID_LANGUAGES: SupportedLanguage[] = [
 const DEFAULT_LANGUAGE: SupportedLanguage = "java";
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState<SupportedLanguage>(DEFAULT_LANGUAGE);
+  const [language, setLanguageState] =
+    useState<SupportedLanguage>(DEFAULT_LANGUAGE);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as SupportedLanguage;

@@ -9,7 +9,10 @@ interface MultipleChoiceProps {
   disabled: boolean;
 }
 
-function parseQuestionText(text: string): { question: string; code: string | null } {
+function parseQuestionText(text: string): { // skipcq: JS-0067
+  question: string;
+  code: string | null;
+} {
   const codePatterns = [
     /^(.+?)\n\n((?:const|let|var|function|class|if|for|while|return|import|export|def |public |private |int |void |String )[\s\S]+)$/,
     /^(.+?)\n\n(```[\s\S]*?```)$/,
@@ -18,15 +21,24 @@ function parseQuestionText(text: string): { question: string; code: string | nul
   for (const pattern of codePatterns) {
     const match = text.match(pattern);
     if (match) {
-      return { question: match[1], code: match[2].replace(/```\w*\n?/g, '').replace(/```$/g, '') };
+      return {
+        question: match[1],
+        code: match[2].replace(/```\w*\n?/g, "").replace(/```$/g, ""),
+      };
     }
   }
 
-  if (text.includes('\\n')) {
+  if (text.includes("\\n")) {
     const parts = text.split(/\\n\\n|\\n/);
     const questionPart = parts[0];
-    const codePart = parts.slice(1).join('\n').trim();
-    if (codePart && (codePart.includes('const ') || codePart.includes('function') || codePart.includes('for (') || codePart.includes('while ('))) {
+    const codePart = parts.slice(1).join("\n").trim();
+    if (
+      codePart &&
+      (codePart.includes("const ") ||
+        codePart.includes("function") ||
+        codePart.includes("for (") ||
+        codePart.includes("while ("))
+    ) {
       return { question: questionPart, code: codePart };
     }
   }
@@ -34,7 +46,7 @@ function parseQuestionText(text: string): { question: string; code: string | nul
   return { question: text, code: null };
 }
 
-export default function MultipleChoice({
+export default function MultipleChoice({ // skipcq: JS-0067
   question,
   answer,
   onAnswer,
@@ -42,7 +54,9 @@ export default function MultipleChoice({
 }: MultipleChoiceProps) {
   const options = question.options || [];
   const showResult = answer !== undefined;
-  const { question: questionText, code: parsedCode } = parseQuestionText(question.questionText);
+  const { question: questionText, code: parsedCode } = parseQuestionText(
+    question.questionText
+  );
   const codeToShow = question.codeSnippet || parsedCode;
 
   return (
@@ -64,7 +78,8 @@ export default function MultipleChoice({
           const isSelected = answer?.selected === index;
           const isCorrect = answer?.correctAnswer === index;
 
-          let borderClass = "border-gray-800 hover:border-gray-600 hover:bg-gray-800/50";
+          let borderClass =
+            "border-gray-800 hover:border-gray-600 hover:bg-gray-800/50";
           let bgClass = "";
 
           if (showResult) {

@@ -104,7 +104,8 @@ describe("Environment configuration", () => {
   it("defaults to development when no env set", () => {
     const envValue: string | undefined = undefined;
     const isProduction = false;
-    const environment = envValue || (isProduction ? "production" : "development");
+    const environment =
+      envValue || (isProduction ? "production" : "development");
 
     expect(environment).toBe("development");
   });
@@ -112,7 +113,8 @@ describe("Environment configuration", () => {
   it("defaults to production when no env set and isProduction", () => {
     const envValue: string | undefined = undefined;
     const isProduction = true;
-    const environment = envValue || (isProduction ? "production" : "development");
+    const environment =
+      envValue || (isProduction ? "production" : "development");
 
     expect(environment).toBe("production");
   });
@@ -120,7 +122,8 @@ describe("Environment configuration", () => {
   it("uses environment variable when set", () => {
     const envValue: string | undefined = "staging";
     const isProduction = true;
-    const environment = envValue || (isProduction ? "production" : "development");
+    const environment =
+      envValue || (isProduction ? "production" : "development");
 
     expect(environment).toBe("staging");
   });

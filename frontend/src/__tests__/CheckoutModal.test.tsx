@@ -52,7 +52,9 @@ describe("CheckoutModal", () => {
           onSuccess={vi.fn()}
         />
       );
-      expect(screen.queryByText("Upgrade to Pro Yearly")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Upgrade to Pro Yearly")
+      ).not.toBeInTheDocument();
     });
 
     it("should render when isOpen is true", () => {
@@ -158,7 +160,9 @@ describe("CheckoutModal", () => {
           onSuccess={vi.fn()}
         />
       );
-      const input = screen.getByPlaceholderText("Discount code") as HTMLInputElement;
+      const input = screen.getByPlaceholderText(
+        "Discount code"
+      ) as HTMLInputElement;
       fireEvent.change(input, { target: { value: "save50" } });
       expect(input.value).toBe("SAVE50");
     });
@@ -191,7 +195,10 @@ describe("CheckoutModal", () => {
       fireEvent.click(applyButton);
 
       await waitFor(() => {
-        expect(mockValidateDiscount).toHaveBeenCalledWith("SAVE50", "pro_yearly");
+        expect(mockValidateDiscount).toHaveBeenCalledWith(
+          "SAVE50",
+          "pro_yearly"
+        );
       });
     });
 
@@ -386,14 +393,12 @@ describe("CheckoutModal", () => {
           onSuccess={vi.fn()}
         />
       );
-      expect(
-        screen.getByText(/Secured by Razorpay/)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Secured by Razorpay/)).toBeInTheDocument();
     });
   });
 
   describe("reset on open", () => {
-    it("should reset state when modal opens", async () => {
+    it("should reset state when modal opens", () => {
       const { rerender } = render(
         <CheckoutModal
           plan={mockPlan}
@@ -412,7 +417,9 @@ describe("CheckoutModal", () => {
         />
       );
 
-      const input = screen.getByPlaceholderText("Discount code") as HTMLInputElement;
+      const input = screen.getByPlaceholderText(
+        "Discount code"
+      ) as HTMLInputElement;
       expect(input.value).toBe("");
     });
   });

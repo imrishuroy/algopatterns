@@ -1,12 +1,19 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { UpgradePrompt, LockedOverlay } from "@/components/pricing/UpgradePrompt";
+import {
+  UpgradePrompt,
+  LockedOverlay,
+} from "@/components/pricing/UpgradePrompt";
 
 // Mock next/link
 vi.mock("next/link", () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  ),
+  default: ({
+    children,
+    href,
+  }: {
+    children: React.ReactNode;
+    href: string;
+  }) => <a href={href}>{children}</a>,
 }));
 
 describe("UpgradePrompt", () => {
@@ -42,7 +49,9 @@ describe("UpgradePrompt", () => {
 
     it("should display pricing information", () => {
       render(<UpgradePrompt />);
-      expect(screen.getByText("Starting at just ₹299/month")).toBeInTheDocument();
+      expect(
+        screen.getByText("Starting at just ₹299/month")
+      ).toBeInTheDocument();
     });
 
     it("should display lock emoji", () => {

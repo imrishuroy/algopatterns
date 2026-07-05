@@ -98,7 +98,7 @@ const defaultPanelProps = {
 function fireKeyDown(
   el: HTMLElement,
   key: string,
-  opts: { shiftKey?: boolean } = {},
+  opts: { shiftKey?: boolean } = {}
 ) {
   fireEvent.keyDown(el, { key, ...opts });
 }
@@ -111,7 +111,7 @@ describe("AIChatPanel", () => {
     vi.mocked(useAIChat).mockReturnValue(baseChatMock());
     vi.mocked(useAuth).mockReturnValue(baseAuthMock());
     Element.prototype.scrollIntoView = vi.fn() as unknown as (
-      opts?: ScrollIntoViewOptions,
+      opts?: ScrollIntoViewOptions
     ) => void;
   });
 
@@ -129,7 +129,7 @@ describe("AIChatPanel", () => {
 
   it("returns null when closed", () => {
     const { container } = render(
-      <AIChatPanel {...defaultPanelProps} isOpen={false} />,
+      <AIChatPanel {...defaultPanelProps} isOpen={false} />
     );
     expect(container.firstChild).toBeNull();
   });
@@ -287,9 +287,7 @@ describe("AIChatPanel", () => {
       isLoadingHistory: true,
     });
     const { container } = render(<AIChatPanel {...defaultPanelProps} />);
-    expect(
-      container.querySelector(".animate-spin"),
-    ).toBeInTheDocument();
+    expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });
 
   it("shows sign-in prompt when not authenticated", () => {
@@ -312,17 +310,17 @@ describe("AIChatPanel", () => {
     render(<AIChatPanel {...defaultPanelProps} />);
     expect(screen.queryByText("Hint")).not.toBeInTheDocument();
     expect(
-      screen.queryByPlaceholderText("Ask a question..."),
+      screen.queryByPlaceholderText("Ask a question...")
     ).not.toBeInTheDocument();
   });
 
   it("shows empty state when authenticated with no messages", () => {
     render(<AIChatPanel {...defaultPanelProps} />);
     expect(
-      screen.getByText("Ask about the problem or use quick actions above"),
+      screen.getByText("Ask about the problem or use quick actions above")
     ).toBeInTheDocument();
     expect(
-      screen.getByText("I guide with questions, not answers"),
+      screen.getByText("I guide with questions, not answers")
     ).toBeInTheDocument();
   });
 
@@ -356,7 +354,7 @@ describe("AIChatPanel", () => {
     });
     render(<AIChatPanel {...defaultPanelProps} />);
     expect(
-      screen.getByText("Viewing archived chat (read-only)"),
+      screen.getByText("Viewing archived chat (read-only)")
     ).toBeInTheDocument();
   });
 
@@ -367,7 +365,7 @@ describe("AIChatPanel", () => {
     });
     render(<AIChatPanel {...defaultPanelProps} />);
     expect(
-      screen.queryByPlaceholderText("Ask a question..."),
+      screen.queryByPlaceholderText("Ask a question...")
     ).not.toBeInTheDocument();
   });
 
@@ -376,7 +374,7 @@ describe("AIChatPanel", () => {
     expect(screen.getByText(/Hint/)).toBeInTheDocument();
     expect(screen.getByText("Review")).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText("Ask a question..."),
+      screen.getByPlaceholderText("Ask a question...")
     ).toBeInTheDocument();
   });
 });
@@ -386,7 +384,7 @@ describe("AIChatPanel", () => {
 describe("AIToggleButton", () => {
   it("renders null when isOpen is true", () => {
     const { container } = render(
-      <AIToggleButton isOpen={true} onClick={vi.fn()} />,
+      <AIToggleButton isOpen={true} onClick={vi.fn()} />
     );
     expect(container.firstChild).toBeNull();
   });
@@ -415,7 +413,7 @@ describe("AIToggleButton", () => {
 
   it("shows active visual state when panel is open (returns null)", () => {
     const { container } = render(
-      <AIToggleButton isOpen={true} onClick={vi.fn()} />,
+      <AIToggleButton isOpen={true} onClick={vi.fn()} />
     );
     expect(container.firstChild).toBeNull();
   });
@@ -431,7 +429,7 @@ describe("AIToggleButton", () => {
 
   it("shows hasNewMessage badge when prop is true", () => {
     render(
-      <AIToggleButton isOpen={false} onClick={vi.fn()} hasNewMessage={true} />,
+      <AIToggleButton isOpen={false} onClick={vi.fn()} hasNewMessage={true} />
     );
     const btn = screen.getByTitle("Open Thor AI");
     const badge = btn.querySelector("span");
@@ -442,7 +440,7 @@ describe("AIToggleButton", () => {
 
   it("does not render badge when hasNewMessage is false", () => {
     render(
-      <AIToggleButton isOpen={false} onClick={vi.fn()} hasNewMessage={false} />,
+      <AIToggleButton isOpen={false} onClick={vi.fn()} hasNewMessage={false} />
     );
     const btn = screen.getByTitle("Open Thor AI");
     const badge = btn.querySelector("span");
@@ -466,11 +464,9 @@ describe("AIToggleButton", () => {
 
 describe("ChatInput", () => {
   it("renders textarea and send button", () => {
-    render(
-      <ChatInput onSend={vi.fn()} isLoading={false} />,
-    );
+    render(<ChatInput onSend={vi.fn()} isLoading={false} />);
     expect(
-      screen.getByPlaceholderText("Ask a question..."),
+      screen.getByPlaceholderText("Ask a question...")
     ).toBeInTheDocument();
     expect(screen.getByTitle("Send")).toBeInTheDocument();
   });
@@ -545,10 +541,14 @@ describe("ChatInput", () => {
 
   it("shows placeholder text", () => {
     render(
-      <ChatInput onSend={vi.fn()} isLoading={false} placeholder="Custom placeholder" />,
+      <ChatInput
+        onSend={vi.fn()}
+        isLoading={false}
+        placeholder="Custom placeholder"
+      />
     );
     expect(
-      screen.getByPlaceholderText("Custom placeholder"),
+      screen.getByPlaceholderText("Custom placeholder")
     ).toBeInTheDocument();
   });
 
@@ -572,9 +572,7 @@ describe("ChatInput", () => {
 
   it("calls onStop when stop button is clicked", () => {
     const onStop = vi.fn();
-    render(
-      <ChatInput onSend={vi.fn()} onStop={onStop} isLoading={true} />,
-    );
+    render(<ChatInput onSend={vi.fn()} onStop={onStop} isLoading />);
     fireEvent.click(screen.getByTitle("Stop"));
     expect(onStop).toHaveBeenCalledTimes(1);
   });
@@ -632,7 +630,7 @@ describe("ChatMessage", () => {
   it("renders code blocks within messages", () => {
     const msg = createMessage({
       role: "assistant",
-      content: 'Here is code:\n```javascript\nconst x = 1;\n```',
+      content: "Here is code:\n```javascript\nconst x = 1;\n```",
     });
     const { container } = render(<ChatMessage message={msg} />);
     const pre = container.querySelector("pre");
@@ -857,7 +855,7 @@ describe("InlineAI", () => {
         onChunk("Streamed response");
         onDone();
         return vi.fn();
-      },
+      }
     );
   });
 
@@ -867,7 +865,7 @@ describe("InlineAI", () => {
 
   it("does NOT render when isOpen is false", () => {
     const { container } = render(
-      <InlineAI {...defaultInlineProps} isOpen={false} />,
+      <InlineAI {...defaultInlineProps} isOpen={false} />
     );
     expect(container.firstChild).toBeNull();
   });
@@ -897,7 +895,7 @@ describe("InlineAI", () => {
     const buttons = header.parentElement!.querySelectorAll("button");
     // The close button is the only button in the header aside from action buttons
     const closeBtn = Array.from(buttons).find(
-      (b) => b.querySelector("svg") && !b.querySelector("span"),
+      (b) => b.querySelector("svg") && !b.querySelector("span")
     );
     expect(closeBtn).toBeDefined();
     fireEvent.click(closeBtn!);
@@ -923,12 +921,8 @@ describe("InlineAI", () => {
   it("has 'Ask' text input with send", () => {
     render(<InlineAI {...defaultInlineProps} />);
     const placeholder = `Ask about this code...`;
-    expect(
-      screen.getByPlaceholderText(placeholder),
-    ).toBeInTheDocument();
-    const input = screen.getByPlaceholderText(
-      placeholder,
-    ) as HTMLInputElement;
+    expect(screen.getByPlaceholderText(placeholder)).toBeInTheDocument();
+    const input = screen.getByPlaceholderText(placeholder) as HTMLInputElement;
     const submitBtn = input
       .closest("form")!
       .querySelector('button[type="submit"]')!;
@@ -937,9 +931,7 @@ describe("InlineAI", () => {
 
   it("uses 'Ask anything...' placeholder when no selectedCode", () => {
     render(<InlineAI {...defaultInlineProps} selectedCode="" />);
-    expect(
-      screen.getByPlaceholderText("Ask anything..."),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Ask anything...")).toBeInTheDocument();
   });
 
   it("clicking Explain triggers chatStream", async () => {
@@ -990,7 +982,7 @@ describe("InlineAI", () => {
       (_req, _onChunk, _onError, _onDone) => {
         // Don't call any callbacks to keep loading state active
         return vi.fn();
-      },
+      }
     );
     render(<InlineAI {...defaultInlineProps} />);
     fireEvent.click(screen.getByText("Explain"));
@@ -1002,7 +994,7 @@ describe("InlineAI", () => {
       (_req, _onChunk, onError, _onDone) => {
         onError("API failure");
         return vi.fn();
-      },
+      }
     );
     render(<InlineAI {...defaultInlineProps} />);
     fireEvent.click(screen.getByText("Explain"));
@@ -1014,7 +1006,7 @@ describe("InlineAI", () => {
   it("submits custom prompt via form submit", async () => {
     render(<InlineAI {...defaultInlineProps} />);
     const input = screen.getByPlaceholderText(
-      "Ask about this code...",
+      "Ask about this code..."
     ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "What does this do?" } });
     const form = input.closest("form")!;
@@ -1027,7 +1019,7 @@ describe("InlineAI", () => {
   it("clears input after custom prompt submit", async () => {
     render(<InlineAI {...defaultInlineProps} />);
     const input = screen.getByPlaceholderText(
-      "Ask about this code...",
+      "Ask about this code..."
     ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "Explain" } });
     const form = input.closest("form")!;
@@ -1059,12 +1051,12 @@ describe("InlineAI", () => {
     vi.mocked(aiApiClient.chatStream).mockImplementation(
       (_req, _onChunk, _onError, _onDone) => {
         return vi.fn();
-      },
+      }
     );
     render(<InlineAI {...defaultInlineProps} />);
     fireEvent.click(screen.getByText("Explain"));
     const input = screen.getByPlaceholderText(
-      "Ask about this code...",
+      "Ask about this code..."
     ) as HTMLInputElement;
     expect(input.disabled).toBe(true);
   });
@@ -1094,7 +1086,7 @@ describe("InlineAI", () => {
   it("cleans up event listeners on unmount", () => {
     const onClose = vi.fn();
     const { unmount } = render(
-      <InlineAI {...defaultInlineProps} onClose={onClose} />,
+      <InlineAI {...defaultInlineProps} onClose={onClose} />
     );
     unmount();
     // After unmount, Escape should not trigger onClose
@@ -1104,12 +1096,11 @@ describe("InlineAI", () => {
 
   it("renders with correct positioning style", () => {
     render(
-      <InlineAI
-        {...defaultInlineProps}
-        position={{ top: 200, left: 300 }}
-      />,
+      <InlineAI {...defaultInlineProps} position={{ top: 200, left: 300 }} />
     );
-    const panel = screen.getByText("Thor AI").closest('[class*="z-50"]') as HTMLElement;
+    const panel = screen
+      .getByText("Thor AI")
+      .closest('[class*="z-50"]') as HTMLElement;
     expect(panel.style.top).toBe("200px");
     expect(panel.style.left).toBe("300px");
   });
@@ -1143,7 +1134,12 @@ describe("QuickActions", () => {
     vi.clearAllMocks();
     vi.mocked(aiApiClient.getHint).mockResolvedValue({
       success: true,
-      data: { hint: "Try two pointers", level: 1, pattern: "Two Pointers", tokensUsed: 10 },
+      data: {
+        hint: "Try two pointers",
+        level: 1,
+        pattern: "Two Pointers",
+        tokensUsed: 10,
+      },
     });
     vi.mocked(aiApiClient.reviewCode).mockResolvedValue({
       success: true,
@@ -1163,7 +1159,7 @@ describe("QuickActions", () => {
 
   it("renders Explain Error button when errorMessage is provided", () => {
     render(
-      <QuickActions {...defaultQuickProps} errorMessage="TypeError: null" />,
+      <QuickActions {...defaultQuickProps} errorMessage="TypeError: null" />
     );
     expect(screen.getByText("Explain Error")).toBeInTheDocument();
   });
@@ -1175,7 +1171,7 @@ describe("QuickActions", () => {
 
   it("Hint button shows hintLevel in label", () => {
     const { rerender } = render(
-      <QuickActions {...defaultQuickProps} hintLevel={1} />,
+      <QuickActions {...defaultQuickProps} hintLevel={1} />
     );
     expect(screen.getByText(/Hint 1\/4/)).toBeInTheDocument();
 
@@ -1197,7 +1193,7 @@ describe("QuickActions", () => {
         {...defaultQuickProps}
         onResult={onResult}
         onHintUsed={onHintUsed}
-      />,
+      />
     );
     fireEvent.click(screen.getByText(/Hint/).closest("button")!);
     await waitFor(() => {
@@ -1207,7 +1203,7 @@ describe("QuickActions", () => {
       expect.objectContaining({
         problemSlug: "two-sum",
         hintLevel: 1,
-      }),
+      })
     );
     await waitFor(() => {
       expect(onResult).toHaveBeenCalledWith("Try two pointers", "hint");
@@ -1217,15 +1213,13 @@ describe("QuickActions", () => {
 
   it("clicking Review calls reviewCode API and triggers onResult", async () => {
     const onResult = vi.fn();
-    render(
-      <QuickActions {...defaultQuickProps} onResult={onResult} />,
-    );
+    render(<QuickActions {...defaultQuickProps} onResult={onResult} />);
     fireEvent.click(screen.getByText("Review").closest("button")!);
     await waitFor(() => {
       expect(aiApiClient.reviewCode).toHaveBeenCalled();
     });
     expect(aiApiClient.reviewCode).toHaveBeenCalledWith(
-      expect.objectContaining({ problemSlug: "two-sum" }),
+      expect.objectContaining({ problemSlug: "two-sum" })
     );
     await waitFor(() => {
       expect(onResult).toHaveBeenCalledWith("Looks good", "review");
@@ -1239,14 +1233,14 @@ describe("QuickActions", () => {
         {...defaultQuickProps}
         errorMessage="TypeError: null"
         onResult={onResult}
-      />,
+      />
     );
     fireEvent.click(screen.getByText("Explain Error").closest("button")!);
     await waitFor(() => {
       expect(aiApiClient.explainError).toHaveBeenCalled();
     });
     expect(aiApiClient.explainError).toHaveBeenCalledWith(
-      expect.objectContaining({ errorMessage: "TypeError: null" }),
+      expect.objectContaining({ errorMessage: "TypeError: null" })
     );
     await waitFor(() => {
       expect(onResult).toHaveBeenCalledWith("Null reference", "explain");
@@ -1263,9 +1257,9 @@ describe("QuickActions", () => {
                 success: true,
                 data: { hint: "Try", level: 1, pattern: "", tokensUsed: 1 },
               }),
-            1000,
-          ),
-        ),
+            1000
+          )
+        )
     );
     render(<QuickActions {...defaultQuickProps} />);
     fireEvent.click(screen.getByText(/Hint/).closest("button")!);
@@ -1285,9 +1279,9 @@ describe("QuickActions", () => {
                 success: true,
                 data: { review: "OK", tokensUsed: 1 },
               }),
-            1000,
-          ),
-        ),
+            1000
+          )
+        )
     );
     render(<QuickActions {...defaultQuickProps} />);
     fireEvent.click(screen.getByText("Review").closest("button")!);
@@ -1307,16 +1301,11 @@ describe("QuickActions", () => {
                 success: true,
                 data: { explanation: "Err", tokensUsed: 1 },
               }),
-            1000,
-          ),
-        ),
+            1000
+          )
+        )
     );
-    render(
-      <QuickActions
-        {...defaultQuickProps}
-        errorMessage="Error: bad"
-      />,
-    );
+    render(<QuickActions {...defaultQuickProps} errorMessage="Error: bad" />);
     fireEvent.click(screen.getByText("Explain Error").closest("button")!);
     await waitFor(() => {
       const errBtn = screen.getByText("Explain Error").closest("button")!;
@@ -1334,16 +1323,11 @@ describe("QuickActions", () => {
                 success: true,
                 data: { hint: "Try", level: 1, pattern: "", tokensUsed: 1 },
               }),
-            1000,
-          ),
-        ),
+            1000
+          )
+        )
     );
-    render(
-      <QuickActions
-        {...defaultQuickProps}
-        errorMessage="Err"
-      />,
-    );
+    render(<QuickActions {...defaultQuickProps} errorMessage="Err" />);
     fireEvent.click(screen.getByText(/Hint/).closest("button")!);
     await waitFor(() => {
       const buttons = screen.getAllByRole("button");
@@ -1355,18 +1339,16 @@ describe("QuickActions", () => {
 
   it("handles getHint API failure gracefully", async () => {
     vi.mocked(aiApiClient.getHint).mockRejectedValue(
-      new Error("Network error"),
+      new Error("Network error")
     );
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const onResult = vi.fn();
-    render(
-      <QuickActions {...defaultQuickProps} onResult={onResult} />,
-    );
+    render(<QuickActions {...defaultQuickProps} onResult={onResult} />);
     fireEvent.click(screen.getByText(/Hint/).closest("button")!);
     await waitFor(() => {
       expect(consoleSpy).toHaveBeenCalledWith(
         "Failed to get hint:",
-        expect.any(Error),
+        expect.any(Error)
       );
     });
     expect(onResult).not.toHaveBeenCalled();
@@ -1375,18 +1357,16 @@ describe("QuickActions", () => {
 
   it("handles reviewCode API failure gracefully", async () => {
     vi.mocked(aiApiClient.reviewCode).mockRejectedValue(
-      new Error("Network error"),
+      new Error("Network error")
     );
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const onResult = vi.fn();
-    render(
-      <QuickActions {...defaultQuickProps} onResult={onResult} />,
-    );
+    render(<QuickActions {...defaultQuickProps} onResult={onResult} />);
     fireEvent.click(screen.getByText("Review").closest("button")!);
     await waitFor(() => {
       expect(consoleSpy).toHaveBeenCalledWith(
         "Failed to get review:",
-        expect.any(Error),
+        expect.any(Error)
       );
     });
     expect(onResult).not.toHaveBeenCalled();
@@ -1395,7 +1375,7 @@ describe("QuickActions", () => {
 
   it("handles explainError API failure gracefully", async () => {
     vi.mocked(aiApiClient.explainError).mockRejectedValue(
-      new Error("Network error"),
+      new Error("Network error")
     );
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const onResult = vi.fn();
@@ -1404,13 +1384,13 @@ describe("QuickActions", () => {
         {...defaultQuickProps}
         errorMessage="Err"
         onResult={onResult}
-      />,
+      />
     );
     fireEvent.click(screen.getByText("Explain Error").closest("button")!);
     await waitFor(() => {
       expect(consoleSpy).toHaveBeenCalledWith(
         "Failed to explain error:",
-        expect.any(Error),
+        expect.any(Error)
       );
     });
     expect(onResult).not.toHaveBeenCalled();
@@ -1424,12 +1404,7 @@ describe("QuickActions", () => {
   });
 
   it("has correct data attributes on buttons", () => {
-    render(
-      <QuickActions
-        {...defaultQuickProps}
-        errorMessage="Err"
-      />,
-    );
+    render(<QuickActions {...defaultQuickProps} errorMessage="Err" />);
     const buttons = screen.getAllByRole("button");
     expect(buttons.length).toBeGreaterThanOrEqual(3);
     buttons.forEach((btn) => {
@@ -1504,10 +1479,7 @@ describe("PatternQuickActions", () => {
 
   it("uses 'this pattern' fallback when activeSection is empty", () => {
     render(
-      <PatternQuickActions
-        {...defaultPatternQuickProps}
-        activeSection=""
-      />
+      <PatternQuickActions {...defaultPatternQuickProps} activeSection="" />
     );
     fireEvent.click(screen.getByText("Explain Concept"));
     expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(
@@ -1518,10 +1490,7 @@ describe("PatternQuickActions", () => {
 
   it("uses 'the core technique' fallback when activeSection is empty for walkthrough", () => {
     render(
-      <PatternQuickActions
-        {...defaultPatternQuickProps}
-        activeSection=""
-      />
+      <PatternQuickActions {...defaultPatternQuickProps} activeSection="" />
     );
     fireEvent.click(screen.getByText("Walk Through"));
     expect(defaultPatternQuickProps.onAction).toHaveBeenCalledWith(

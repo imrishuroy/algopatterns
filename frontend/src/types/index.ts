@@ -61,7 +61,8 @@ export interface PatternVariation {
   guide?: string;
 }
 
-export type DPApproach = "recursion" | "memoization" | "tabulation" | "spaceOptimized";
+export type DPApproach =
+  "recursion" | "memoization" | "tabulation" | "spaceOptimized";
 
 export interface ApproachCode {
   java?: string;
@@ -516,6 +517,103 @@ export interface CancelSubscriptionResponse {
   status: string;
   cancel_at_period_end: boolean;
   current_period_end?: string;
+}
+
+// Search Types
+export type SearchMode = "keyword" | "ai";
+
+export type SearchContentType =
+  "pattern" | "question" | "concept" | "article" | "solution" | "highlight";
+
+export interface SearchResultPreview {
+  timeComplexity?: string;
+  spaceComplexity?: string;
+  category?: string;
+  slug?: string;
+  patternId?: string;
+  companies?: string[];
+  leetcodeUrl?: string;
+  contentType?: string;
+  contentId?: string;
+  color?: string;
+  text?: string;
+}
+
+export interface SearchResult {
+  id: string;
+  type: SearchContentType;
+  title: string;
+  description: string;
+  difficulty?: string;
+  url: string;
+  preview?: SearchResultPreview;
+  score: number;
+}
+
+export interface SearchResults {
+  query: string;
+  mode: SearchMode;
+  totalResults: number;
+  results: Record<SearchContentType, SearchResult[]>;
+  suggestions?: string[];
+}
+
+export interface SearchHistoryItem {
+  id: string;
+  query: string;
+  mode: SearchMode;
+  resultCount: number;
+  createdAt: string;
+}
+
+export interface RecentViewItem {
+  id: string;
+  contentType: SearchContentType;
+  contentId: string;
+  title: string;
+  url: string;
+  viewCount: number;
+  lastViewedAt: string;
+}
+
+export interface FavoriteItem {
+  id: string;
+  contentType: SearchContentType;
+  contentId: string;
+  title: string;
+  url: string;
+  createdAt: string;
+}
+
+export interface SearchHistoryResponse {
+  history: SearchHistoryItem[];
+}
+
+export interface RecentViewsResponse {
+  recent: RecentViewItem[];
+}
+
+export interface FavoritesResponse {
+  favorites: FavoriteItem[];
+}
+
+export interface AddFavoriteRequest {
+  contentType: SearchContentType;
+  contentId: string;
+}
+
+export interface AddFavoriteResponse {
+  id: string;
+  contentType: SearchContentType;
+  contentId: string;
+  createdAt: string;
+}
+
+export interface TrackViewRequest {
+  contentType: SearchContentType;
+  contentId: string;
+  title: string;
+  url: string;
 }
 
 // Re-export AI types

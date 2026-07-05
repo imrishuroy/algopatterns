@@ -94,8 +94,4 @@ export interface ChatResponse {
 export type AIFeatureType = "chat" | "hint" | "review" | "explain";
 
 export type PatternQuickAction =
-  | "explain"
-  | "compare"
-  | "whenToUse"
-  | "walkThrough"
-  | "practiceNext";
+  "explain" | "compare" | "whenToUse" | "walkThrough" | "practiceNext";

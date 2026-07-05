@@ -493,6 +493,8 @@ describe("usePatternProgress hook", () => {
   it("should throw error when used outside provider", () => {
     expect(() => {
       renderHook(() => usePatternProgress());
-    }).toThrow("usePatternProgress must be used within a PatternProgressProvider");
+    }).toThrow(
+      "usePatternProgress must be used within a PatternProgressProvider"
+    );
   });
 });

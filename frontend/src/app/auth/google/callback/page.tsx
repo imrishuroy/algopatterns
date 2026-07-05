@@ -96,7 +96,7 @@ function GoogleCallbackContent() {
   );
 }
 
-function LoadingFallback() {
+function LoadingFallback() { // skipcq: JS-0067
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -105,16 +105,14 @@ function LoadingFallback() {
           <h1 className="text-xl font-bold text-white dark:text-white mb-2">
             Loading
           </h1>
-          <p className="text-gray-400 dark:text-gray-400">
-            Please wait...
-          </p>
+          <p className="text-gray-400 dark:text-gray-400">Please wait...</p>
         </div>
       </div>
     </div>
   );
 }
 
-export default function GoogleCallbackPage() {
+export default function GoogleCallbackPage() { // skipcq: JS-0067
   return (
     <Suspense fallback={<LoadingFallback />}>
       <GoogleCallbackContent />

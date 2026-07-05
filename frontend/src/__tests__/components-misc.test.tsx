@@ -17,6 +17,7 @@ const mockUseAuth = vi.hoisted(() => vi.fn());
 const mockUseProgress = vi.hoisted(() => vi.fn());
 const mockUseFilter = vi.hoisted(() => vi.fn());
 const mockUseTheme = vi.hoisted(() => vi.fn());
+const mockUseSearch = vi.hoisted(() => vi.fn());
 const mockUseIsMobile = vi.hoisted(() => vi.fn());
 const mockUsePathname = vi.hoisted(() => vi.fn(() => "/"));
 const mockGetQuestions = vi.hoisted(() => vi.fn());
@@ -27,8 +28,17 @@ const mockCompleteAttempt = vi.hoisted(() => vi.fn());
 // Global vi.mock declarations (hoisted to top)
 
 vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: { children: ReactNode; href: string }) => (
-    <a href={href} {...props}>{children}</a>
+  default: ({
+    children,
+    href,
+    ...props
+  }: {
+    children: ReactNode;
+    href: string;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
   ),
 }));
 
@@ -65,6 +75,10 @@ vi.mock("@/contexts/FilterContext", () => ({
 
 vi.mock("@/contexts/ThemeContext", () => ({
   useTheme: () => mockUseTheme(),
+}));
+
+vi.mock("@/contexts/SearchContext", () => ({
+  useSearch: () => mockUseSearch(),
 }));
 
 vi.mock("@/hooks/useMediaQuery", () => ({
@@ -173,7 +187,7 @@ describe("Footer", () => {
     const Footer = (await import("@/components/layout/Footer")).default;
     render(<Footer />);
     expect(
-      screen.getByText("AlgoPatterns - Interactive Algorithm Visualizations"),
+      screen.getByText("AlgoPatterns - Interactive Algorithm Visualizations")
     ).toBeInTheDocument();
   });
 
@@ -248,14 +262,19 @@ describe("JsonLd", () => {
   it("WebsiteJsonLd renders script tag with correct type", async () => {
     const { WebsiteJsonLd } = await import("@/components/seo/JsonLd");
     const { container } = render(<WebsiteJsonLd />);
-    const script = container.querySelector('script[type="application/ld+json"]');
+    const script = container.querySelector(
+      'script[type="application/ld+json"]'
+    );
     expect(script).toBeInTheDocument();
   });
 
   it("WebsiteJsonLd has WebSite type and SearchAction", async () => {
     const { WebsiteJsonLd } = await import("@/components/seo/JsonLd");
     const { container } = render(<WebsiteJsonLd />);
-    const json = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.innerHTML || "{}");
+    const json = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.innerHTML || "{}"
+    );
     expect(json["@type"]).toBe("WebSite");
     expect(json.potentialAction["@type"]).toBe("SearchAction");
   });
@@ -263,7 +282,10 @@ describe("JsonLd", () => {
   it("OrganizationJsonLd renders with Organization type", async () => {
     const { OrganizationJsonLd } = await import("@/components/seo/JsonLd");
     const { container } = render(<OrganizationJsonLd />);
-    const json = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.innerHTML || "{}");
+    const json = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.innerHTML || "{}"
+    );
     expect(json["@type"]).toBe("Organization");
     expect(json.sameAs).toHaveLength(2);
   });
@@ -271,7 +293,10 @@ describe("JsonLd", () => {
   it("CourseJsonLd renders with Course type", async () => {
     const { CourseJsonLd } = await import("@/components/seo/JsonLd");
     const { container } = render(<CourseJsonLd pattern={mockPattern} />);
-    const json = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.innerHTML || "{}");
+    const json = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.innerHTML || "{}"
+    );
     expect(json["@type"]).toBe("Course");
     expect(json.teaches).toEqual(["Sorted array"]);
     expect(json.isAccessibleForFree).toBe(true);
@@ -284,7 +309,10 @@ describe("JsonLd", () => {
       { question: "Q2?", answer: "A2." },
     ];
     const { container } = render(<FAQJsonLd faqs={faqs} />);
-    const json = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.innerHTML || "{}");
+    const json = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.innerHTML || "{}"
+    );
     expect(json["@type"]).toBe("FAQPage");
     expect(json.mainEntity).toHaveLength(2);
     expect(json.mainEntity[0]["@type"]).toBe("Question");
@@ -297,7 +325,10 @@ describe("JsonLd", () => {
       { name: "Patterns", url: "/patterns" },
     ];
     const { container } = render(<BreadcrumbJsonLd items={items} />);
-    const json = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.innerHTML || "{}");
+    const json = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.innerHTML || "{}"
+    );
     expect(json["@type"]).toBe("BreadcrumbList");
     expect(json.itemListElement[0].position).toBe(1);
   });
@@ -305,13 +336,22 @@ describe("JsonLd", () => {
   it("ConceptJsonLd renders TechArticle", async () => {
     const { ConceptJsonLd } = await import("@/components/seo/JsonLd");
     const mockConcept: Concept = {
-      id: "recursion", name: "Recursion", slug: "recursion",
-      category: "Java Fundamentals", description: "concept",
-      whenToUse: [], codeSnippets: { java: "", python: "", cpp: "", javascript: "" },
-      createdAt: "2024-01-01", updatedAt: "2024-01-02", timeComplexity: "O(n)",
+      id: "recursion",
+      name: "Recursion",
+      slug: "recursion",
+      category: "Java Fundamentals",
+      description: "concept",
+      whenToUse: [],
+      codeSnippets: { java: "", python: "", cpp: "", javascript: "" },
+      createdAt: "2024-01-01",
+      updatedAt: "2024-01-02",
+      timeComplexity: "O(n)",
     };
     const { container } = render(<ConceptJsonLd concept={mockConcept} />);
-    const json = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.innerHTML || "{}");
+    const json = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.innerHTML || "{}"
+    );
     expect(json["@type"]).toBe("TechArticle");
     expect(json.headline).toBe("Recursion");
   });
@@ -319,9 +359,18 @@ describe("JsonLd", () => {
   it("ArticleJsonLd renders Article with author", async () => {
     const { ArticleJsonLd } = await import("@/components/seo/JsonLd");
     const { container } = render(
-      <ArticleJsonLd title="Test" description="A" url="/test" datePublished="2024-01-01" author="TA" />,
+      <ArticleJsonLd
+        title="Test"
+        description="A"
+        url="/test"
+        datePublished="2024-01-01"
+        author="TA"
+      />
     );
-    const json = JSON.parse(container.querySelector('script[type="application/ld+json"]')?.innerHTML || "{}");
+    const json = JSON.parse(
+      container.querySelector('script[type="application/ld+json"]')
+        ?.innerHTML || "{}"
+    );
     expect(json["@type"]).toBe("Article");
     expect(json.author.name).toBe("TA");
   });
@@ -338,25 +387,29 @@ describe("HeaderProgress", () => {
   });
 
   it("shows 0% when nothing is completed", async () => {
-    const HeaderProgress = (await import("@/components/layout/HeaderProgress")).default;
+    const HeaderProgress = (await import("@/components/layout/HeaderProgress"))
+      .default;
     render(<HeaderProgress />);
     expect(screen.getByText("0%")).toBeInTheDocument();
   });
 
   it("shows Completed label", async () => {
-    const HeaderProgress = (await import("@/components/layout/HeaderProgress")).default;
+    const HeaderProgress = (await import("@/components/layout/HeaderProgress"))
+      .default;
     render(<HeaderProgress />);
     expect(screen.getByText("Completed")).toBeInTheDocument();
   });
 
   it("shows count as 0 / total", async () => {
-    const HeaderProgress = (await import("@/components/layout/HeaderProgress")).default;
+    const HeaderProgress = (await import("@/components/layout/HeaderProgress"))
+      .default;
     render(<HeaderProgress />);
     expect(screen.getByText(/0 \/ \d+/)).toBeInTheDocument();
   });
 
   it("renders an SVG with progress circles", async () => {
-    const HeaderProgress = (await import("@/components/layout/HeaderProgress")).default;
+    const HeaderProgress = (await import("@/components/layout/HeaderProgress"))
+      .default;
     const { container } = render(<HeaderProgress />);
     const svg = container.querySelector("svg");
     expect(svg).toBeInTheDocument();
@@ -364,7 +417,8 @@ describe("HeaderProgress", () => {
   });
 
   it("shows percentage text", async () => {
-    const HeaderProgress = (await import("@/components/layout/HeaderProgress")).default;
+    const HeaderProgress = (await import("@/components/layout/HeaderProgress"))
+      .default;
     render(<HeaderProgress />);
     expect(screen.getByText(/%/)).toBeInTheDocument();
   });
@@ -390,6 +444,13 @@ describe("Header", () => {
     mockUseTheme.mockReturnValue({
       theme: "dark",
       toggleTheme: vi.fn(),
+    });
+    mockUseSearch.mockReturnValue({
+      isOpen: false,
+      openSearch: vi.fn(),
+      closeSearch: vi.fn(),
+      searchMode: "keyword",
+      setSearchMode: vi.fn(),
     });
     mockUseIsMobile.mockReturnValue(false);
   });
@@ -496,7 +557,9 @@ describe("Header", () => {
 
   it("shows loading skeleton when auth is loading", async () => {
     mockUseAuth.mockReturnValue({
-      user: null, isAuthenticated: false, isLoading: true,
+      user: null,
+      isAuthenticated: false,
+      isLoading: true,
       logout: vi.fn(),
     });
     const Header = (await import("@/components/layout/Header")).default;
@@ -513,7 +576,10 @@ describe("Header", () => {
   });
 
   it("shows company filter text when set", async () => {
-    mockUseFilter.mockReturnValue({ companyFilter: "Google", setCompanyFilter: vi.fn() });
+    mockUseFilter.mockReturnValue({
+      companyFilter: "Google",
+      setCompanyFilter: vi.fn(),
+    });
     const Header = (await import("@/components/layout/Header")).default;
     render(<Header />);
     expect(screen.getByText("Google")).toBeInTheDocument();
@@ -521,7 +587,10 @@ describe("Header", () => {
 
   it("calls toggleTheme when theme button clicked", async () => {
     const toggleThemeMock = vi.fn();
-    mockUseTheme.mockReturnValue({ theme: "dark", toggleTheme: toggleThemeMock });
+    mockUseTheme.mockReturnValue({
+      theme: "dark",
+      toggleTheme: toggleThemeMock,
+    });
     const Header = (await import("@/components/layout/Header")).default;
     render(<Header />);
     fireEvent.click(screen.getByTitle("Switch to light mode"));
@@ -537,7 +606,8 @@ describe("Header", () => {
   it("uses email-derived name for avatar when name is missing", async () => {
     mockUseAuth.mockReturnValue({
       user: { name: undefined, email: "john@test.com" },
-      isAuthenticated: true, isLoading: false,
+      isAuthenticated: true,
+      isLoading: false,
       logout: vi.fn().mockResolvedValue(undefined),
     });
     const Header = (await import("@/components/layout/Header")).default;
@@ -556,103 +626,156 @@ describe("ArticleLayout", () => {
   });
 
   it("renders article title in sidebar", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
     const { container } = render(
-      <ArticleLayout article={mockArticle}><div>Content</div></ArticleLayout>,
+      <ArticleLayout article={mockArticle}>
+        <div>Content</div>
+      </ArticleLayout>
     );
     expect(container.textContent).toContain("Mastering Recursion");
   });
 
   it("renders children content", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
     render(
       <ArticleLayout article={mockArticle}>
         <div data-testid="content">Article content here</div>
-      </ArticleLayout>,
+      </ArticleLayout>
     );
-    expect(screen.getByTestId("content")).toHaveTextContent("Article content here");
+    expect(screen.getByTestId("content")).toHaveTextContent(
+      "Article content here"
+    );
   });
 
   it("shows difficulty badge", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
-    const { container } = render(<ArticleLayout article={mockArticle}><div>Content</div></ArticleLayout>);
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
+    const { container } = render(
+      <ArticleLayout article={mockArticle}>
+        <div>Content</div>
+      </ArticleLayout>
+    );
     expect(container.textContent).toContain("intermediate");
   });
 
   it("shows estimated time", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
-    render(<ArticleLayout article={mockArticle}><div>Content</div></ArticleLayout>);
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
+    render(
+      <ArticleLayout article={mockArticle}>
+        <div>Content</div>
+      </ArticleLayout>
+    );
     expect(screen.getByText("2 hours")).toBeInTheDocument();
   });
 
   it("shows sections in sidebar", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
-    render(<ArticleLayout article={mockArticle}><div>Content</div></ArticleLayout>);
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
+    render(
+      <ArticleLayout article={mockArticle}>
+        <div>Content</div>
+      </ArticleLayout>
+    );
     expect(screen.getByText("Fundamentals of Recursion")).toBeInTheDocument();
     expect(screen.getByText("Types of Recursion")).toBeInTheDocument();
   });
 
   it("highlights active section", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
     render(
-      <ArticleLayout article={mockArticle} currentSection="fundamentals"><div>Content</div></ArticleLayout>,
+      <ArticleLayout article={mockArticle} currentSection="fundamentals">
+        <div>Content</div>
+      </ArticleLayout>
     );
     const links = screen.getAllByText("Fundamentals of Recursion");
-    const activeLink = links.find((l) => l.closest("a")?.className.includes("bg-indigo-500/20"));
+    const activeLink = links.find((l) =>
+      l.closest("a")?.className.includes("bg-indigo-500/20")
+    );
     expect(activeLink?.closest("a")?.className).toContain("bg-indigo-500/20");
   });
 
   it("shows breadcrumb with article title", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
-    const { container } = render(<ArticleLayout article={mockArticle}><div>Content</div></ArticleLayout>);
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
+    const { container } = render(
+      <ArticleLayout article={mockArticle}>
+        <div>Content</div>
+      </ArticleLayout>
+    );
     expect(container.textContent).toContain("Articles");
     expect(container.textContent).toContain("Mastering Recursion");
   });
 
   it("shows current section in breadcrumb", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
     const { container } = render(
-      <ArticleLayout article={mockArticle} currentSection="types"><div>Content</div></ArticleLayout>,
+      <ArticleLayout article={mockArticle} currentSection="types">
+        <div>Content</div>
+      </ArticleLayout>
     );
     expect(container.textContent).toContain("Types of Recursion");
   });
 
   it("shows next navigation on first section (no previous)", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
     const { container } = render(
-      <ArticleLayout article={mockArticle} currentSection="fundamentals"><div>Content</div></ArticleLayout>,
+      <ArticleLayout article={mockArticle} currentSection="fundamentals">
+        <div>Content</div>
+      </ArticleLayout>
     );
     expect(container.textContent).toContain("Next");
     expect(container.textContent).not.toContain("Previous");
   });
 
   it("shows previous section link for non-first section", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
     const { container } = render(
-      <ArticleLayout article={mockArticle} currentSection="types"><div>Content</div></ArticleLayout>,
+      <ArticleLayout article={mockArticle} currentSection="types">
+        <div>Content</div>
+      </ArticleLayout>
     );
     expect(container.textContent).toContain("Fundamentals of Recursion");
   });
 
   it("shows Completed! on last section", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
     render(
-      <ArticleLayout article={mockArticle} currentSection="types"><div>Content</div></ArticleLayout>,
+      <ArticleLayout article={mockArticle} currentSection="types">
+        <div>Content</div>
+      </ArticleLayout>
     );
     expect(screen.getByText("Completed!")).toBeInTheDocument();
     expect(screen.getByText("Back to Articles")).toBeInTheDocument();
   });
 
   it("shows progress indicator in sidebar", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
-    render(<ArticleLayout article={mockArticle}><div>Content</div></ArticleLayout>);
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
+    render(
+      <ArticleLayout article={mockArticle}>
+        <div>Content</div>
+      </ArticleLayout>
+    );
     expect(screen.getByText("Progress")).toBeInTheDocument();
     expect(screen.getByText("0/2")).toBeInTheDocument();
   });
 
   it("shows Sections heading", async () => {
-    const ArticleLayout = (await import("@/components/articles/ArticleLayout")).default;
-    render(<ArticleLayout article={mockArticle}><div>Content</div></ArticleLayout>);
+    const ArticleLayout = (await import("@/components/articles/ArticleLayout"))
+      .default;
+    render(
+      <ArticleLayout article={mockArticle}>
+        <div>Content</div>
+      </ArticleLayout>
+    );
     expect(screen.getByText("Sections")).toBeInTheDocument();
   });
 });
@@ -668,60 +791,92 @@ describe("SinglePageArticleLayout", () => {
   const MockSection = () => <div data-testid="section-component">Section</div>;
 
   it("renders the article title", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
     const { container } = render(
-      <Layout article={mockArticle} sectionComponents={{ fundamentals: MockSection, types: MockSection }} />,
+      <Layout
+        article={mockArticle}
+        sectionComponents={{ fundamentals: MockSection, types: MockSection }}
+      />
     );
     expect(container.textContent).toContain("Mastering Recursion");
   });
 
   it("shows difficulty badge", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
-    const { container } = render(<Layout article={mockArticle} sectionComponents={{}} />);
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
+    const { container } = render(
+      <Layout article={mockArticle} sectionComponents={{}} />
+    );
     expect(container.textContent).toContain("intermediate");
   });
 
   it("shows estimated time", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
-    const { container } = render(<Layout article={mockArticle} sectionComponents={{}} />);
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
+    const { container } = render(
+      <Layout article={mockArticle} sectionComponents={{}} />
+    );
     expect(container.textContent).toContain("2 hours");
   });
 
   it("renders section components", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
     render(
-      <Layout article={mockArticle} sectionComponents={{ fundamentals: MockSection, types: MockSection }} />,
+      <Layout
+        article={mockArticle}
+        sectionComponents={{ fundamentals: MockSection, types: MockSection }}
+      />
     );
     expect(screen.getAllByTestId("section-component")).toHaveLength(2);
   });
 
   it("shows completion message", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
     render(<Layout article={mockArticle} sectionComponents={{}} />);
-    expect(screen.getByText("You've completed this article!")).toBeInTheDocument();
+    expect(
+      screen.getByText("You've completed this article!")
+    ).toBeInTheDocument();
   });
 
   it("shows Browse More Articles link", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
     render(<Layout article={mockArticle} sectionComponents={{}} />);
     expect(screen.getByText("Browse More Articles")).toBeInTheDocument();
   });
 
   it("renders tags", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
     render(<Layout article={mockArticle} sectionComponents={{}} />);
     expect(screen.getByText("Recursion")).toBeInTheDocument();
     expect(screen.getByText("Fundamentals")).toBeInTheDocument();
   });
 
   it("shows Table of Contents", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
-    const { container } = render(<Layout article={mockArticle} sectionComponents={{}} />);
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
+    const { container } = render(
+      <Layout article={mockArticle} sectionComponents={{}} />
+    );
     expect(container.textContent).toContain("Table of Contents");
   });
 
   it("shows author info", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
     render(<Layout article={mockArticle} sectionComponents={{}} />);
     expect(screen.getByText("Rishu Kumar")).toBeInTheDocument();
     expect(screen.getByText("2026-02-13")).toBeInTheDocument();
@@ -729,29 +884,69 @@ describe("SinglePageArticleLayout", () => {
   });
 
   it("shows reading progress", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
-    const { container } = render(<Layout article={mockArticle} sectionComponents={{}} />);
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
+    const { container } = render(
+      <Layout article={mockArticle} sectionComponents={{}} />
+    );
     expect(container.textContent).toContain("Reading progress");
     expect(container.textContent).toContain("1/2");
   });
 
-  it("shows back link to All Articles", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
+  it("shows back link to Articles", async () => {
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
     render(<Layout article={mockArticle} sectionComponents={{}} />);
-    expect(screen.getAllByText(/All Articles/).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/Back to Articles/).length
+    ).toBeGreaterThanOrEqual(1);
+  });
+
+  it("back link points to /articles", async () => {
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
+    render(<Layout article={mockArticle} sectionComponents={{}} />);
+    const backLinks = screen.getAllByText(/Back to Articles/);
+    const backLink = backLinks[0].closest("a");
+    expect(backLink).toHaveAttribute("href", "/articles");
+  });
+
+  it("sidebar back button has correct styling", async () => {
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
+    const { container } = render(
+      <Layout article={mockArticle} sectionComponents={{}} />
+    );
+    // Check sidebar has back button with arrow icon
+    const sidebar = container.querySelector("aside");
+    expect(sidebar).toBeInTheDocument();
+    const svgInSidebar = sidebar?.querySelector("svg");
+    expect(svgInSidebar).toBeInTheDocument();
   });
 
   it("shows content not found when section component missing", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
     render(<Layout article={mockArticle} sectionComponents={{}} />);
     expect(screen.getAllByText("Section content not found")).toHaveLength(2);
   });
 
   it("expands mobile TOC on click", async () => {
-    const Layout = (await import("@/components/articles/SinglePageArticleLayout")).default;
-    const { container } = render(<Layout article={mockArticle} sectionComponents={{}} />);
+    const Layout = (
+      await import("@/components/articles/SinglePageArticleLayout")
+    ).default;
+    const { container } = render(
+      <Layout article={mockArticle} sectionComponents={{}} />
+    );
     const tocBtns = screen.getAllByText("Table of Contents");
-    const mobileBtn = tocBtns.find((btn) => btn.tagName === "BUTTON" || btn.closest("button"));
+    const mobileBtn = tocBtns.find(
+      (btn) => btn.tagName === "BUTTON" || btn.closest("button")
+    );
     if (mobileBtn) fireEvent.click(mobileBtn);
     await waitFor(() => {
       expect(container.textContent).toContain("Fundamentals of Recursion");
@@ -801,7 +996,12 @@ describe("QuizResults", () => {
     correctCount: 7,
     scorePercentage: 70,
     questions: [mockQuizQuestion],
-    answers: new Map([["q1", { selected: 1, isCorrect: true, correctAnswer: 1, explanation: "x" }]]),
+    answers: new Map([
+      [
+        "q1",
+        { selected: 1, isCorrect: true, correctAnswer: 1, explanation: "x" },
+      ],
+    ]),
     onRetake: vi.fn(),
     onClose: vi.fn(),
   };
@@ -815,7 +1015,9 @@ describe("QuizResults", () => {
   it("shows correct/total count text", async () => {
     const QuizResults = (await import("@/components/quiz/QuizResults")).default;
     render(<QuizResults {...baseProps} />);
-    expect(screen.getByText(/You got 7 out of 10 questions correct/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/You got 7 out of 10 questions correct/)
+    ).toBeInTheDocument();
   });
 
   it("shows Good job! for 70%", async () => {
@@ -826,25 +1028,53 @@ describe("QuizResults", () => {
 
   it("shows Outstanding! for 90%+", async () => {
     const QuizResults = (await import("@/components/quiz/QuizResults")).default;
-    render(<QuizResults {...baseProps} scorePercentage={95} correctCount={19} totalQuestions={20} />);
+    render(
+      <QuizResults
+        {...baseProps}
+        scorePercentage={95}
+        correctCount={19}
+        totalQuestions={20}
+      />
+    );
     expect(screen.getByText("Outstanding!")).toBeInTheDocument();
   });
 
   it("shows Excellent! for 80%+", async () => {
     const QuizResults = (await import("@/components/quiz/QuizResults")).default;
-    render(<QuizResults {...baseProps} scorePercentage={85} correctCount={17} totalQuestions={20} />);
+    render(
+      <QuizResults
+        {...baseProps}
+        scorePercentage={85}
+        correctCount={17}
+        totalQuestions={20}
+      />
+    );
     expect(screen.getByText("Excellent!")).toBeInTheDocument();
   });
 
   it("shows Nice effort! for 60%+", async () => {
     const QuizResults = (await import("@/components/quiz/QuizResults")).default;
-    render(<QuizResults {...baseProps} scorePercentage={65} correctCount={13} totalQuestions={20} />);
+    render(
+      <QuizResults
+        {...baseProps}
+        scorePercentage={65}
+        correctCount={13}
+        totalQuestions={20}
+      />
+    );
     expect(screen.getByText("Nice effort!")).toBeInTheDocument();
   });
 
   it("shows Keep practicing! for below 60%", async () => {
     const QuizResults = (await import("@/components/quiz/QuizResults")).default;
-    render(<QuizResults {...baseProps} scorePercentage={40} correctCount={4} totalQuestions={10} />);
+    render(
+      <QuizResults
+        {...baseProps}
+        scorePercentage={40}
+        correctCount={4}
+        totalQuestions={10}
+      />
+    );
     expect(screen.getByText("Keep practicing!")).toBeInTheDocument();
   });
 
@@ -888,7 +1118,9 @@ describe("QuizResults", () => {
   it("shows correct answer checkmark SVG", async () => {
     const QuizResults = (await import("@/components/quiz/QuizResults")).default;
     const { container } = render(<QuizResults {...baseProps} />);
-    expect(container.querySelector("svg path[d='M5 13l4 4L19 7']")).toBeInTheDocument();
+    expect(
+      container.querySelector("svg path[d='M5 13l4 4L19 7']")
+    ).toBeInTheDocument();
   });
 
   it("shows incorrect answer X mark SVG", async () => {
@@ -896,10 +1128,24 @@ describe("QuizResults", () => {
     const { container } = render(
       <QuizResults
         {...baseProps}
-        answers={new Map([["q1", { selected: 0, isCorrect: false, correctAnswer: 1, explanation: "x" }]])}
-      />,
+        answers={
+          new Map([
+            [
+              "q1",
+              {
+                selected: 0,
+                isCorrect: false,
+                correctAnswer: 1,
+                explanation: "x",
+              },
+            ],
+          ])
+        }
+      />
     );
-    expect(container.querySelector("svg path[d='M6 18L18 6M6 6l12 12']")).toBeInTheDocument();
+    expect(
+      container.querySelector("svg path[d='M6 18L18 6M6 6l12 12']")
+    ).toBeInTheDocument();
   });
 
   it("renders score circle SVG with two circles", async () => {
@@ -939,7 +1185,7 @@ describe("QuizModal", () => {
   it("returns null when isOpen is false", async () => {
     const QuizModal = (await import("@/components/quiz/QuizModal")).default;
     const { container } = render(
-      <QuizModal isOpen={false} onClose={vi.fn()} patternId="pattern-1" />,
+      <QuizModal isOpen={false} onClose={vi.fn()} patternId="pattern-1" />
     );
     expect(container.innerHTML).toBe("");
   });
@@ -969,17 +1215,25 @@ describe("QuizModal", () => {
   it("handles answering a question", async () => {
     const QuizModal = (await import("@/components/quiz/QuizModal")).default;
     render(<QuizModal isOpen={true} onClose={vi.fn()} patternId="pattern-1" />);
-    await waitFor(() => expect(screen.getByText("Question 1 of 1")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Question 1 of 1")).toBeInTheDocument()
+    );
     fireEvent.click(screen.getByText("A function calling itself"));
-    await waitFor(() => expect(screen.getByText("Correct!")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Correct!")).toBeInTheDocument()
+    );
   });
 
   it("shows See Results after answering last question", async () => {
     const QuizModal = (await import("@/components/quiz/QuizModal")).default;
     render(<QuizModal isOpen={true} onClose={vi.fn()} patternId="pattern-1" />);
-    await waitFor(() => expect(screen.getByText("Question 1 of 1")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Question 1 of 1")).toBeInTheDocument()
+    );
     fireEvent.click(screen.getByText("A function calling itself"));
-    await waitFor(() => expect(screen.getByText("See Results")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("See Results")).toBeInTheDocument()
+    );
   });
 
   it("shows progress bar percentage", async () => {
@@ -992,9 +1246,11 @@ describe("QuizModal", () => {
     const onClose = vi.fn();
     const QuizModal = (await import("@/components/quiz/QuizModal")).default;
     const { container } = render(
-      <QuizModal isOpen={true} onClose={onClose} patternId="pattern-1" />,
+      <QuizModal isOpen={true} onClose={onClose} patternId="pattern-1" />
     );
-    await waitFor(() => expect(screen.getByText("Question 1 of 1")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Question 1 of 1")).toBeInTheDocument()
+    );
     const backdrop = container.querySelector("[class*='bg-black']");
     if (backdrop) {
       fireEvent.click(backdrop);
@@ -1006,7 +1262,9 @@ describe("QuizModal", () => {
     const onClose = vi.fn();
     const QuizModal = (await import("@/components/quiz/QuizModal")).default;
     render(<QuizModal isOpen={true} onClose={onClose} patternId="pattern-1" />);
-    await waitFor(() => expect(screen.getByText("Question 1 of 1")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Question 1 of 1")).toBeInTheDocument()
+    );
     const btns = screen.getAllByRole("button");
     const xBtn = btns.find((b) => b.innerHTML.includes("M6 18L18 6"));
     if (xBtn) {
@@ -1016,11 +1274,17 @@ describe("QuizModal", () => {
   });
 
   it("shows error when no questions available", async () => {
-    mockGetQuestions.mockResolvedValue({ patternId: "p", questions: [], totalQuestions: 0 });
+    mockGetQuestions.mockResolvedValue({
+      patternId: "p",
+      questions: [],
+      totalQuestions: 0,
+    });
     const QuizModal = (await import("@/components/quiz/QuizModal")).default;
     render(<QuizModal isOpen={true} onClose={vi.fn()} patternId="p" />);
     await waitFor(() =>
-      expect(screen.getByText("No questions available for this quiz.")).toBeInTheDocument(),
+      expect(
+        screen.getByText("No questions available for this quiz.")
+      ).toBeInTheDocument()
     );
   });
 
@@ -1029,7 +1293,7 @@ describe("QuizModal", () => {
     const QuizModal = (await import("@/components/quiz/QuizModal")).default;
     render(<QuizModal isOpen={true} onClose={vi.fn()} patternId="p" />);
     await waitFor(() =>
-      expect(screen.getByText("Failed to load quiz")).toBeInTheDocument(),
+      expect(screen.getByText("Failed to load quiz")).toBeInTheDocument()
     );
   });
 
@@ -1045,12 +1309,18 @@ describe("QuizModal", () => {
 
   it("disables back button on first question", async () => {
     mockGetQuestions.mockResolvedValue({
-      patternId: "p", totalQuestions: 2,
-      questions: [mockQuizQuestion, { ...mockQuizQuestion, id: "q2", questionText: "Second?" }],
+      patternId: "p",
+      totalQuestions: 2,
+      questions: [
+        mockQuizQuestion,
+        { ...mockQuizQuestion, id: "q2", questionText: "Second?" },
+      ],
     });
     const QuizModal = (await import("@/components/quiz/QuizModal")).default;
     render(<QuizModal isOpen={true} onClose={vi.fn()} patternId="p" />);
-    await waitFor(() => expect(screen.getByText("Question 1 of 2")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Question 1 of 2")).toBeInTheDocument()
+    );
     expect(screen.getByText("Back").closest("button")).toBeDisabled();
   });
 });

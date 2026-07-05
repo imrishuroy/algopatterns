@@ -22,7 +22,8 @@ export default function QuizResults({
   onClose,
 }: QuizResultsProps) {
   const circumference = 2 * Math.PI * 45;
-  const strokeDashoffset = circumference - (scorePercentage / 100) * circumference;
+  const strokeDashoffset =
+    circumference - (scorePercentage / 100) * circumference;
 
   const getMessage = () => {
     if (scorePercentage >= 90) return "Outstanding!";
@@ -42,7 +43,10 @@ export default function QuizResults({
     <div className="text-center py-4">
       {/* Score circle */}
       <div className="relative w-32 h-32 mx-auto mb-6">
-        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+        <svg
+          className="w-full h-full transform -rotate-90"
+          viewBox="0 0 100 100"
+        >
           <circle
             cx="50"
             cy="50"
@@ -101,7 +105,7 @@ export default function QuizResults({
         <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
           {questions.map((q, i) => {
             const answer = answers.get(q.id);
-            const questionText = q.questionText.split('\\n')[0];
+            const questionText = q.questionText.split("\\n")[0];
             return (
               <div
                 key={q.id}
@@ -109,7 +113,9 @@ export default function QuizResults({
               >
                 <span
                   className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${
-                    answer?.isCorrect ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                    answer?.isCorrect
+                      ? "bg-green-500 text-white"
+                      : "bg-red-500 text-white"
                   }`}
                 >
                   {answer?.isCorrect ? (

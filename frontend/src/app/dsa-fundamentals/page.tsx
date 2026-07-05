@@ -48,9 +48,6 @@ export const metadata: Metadata = {
 
 export default function DSAFundamentalsPage() {
   return (
-    <DSAFundamentalsClient
-      concepts={concepts}
-      categories={conceptCategories}
-    />
+    <DSAFundamentalsClient concepts={concepts} categories={conceptCategories} />
   );
 }

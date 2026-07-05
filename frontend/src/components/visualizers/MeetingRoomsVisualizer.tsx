@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion } from "framer-motion";
 
 interface Meeting {
@@ -53,7 +59,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 export default function MeetingRoomsVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(800);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [events, setEvents] = useState<Event[]>([]);

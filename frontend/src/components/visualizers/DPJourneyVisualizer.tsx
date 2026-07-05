@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Item {
@@ -64,7 +70,12 @@ const buildTree = (
   }
 
   if (items[index]?.weight <= cap) {
-    const takeChild = buildTree(index - 1, cap - items[index].weight, depth + 1, memo);
+    const takeChild = buildTree(
+      index - 1,
+      cap - items[index].weight,
+      depth + 1,
+      memo
+    );
     if (takeChild) {
       takeChild.choice = "take";
       node.children.push(takeChild);
@@ -84,8 +95,11 @@ const flattenTree = (node: TreeNode | null, order: string[] = []): string[] => {
 };
 
 const generateTableSteps = () => {
-  const steps: { i: number; w: number; value: number; explanation: string }[] = [];
-  const dp: number[][] = Array(items.length + 1).fill(null).map(() => Array(capacity + 1).fill(0));
+  const steps: { i: number; w: number; value: number; explanation: string }[] =
+    [];
+  const dp: number[][] = Array(items.length + 1)
+    .fill(null)
+    .map(() => Array(capacity + 1).fill(0));
 
   for (let i = 1; i <= items.length; i++) {
     for (let w = 0; w <= capacity; w++) {
@@ -142,8 +156,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Back"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
 
@@ -165,7 +189,11 @@ const Controls = ({
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-green-600/20"
           title="Play"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -177,8 +205,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Forward"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
 
@@ -187,15 +225,27 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-all ml-2"
         title="Reset"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </button>
     </div>
 
     <div className="flex items-center justify-center gap-4">
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Speed</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Speed
+        </span>
         <div className="flex gap-1">
           {[
             { value: 1000, label: "0.5x" },
@@ -218,7 +268,9 @@ const Controls = ({
       </div>
 
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Step</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Step
+        </span>
         <span className="text-sm font-mono text-white">
           {step} <span className="text-gray-500">/</span> {total}
         </span>
@@ -248,11 +300,8 @@ const TreeNodeComponent = ({
 }) => {
   if (!visible) return null;
 
-  const nodeColor = node.isCacheHit && showMemo
-    ? "#FCD34D"
-    : isLatest
-    ? "#3B82F6"
-    : "#4B5563";
+  const nodeColor =
+    node.isCacheHit && showMemo ? "#FCD34D" : isLatest ? "#3B82F6" : "#4B5563";
 
   return (
     <g>
@@ -275,11 +324,21 @@ const TreeNodeComponent = ({
         stroke={isLatest ? "#60A5FA" : "#6B7280"}
         strokeWidth={isLatest ? 3 : 1.5}
       />
-      <text x={x} y={y + 5} textAnchor="middle" className="text-sm fill-white font-mono font-medium">
+      <text
+        x={x}
+        y={y + 5}
+        textAnchor="middle"
+        className="text-sm fill-white font-mono font-medium"
+      >
         {node.index},{node.capacity}
       </text>
       {node.isCacheHit && showMemo && (
-        <text x={x} y={y + 38} textAnchor="middle" className="text-xs fill-yellow-400 font-medium">
+        <text
+          x={x}
+          y={y + 38}
+          textAnchor="middle"
+          className="text-xs fill-yellow-400 font-medium"
+        >
           cached
         </text>
       )}
@@ -304,7 +363,10 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
       const count = levelCounts[depth];
       const width = 680;
       const spacing = width / (levelWidth[depth] + 1);
-      const x = spacing * count + (width - spacing * levelWidth[depth]) / 2 - spacing / 2;
+      const x =
+        spacing * count +
+        (width - spacing * levelWidth[depth]) / 2 -
+        spacing / 2;
       const y = depth * 90 + 40;
 
       pos[node.id] = { x, y };
@@ -318,7 +380,10 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
     return pos;
   }, [tree]);
 
-  const renderTree = (node: TreeNode | null, parentId?: string): React.ReactNode => {
+  const renderTree = (
+    node: TreeNode | null,
+    parentId?: string
+  ): React.ReactNode => {
     if (!node) return null;
 
     const isVisible = visibleNodes.has(node.id);
@@ -345,7 +410,12 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
   return (
     <div className="flex flex-col items-center">
-      <svg width="100%" height="400" viewBox="0 0 700 400" className="bg-gray-800/30 rounded-lg">
+      <svg
+        width="100%"
+        height="400"
+        viewBox="0 0 700 400"
+        className="bg-gray-800/30 rounded-lg"
+      >
         {tree && renderTree(tree)}
       </svg>
       <div className="flex gap-6 mt-4 text-sm text-gray-400">
@@ -365,7 +435,13 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
   );
 };
 
-const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType<typeof generateTableSteps> }) => {
+const TablePhase = ({
+  step,
+  tableSteps,
+}: {
+  step: number;
+  tableSteps: ReturnType<typeof generateTableSteps>;
+}) => {
   const currentDp = useMemo(() => {
     const dp: (number | null)[][] = Array(items.length + 1)
       .fill(null)
@@ -389,9 +465,16 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
         <table className="border-collapse text-base">
           <thead>
             <tr>
-              <th className="p-3 text-gray-500 w-16 text-center font-medium">Item</th>
+              <th className="p-3 text-gray-500 w-16 text-center font-medium">
+                Item
+              </th>
               {Array.from({ length: capacity + 1 }, (_, w) => (
-                <th key={w} className="p-3 text-gray-400 w-14 text-center font-medium">{w}</th>
+                <th
+                  key={w}
+                  className="p-3 text-gray-400 w-14 text-center font-medium"
+                >
+                  {w}
+                </th>
               ))}
             </tr>
           </thead>
@@ -402,7 +485,8 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
                   {i === 0 ? "-" : items[i - 1].name}
                 </td>
                 {Array.from({ length: capacity + 1 }, (_, w) => {
-                  const isCurrent = currentStep && currentStep.i === i && currentStep.w === w;
+                  const isCurrent =
+                    currentStep && currentStep.i === i && currentStep.w === w;
                   const value = currentDp[i][w];
 
                   return (
@@ -412,12 +496,14 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
                         isCurrent
                           ? "bg-blue-600 border-blue-400"
                           : value !== null
-                          ? "bg-gray-800 border-gray-600"
-                          : "bg-gray-900/50 border-gray-700"
+                            ? "bg-gray-800 border-gray-600"
+                            : "bg-gray-900/50 border-gray-700"
                       }`}
                     >
                       {value !== null && (
-                        <span className={`font-mono text-lg ${isCurrent ? "text-white font-bold" : "text-gray-300"}`}>
+                        <span
+                          className={`font-mono text-lg ${isCurrent ? "text-white font-bold" : "text-gray-300"}`}
+                        >
                           {value}
                         </span>
                       )}
@@ -439,7 +525,8 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
   );
 };
 
-export default function DPJourneyVisualizer() { // skipcq: JS-0067
+export default function DPJourneyVisualizer() {
+  // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion Tree",
@@ -455,7 +542,10 @@ export default function DPJourneyVisualizer() { // skipcq: JS-0067
 
   const tableSteps = useMemo(() => generateTableSteps(), []);
   const tree = useMemo(() => buildTree(items.length - 1, capacity), []);
-  const treeNodeCount = useMemo(() => (tree ? flattenTree(tree).length : 0), [tree]);
+  const treeNodeCount = useMemo(
+    () => (tree ? flattenTree(tree).length : 0),
+    [tree]
+  );
 
   const getMaxSteps = useCallback(
     (phase: Phase) => {
@@ -502,9 +592,11 @@ export default function DPJourneyVisualizer() { // skipcq: JS-0067
               }`}
             >
               <span className="flex items-center gap-2">
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
-                  currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
-                }`}>
+                <span
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
+                    currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
+                  }`}
+                >
                   {index + 1}
                 </span>
                 {phaseLabels[phase]}
@@ -539,9 +631,13 @@ export default function DPJourneyVisualizer() { // skipcq: JS-0067
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
+          {currentPhase === "tree" && (
+            <TreePhase step={step} showMemo={false} />
+          )}
           {currentPhase === "memo" && <TreePhase step={step} showMemo />}
-          {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
+          {currentPhase === "table" && (
+            <TablePhase step={step} tableSteps={tableSteps} />
+          )}
         </motion.div>
       </AnimatePresence>
 

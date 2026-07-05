@@ -33,36 +33,32 @@ export default function RecursionTreeVisualizer({
   const [step, setStep] = useState(0);
   const [speed, setSpeed] = useState(800);
 
-  const buildFibTree = useCallback(
-    function buildFibTree(
-      n: number,
-      depth: number = 0,
-      pos: number = 0,
-      id: string = "0"
-    ): TreeNode | null {
-      if (n < 0) return null;
+  const buildFibTree = useCallback(function buildFibTree(
+    n: number,
+    depth: number = 0,
+    pos: number = 0,
+    id: string = "0"
+  ): TreeNode | null {
+    if (n < 0) return null;
 
-      const node: TreeNode = {
-        id,
-        value: n,
-        depth,
-        position: pos,
-      };
+    const node: TreeNode = {
+      id,
+      value: n,
+      depth,
+      position: pos,
+    };
 
-      if (n <= 1) {
-        node.result = n;
-        return node;
-      }
-
-      node.left =
-        buildFibTree(n - 1, depth + 1, pos * 2, `${id}L`) || undefined;
-      node.right =
-        buildFibTree(n - 2, depth + 1, pos * 2 + 1, `${id}R`) || undefined;
-
+    if (n <= 1) {
+      node.result = n;
       return node;
-    },
-    []
-  );
+    }
+
+    node.left = buildFibTree(n - 1, depth + 1, pos * 2, `${id}L`) || undefined;
+    node.right =
+      buildFibTree(n - 2, depth + 1, pos * 2 + 1, `${id}R`) || undefined;
+
+    return node;
+  }, []);
 
   const tree = useMemo(() => {
     const maxInput = Math.min(inputValue, 6);

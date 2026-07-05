@@ -227,7 +227,10 @@ export default function CallStackVisualizer({
           for (let i = 2; i <= inputValue; i++) r *= i;
           dispatch({ type: "FINISHED", result: r });
         } else if (example === "sum") {
-          dispatch({ type: "FINISHED", result: (inputValue * (inputValue + 1)) / 2 });
+          dispatch({
+            type: "FINISHED",
+            result: (inputValue * (inputValue + 1)) / 2,
+          });
         } else {
           const fib = (n: number): number =>
             n <= 1 ? n : fib(n - 1) + fib(n - 2);
@@ -292,7 +295,9 @@ export default function CallStackVisualizer({
 
           <div className="flex items-center gap-2 mb-4 flex-wrap">
             <button
-              onClick={() => dispatch({ type: "SET_PLAYING", payload: !isPlaying })}
+              onClick={() =>
+                dispatch({ type: "SET_PLAYING", payload: !isPlaying })
+              }
               className={`px-4 py-2 rounded-md font-medium transition ${
                 isPlaying
                   ? "bg-yellow-500 text-black hover:bg-yellow-400"

@@ -15,12 +15,8 @@ interface UnifiedTrackerProps {
 
 export default function UnifiedTracker({ questions }: UnifiedTrackerProps) {
   const patterns = patternsData as Pattern[];
-  const {
-    completed,
-    toggleComplete,
-    resetProgress,
-    celebrationKey,
-  } = useProgress();
+  const { completed, toggleComplete, resetProgress, celebrationKey } =
+    useProgress();
   const [search, setSearch] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("");
   const [companyFilter, setCompanyFilter] = useState("");

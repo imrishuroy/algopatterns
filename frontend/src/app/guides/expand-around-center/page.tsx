@@ -50,7 +50,10 @@ export const metadata: Metadata = {
 const breadcrumbs = [
   { name: "Home", url: siteUrl },
   { name: "Guides", url: `${siteUrl}/guides` },
-  { name: "Expand Around Center", url: `${siteUrl}/guides/expand-around-center` },
+  {
+    name: "Expand Around Center",
+    url: `${siteUrl}/guides/expand-around-center`,
+  },
 ];
 
 // skipcq: JS-0067

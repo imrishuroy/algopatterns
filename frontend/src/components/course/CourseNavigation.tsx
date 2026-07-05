@@ -3,7 +3,13 @@
 import React from "react";
 import { usePatternProgress } from "@/contexts/PatternProgressContext";
 import { Pattern } from "@/types";
-import { ArrowLeft, ArrowRight, CheckCircle, Circle, FileQuestion } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  Circle,
+  FileQuestion,
+} from "lucide-react";
 
 interface CourseNavigationProps {
   pattern: Pattern;

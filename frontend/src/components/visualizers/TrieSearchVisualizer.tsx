@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+  useMemo,
+} from "react";
 import { motion } from "framer-motion";
 
 interface TrieNode {
@@ -31,7 +38,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 export default function TrieSearchVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(700);
   const [searchMode, setSearchMode] = useState<"search" | "startsWith">(
     "search"
@@ -428,8 +438,9 @@ export default function TrieSearchVisualizer() {
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
             <strong className="text-indigo-400">Key Difference:</strong>{" "}
-            search(&quot;appl&quot;) = false (not a word), but startsWith(&quot;appl&quot;) = true
-            (prefix exists). * marks isEnd = true.
+            search(&quot;appl&quot;) = false (not a word), but
+            startsWith(&quot;appl&quot;) = true (prefix exists). * marks isEnd =
+            true.
           </p>
         </div>
       </div>

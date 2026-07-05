@@ -132,6 +132,9 @@ func main() {
 	quizRepo := repository.NewQuizRepository(db)
 	quizService := services.NewQuizService(quizRepo)
 
+	searchRepo := repository.NewSearchRepository(db)
+	searchService := services.NewSearchService(searchRepo)
+
 	paymentRepo := repository.NewPaymentRepository(db)
 	razorpayClient := razorpay.NewClient(cfg.Razorpay.KeyID, cfg.Razorpay.KeySecret, cfg.Razorpay.WebhookSecret)
 	emailService := services.NewEmailService(services.EmailConfig{
@@ -226,7 +229,7 @@ func main() {
 	}
 
 	gin.SetMode(cfg.Server.Mode)
-	router := setupRouter(cfg, db, patternService, authService, oauthService, sessionService, progressService, problemService, submissionService, highlightService, patternProgressService, quizService, paymentService, webhookService, featureAccess, aiService)
+	router := setupRouter(cfg, db, patternService, authService, oauthService, sessionService, progressService, problemService, submissionService, highlightService, patternProgressService, quizService, searchService, paymentService, webhookService, featureAccess, aiService)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port),
@@ -265,7 +268,7 @@ func setupLogger(cfg config.LoggingConfig) {
 	}
 }
 
-func setupRouter(cfg *config.Config, db *repository.Database, patternService *services.PatternService, authService *services.AuthService, oauthService *services.OAuthService, sessionService *services.SessionService, progressService *services.ProgressService, problemService *services.ProblemService, submissionService *services.SubmissionService, highlightService *services.HighlightService, patternProgressService *services.PatternProgressService, quizService *services.QuizService, paymentService *services.PaymentService, webhookService *services.WebhookService, featureAccess *services.FeatureAccess, aiService *ai.Service) *gin.Engine {
+func setupRouter(cfg *config.Config, db *repository.Database, patternService *services.PatternService, authService *services.AuthService, oauthService *services.OAuthService, sessionService *services.SessionService, progressService *services.ProgressService, problemService *services.ProblemService, submissionService *services.SubmissionService, highlightService *services.HighlightService, patternProgressService *services.PatternProgressService, quizService *services.QuizService, searchService *services.SearchService, paymentService *services.PaymentService, webhookService *services.WebhookService, featureAccess *services.FeatureAccess, aiService *ai.Service) *gin.Engine {
 	router := gin.New()
 
 	rateLimiter := middleware.NewRateLimiter(cfg.Server.RateLimitRPS, cfg.Server.RateLimitBurst)
@@ -341,6 +344,9 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 
 		quizHandler := handlers.NewQuizHandler(quizService, featureAccess, authMW)
 		quizHandler.RegisterRoutes(v1)
+
+		searchHandler := handlers.NewSearchHandler(searchService, authMW)
+		searchHandler.RegisterRoutes(v1)
 
 		paymentHandler := handlers.NewPaymentHandler(paymentService, webhookService, authMW)
 		paymentHandler.RegisterRoutes(v1)

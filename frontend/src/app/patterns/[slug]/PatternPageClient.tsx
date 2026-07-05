@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback, startTransition } from "react";
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+  startTransition,
+} from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Pattern } from "@/types";
@@ -34,7 +41,8 @@ const difficultyColors: Record<string, string> = {
   "Medium-Hard": "bg-orange-500/20 text-orange-400",
 };
 
-export default function PatternPageClient({ pattern }: PatternPageClientProps) { // skipcq: JS-0067, JS-R1005
+export default function PatternPageClient({ pattern }: PatternPageClientProps) {
+  // skipcq: JS-0067, JS-R1005
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -54,7 +62,11 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
   }, [activeSection]);
 
   useEffect(() => {
-    if (tabParam === "problems" || tabParam === "cheatsheet" || tabParam === "tutorial") {
+    if (
+      tabParam === "problems" ||
+      tabParam === "cheatsheet" ||
+      tabParam === "tutorial"
+    ) {
       startTransition(() => {
         setActiveTab(tabParam);
       });
@@ -103,7 +115,8 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             lastUpdate = now;
-            const sectionId = entry.target.getAttribute("data-section-id") || "";
+            const sectionId =
+              entry.target.getAttribute("data-section-id") || "";
             if (sectionId && sectionId !== activeSectionRef.current) {
               setActiveSection(sectionId);
               setSectionContent(entry.target.textContent?.slice(0, 2000) || "");
@@ -115,10 +128,13 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
     );
 
     const timer = setTimeout(() => {
-      document.querySelectorAll("[data-section-id]").forEach((el) => observer.observe(el));
+      document
+        .querySelectorAll("[data-section-id]")
+        .forEach((el) => observer.observe(el));
     }, 100);
 
-    return () => { // skipcq: JS-0045
+    return () => {
+      // skipcq: JS-0045
       clearTimeout(timer);
       observer.disconnect();
     };
@@ -184,130 +200,168 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
     setAiMessageKey(0);
   }, []);
 
-  const header = ( // skipcq: JS-0415
-    <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm flex-shrink-0">
-      <div className="px-4 py-4">
-        <div className="flex items-center gap-4 mb-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <span>Back</span>
-          </Link>
-        </div>
-
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
-                {pattern.category}
-              </h1>
-              <span
-                className={`px-3 py-1 text-sm rounded-full ${difficultyColors[pattern.difficulty]}`}
+  const header = // skipcq: JS-0415
+    (
+      <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm flex-shrink-0">
+        <div className="px-4 py-4">
+          <div className="flex items-center gap-4 mb-4">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {pattern.difficulty}
-              </span>
-            </div>
-            <div className="flex items-center gap-4 text-sm text-gray-400">
-              <span>
-                Time:{" "}
-                <span className="text-indigo-400 font-mono">{pattern.timeComplexity}</span>
-              </span>
-              <span>
-                Space:{" "}
-                <span className="text-purple-400 font-mono">{pattern.spaceComplexity}</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <div className="text-2xl font-bold text-white">
-                {stats.done}/{stats.total}
-              </div>
-              <div className="text-sm text-gray-500">problems solved</div>
-            </div>
-            <div className="w-16 h-16 relative">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
-                <circle
-                  cx="32" cy="32" r="28"
-                  stroke="currentColor" strokeWidth="4" fill="none"
-                  className="text-gray-800"
-                />
-                <circle
-                  cx="32" cy="32" r="28"
-                  stroke="url(#miniGradient)" strokeWidth="4" fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray={`${stats.percent * 1.76} 176`}
-                />
-                <defs>
-                  <linearGradient id="miniGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="100%" stopColor="#a855f7" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white">
-                {stats.percent}%
-              </span>
-            </div>
-            <button
-              onClick={() => setIsAIChatOpen(!isAIChatOpen)}
-              className={`p-2 rounded-md transition-colors border ${
-                isAIChatOpen
-                  ? "bg-indigo-600/20 border-indigo-500/50 text-indigo-400"
-                  : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600"
-              }`}
-              title="Thor AI (Cmd+Shift+A)"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
-                  strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
                 />
               </svg>
-            </button>
+              <span>Back</span>
+            </Link>
           </div>
-        </div>
 
-        <div className="flex gap-1 mt-4 md:mt-6 -mb-px overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 text-sm font-medium rounded-t-md transition-colors whitespace-nowrap ${
-                activeTab === tab.id
-                  ? "bg-gray-950 text-white border-t border-l border-r border-gray-800"
-                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-              }`}
-            >
-              <span>{tab.label}</span>
-              {tab.count !== undefined && (
-                <span className="px-2 py-0.5 text-xs bg-gray-800 rounded-full">{tab.count}</span>
-              )}
-            </button>
-          ))}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  {pattern.category}
+                </h1>
+                <span
+                  className={`px-3 py-1 text-sm rounded-full ${difficultyColors[pattern.difficulty]}`}
+                >
+                  {pattern.difficulty}
+                </span>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-gray-400">
+                <span>
+                  Time:{" "}
+                  <span className="text-indigo-400 font-mono">
+                    {pattern.timeComplexity}
+                  </span>
+                </span>
+                <span>
+                  Space:{" "}
+                  <span className="text-purple-400 font-mono">
+                    {pattern.spaceComplexity}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <div className="text-2xl font-bold text-white">
+                  {stats.done}/{stats.total}
+                </div>
+                <div className="text-sm text-gray-500">problems solved</div>
+              </div>
+              <div className="w-16 h-16 relative">
+                <svg
+                  className="w-full h-full transform -rotate-90"
+                  viewBox="0 0 64 64"
+                >
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                    className="text-gray-800"
+                  />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    stroke="url(#miniGradient)"
+                    strokeWidth="4"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={`${stats.percent * 1.76} 176`}
+                  />
+                  <defs>
+                    <linearGradient
+                      id="miniGradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%"
+                    >
+                      <stop offset="0%" stopColor="#6366f1" />
+                      <stop offset="100%" stopColor="#a855f7" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white">
+                  {stats.percent}%
+                </span>
+              </div>
+              <button
+                onClick={() => setIsAIChatOpen(!isAIChatOpen)}
+                className={`p-2 rounded-md transition-colors border ${
+                  isAIChatOpen
+                    ? "bg-indigo-600/20 border-indigo-500/50 text-indigo-400"
+                    : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600"
+                }`}
+                title="Thor AI (Cmd+Shift+A)"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-1 mt-4 md:mt-6 -mb-px overflow-x-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 text-sm font-medium rounded-t-md transition-colors whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? "bg-gray-950 text-white border-t border-l border-r border-gray-800"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                }`}
+              >
+                <span>{tab.label}</span>
+                {tab.count !== undefined && (
+                  <span className="px-2 py-0.5 text-xs bg-gray-800 rounded-full">
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
 
   return (
     <div ref={containerRef} className="h-[calc(100vh-64px)] flex bg-gray-950">
       {/* Main Content Column */}
-      <div
-        className="flex flex-col flex-1 min-w-0 overflow-hidden"
-      >        {header}
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        {" "}
+        {header}
         <div className="flex-1 overflow-y-auto">
-          <div className={`py-4 md:py-8 ${activeTab === "tutorial" ? "pl-0 pr-4 lg:pr-8" : "px-4 max-w-4xl mx-auto"}`}>
+          <div
+            className={`py-4 md:py-8 ${activeTab === "tutorial" ? "pl-0 pr-4 lg:pr-8" : "px-4 max-w-4xl mx-auto"}`}
+          >
             {subscriptionLoading ? (
               <div className="flex items-center justify-center py-16">
                 <div className="text-gray-400">Loading...</div>
@@ -332,7 +386,11 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
                   />
                 )}
                 {activeTab === "cheatsheet" && (
-                  <Highlightable contentType="pattern_cheatsheet" contentId={pattern.id} onAskAI={handleAskAI}>
+                  <Highlightable
+                    contentType="pattern_cheatsheet"
+                    contentId={pattern.id}
+                    onAskAI={handleAskAI}
+                  >
                     <CheatsheetTab pattern={pattern} />
                   </Highlightable>
                 )}

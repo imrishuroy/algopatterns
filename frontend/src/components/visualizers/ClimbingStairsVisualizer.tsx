@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TreeNode {
@@ -66,13 +72,14 @@ const generateTableSteps = () => {
   steps.push({ i: 0, value: 1, formula: "dp[0] = 1 (base case)" });
   steps.push({ i: 1, value: 1, formula: "dp[1] = 1 (base case)" });
 
-  let prev2 = 1, prev1 = 1;
+  let prev2 = 1,
+    prev1 = 1;
   for (let i = 2; i <= TARGET_N; i++) {
     const curr = prev1 + prev2;
     steps.push({
       i,
       value: curr,
-      formula: `dp[${i}] = dp[${i-1}] + dp[${i-2}] = ${prev1} + ${prev2} = ${curr}`,
+      formula: `dp[${i}] = dp[${i - 1}] + dp[${i - 2}] = ${prev1} + ${prev2} = ${curr}`,
     });
     prev2 = prev1;
     prev1 = curr;
@@ -82,11 +89,23 @@ const generateTableSteps = () => {
 };
 
 const generateOptimizedSteps = () => {
-  const steps: { i: number; prev2: number; prev1: number; curr?: number; formula: string }[] = [];
+  const steps: {
+    i: number;
+    prev2: number;
+    prev1: number;
+    curr?: number;
+    formula: string;
+  }[] = [];
 
-  steps.push({ i: 0, prev2: 1, prev1: 1, formula: "prev2 = 1, prev1 = 1 (base cases)" });
+  steps.push({
+    i: 0,
+    prev2: 1,
+    prev1: 1,
+    formula: "prev2 = 1, prev1 = 1 (base cases)",
+  });
 
-  let prev2 = 1, prev1 = 1;
+  let prev2 = 1,
+    prev1 = 1;
   for (let i = 2; i <= TARGET_N; i++) {
     const curr = prev1 + prev2;
     steps.push({
@@ -134,8 +153,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Back"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
 
@@ -157,7 +186,11 @@ const Controls = ({
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-green-600/20"
           title="Play"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -169,8 +202,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Forward"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
 
@@ -179,15 +222,27 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-all ml-2"
         title="Reset"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </button>
     </div>
 
     <div className="flex items-center justify-center gap-4">
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Speed</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Speed
+        </span>
         <div className="flex gap-1">
           {[
             { value: 1000, label: "0.5x" },
@@ -210,7 +265,9 @@ const Controls = ({
       </div>
 
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Step</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Step
+        </span>
         <span className="text-sm font-mono text-white">
           {step} <span className="text-gray-500">/</span> {total}
         </span>
@@ -241,13 +298,14 @@ const TreeNodeComponent = ({
   if (!visible) return null;
 
   const isBaseCase = node.n <= 1;
-  const nodeColor = node.isCacheHit && showMemo
-    ? "#FCD34D"
-    : isLatest
-    ? "#3B82F6"
-    : isBaseCase
-    ? "#10B981"
-    : "#4B5563";
+  const nodeColor =
+    node.isCacheHit && showMemo
+      ? "#FCD34D"
+      : isLatest
+        ? "#3B82F6"
+        : isBaseCase
+          ? "#10B981"
+          : "#4B5563";
 
   const radius = 24;
 
@@ -272,16 +330,31 @@ const TreeNodeComponent = ({
         stroke={isLatest ? "#60A5FA" : "#6B7280"}
         strokeWidth={isLatest ? 3 : 1.5}
       />
-      <text x={x} y={y + 5} textAnchor="middle" className="text-sm fill-white font-mono font-medium">
+      <text
+        x={x}
+        y={y + 5}
+        textAnchor="middle"
+        className="text-sm fill-white font-mono font-medium"
+      >
         f({node.n})
       </text>
       {isBaseCase && (
-        <text x={x} y={y + radius + 14} textAnchor="middle" className="text-xs fill-green-400 font-medium">
+        <text
+          x={x}
+          y={y + radius + 14}
+          textAnchor="middle"
+          className="text-xs fill-green-400 font-medium"
+        >
           = 1
         </text>
       )}
       {node.isCacheHit && showMemo && (
-        <text x={x} y={y + radius + 14} textAnchor="middle" className="text-xs fill-yellow-400 font-medium">
+        <text
+          x={x}
+          y={y + radius + 14}
+          textAnchor="middle"
+          className="text-xs fill-yellow-400 font-medium"
+        >
           cached
         </text>
       )}
@@ -304,10 +377,18 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
     const getSubtreeWidth = (node: TreeNode | null): number => {
       if (!node) return 0;
       if (node.children.length === 0) return nodeWidth;
-      return node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) + (node.children.length - 1) * nodeGap;
+      return (
+        node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
+        (node.children.length - 1) * nodeGap
+      );
     };
 
-    const assignPositions = (node: TreeNode | null, depth: number, leftBound: number, rightBound: number) => {
+    const assignPositions = (
+      node: TreeNode | null,
+      depth: number,
+      leftBound: number,
+      rightBound: number
+    ) => {
       if (!node) return;
 
       const x = (leftBound + rightBound) / 2;
@@ -316,7 +397,10 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
       if (node.children.length === 0) return;
 
-      const totalChildWidth = node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0);
+      const totalChildWidth = node.children.reduce(
+        (sum, child) => sum + getSubtreeWidth(child),
+        0
+      );
       const gaps = (node.children.length - 1) * nodeGap;
       const totalWidth = totalChildWidth + gaps;
 
@@ -338,7 +422,10 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
     return pos;
   }, [tree]);
 
-  const renderTree = (node: TreeNode | null, parentId?: string): React.ReactNode => {
+  const renderTree = (
+    node: TreeNode | null,
+    parentId?: string
+  ): React.ReactNode => {
     if (!node) return null;
 
     const isVisible = visibleNodes.has(node.id);
@@ -368,7 +455,13 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <svg width="100%" height="420" viewBox="0 0 700 420" preserveAspectRatio="xMidYMid meet" className="bg-gray-800/30 rounded-lg">
+      <svg
+        width="100%"
+        height="420"
+        viewBox="0 0 700 420"
+        preserveAspectRatio="xMidYMid meet"
+        className="bg-gray-800/30 rounded-lg"
+      >
         {tree && renderTree(tree)}
       </svg>
 
@@ -389,14 +482,19 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
       <div className="text-center text-sm text-gray-400 bg-gray-800/50 px-4 py-2 rounded-lg font-mono">
         {currentN <= 1
           ? `f(${currentN}) = 1 (base case)`
-          : `f(${currentN}) = f(${currentN - 1}) + f(${currentN - 2})`
-        }
+          : `f(${currentN}) = f(${currentN - 1}) + f(${currentN - 2})`}
       </div>
     </div>
   );
 };
 
-const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType<typeof generateTableSteps> }) => {
+const TablePhase = ({
+  step,
+  tableSteps,
+}: {
+  step: number;
+  tableSteps: ReturnType<typeof generateTableSteps>;
+}) => {
   const currentDp = useMemo(() => {
     const dp: (number | null)[] = Array(TARGET_N + 1).fill(null);
     for (let s = 0; s < Math.min(step, tableSteps.length); s++) {
@@ -406,7 +504,8 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
     return dp;
   }, [step, tableSteps]);
 
-  const currentStep = step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -424,8 +523,8 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
                     isCurrent
                       ? "bg-blue-600 border-blue-400 text-white font-bold"
                       : value !== null
-                      ? "bg-gray-800 border-gray-600 text-gray-300"
-                      : "bg-gray-900/50 border-gray-700 text-gray-600"
+                        ? "bg-gray-800 border-gray-600 text-gray-300"
+                        : "bg-gray-900/50 border-gray-700 text-gray-600"
                   }`}
                 >
                   {value !== null ? value : "?"}
@@ -449,13 +548,22 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
   );
 };
 
-const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps: ReturnType<typeof generateOptimizedSteps> }) => {
-  const currentStep = step > 0 && step <= optimizedSteps.length ? optimizedSteps[step - 1] : null;
+const OptimizedPhase = ({
+  step,
+  optimizedSteps,
+}: {
+  step: number;
+  optimizedSteps: ReturnType<typeof generateOptimizedSteps>;
+}) => {
+  const currentStep =
+    step > 0 && step <= optimizedSteps.length ? optimizedSteps[step - 1] : null;
 
   return (
     <div className="flex flex-col items-center gap-6">
       <div className="text-center">
-        <div className="text-sm text-gray-500 mb-4">Only 2 variables needed</div>
+        <div className="text-sm text-gray-500 mb-4">
+          Only 2 variables needed
+        </div>
         <div className="flex gap-8 justify-center">
           <div className="flex flex-col items-center">
             <div className="text-xs text-gray-500 mb-2">prev2</div>
@@ -485,19 +593,21 @@ const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps
 
       {currentStep && (
         <div className="text-base text-gray-400 text-center font-mono bg-gray-800/50 px-6 py-3 rounded-lg">
-          {currentStep.i > 1 ? `i = ${currentStep.i}: ` : ""}{currentStep.formula}
+          {currentStep.i > 1 ? `i = ${currentStep.i}: ` : ""}
+          {currentStep.formula}
         </div>
       )}
 
       <div className="text-sm text-gray-500 text-center max-w-md">
-        Space O(1): Instead of storing all values, just keep track of the last two.
-        After each step, slide the window: prev2 = prev1, prev1 = curr.
+        Space O(1): Instead of storing all values, just keep track of the last
+        two. After each step, slide the window: prev2 = prev1, prev1 = curr.
       </div>
     </div>
   );
 };
 
-export default function ClimbingStairsVisualizer() { // skipcq: JS-0067
+export default function ClimbingStairsVisualizer() {
+  // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "optimized"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion",
@@ -515,7 +625,10 @@ export default function ClimbingStairsVisualizer() { // skipcq: JS-0067
   const tableSteps = useMemo(() => generateTableSteps(), []);
   const optimizedSteps = useMemo(() => generateOptimizedSteps(), []);
   const tree = useMemo(() => buildTree(TARGET_N), []);
-  const treeNodeCount = useMemo(() => (tree ? flattenTree(tree).length : 0), [tree]);
+  const treeNodeCount = useMemo(
+    () => (tree ? flattenTree(tree).length : 0),
+    [tree]
+  );
 
   const getMaxSteps = useCallback(
     (phase: Phase) => {
@@ -570,9 +683,11 @@ export default function ClimbingStairsVisualizer() { // skipcq: JS-0067
               }`}
             >
               <span className="flex items-center gap-2">
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
-                  currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
-                }`}>
+                <span
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
+                    currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
+                  }`}
+                >
                   {index + 1}
                 </span>
                 {phaseLabels[phase]}
@@ -607,10 +722,16 @@ export default function ClimbingStairsVisualizer() { // skipcq: JS-0067
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
+          {currentPhase === "tree" && (
+            <TreePhase step={step} showMemo={false} />
+          )}
           {currentPhase === "memo" && <TreePhase step={step} showMemo />}
-          {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
-          {currentPhase === "optimized" && <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />}
+          {currentPhase === "table" && (
+            <TablePhase step={step} tableSteps={tableSteps} />
+          )}
+          {currentPhase === "optimized" && (
+            <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />
+          )}
         </motion.div>
       </AnimatePresence>
 

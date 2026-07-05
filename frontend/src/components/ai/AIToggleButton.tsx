@@ -6,7 +6,11 @@ interface AIToggleButtonProps {
   hasNewMessage?: boolean;
 }
 
-export function AIToggleButton({ isOpen, onClick, hasNewMessage }: AIToggleButtonProps) {
+export function AIToggleButton({
+  isOpen,
+  onClick,
+  hasNewMessage,
+}: AIToggleButtonProps) {
   if (isOpen) return null;
 
   return (

@@ -297,7 +297,11 @@ export const patternSEO: Record<string, PatternSEO> = {
 };
 
 // skipcq: JS-0067
-export function getPatternMetadata(slug: string, category: string, description: string): Metadata {
+export function getPatternMetadata(
+  slug: string,
+  category: string,
+  description: string
+): Metadata {
   const seo = patternSEO[slug];
   const baseUrl = siteConfig.url;
 
@@ -305,7 +309,12 @@ export function getPatternMetadata(slug: string, category: string, description: 
   const metaDescription =
     seo?.description ||
     `${description} Learn with interactive visualizations and curated practice problems.`;
-  const keywords = seo?.keywords || [slug, "algorithm", "leetcode", "dsa pattern"];
+  const keywords = seo?.keywords || [
+    slug,
+    "algorithm",
+    "leetcode",
+    "dsa pattern",
+  ];
 
   return {
     title,

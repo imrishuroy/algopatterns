@@ -37,10 +37,12 @@ const ErrorContent = ({ reset }: { reset: () => void }) => {
   const handleReport = () => {
     const feedback = Sentry.getFeedback();
     if (feedback) {
-      feedback.createForm().then((form: { appendToDom: () => void; open: () => void }) => {
-        form.appendToDom();
-        form.open();
-      });
+      feedback
+        .createForm()
+        .then((form: { appendToDom: () => void; open: () => void }) => {
+          form.appendToDom();
+          form.open();
+        });
     }
   };
 

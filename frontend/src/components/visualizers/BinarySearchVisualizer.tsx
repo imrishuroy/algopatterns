@@ -200,7 +200,10 @@ export default function BinarySearchVisualizer() {
               const isEliminated = eliminated.has(idx);
 
               return (
-                <div key={`${num}-${idx}`} className="flex flex-col items-center">
+                <div
+                  key={`${num}-${idx}`}
+                  className="flex flex-col items-center"
+                >
                   <motion.div
                     animate={{
                       backgroundColor: isFound

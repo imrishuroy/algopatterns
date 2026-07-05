@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, startTransition } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  startTransition,
+} from "react";
 import type { QuizQuestion, Answer } from "@/types/quiz";
 import { quizService } from "@/lib/quizService";
 import MultipleChoice from "./questions/MultipleChoice";
@@ -41,9 +47,7 @@ export default function QuizModal({
   const currentQuestion = questions[currentIndex];
   const progress =
     questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
-  const hasAnswered = currentQuestion
-    ? answers.has(currentQuestion.id)
-    : false;
+  const hasAnswered = currentQuestion ? answers.has(currentQuestion.id) : false;
 
   const initQuiz = useCallback(async () => {
     if (!isOpen) return;
@@ -105,14 +109,13 @@ export default function QuizModal({
         timeTakenMs,
       });
 
-      setAnswers(
-        (prev) =>
-          new Map(prev).set(currentQuestion.id, {
-            selected: answer,
-            isCorrect: response.isCorrect,
-            correctAnswer: response.correctAnswer,
-            explanation: response.explanation,
-          })
+      setAnswers((prev) =>
+        new Map(prev).set(currentQuestion.id, {
+          selected: answer,
+          isCorrect: response.isCorrect,
+          correctAnswer: response.correctAnswer,
+          explanation: response.explanation,
+        })
       );
 
       setShowExplanation(true);
@@ -198,7 +201,9 @@ export default function QuizModal({
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <span className="text-sm text-gray-400">{Math.round(progress)}%</span>
+                <span className="text-sm text-gray-400">
+                  {Math.round(progress)}%
+                </span>
               </div>
             )}
           </div>

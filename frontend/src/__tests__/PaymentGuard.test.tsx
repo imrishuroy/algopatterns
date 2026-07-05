@@ -11,9 +11,13 @@ vi.mock("@/contexts/SubscriptionContext", () => ({
 
 // Mock next/link
 vi.mock("next/link", () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  ),
+  default: ({
+    children,
+    href,
+  }: {
+    children: React.ReactNode;
+    href: string;
+  }) => <a href={href}>{children}</a>,
 }));
 
 const mockProFeatures: PlanFeatures = {
@@ -127,10 +131,9 @@ describe("PaymentGuard", () => {
 
       expect(screen.getByText("Premium Feature")).toBeInTheDocument();
       expect(screen.getByText("Upgrade to Pro")).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: /Upgrade to Pro/i })).toHaveAttribute(
-        "href",
-        "/pricing"
-      );
+      expect(
+        screen.getByRole("link", { name: /Upgrade to Pro/i })
+      ).toHaveAttribute("href", "/pricing");
     });
 
     it("should show correct description for code playground feature", () => {
@@ -146,7 +149,9 @@ describe("PaymentGuard", () => {
       );
 
       expect(
-        screen.getByText("Practice coding with our interactive code playground.")
+        screen.getByText(
+          "Practice coding with our interactive code playground."
+        )
       ).toBeInTheDocument();
     });
 
@@ -163,7 +168,9 @@ describe("PaymentGuard", () => {
       );
 
       expect(
-        screen.getByText("Get detailed solutions and explanations for all problems.")
+        screen.getByText(
+          "Get detailed solutions and explanations for all problems."
+        )
       ).toBeInTheDocument();
     });
 
@@ -180,7 +187,9 @@ describe("PaymentGuard", () => {
       );
 
       expect(
-        screen.getByText("Highlight and annotate content for better note-taking.")
+        screen.getByText(
+          "Highlight and annotate content for better note-taking."
+        )
       ).toBeInTheDocument();
     });
 
@@ -197,7 +206,9 @@ describe("PaymentGuard", () => {
       );
 
       expect(
-        screen.getByText("Track your quiz performance and review past attempts.")
+        screen.getByText(
+          "Track your quiz performance and review past attempts."
+        )
       ).toBeInTheDocument();
     });
 
@@ -298,14 +309,20 @@ describe("PaymentGuard", () => {
 
   describe("all feature descriptions", () => {
     const featureDescriptions: Record<keyof PlanFeatures, string> = {
-      max_patterns: "Access all algorithm patterns and their detailed tutorials.",
-      max_visualizers: "Use interactive visualizers to understand algorithms better.",
-      quiz_questions_per_pattern: "Test your knowledge with quizzes for each pattern.",
+      max_patterns:
+        "Access all algorithm patterns and their detailed tutorials.",
+      max_visualizers:
+        "Use interactive visualizers to understand algorithms better.",
+      quiz_questions_per_pattern:
+        "Test your knowledge with quizzes for each pattern.",
       has_quiz_history: "Track your quiz performance and review past attempts.",
-      has_code_playground: "Practice coding with our interactive code playground.",
+      has_code_playground:
+        "Practice coding with our interactive code playground.",
       has_progress_sync: "Sync your learning progress across all devices.",
-      has_highlighting: "Highlight and annotate content for better note-taking.",
-      has_solutions_access: "Get detailed solutions and explanations for all problems.",
+      has_highlighting:
+        "Highlight and annotate content for better note-taking.",
+      has_solutions_access:
+        "Get detailed solutions and explanations for all problems.",
       has_offline_export: "Export content for offline learning.",
     };
 

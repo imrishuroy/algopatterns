@@ -37,177 +37,180 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 const allSteps: {
-    action: "push" | "pop" | "update";
-    frame?: MemoryFrame;
-    message: string;
-  }[] = [
-    {
-      action: "push",
-      frame: {
-        functionName: "main()",
-        blocks: [
-          {
-            id: 0,
-            address: "0x7FFE",
-            name: "return addr",
-            value: "OS",
-            type: "return-address",
-          },
-          {
-            id: 1,
-            address: "0x7FFC",
-            name: "result",
-            value: "?",
-            type: "local-var",
-          },
-        ],
-      },
-      message: "main() starts executing, allocates space for result",
+  action: "push" | "pop" | "update";
+  frame?: MemoryFrame;
+  message: string;
+}[] = [
+  {
+    action: "push",
+    frame: {
+      functionName: "main()",
+      blocks: [
+        {
+          id: 0,
+          address: "0x7FFE",
+          name: "return addr",
+          value: "OS",
+          type: "return-address",
+        },
+        {
+          id: 1,
+          address: "0x7FFC",
+          name: "result",
+          value: "?",
+          type: "local-var",
+        },
+      ],
     },
-    {
-      action: "push",
-      frame: {
-        functionName: "factorial(4)",
-        blocks: [
-          {
-            id: 2,
-            address: "0x7FF8",
-            name: "return addr",
-            value: "main",
-            type: "return-address",
-          },
-          {
-            id: 3,
-            address: "0x7FF4",
-            name: "n",
-            value: "4",
-            type: "parameter",
-          },
-        ],
-      },
-      message: "factorial(4) called, n=4 pushed onto stack",
+    message: "main() starts executing, allocates space for result",
+  },
+  {
+    action: "push",
+    frame: {
+      functionName: "factorial(4)",
+      blocks: [
+        {
+          id: 2,
+          address: "0x7FF8",
+          name: "return addr",
+          value: "main",
+          type: "return-address",
+        },
+        {
+          id: 3,
+          address: "0x7FF4",
+          name: "n",
+          value: "4",
+          type: "parameter",
+        },
+      ],
     },
-    {
-      action: "push",
-      frame: {
-        functionName: "factorial(3)",
-        blocks: [
-          {
-            id: 4,
-            address: "0x7FF0",
-            name: "return addr",
-            value: "fact(4)",
-            type: "return-address",
-          },
-          {
-            id: 5,
-            address: "0x7FEC",
-            name: "n",
-            value: "3",
-            type: "parameter",
-          },
-        ],
-      },
-      message: "factorial(3) called, n=3 pushed onto stack",
+    message: "factorial(4) called, n=4 pushed onto stack",
+  },
+  {
+    action: "push",
+    frame: {
+      functionName: "factorial(3)",
+      blocks: [
+        {
+          id: 4,
+          address: "0x7FF0",
+          name: "return addr",
+          value: "fact(4)",
+          type: "return-address",
+        },
+        {
+          id: 5,
+          address: "0x7FEC",
+          name: "n",
+          value: "3",
+          type: "parameter",
+        },
+      ],
     },
-    {
-      action: "push",
-      frame: {
-        functionName: "factorial(2)",
-        blocks: [
-          {
-            id: 6,
-            address: "0x7FE8",
-            name: "return addr",
-            value: "fact(3)",
-            type: "return-address",
-          },
-          {
-            id: 7,
-            address: "0x7FE4",
-            name: "n",
-            value: "2",
-            type: "parameter",
-          },
-        ],
-      },
-      message: "factorial(2) called, n=2 pushed onto stack",
+    message: "factorial(3) called, n=3 pushed onto stack",
+  },
+  {
+    action: "push",
+    frame: {
+      functionName: "factorial(2)",
+      blocks: [
+        {
+          id: 6,
+          address: "0x7FE8",
+          name: "return addr",
+          value: "fact(3)",
+          type: "return-address",
+        },
+        {
+          id: 7,
+          address: "0x7FE4",
+          name: "n",
+          value: "2",
+          type: "parameter",
+        },
+      ],
     },
-    {
-      action: "push",
-      frame: {
-        functionName: "factorial(1)",
-        blocks: [
-          {
-            id: 8,
-            address: "0x7FE0",
-            name: "return addr",
-            value: "fact(2)",
-            type: "return-address",
-          },
-          {
-            id: 9,
-            address: "0x7FDC",
-            name: "n",
-            value: "1",
-            type: "parameter",
-          },
-        ],
-      },
-      message: "factorial(1) called, n=1 pushed onto stack",
+    message: "factorial(2) called, n=2 pushed onto stack",
+  },
+  {
+    action: "push",
+    frame: {
+      functionName: "factorial(1)",
+      blocks: [
+        {
+          id: 8,
+          address: "0x7FE0",
+          name: "return addr",
+          value: "fact(2)",
+          type: "return-address",
+        },
+        {
+          id: 9,
+          address: "0x7FDC",
+          name: "n",
+          value: "1",
+          type: "parameter",
+        },
+      ],
     },
-    {
-      action: "push",
-      frame: {
-        functionName: "factorial(0)",
-        blocks: [
-          {
-            id: 10,
-            address: "0x7FD8",
-            name: "return addr",
-            value: "fact(1)",
-            type: "return-address",
-          },
-          {
-            id: 11,
-            address: "0x7FD4",
-            name: "n",
-            value: "0",
-            type: "parameter",
-          },
-        ],
-      },
-      message: "factorial(0) called - BASE CASE reached!",
+    message: "factorial(1) called, n=1 pushed onto stack",
+  },
+  {
+    action: "push",
+    frame: {
+      functionName: "factorial(0)",
+      blocks: [
+        {
+          id: 10,
+          address: "0x7FD8",
+          name: "return addr",
+          value: "fact(1)",
+          type: "return-address",
+        },
+        {
+          id: 11,
+          address: "0x7FD4",
+          name: "n",
+          value: "0",
+          type: "parameter",
+        },
+      ],
     },
-    {
-      action: "pop",
-      message: "factorial(0) returns 1, frame popped",
-    },
-    {
-      action: "pop",
-      message: "factorial(1) returns 1*1=1, frame popped",
-    },
-    {
-      action: "pop",
-      message: "factorial(2) returns 2*1=2, frame popped",
-    },
-    {
-      action: "pop",
-      message: "factorial(3) returns 3*2=6, frame popped",
-    },
-    {
-      action: "pop",
-      message: "factorial(4) returns 4*6=24, frame popped",
-    },
-    {
-      action: "update",
-      message: "main() receives result = 24",
-    },
-  ];
+    message: "factorial(0) called - BASE CASE reached!",
+  },
+  {
+    action: "pop",
+    message: "factorial(0) returns 1, frame popped",
+  },
+  {
+    action: "pop",
+    message: "factorial(1) returns 1*1=1, frame popped",
+  },
+  {
+    action: "pop",
+    message: "factorial(2) returns 2*1=2, frame popped",
+  },
+  {
+    action: "pop",
+    message: "factorial(3) returns 3*2=6, frame popped",
+  },
+  {
+    action: "pop",
+    message: "factorial(4) returns 4*6=24, frame popped",
+  },
+  {
+    action: "update",
+    message: "main() receives result = 24",
+  },
+];
 
 export default function MemoryVisualizer() {
   const [frames, setFrames] = useState<MemoryFrame[]>([]);
-  const [{ step, isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ step, isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(1200);
 
   useEffect(() => {

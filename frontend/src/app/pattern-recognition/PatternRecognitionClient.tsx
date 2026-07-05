@@ -1056,7 +1056,10 @@ function KeywordsTab() {
           <div className="font-semibold mb-2">{group.category}</div>
           <div className="flex flex-wrap gap-2">
             {group.words.map((word) => (
-              <span key={word} className="px-2 py-1 bg-black/20 rounded-md text-sm">
+              <span
+                key={word}
+                className="px-2 py-1 bg-black/20 rounded-md text-sm"
+              >
                 &quot;{word}&quot;
               </span>
             ))}

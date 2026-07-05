@@ -370,9 +370,9 @@ export default function JumpGameVisualizer() {
           ) : (
             <p>
               <strong className="text-blue-400">BFS-like Greedy:</strong> Think
-              of it as levels. currentEnd marks the boundary of current &ldquo;level&rdquo;.
-              When we reach it, we must jump (increment jumps) and set new
-              boundary to farthest.
+              of it as levels. currentEnd marks the boundary of current
+              &ldquo;level&rdquo;. When we reach it, we must jump (increment
+              jumps) and set new boundary to farthest.
             </p>
           )}
         </div>

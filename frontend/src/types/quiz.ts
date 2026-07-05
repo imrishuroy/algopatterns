@@ -1,15 +1,15 @@
 export type QuestionType =
-  | 'multiple-choice'
-  | 'true-false'
-  | 'code-output'
-  | 'fill-blank'
-  | 'identify-bug'
-  | 'code-trace'
-  | 'ordering';
+  | "multiple-choice"
+  | "true-false"
+  | "code-output"
+  | "fill-blank"
+  | "identify-bug"
+  | "code-trace"
+  | "ordering";
 
-export type QuestionDifficulty = 'easy' | 'medium' | 'hard';
+export type QuestionDifficulty = "easy" | "medium" | "hard";
 
-export type AttemptStatus = 'in_progress' | 'completed' | 'abandoned';
+export type AttemptStatus = "in_progress" | "completed" | "abandoned";
 
 export interface QuizQuestion {
   id: string;
@@ -113,5 +113,5 @@ export interface QuizState {
   answers: Map<string, Answer>;
   attemptId: string | null;
   startTime: number | null;
-  status: 'loading' | 'ready' | 'in_progress' | 'completed' | 'error';
+  status: "loading" | "ready" | "in_progress" | "completed" | "error";
 }

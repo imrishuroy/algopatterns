@@ -56,7 +56,13 @@ export default async function PatternPage({ params }: PageProps) {
     <>
       <CourseJsonLd pattern={pattern} />
       <BreadcrumbJsonLd items={breadcrumbs} />
-      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-gray-400">Loading...</div></div>}>
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-gray-400">Loading...</div>
+          </div>
+        }
+      >
         <PatternPageClient pattern={pattern} />
       </Suspense>
     </>

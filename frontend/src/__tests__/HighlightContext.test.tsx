@@ -74,14 +74,22 @@ describe("HighlightContext", () => {
         data: { highlights: [mockHighlight] },
       });
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
+      });
 
       await act(async () => {
-        await result.current.fetchHighlightsForContent("pattern_tutorial", "two-pointers");
+        await result.current.fetchHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        );
       });
 
       await waitFor(() => {
-        const highlights = result.current.getHighlightsForContent("pattern_tutorial", "two-pointers");
+        const highlights = result.current.getHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        );
         expect(highlights).toHaveLength(1);
         expect(highlights[0].id).toBe("highlight-1");
       });
@@ -93,14 +101,22 @@ describe("HighlightContext", () => {
         data: { highlights: [mockHighlight] },
       });
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
-
-      await act(async () => {
-        await result.current.fetchHighlightsForContent("pattern_tutorial", "two-pointers");
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
       });
 
       await act(async () => {
-        await result.current.fetchHighlightsForContent("pattern_tutorial", "two-pointers");
+        await result.current.fetchHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        );
+      });
+
+      await act(async () => {
+        await result.current.fetchHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        );
       });
 
       // Should only call API once
@@ -116,7 +132,9 @@ describe("HighlightContext", () => {
         data: serverResponse,
       });
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
+      });
 
       await act(async () => {
         const created = await result.current.createHighlight({
@@ -130,17 +148,27 @@ describe("HighlightContext", () => {
         expect(created?.id).toBe("server-id");
       });
 
-      const highlights = result.current.getHighlightsForContent("pattern_tutorial", "two-pointers");
+      const highlights = result.current.getHighlightsForContent(
+        "pattern_tutorial",
+        "two-pointers"
+      );
       expect(highlights).toHaveLength(1);
       expect(highlights[0].id).toBe("server-id");
     });
 
     it("should keep optimistic update when offline", async () => {
       // Simulate offline
-      Object.defineProperty(navigator, "onLine", { value: false, configurable: true });
-      vi.mocked(apiClient.createHighlight).mockRejectedValue(new Error("Network error"));
+      Object.defineProperty(navigator, "onLine", {
+        value: false,
+        configurable: true,
+      });
+      vi.mocked(apiClient.createHighlight).mockRejectedValue(
+        new Error("Network error")
+      );
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
+      });
 
       await act(async () => {
         await result.current.createHighlight({
@@ -154,7 +182,10 @@ describe("HighlightContext", () => {
       });
 
       // Highlight should still be visible (temp id)
-      const highlights = result.current.getHighlightsForContent("pattern_tutorial", "two-pointers");
+      const highlights = result.current.getHighlightsForContent(
+        "pattern_tutorial",
+        "two-pointers"
+      );
       expect(highlights).toHaveLength(1);
       expect(highlights[0].id).toMatch(/^temp-/);
     });
@@ -166,7 +197,9 @@ describe("HighlightContext", () => {
         error: { code: "ERROR", message: "Failed" },
       });
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
+      });
 
       await act(async () => {
         await result.current.createHighlight({
@@ -179,7 +212,10 @@ describe("HighlightContext", () => {
         });
       });
 
-      const highlights = result.current.getHighlightsForContent("pattern_tutorial", "two-pointers");
+      const highlights = result.current.getHighlightsForContent(
+        "pattern_tutorial",
+        "two-pointers"
+      );
       expect(highlights).toHaveLength(0);
     });
   });
@@ -192,23 +228,38 @@ describe("HighlightContext", () => {
         data: { highlights: [mockHighlight] },
       });
 
-      const updatedHighlight = { ...mockHighlight, color: "blue" as const, version: 2 };
+      const updatedHighlight = {
+        ...mockHighlight,
+        color: "blue" as const,
+        version: 2,
+      };
       vi.mocked(apiClient.updateHighlight).mockResolvedValue({
         success: true,
         data: updatedHighlight,
       });
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
-
-      await act(async () => {
-        await result.current.fetchHighlightsForContent("pattern_tutorial", "two-pointers");
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
       });
 
       await act(async () => {
-        await result.current.updateHighlight("highlight-1", { color: "blue", version: 1 });
+        await result.current.fetchHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        );
       });
 
-      const highlights = result.current.getHighlightsForContent("pattern_tutorial", "two-pointers");
+      await act(async () => {
+        await result.current.updateHighlight("highlight-1", {
+          color: "blue",
+          version: 1,
+        });
+      });
+
+      const highlights = result.current.getHighlightsForContent(
+        "pattern_tutorial",
+        "two-pointers"
+      );
       expect(highlights[0].color).toBe("blue");
     });
   });
@@ -225,19 +276,34 @@ describe("HighlightContext", () => {
         data: undefined as never,
       });
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
-
-      await act(async () => {
-        await result.current.fetchHighlightsForContent("pattern_tutorial", "two-pointers");
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
       });
 
-      expect(result.current.getHighlightsForContent("pattern_tutorial", "two-pointers")).toHaveLength(1);
+      await act(async () => {
+        await result.current.fetchHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        );
+      });
+
+      expect(
+        result.current.getHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        )
+      ).toHaveLength(1);
 
       await act(async () => {
         await result.current.deleteHighlight("highlight-1");
       });
 
-      expect(result.current.getHighlightsForContent("pattern_tutorial", "two-pointers")).toHaveLength(0);
+      expect(
+        result.current.getHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        )
+      ).toHaveLength(0);
     });
 
     it("should keep deletion when offline", async () => {
@@ -247,22 +313,37 @@ describe("HighlightContext", () => {
         data: { highlights: [mockHighlight] },
       });
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
+      });
 
       await act(async () => {
-        await result.current.fetchHighlightsForContent("pattern_tutorial", "two-pointers");
+        await result.current.fetchHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        );
       });
 
       // Simulate offline
-      Object.defineProperty(navigator, "onLine", { value: false, configurable: true });
-      vi.mocked(apiClient.deleteHighlight).mockRejectedValue(new Error("Network error"));
+      Object.defineProperty(navigator, "onLine", {
+        value: false,
+        configurable: true,
+      });
+      vi.mocked(apiClient.deleteHighlight).mockRejectedValue(
+        new Error("Network error")
+      );
 
       await act(async () => {
         await result.current.deleteHighlight("highlight-1");
       });
 
       // Should still be deleted from UI
-      expect(result.current.getHighlightsForContent("pattern_tutorial", "two-pointers")).toHaveLength(0);
+      expect(
+        result.current.getHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        )
+      ).toHaveLength(0);
     });
   });
 
@@ -273,19 +354,34 @@ describe("HighlightContext", () => {
         data: { highlights: [mockHighlight] },
       });
 
-      const { result } = renderHook(() => useHighlights(), { wrapper: Wrapper });
-
-      await act(async () => {
-        await result.current.fetchHighlightsForContent("pattern_tutorial", "two-pointers");
+      const { result } = renderHook(() => useHighlights(), {
+        wrapper: Wrapper,
       });
 
-      expect(result.current.getHighlightsForContent("pattern_tutorial", "two-pointers")).toHaveLength(1);
+      await act(async () => {
+        await result.current.fetchHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        );
+      });
+
+      expect(
+        result.current.getHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        )
+      ).toHaveLength(1);
 
       await act(async () => {
         await result.current.clearHighlights();
       });
 
-      expect(result.current.getHighlightsForContent("pattern_tutorial", "two-pointers")).toHaveLength(0);
+      expect(
+        result.current.getHighlightsForContent(
+          "pattern_tutorial",
+          "two-pointers"
+        )
+      ).toHaveLength(0);
     });
   });
 });

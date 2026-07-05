@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion } from "framer-motion";
 
 interface Step {
@@ -36,7 +42,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 export default function KadaneVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(1000);
   const [nums] = useState([-2, 1, -3, 4, -1, 2, 1, -5, 4]);
   const [currentStep, setCurrentStep] = useState(-1);
@@ -162,7 +171,9 @@ export default function KadaneVisualizer() {
   return (
     <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-gray-800">
-        <h3 className="text-lg font-semibold text-white">Kadane&apos;s Algorithm</h3>
+        <h3 className="text-lg font-semibold text-white">
+          Kadane&apos;s Algorithm
+        </h3>
         <p className="text-gray-400 text-sm mt-1">
           Find maximum subarray sum in O(n) time
         </p>
@@ -271,7 +282,10 @@ export default function KadaneVisualizer() {
           </div>
           <div className="flex gap-1 justify-center mt-1">
             {nums.map((num, idx) => (
-              <div key={`num-${num}-${idx}`} className="w-10 text-center text-xs text-gray-500">
+              <div
+                key={`num-${num}-${idx}`}
+                className="w-10 text-center text-xs text-gray-500"
+              >
                 {idx}
               </div>
             ))}

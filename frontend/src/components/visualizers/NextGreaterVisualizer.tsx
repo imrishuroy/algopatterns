@@ -214,8 +214,8 @@ export default function NextGreaterVisualizer() {
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
             <strong className="text-orange-400">Key Insight:</strong> Elements
-            wait on stack until a larger element &ldquo;answers&rdquo; them. Each element
-            pushed once, popped at most once = O(n).
+            wait on stack until a larger element &ldquo;answers&rdquo; them.
+            Each element pushed once, popped at most once = O(n).
           </p>
         </div>
       </div>

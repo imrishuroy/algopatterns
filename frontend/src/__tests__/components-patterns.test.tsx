@@ -1,17 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import {
-  render,
-  screen,
-  fireEvent,
-  cleanup,
-} from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import type { ReactNode } from "react";
-import type {
-  Pattern,
-  Question,
-  SupportedLanguage,
-} from "@/types";
+import type { Pattern, Question, SupportedLanguage } from "@/types";
 
 // Next.js mocks
 
@@ -314,9 +305,7 @@ vi.mock("@/contexts/ProgressContext", () => ({
     syncFromLocal: mockSyncFromLocal,
     celebrationKey: mockCelebrationKey,
   })),
-  ProgressProvider: ({ children }: { children: ReactNode }) => (
-    <>{children}</>
-  ),
+  ProgressProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
 let mockCompanyFilter = "";
@@ -327,9 +316,7 @@ vi.mock("@/contexts/FilterContext", () => ({
     companyFilter: mockCompanyFilter,
     setCompanyFilter: mockSetCompanyFilter,
   })),
-  FilterProvider: ({ children }: { children: ReactNode }) => (
-    <>{children}</>
-  ),
+  FilterProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
 let mockIsPro = false;
@@ -606,7 +593,9 @@ describe("PatternCard", () => {
       />
     );
 
-    const cardEl = screen.getByText("Arrays & Strings").closest('[class*="group"]') as HTMLElement | null;
+    const cardEl = screen
+      .getByText("Arrays & Strings")
+      .closest('[class*="group"]') as HTMLElement | null;
     expect(cardEl).toBeTruthy();
     if (cardEl) {
       fireEvent.mouseEnter(cardEl);
@@ -822,9 +811,15 @@ describe("Dashboard", () => {
   it("renders all pattern names as card titles", async () => {
     await renderDashboard();
 
-    expect(screen.getAllByText("Arrays & Strings").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Two Pointers").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Sliding Window").length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText("Arrays & Strings").length
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Two Pointers").length).toBeGreaterThanOrEqual(
+      1
+    );
+    expect(screen.getAllByText("Sliding Window").length).toBeGreaterThanOrEqual(
+      1
+    );
   });
 
   it("shows pattern count", async () => {
@@ -867,9 +862,9 @@ describe("Dashboard", () => {
 
     expect(screen.getByText("1 patterns")).toBeInTheDocument();
     expect(screen.queryByText("Arrays & Strings")).not.toBeInTheDocument();
-    expect(
-      screen.getAllByText("Two Pointers").length
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Two Pointers").length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.queryByText("Sliding Window")).not.toBeInTheDocument();
   });
 
@@ -1003,8 +998,9 @@ describe("Dashboard", () => {
 
 describe("PatternSection", () => {
   it("renders section title and problem count", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1021,8 +1017,9 @@ describe("PatternSection", () => {
   });
 
   it("renders PatternSectionCard", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1037,8 +1034,9 @@ describe("PatternSection", () => {
   });
 
   it("renders Practice Problems list", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1054,8 +1052,9 @@ describe("PatternSection", () => {
   });
 
   it("shows updated completion stats", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1070,8 +1069,9 @@ describe("PatternSection", () => {
   });
 
   it("calls onToggleComplete when toggle button is clicked", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1094,8 +1094,9 @@ describe("PatternSection", () => {
   });
 
   it("shows problem difficulty, pattern, companies, and frequency", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1113,8 +1114,9 @@ describe("PatternSection", () => {
   });
 
   it("renders external link to LeetCode", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1136,8 +1138,9 @@ describe("PatternSection", () => {
   });
 
   it("renders multiple problems", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1154,8 +1157,9 @@ describe("PatternSection", () => {
   });
 
   it("shows completion checkmark for completed questions", async () => {
-    const PatternSection = (await import("@/components/patterns/PatternSection"))
-      .default;
+    const PatternSection = (
+      await import("@/components/patterns/PatternSection")
+    ).default;
 
     render(
       <PatternSection
@@ -1167,9 +1171,8 @@ describe("PatternSection", () => {
     );
 
     const svgs = document.querySelectorAll("svg");
-    const checkSvg = Array.from(svgs).find(
-      (s) =>
-        s.innerHTML.includes("M5 13l4 4L19 7")
+    const checkSvg = Array.from(svgs).find((s) =>
+      s.innerHTML.includes("M5 13l4 4L19 7")
     );
     expect(checkSvg).toBeTruthy();
   });
@@ -1205,8 +1208,12 @@ describe("UnifiedTracker", () => {
     await renderTracker();
 
     expect(screen.getByText("Arrays & Strings")).toBeInTheDocument();
-    expect(screen.getAllByText("Two Pointers").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("Practice Problems").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Two Pointers").length).toBeGreaterThanOrEqual(
+      1
+    );
+    expect(
+      screen.getAllByText("Practice Problems").length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("shows confetti when celebrationKey > 0", async () => {
@@ -1259,7 +1266,9 @@ describe("UnifiedTracker", () => {
 
     expect(screen.getByText("Two Sum")).toBeInTheDocument();
     expect(screen.queryByText("3Sum")).not.toBeInTheDocument();
-    expect(screen.queryByText("Container With Most Water")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Container With Most Water")
+    ).not.toBeInTheDocument();
   });
 
   it("filters questions by company", async () => {
@@ -1346,7 +1355,9 @@ describe("UnifiedTracker", () => {
 
     const toggleBtns = screen.getAllByRole("button");
     const sectionToggle = toggleBtns.find(
-      (btn) => btn.closest("section")?.querySelector("svg") === btn.querySelector("svg")
+      (btn) =>
+        btn.closest("section")?.querySelector("svg") ===
+        btn.querySelector("svg")
     );
 
     if (sectionToggle) {
@@ -1378,9 +1389,7 @@ describe("TutorialTab", () => {
     render(<TutorialTab pattern={mockPatternsData[0]} />);
 
     // The new TutorialTab shows one section at a time, starting with the first section
-    expect(
-      screen.getByText("Introduction to Arrays")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Introduction to Arrays")).toBeInTheDocument();
   });
 
   it("renders section content text via ReactMarkdown", async () => {
@@ -1402,7 +1411,9 @@ describe("TutorialTab", () => {
     render(<TutorialTab pattern={mockPatternsData[0]} />);
 
     // Code blocks are shown for the current section
-    expect(screen.getAllByTestId("language-toggle").length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByTestId("language-toggle").length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("renders section numbering for current section", async () => {
@@ -1437,9 +1448,7 @@ describe("TutorialTab", () => {
 
     expect(screen.getByText("When to Use")).toBeInTheDocument();
     expect(screen.getByText("Sorted arrays")).toBeInTheDocument();
-    expect(
-      screen.getByText("Linked list cycle detection")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Linked list cycle detection")).toBeInTheDocument();
   });
 
   it("renders Key Insights in fallback mode", async () => {
@@ -1457,9 +1466,7 @@ describe("TutorialTab", () => {
     const TutorialTab = (await import("@/app/patterns/[slug]/tabs/TutorialTab"))
       .default;
 
-    render(
-      <TutorialTab pattern={mockPatternNoTutorialWithMistakes} />
-    );
+    render(<TutorialTab pattern={mockPatternNoTutorialWithMistakes} />);
 
     expect(screen.getByText("Common Mistakes")).toBeInTheDocument();
     expect(screen.getByText("Test mistake 1")).toBeInTheDocument();
@@ -1486,9 +1493,7 @@ describe("TutorialTab", () => {
     expect(screen.getByText("Overview")).toBeInTheDocument();
     expect(screen.getByText("When to Use")).toBeInTheDocument();
     expect(screen.getByText("Key Insights")).toBeInTheDocument();
-    expect(
-      screen.queryByText("Common Mistakes")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Common Mistakes")).not.toBeInTheDocument();
   });
 });
 
@@ -1503,12 +1508,8 @@ describe("CheatsheetTab", () => {
     render(<CheatsheetTab pattern={mockPatternsData[0]} />);
 
     expect(screen.getByText("When to Use")).toBeInTheDocument();
-    expect(
-      screen.getByText("Hash Map for O(1) lookups")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Sorting when order matters")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Hash Map for O(1) lookups")).toBeInTheDocument();
+    expect(screen.getByText("Sorting when order matters")).toBeInTheDocument();
   });
 
   it("renders Key Insights section", async () => {
@@ -1547,9 +1548,7 @@ describe("CheatsheetTab", () => {
     };
     render(<CheatsheetTab pattern={patternNoMistakes} />);
 
-    expect(
-      screen.queryByText("Common Mistakes")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Common Mistakes")).not.toBeInTheDocument();
   });
 
   it("renders Quick Template section heading", async () => {

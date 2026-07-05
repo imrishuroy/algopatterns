@@ -164,7 +164,9 @@ export default function FixedWindowVisualizer() {
             {arr.map((val, position) => {
               const inWindow = position >= winLeft && position <= winRight;
               const isMaxWindow =
-                maxWindow && position >= maxWindow[0] && position <= maxWindow[1];
+                maxWindow &&
+                position >= maxWindow[0] &&
+                position <= maxWindow[1];
 
               return (
                 <motion.div

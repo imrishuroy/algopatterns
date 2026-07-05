@@ -56,22 +56,22 @@ export function useEditorPreferences() {
   // State — lazy-initialised from localStorage
 
   const [fontSize, setFontSizeState] = useState(() =>
-    readNum(KEYS.fontSize, DEFAULTS.fontSize),
+    readNum(KEYS.fontSize, DEFAULTS.fontSize)
   );
   const [wordWrap, setWordWrapState] = useState(() =>
-    readBool(KEYS.wordWrap, DEFAULTS.wordWrap),
+    readBool(KEYS.wordWrap, DEFAULTS.wordWrap)
   );
   const [tabSize, setTabSizeState] = useState(() =>
-    readNum(KEYS.tabSize, DEFAULTS.tabSize),
+    readNum(KEYS.tabSize, DEFAULTS.tabSize)
   );
   const [leftPanelWidth, setLeftPanelWidth] = useState(() =>
-    readNum(KEYS.leftPanelWidth, DEFAULTS.leftPanelWidth),
+    readNum(KEYS.leftPanelWidth, DEFAULTS.leftPanelWidth)
   );
   const [rightPanelWidth, setRightPanelWidth] = useState(() =>
-    readNum(KEYS.rightPanelWidth, DEFAULTS.rightPanelWidth),
+    readNum(KEYS.rightPanelWidth, DEFAULTS.rightPanelWidth)
   );
   const [editorHeight, setEditorHeight] = useState(() =>
-    readNum(KEYS.editorHeight, DEFAULTS.editorHeight),
+    readNum(KEYS.editorHeight, DEFAULTS.editorHeight)
   );
 
   // Immediate writes for discrete settings
@@ -95,16 +95,18 @@ export function useEditorPreferences() {
 
   useEffect(() => {
     const timer = setTimeout(
-      () => localStorage.setItem(KEYS.leftPanelWidth, leftPanelWidth.toString()),
-      500,
+      () =>
+        localStorage.setItem(KEYS.leftPanelWidth, leftPanelWidth.toString()),
+      500
     );
     return () => clearTimeout(timer);
   }, [leftPanelWidth]);
 
   useEffect(() => {
     const timer = setTimeout(
-      () => localStorage.setItem(KEYS.rightPanelWidth, rightPanelWidth.toString()),
-      500,
+      () =>
+        localStorage.setItem(KEYS.rightPanelWidth, rightPanelWidth.toString()),
+      500
     );
     return () => clearTimeout(timer);
   }, [rightPanelWidth]);
@@ -112,7 +114,7 @@ export function useEditorPreferences() {
   useEffect(() => {
     const timer = setTimeout(
       () => localStorage.setItem(KEYS.editorHeight, editorHeight.toString()),
-      500,
+      500
     );
     return () => clearTimeout(timer);
   }, [editorHeight]);

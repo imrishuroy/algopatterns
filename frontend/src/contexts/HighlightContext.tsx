@@ -89,7 +89,10 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
 
         if (!cacheStale) {
           // Try to get from IndexedDB first
-          const cachedHighlights = await getHighlightsFromCache(contentType, contentId);
+          const cachedHighlights = await getHighlightsFromCache(
+            contentType,
+            contentId
+          );
           if (cachedHighlights && cachedHighlights.length > 0) {
             setHighlights((prev) => {
               const next = new Map(prev);
@@ -126,7 +129,10 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
         console.error("Failed to fetch highlights:", error);
 
         // On network error, try to serve from cache anyway
-        const cachedHighlights = await getHighlightsFromCache(contentType, contentId);
+        const cachedHighlights = await getHighlightsFromCache(
+          contentType,
+          contentId
+        );
         if (cachedHighlights && cachedHighlights.length > 0) {
           setHighlights((prev) => {
             const next = new Map(prev);
@@ -230,7 +236,9 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         // If offline, keep the optimistic update - it's saved in IndexedDB for later sync
         if (!navigator.onLine) {
-          console.info("Offline: highlight saved locally, will sync when online");
+          console.info(
+            "Offline: highlight saved locally, will sync when online"
+          );
           return tempHighlight;
         }
 
@@ -271,7 +279,11 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
           if (idx !== -1) {
             previousHighlight = list[idx];
             const updated = [...list];
-            updated[idx] = { ...list[idx], ...req, updatedAt: new Date().toISOString() };
+            updated[idx] = {
+              ...list[idx],
+              ...req,
+              updatedAt: new Date().toISOString(),
+            };
             next.set(key, updated);
             break;
           }
@@ -312,7 +324,9 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
 
           // If we have retries left and server data, auto-retry
           if (retryCount < MAX_RETRIES && serverHighlight) {
-            console.warn(`Version conflict for highlight ${id}, retrying with latest version...`);
+            console.warn(
+              `Version conflict for highlight ${id}, retrying with latest version...`
+            );
             const retryReq: UpdateHighlightRequest = {
               ...req,
               version: serverHighlight.version,
@@ -322,7 +336,9 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
 
           // Max retries exceeded or no server data - show conflict dialog
           if (previousHighlight && serverHighlight) {
-            console.warn(`Version conflict for highlight ${id}, showing resolution dialog...`);
+            console.warn(
+              `Version conflict for highlight ${id}, showing resolution dialog...`
+            );
             // Rollback optimistic update first
             setHighlights((prev) => {
               const next = new Map(prev);
@@ -371,7 +387,9 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         // If offline, keep the optimistic update - it's saved in IndexedDB for later sync
         if (!navigator.onLine) {
-          console.info("Offline: highlight update saved locally, will sync when online");
+          console.info(
+            "Offline: highlight update saved locally, will sync when online"
+          );
           // Return updated version so UI shows the change
           if (previousHighlight) {
             const prev = previousHighlight as Highlight;
@@ -452,13 +470,20 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
           });
           // Restore in IndexedDB
           const [contentType, contentId] = keyToRestore.split(":");
-          await addHighlightToCache(highlightToRestore, contentType, contentId, "synced");
+          await addHighlightToCache(
+            highlightToRestore,
+            contentType,
+            contentId,
+            "synced"
+          );
         }
         return false;
       } catch (error) {
         // If offline, keep the deletion - it's marked pending_delete in IndexedDB
         if (!navigator.onLine) {
-          console.info("Offline: highlight deletion saved locally, will sync when online");
+          console.info(
+            "Offline: highlight deletion saved locally, will sync when online"
+          );
           return true;
         }
 
@@ -475,7 +500,12 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
           });
           // Restore in IndexedDB
           const [contentType, contentId] = keyToRestore.split(":");
-          await addHighlightToCache(highlightToRestore, contentType, contentId, "synced");
+          await addHighlightToCache(
+            highlightToRestore,
+            contentType,
+            contentId,
+            "synced"
+          );
         }
         return false;
       }
@@ -549,8 +579,16 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
                 result.highlight.contentId,
                 "synced"
               );
-            } else if (result.op === "update" && result.id && result.highlight) {
-              await updateHighlightInCache(result.id, result.highlight, "synced");
+            } else if (
+              result.op === "update" &&
+              result.id &&
+              result.highlight
+            ) {
+              await updateHighlightInCache(
+                result.id,
+                result.highlight,
+                "synced"
+              );
             } else if (result.op === "delete" && result.id) {
               await deleteHighlightFromCache(result.id);
             }
@@ -559,7 +597,9 @@ export function HighlightProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        console.log(`Batch sync completed: ${response.data.results.filter(r => r.success).length}/${response.data.results.length} succeeded`);
+        console.log(
+          `Batch sync completed: ${response.data.results.filter((r) => r.success).length}/${response.data.results.length} succeeded`
+        );
       }
     } catch (error) {
       console.warn("Batch sync failed, will retry later:", error);

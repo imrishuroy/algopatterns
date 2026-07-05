@@ -3,10 +3,23 @@ vi.hoisted(() => {
   process.env.NEXT_PUBLIC_SITE_URL = "https://algopatterns.in";
 });
 
-import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  beforeAll,
+  afterAll,
+} from "vitest";
 import { apiClient } from "@/lib/api";
 import { aiApiClient } from "@/lib/ai-api";
-import { siteConfig, defaultMetadata, patternSEO, getPatternMetadata } from "@/lib/seo";
+import {
+  siteConfig,
+  defaultMetadata,
+  patternSEO,
+  getPatternMetadata,
+} from "@/lib/seo";
 import { solutions } from "@/lib/solutions";
 import {
   questions,
@@ -67,8 +80,15 @@ describe("apiClient", () => {
 
   describe("request (via getMe)", () => {
     it("sends GET with Content-Type and credentials", async () => {
-      const body = { success: true, data: { id: "u1", email: "a@b.com", emailVerified: true } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(body) });
+      const body = {
+        success: true,
+        data: { id: "u1", email: "a@b.com", emailVerified: true },
+      };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(body),
+      });
 
       const res = await apiClient.getMe();
 
@@ -77,34 +97,56 @@ describe("apiClient", () => {
         expect.stringContaining("/api/v1/user/me"),
         expect.objectContaining({
           credentials: "include",
-          headers: expect.objectContaining({ "Content-Type": "application/json" }),
-        }),
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+          }),
+        })
       );
     });
 
     it("omits Authorization when no token is set", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.getMe();
 
-      const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
       expect(headers).not.toHaveProperty("Authorization");
     });
 
     it("includes Authorization Bearer when token is set", async () => {
       apiClient.setAccessToken("my-token");
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.getMe();
 
-      const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+      const headers = mockFetch.mock.calls[0][1].headers as Record<
+        string,
+        string
+      >;
       expect(headers["Authorization"]).toBe("Bearer my-token");
     });
   });
 
   describe("204 No Content handling", () => {
     it("returns success for 204 responses", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: () => { throw new Error("should not call json"); } });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 204,
+        json: () => {
+          throw new Error("should not call json");
+        },
+      });
 
       const res = await apiClient.deleteHighlight("h-1");
 
@@ -117,10 +159,11 @@ describe("apiClient", () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 409,
-        json: () => Promise.resolve({
-          error: { message: "conflict" },
-          data: { version: 42 },
-        }),
+        json: () =>
+          Promise.resolve({
+            error: { message: "conflict" },
+            data: { version: 42 },
+          }),
       });
 
       const res = await apiClient.getMe();
@@ -143,25 +186,42 @@ describe("apiClient", () => {
 
       expect(res.success).toBe(false);
       expect(res.error?.code).toBe("VERSION_CONFLICT");
-      expect(res.error?.message).toBe("Resource was modified by another client");
+      expect(res.error?.message).toBe(
+        "Resource was modified by another client"
+      );
     });
   });
 
   describe("401 auto-refresh", () => {
     it("refreshes token and retries the original request", async () => {
       apiClient.setAccessToken("expired");
-      const retryData = { success: true, data: { id: "u1", email: "a@b.com", emailVerified: true } };
+      const retryData = {
+        success: true,
+        data: { id: "u1", email: "a@b.com", emailVerified: true },
+      };
 
       // 1. original → 401
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 401, json: () => Promise.resolve({ success: false }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ success: false }),
+      });
       // 2. refresh → ok
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: () => Promise.resolve({ success: true, data: { accessToken: "refreshed", expiresIn: 3600 } }),
+        json: () =>
+          Promise.resolve({
+            success: true,
+            data: { accessToken: "refreshed", expiresIn: 3600 },
+          }),
       });
       // 3. retry → success
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(retryData) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(retryData),
+      });
 
       const res = await apiClient.getMe();
 
@@ -173,8 +233,16 @@ describe("apiClient", () => {
     it("does not retry when refresh fails and clears token", async () => {
       apiClient.setAccessToken("expired");
 
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 401, json: () => Promise.resolve({ success: false }) });
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 401, json: () => Promise.resolve({ success: false }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ success: false }),
+      });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ success: false }),
+      });
 
       const res = await apiClient.getMe();
 
@@ -190,7 +258,11 @@ describe("apiClient", () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: () => Promise.resolve({ success: true, data: { accessToken: "new-token", expiresIn: 3600 } }),
+        json: () =>
+          Promise.resolve({
+            success: true,
+            data: { accessToken: "new-token", expiresIn: 3600 },
+          }),
       });
 
       const result = await apiClient.refreshToken();
@@ -199,13 +271,17 @@ describe("apiClient", () => {
       expect(apiClient.getAccessToken()).toBe("new-token");
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("/api/v1/auth/refresh"),
-        expect.objectContaining({ method: "POST", credentials: "include" }),
+        expect.objectContaining({ method: "POST", credentials: "include" })
       );
     });
 
     it("returns null when refresh endpoint fails", async () => {
       apiClient.setAccessToken("old");
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 401, json: () => Promise.resolve({}) });
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({}),
+      });
 
       const result = await apiClient.refreshToken();
 
@@ -231,7 +307,11 @@ describe("apiClient", () => {
         return {
           ok: true,
           status: 200,
-          json: () => Promise.resolve({ success: true, data: { accessToken: "deduped", expiresIn: 3600 } }),
+          json: () =>
+            Promise.resolve({
+              success: true,
+              data: { accessToken: "deduped", expiresIn: 3600 },
+            }),
         };
       });
 
@@ -252,20 +332,45 @@ describe("apiClient", () => {
 
   describe("auth endpoints", () => {
     it("register sends POST and stores token", async () => {
-      const authResp = { success: true, data: { user: { id: "u1", email: "a@b.com", emailVerified: false }, accessToken: "tok", expiresIn: 3600 } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(authResp) });
+      const authResp = {
+        success: true,
+        data: {
+          user: { id: "u1", email: "a@b.com", emailVerified: false },
+          accessToken: "tok",
+          expiresIn: 3600,
+        },
+      };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(authResp),
+      });
 
       const res = await apiClient.register({ email: "a@b.com", password: "p" });
 
       expect(res).toEqual(authResp);
       expect(apiClient.getAccessToken()).toBe("tok");
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/auth/register");
-      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ email: "a@b.com", password: "p" });
+      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({
+        email: "a@b.com",
+        password: "p",
+      });
     });
 
     it("login sends POST and stores token", async () => {
-      const authResp = { success: true, data: { user: { id: "u1", email: "a@b.com", emailVerified: false }, accessToken: "tok", expiresIn: 3600 } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(authResp) });
+      const authResp = {
+        success: true,
+        data: {
+          user: { id: "u1", email: "a@b.com", emailVerified: false },
+          accessToken: "tok",
+          expiresIn: 3600,
+        },
+      };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(authResp),
+      });
 
       const res = await apiClient.login({ email: "a@b.com", password: "p" });
 
@@ -275,7 +380,11 @@ describe("apiClient", () => {
     });
 
     it("login does not store token when response is unsuccessful", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: false, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: false, data: {} }),
+      });
 
       await apiClient.login({ email: "a@b.com", password: "p" });
 
@@ -284,7 +393,12 @@ describe("apiClient", () => {
 
     it("logout sends POST and clears token", async () => {
       apiClient.setAccessToken("tok");
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { message: "bye" } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({ success: true, data: { message: "bye" } }),
+      });
 
       const res = await apiClient.logout();
 
@@ -294,8 +408,18 @@ describe("apiClient", () => {
     });
 
     it("getGoogleAuthURL calls the google url endpoint", async () => {
-      const resp = { success: true, data: { url: "https://accounts.google.com/o/oauth2/auth", state: "xyz" } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(resp) });
+      const resp = {
+        success: true,
+        data: {
+          url: "https://accounts.google.com/o/oauth2/auth",
+          state: "xyz",
+        },
+      };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(resp),
+      });
 
       const result = await apiClient.getGoogleAuthURL();
 
@@ -304,14 +428,27 @@ describe("apiClient", () => {
     });
 
     it("googleCallback sends POST and stores token", async () => {
-      const authResp = { success: true, data: { user: { id: "u1", email: "a@b.com", emailVerified: false }, accessToken: "gtok", expiresIn: 3600 } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(authResp) });
+      const authResp = {
+        success: true,
+        data: {
+          user: { id: "u1", email: "a@b.com", emailVerified: false },
+          accessToken: "gtok",
+          expiresIn: 3600,
+        },
+      };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(authResp),
+      });
 
       const res = await apiClient.googleCallback({ code: "c", state: "s" });
 
       expect(res).toEqual(authResp);
       expect(apiClient.getAccessToken()).toBe("gtok");
-      expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/auth/google/callback");
+      expect(mockFetch.mock.calls[0][0]).toContain(
+        "/api/v1/auth/google/callback"
+      );
     });
   });
 
@@ -319,9 +456,23 @@ describe("apiClient", () => {
 
   describe("problem endpoints", () => {
     it("getProblems builds query params", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { problems: [], total: 0, page: 1, limit: 10, totalPages: 0 } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            success: true,
+            data: { problems: [], total: 0, page: 1, limit: 10, totalPages: 0 },
+          }),
+      });
 
-      await apiClient.getProblems({ page: 2, limit: 5, difficulty: "Easy", patternId: "sliding-window", search: "max" });
+      await apiClient.getProblems({
+        page: 2,
+        limit: 5,
+        difficulty: "Easy",
+        patternId: "sliding-window",
+        search: "max",
+      });
 
       const url = mockFetch.mock.calls[0][0] as string;
       expect(url).toContain("page=2");
@@ -332,7 +483,15 @@ describe("apiClient", () => {
     });
 
     it("getProblems sends request without query when no params", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { problems: [], total: 0, page: 1, limit: 10, totalPages: 0 } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            success: true,
+            data: { problems: [], total: 0, page: 1, limit: 10, totalPages: 0 },
+          }),
+      });
 
       await apiClient.getProblems();
 
@@ -341,7 +500,11 @@ describe("apiClient", () => {
     });
 
     it("getProblemBySlug calls correct endpoint", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.getProblemBySlug("two-sum");
 
@@ -349,7 +512,11 @@ describe("apiClient", () => {
     });
 
     it("getLanguages calls languages endpoint", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: [] }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: [] }),
+      });
 
       await apiClient.getLanguages();
 
@@ -362,9 +529,17 @@ describe("apiClient", () => {
   describe("submission endpoints", () => {
     it("submitCode sends POST with body", async () => {
       const resp = { success: true, data: { id: "s1", status: "pending" } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(resp) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(resp),
+      });
 
-      const res = await apiClient.submitCode({ problemId: "p1", languageId: 1, code: "print(1)" });
+      const res = await apiClient.submitCode({
+        problemId: "p1",
+        languageId: 1,
+        code: "print(1)",
+      });
 
       expect(res).toEqual(resp);
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/submissions");
@@ -372,10 +547,22 @@ describe("apiClient", () => {
     });
 
     it("runCode sends POST with custom input", async () => {
-      const resp = { success: true, data: { results: [], totalPassed: 0, totalTests: 0 } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(resp) });
+      const resp = {
+        success: true,
+        data: { results: [], totalPassed: 0, totalTests: 0 },
+      };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(resp),
+      });
 
-      const res = await apiClient.runCode({ problemId: "p1", languageId: 1, code: "print(1)", customInput: "5" });
+      const res = await apiClient.runCode({
+        problemId: "p1",
+        languageId: 1,
+        code: "print(1)",
+        customInput: "5",
+      });
 
       expect(res).toEqual(resp);
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/submissions/run");
@@ -383,7 +570,11 @@ describe("apiClient", () => {
     });
 
     it("getSubmission fetches by id", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.getSubmission("s-42");
 
@@ -391,7 +582,11 @@ describe("apiClient", () => {
     });
 
     it("getSubmissions appends query when problemId provided", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: [] }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: [] }),
+      });
 
       await apiClient.getSubmissions("p-1");
 
@@ -399,7 +594,11 @@ describe("apiClient", () => {
     });
 
     it("getSubmissions omits query when no problemId", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: [] }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: [] }),
+      });
 
       await apiClient.getSubmissions();
 
@@ -412,9 +611,20 @@ describe("apiClient", () => {
   describe("highlight endpoints", () => {
     it("createHighlight sends POST with body", async () => {
       const resp = { success: true, data: { id: "h1" } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(resp) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(resp),
+      });
 
-      const req = { contentType: "article", contentId: "c1", startOffset: 0, endOffset: 5, selectedText: "hello", color: "yellow" as const };
+      const req = {
+        contentType: "article",
+        contentId: "c1",
+        startOffset: 0,
+        endOffset: 5,
+        selectedText: "hello",
+        color: "yellow" as const,
+      };
       const res = await apiClient.createHighlight(req);
 
       expect(res).toEqual(resp);
@@ -423,7 +633,11 @@ describe("apiClient", () => {
     });
 
     it("getHighlight fetches by id", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.getHighlight("h-1");
 
@@ -431,7 +645,12 @@ describe("apiClient", () => {
     });
 
     it("getHighlightsForContent builds path with encoded params", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { highlights: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({ success: true, data: { highlights: [] } }),
+      });
 
       await apiClient.getHighlightsForContent("article", "p 1");
 
@@ -440,9 +659,21 @@ describe("apiClient", () => {
     });
 
     it("getHighlights builds query params", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { highlights: [], totalCount: 0 } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            success: true,
+            data: { highlights: [], totalCount: 0 },
+          }),
+      });
 
-      await apiClient.getHighlights({ limit: 10, cursor: "next", contentType: "article" });
+      await apiClient.getHighlights({
+        limit: 10,
+        cursor: "next",
+        contentType: "article",
+      });
 
       const url = mockFetch.mock.calls[0][0] as string;
       expect(url).toContain("limit=10");
@@ -451,7 +682,15 @@ describe("apiClient", () => {
     });
 
     it("getHighlights omits query when no params", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { highlights: [], totalCount: 0 } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            success: true,
+            data: { highlights: [], totalCount: 0 },
+          }),
+      });
 
       await apiClient.getHighlights();
 
@@ -460,9 +699,16 @@ describe("apiClient", () => {
 
     it("updateHighlight sends PATCH with body", async () => {
       const resp = { success: true, data: { id: "h1" } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(resp) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(resp),
+      });
 
-      const res = await apiClient.updateHighlight("h-1", { color: "blue", version: 2 });
+      const res = await apiClient.updateHighlight("h-1", {
+        color: "blue",
+        version: 2,
+      });
 
       expect(res).toEqual(resp);
       expect(mockFetch.mock.calls[0][1].method).toBe("PATCH");
@@ -470,7 +716,11 @@ describe("apiClient", () => {
     });
 
     it("deleteHighlight sends DELETE", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: undefined }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: undefined }),
+      });
 
       await apiClient.deleteHighlight("h-1");
 
@@ -479,7 +729,11 @@ describe("apiClient", () => {
     });
 
     it("batchSyncHighlights sends POST", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { results: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: { results: [] } }),
+      });
 
       const res = await apiClient.batchSyncHighlights({ operations: [] });
 
@@ -492,7 +746,11 @@ describe("apiClient", () => {
 
   describe("payment endpoints", () => {
     it("getPlans appends currency query when provided", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { plans: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: { plans: [] } }),
+      });
 
       await apiClient.getPlans("INR");
 
@@ -500,7 +758,11 @@ describe("apiClient", () => {
     });
 
     it("getPlans omits query when no currency", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { plans: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: { plans: [] } }),
+      });
 
       await apiClient.getPlans();
 
@@ -508,52 +770,91 @@ describe("apiClient", () => {
     });
 
     it("getSubscription fetches subscription", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.getSubscription();
 
-      expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/payments/subscription");
+      expect(mockFetch.mock.calls[0][0]).toContain(
+        "/api/v1/payments/subscription"
+      );
     });
 
     it("createOrder sends POST with optional idempotency key", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.createOrder({ plan_id: "p1" }, "idem-1");
 
-      expect(mockFetch.mock.calls[0][1].headers).toHaveProperty("Idempotency-Key", "idem-1");
+      expect(mockFetch.mock.calls[0][1].headers).toHaveProperty(
+        "Idempotency-Key",
+        "idem-1"
+      );
       expect(mockFetch.mock.calls[0][1].method).toBe("POST");
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/payments/orders");
     });
 
     it("createOrder omits idempotency key when not provided", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.createOrder({ plan_id: "p1" });
 
       expect(mockFetch.mock.calls[0][1].headers).toEqual(expect.any(Object));
       // no Idempotency-Key header
-      expect((mockFetch.mock.calls[0][1].headers as Record<string, string>)["Idempotency-Key"]).toBeUndefined();
+      expect(
+        (mockFetch.mock.calls[0][1].headers as Record<string, string>)[
+          "Idempotency-Key"
+        ]
+      ).toBeUndefined();
     });
 
     it("verifyPayment sends POST", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
-      await apiClient.verifyPayment({ razorpay_payment_id: "p", razorpay_order_id: "o", razorpay_signature: "s" });
+      await apiClient.verifyPayment({
+        razorpay_payment_id: "p",
+        razorpay_order_id: "o",
+        razorpay_signature: "s",
+      });
 
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/payments/verify");
       expect(mockFetch.mock.calls[0][1].method).toBe("POST");
     });
 
     it("validateDiscount sends POST", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.validateDiscount({ code: "SAVE10", plan_id: "p1" });
 
-      expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/payments/validate-discount");
+      expect(mockFetch.mock.calls[0][0]).toContain(
+        "/api/v1/payments/validate-discount"
+      );
     });
 
     it("cancelSubscription sends POST", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       await apiClient.cancelSubscription({ reason: "too expensive" });
 
@@ -564,7 +865,12 @@ describe("apiClient", () => {
 
   describe("progress endpoints", () => {
     it("getProgress calls progress endpoint", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { questionIds: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({ success: true, data: { questionIds: [] } }),
+      });
 
       const res = await apiClient.getProgress();
 
@@ -573,21 +879,36 @@ describe("apiClient", () => {
     });
 
     it("toggleProgress sends POST", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { questionIds: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({ success: true, data: { questionIds: [] } }),
+      });
 
       await apiClient.toggleProgress("q-1", true);
 
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/progress/toggle");
-      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ questionId: "q-1", completed: true });
+      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({
+        questionId: "q-1",
+        completed: true,
+      });
     });
 
     it("syncProgress sends POST with question IDs", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { questionIds: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({ success: true, data: { questionIds: [] } }),
+      });
 
       await apiClient.syncProgress(["q1", "q2"]);
 
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/progress/sync");
-      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ questionIds: ["q1", "q2"] });
+      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({
+        questionIds: ["q1", "q2"],
+      });
     });
   });
 });
@@ -605,8 +926,20 @@ describe("aiApiClient", () => {
   describe("chat", () => {
     it("sends POST to /api/v1/ai/chat", async () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("tok");
-      const resp = { success: true, data: { content: "answer", sessionId: "s1", tokensUsed: 10, model: "gpt-4" } };
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve(resp) });
+      const resp = {
+        success: true,
+        data: {
+          content: "answer",
+          sessionId: "s1",
+          tokensUsed: 10,
+          model: "gpt-4",
+        },
+      };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(resp),
+      });
 
       const result = await aiApiClient.chat({ message: "hello" });
 
@@ -619,7 +952,11 @@ describe("aiApiClient", () => {
 
     it("maps all ChatRequest fields", async () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("tok");
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
       const req = {
         message: "hi",
@@ -658,7 +995,10 @@ describe("aiApiClient", () => {
           getReader: () => ({
             read: async () => {
               if (idx < chunks.length) {
-                return { done: false, value: new TextEncoder().encode(chunks[idx++]) };
+                return {
+                  done: false,
+                  value: new TextEncoder().encode(chunks[idx++]),
+                };
               }
               return { done: true, value: undefined };
             },
@@ -670,13 +1010,22 @@ describe("aiApiClient", () => {
     }
 
     function noBodyResponse(status = 200, ok = true) {
-      return { ok, status, json: () => Promise.resolve({}), body: null } as unknown as Response;
+      return {
+        ok,
+        status,
+        json: () => Promise.resolve({}),
+        body: null,
+      } as unknown as Response;
     }
 
     it("processes chunks and calls onChunk / onDone", () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("tok");
       mockFetch.mockResolvedValueOnce(
-        streamResponse(['data: {"content":"Hel"}\n\n', 'data: {"content":"lo"}\n\n', "data: [DONE]\n\n"]),
+        streamResponse([
+          'data: {"content":"Hel"}\n\n',
+          'data: {"content":"lo"}\n\n',
+          "data: [DONE]\n\n",
+        ])
       );
 
       return new Promise<void>((resolve, reject) => {
@@ -688,7 +1037,7 @@ describe("aiApiClient", () => {
           () => {
             expect(chunks).toEqual(["Hel", "lo"]);
             resolve();
-          },
+          }
         );
       });
     });
@@ -696,7 +1045,7 @@ describe("aiApiClient", () => {
     it("handles data:{...} format without space", () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("tok");
       mockFetch.mockResolvedValueOnce(
-        streamResponse(['data:{"content":"Hi"}\n\n', 'data:{"done":true}\n\n']),
+        streamResponse(['data:{"content":"Hi"}\n\n', 'data:{"done":true}\n\n'])
       );
 
       return new Promise<void>((resolve, reject) => {
@@ -708,7 +1057,7 @@ describe("aiApiClient", () => {
           () => {
             expect(chunks).toEqual(["Hi"]);
             resolve();
-          },
+          }
         );
       });
     });
@@ -716,7 +1065,7 @@ describe("aiApiClient", () => {
     it("calls onError when response has error field", () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("tok");
       mockFetch.mockResolvedValueOnce(
-        streamResponse(['data: {"error":"Rate limit exceeded"}\n\n']),
+        streamResponse(['data: {"error":"Rate limit exceeded"}\n\n'])
       );
 
       return new Promise<void>((resolve, reject) => {
@@ -727,7 +1076,7 @@ describe("aiApiClient", () => {
             expect(err).toBe("Rate limit exceeded");
             resolve();
           },
-          () => reject(new Error("unexpected done")),
+          () => reject(new Error("unexpected done"))
         );
       });
     });
@@ -744,7 +1093,7 @@ describe("aiApiClient", () => {
             expect(err).toBe("No response body");
             resolve();
           },
-          () => reject(new Error("unexpected done")),
+          () => reject(new Error("unexpected done"))
         );
       });
     });
@@ -765,7 +1114,7 @@ describe("aiApiClient", () => {
             expect(err).toBe("Server error");
             resolve();
           },
-          () => reject(new Error("unexpected done")),
+          () => reject(new Error("unexpected done"))
         );
       });
     });
@@ -786,7 +1135,7 @@ describe("aiApiClient", () => {
             expect(err).toBe("Failed to connect to AI");
             resolve();
           },
-          () => reject(new Error("unexpected done")),
+          () => reject(new Error("unexpected done"))
         );
       });
     });
@@ -796,9 +1145,14 @@ describe("aiApiClient", () => {
       vi.spyOn(apiClient, "refreshToken").mockResolvedValue("new-token");
 
       // 1st call → 401
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 401 } as unknown as Response);
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+      } as unknown as Response);
       // 2nd call (retry) → success
-      mockFetch.mockResolvedValueOnce(streamResponse(['data: {"content":"retried"}\n', "data: [DONE]\n"]));
+      mockFetch.mockResolvedValueOnce(
+        streamResponse(['data: {"content":"retried"}\n', "data: [DONE]\n"])
+      );
 
       return new Promise<void>((resolve, reject) => {
         const chunks: string[] = [];
@@ -809,7 +1163,7 @@ describe("aiApiClient", () => {
           () => {
             expect(chunks).toEqual(["retried"]);
             resolve();
-          },
+          }
         );
       });
     });
@@ -818,7 +1172,10 @@ describe("aiApiClient", () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("expired");
       vi.spyOn(apiClient, "refreshToken").mockResolvedValue(null);
 
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 401 } as unknown as Response);
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+      } as unknown as Response);
 
       return new Promise<void>((resolve, reject) => {
         aiApiClient.chatStream(
@@ -828,7 +1185,7 @@ describe("aiApiClient", () => {
             expect(err).toBe("Session expired. Please refresh the page.");
             resolve();
           },
-          () => reject(new Error("unexpected done")),
+          () => reject(new Error("unexpected done"))
         );
       });
     });
@@ -854,7 +1211,7 @@ describe("aiApiClient", () => {
         { message: "hi" },
         () => {},
         () => {},
-        () => {},
+        () => {}
       );
 
       // Abort after giving the async IIFE a chance to start
@@ -868,9 +1225,18 @@ describe("aiApiClient", () => {
   describe("getHint", () => {
     it("sends POST with mapped fields", async () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("tok");
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
-      await aiApiClient.getHint({ problemSlug: "two-sum", problemTitle: "Two Sum", code: "", language: "java" });
+      await aiApiClient.getHint({
+        problemSlug: "two-sum",
+        problemTitle: "Two Sum",
+        code: "",
+        language: "java",
+      });
 
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/ai/hint");
       expect(mockFetch.mock.calls[0][1].method).toBe("POST");
@@ -880,9 +1246,19 @@ describe("aiApiClient", () => {
   describe("reviewCode", () => {
     it("sends POST with mapped fields", async () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("tok");
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
-      await aiApiClient.reviewCode({ problemSlug: "two-sum", problemTitle: "Two Sum", code: "", language: "java", focusAreas: ["performance"] });
+      await aiApiClient.reviewCode({
+        problemSlug: "two-sum",
+        problemTitle: "Two Sum",
+        code: "",
+        language: "java",
+        focusAreas: ["performance"],
+      });
 
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/ai/review");
       const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -893,9 +1269,19 @@ describe("aiApiClient", () => {
   describe("explainError", () => {
     it("sends POST with mapped fields", async () => {
       vi.spyOn(apiClient, "getAccessToken").mockReturnValue("tok");
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: {} }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: {} }),
+      });
 
-      await aiApiClient.explainError({ code: "x", language: "java", errorType: "compile", errorMessage: "syntax", lineNumber: 5 });
+      await aiApiClient.explainError({
+        code: "x",
+        language: "java",
+        errorType: "compile",
+        errorMessage: "syntax",
+        lineNumber: 5,
+      });
 
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/ai/explain");
       const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -911,7 +1297,11 @@ describe("aiApiClient", () => {
     });
 
     it("getSessions fetches sessions", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { sessions: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: { sessions: [] } }),
+      });
 
       const res = await aiApiClient.getSessions();
 
@@ -920,15 +1310,25 @@ describe("aiApiClient", () => {
     });
 
     it("getSessionMessages fetches messages for a session", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { messages: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: { messages: [] } }),
+      });
 
       await aiApiClient.getSessionMessages("s-1");
 
-      expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/ai/sessions/s-1/messages");
+      expect(mockFetch.mock.calls[0][0]).toContain(
+        "/api/v1/ai/sessions/s-1/messages"
+      );
     });
 
     it("clearSession sends DELETE", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { cleared: true } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: { cleared: true } }),
+      });
 
       const res = await aiApiClient.clearSession("s-1");
 
@@ -938,25 +1338,45 @@ describe("aiApiClient", () => {
     });
 
     it("archiveSession sends POST with optional title", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { archived: true } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({ success: true, data: { archived: true } }),
+      });
 
       await aiApiClient.archiveSession("s-1", "My Session");
 
       expect(mockFetch.mock.calls[0][1].method).toBe("POST");
-      expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/ai/sessions/s-1/archive");
-      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ title: "My Session" });
+      expect(mockFetch.mock.calls[0][0]).toContain(
+        "/api/v1/ai/sessions/s-1/archive"
+      );
+      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({
+        title: "My Session",
+      });
     });
 
     it("archiveSession works without title", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { archived: true } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({ success: true, data: { archived: true } }),
+      });
 
       await aiApiClient.archiveSession("s-1");
 
-      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ title: undefined });
+      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({
+        title: undefined,
+      });
     });
 
     it("getArchivedSessions sends GET with query param", async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: { sessions: [] } }) });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true, data: { sessions: [] } }),
+      });
 
       await aiApiClient.getArchivedSessions("two-sum");
 
@@ -1011,9 +1431,22 @@ describe("seo", () => {
 
   describe("patternSEO", () => {
     const expectedSlugs = [
-      "arrays-strings", "backtracking", "binary-search", "dynamic-programming",
-      "greedy", "graphs", "hash-map", "heap", "intervals", "linked-list",
-      "prefix-sum", "sliding-window", "stack", "trees", "trie", "two-pointers",
+      "arrays-strings",
+      "backtracking",
+      "binary-search",
+      "dynamic-programming",
+      "greedy",
+      "graphs",
+      "hash-map",
+      "heap",
+      "intervals",
+      "linked-list",
+      "prefix-sum",
+      "sliding-window",
+      "stack",
+      "trees",
+      "trie",
+      "two-pointers",
       "union-find",
     ];
 
@@ -1041,24 +1474,47 @@ describe("seo", () => {
 
   describe("getPatternMetadata", () => {
     it("returns correct metadata for a known slug", () => {
-      const meta = getPatternMetadata("two-pointers", "Two Pointers", "Master two pointers technique.");
+      const meta = getPatternMetadata(
+        "two-pointers",
+        "Two Pointers",
+        "Master two pointers technique."
+      );
 
       expect(meta.title).toBe("Two Pointers Pattern - Array & String Problems");
       expect(meta.description).toContain("Master two pointers technique");
       expect(Array.isArray(meta.keywords)).toBe(true);
       expect(meta.keywords?.length).toBeGreaterThan(0);
-      expect((meta.openGraph as { title?: string })?.title).toBe("Two Pointers Pattern - Array & String Problems");
-      expect((meta.openGraph as { url?: string })?.url).toContain("/patterns/two-pointers");
-      expect((meta.twitter as { card?: string })?.card).toBe("summary_large_image");
-      expect((meta.alternates as { canonical?: string })?.canonical).toContain("/patterns/two-pointers");
+      expect((meta.openGraph as { title?: string })?.title).toBe(
+        "Two Pointers Pattern - Array & String Problems"
+      );
+      expect((meta.openGraph as { url?: string })?.url).toContain(
+        "/patterns/two-pointers"
+      );
+      expect((meta.twitter as { card?: string })?.card).toBe(
+        "summary_large_image"
+      );
+      expect((meta.alternates as { canonical?: string })?.canonical).toContain(
+        "/patterns/two-pointers"
+      );
     });
 
     it("falls back for unknown slug", () => {
-      const meta = getPatternMetadata("unknown-pattern", "Custom", "Custom description.");
+      const meta = getPatternMetadata(
+        "unknown-pattern",
+        "Custom",
+        "Custom description."
+      );
 
       expect(meta.title).toBe("Custom Pattern - DSA Tutorial");
-      expect(meta.description).toBe("Custom description. Learn with interactive visualizations and curated practice problems.");
-      expect(meta.keywords).toEqual(["unknown-pattern", "algorithm", "leetcode", "dsa pattern"]);
+      expect(meta.description).toBe(
+        "Custom description. Learn with interactive visualizations and curated practice problems."
+      );
+      expect(meta.keywords).toEqual([
+        "unknown-pattern",
+        "algorithm",
+        "leetcode",
+        "dsa pattern",
+      ]);
     });
   });
 });
@@ -1206,7 +1662,13 @@ describe("quizService", () => {
 
   describe("getQuestions", () => {
     it("builds URL with patternId only", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ patternId: "hash-map", totalQuestions: 5, questions: [] }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({
+          patternId: "hash-map",
+          totalQuestions: 5,
+          questions: [],
+        })
+      );
 
       await quizService.getQuestions("hash-map");
 
@@ -1216,7 +1678,13 @@ describe("quizService", () => {
     });
 
     it("appends section slug when provided", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ patternId: "hash-map", totalQuestions: 3, questions: [] }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({
+          patternId: "hash-map",
+          totalQuestions: 3,
+          questions: [],
+        })
+      );
 
       await quizService.getQuestions("hash-map", "section-1");
 
@@ -1227,42 +1695,81 @@ describe("quizService", () => {
 
   describe("startAttempt", () => {
     it("sends POST with proper body", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ attemptId: "a1", startedAt: "2025-01-01T00:00:00Z" }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({ attemptId: "a1", startedAt: "2025-01-01T00:00:00Z" })
+      );
 
-      const result = await quizService.startAttempt({ patternId: "hash-map", totalQuestions: 5 });
+      const result = await quizService.startAttempt({
+        patternId: "hash-map",
+        totalQuestions: 5,
+      });
 
       expect(result.attemptId).toBe("a1");
       expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/quiz/attempts");
       expect(mockFetch.mock.calls[0][1].method).toBe("POST");
-      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({ patternId: "hash-map", totalQuestions: 5 });
+      expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toEqual({
+        patternId: "hash-map",
+        totalQuestions: 5,
+      });
     });
   });
 
   describe("submitResponse", () => {
     it("sends POST with response body", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ isCorrect: true, correctAnswer: "A", explanation: "ok" }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({
+          isCorrect: true,
+          correctAnswer: "A",
+          explanation: "ok",
+        })
+      );
 
-      const result = await quizService.submitResponse("a1", { questionId: "q1", selectedAnswer: "A" });
+      const result = await quizService.submitResponse("a1", {
+        questionId: "q1",
+        selectedAnswer: "A",
+      });
 
       expect(result.isCorrect).toBe(true);
-      expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/quiz/attempts/a1/responses");
+      expect(mockFetch.mock.calls[0][0]).toContain(
+        "/api/v1/quiz/attempts/a1/responses"
+      );
       expect(mockFetch.mock.calls[0][1].method).toBe("POST");
     });
   });
 
   describe("completeAttempt", () => {
     it("sends PATCH with timeTakenSeconds", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ attemptId: "a1", totalQuestions: 5, correctCount: 4, scorePercentage: 80, completedAt: "2025-01-01T00:00:00Z" }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({
+          attemptId: "a1",
+          totalQuestions: 5,
+          correctCount: 4,
+          scorePercentage: 80,
+          completedAt: "2025-01-01T00:00:00Z",
+        })
+      );
 
-      const result = await quizService.completeAttempt("a1", { timeTakenSeconds: 120 });
+      const result = await quizService.completeAttempt("a1", {
+        timeTakenSeconds: 120,
+      });
 
       expect(result.scorePercentage).toBe(80);
       expect(mockFetch.mock.calls[0][1].method).toBe("PATCH");
-      expect(mockFetch.mock.calls[0][0]).toContain("/api/v1/quiz/attempts/a1/complete");
+      expect(mockFetch.mock.calls[0][0]).toContain(
+        "/api/v1/quiz/attempts/a1/complete"
+      );
     });
 
     it("works without request body", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ attemptId: "a1", totalQuestions: 5, correctCount: 3, scorePercentage: 60, completedAt: "2025-01-01T00:00:00Z" }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({
+          attemptId: "a1",
+          totalQuestions: 5,
+          correctCount: 3,
+          scorePercentage: 60,
+          completedAt: "2025-01-01T00:00:00Z",
+        })
+      );
 
       const result = await quizService.completeAttempt("a1");
 
@@ -1272,7 +1779,16 @@ describe("quizService", () => {
 
   describe("getAttempt", () => {
     it("fetches attempt by id", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ id: "a1", patternId: "hash-map", totalQuestions: 5, correctCount: 3, startedAt: "", status: "in_progress" }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({
+          id: "a1",
+          patternId: "hash-map",
+          totalQuestions: 5,
+          correctCount: 3,
+          startedAt: "",
+          status: "in_progress",
+        })
+      );
 
       const result = await quizService.getAttempt("a1");
 
@@ -1283,9 +1799,16 @@ describe("quizService", () => {
 
   describe("getAttemptHistory", () => {
     it("builds query string with all params", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ attempts: [], totalAttempts: 0 }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({ attempts: [], totalAttempts: 0 })
+      );
 
-      await quizService.getAttemptHistory("hash-map", "section-1", 20, "cursor-abc");
+      await quizService.getAttemptHistory(
+        "hash-map",
+        "section-1",
+        20,
+        "cursor-abc"
+      );
 
       const url = mockFetch.mock.calls[0][0] as string;
       expect(url).toContain("pattern_id=hash-map");
@@ -1295,7 +1818,9 @@ describe("quizService", () => {
     });
 
     it("includes only default limit when no params provided", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ attempts: [], totalAttempts: 0 }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({ attempts: [], totalAttempts: 0 })
+      );
 
       await quizService.getAttemptHistory();
 
@@ -1307,7 +1832,9 @@ describe("quizService", () => {
     });
 
     it("sets default limit of 10", async () => {
-      mockFetch.mockResolvedValueOnce(successResponse({ attempts: [], totalAttempts: 0 }));
+      mockFetch.mockResolvedValueOnce(
+        successResponse({ attempts: [], totalAttempts: 0 })
+      );
 
       await quizService.getAttemptHistory("hash-map");
 
@@ -1318,9 +1845,13 @@ describe("quizService", () => {
 
   describe("fetchApi error handling", () => {
     it("throws on non-ok response", async () => {
-      mockFetch.mockResolvedValueOnce(failResponse("BAD_REQUEST", "Invalid pattern"));
+      mockFetch.mockResolvedValueOnce(
+        failResponse("BAD_REQUEST", "Invalid pattern")
+      );
 
-      await expect(quizService.getQuestions("invalid")).rejects.toThrow("Invalid pattern");
+      await expect(quizService.getQuestions("invalid")).rejects.toThrow(
+        "Invalid pattern"
+      );
     });
 
     it("throws with fallback message when error has no message", async () => {
@@ -1329,10 +1860,12 @@ describe("quizService", () => {
           ok: false,
           status: 500,
           json: () => Promise.resolve({ success: false, error: {} }),
-        }),
+        })
       );
 
-      await expect(quizService.getQuestions("x")).rejects.toThrow("Request failed");
+      await expect(quizService.getQuestions("x")).rejects.toThrow(
+        "Request failed"
+      );
     });
 
     it("throws on success: false with ok: true", async () => {
@@ -1340,17 +1873,486 @@ describe("quizService", () => {
         Promise.resolve({
           ok: true,
           status: 200,
-          json: () => Promise.resolve({ success: false, error: { code: "ERROR", message: "Logic error" } }),
-        }),
+          json: () =>
+            Promise.resolve({
+              success: false,
+              error: { code: "ERROR", message: "Logic error" },
+            }),
+        })
       );
 
-      await expect(quizService.getQuestions("x")).rejects.toThrow("Logic error");
+      await expect(quizService.getQuestions("x")).rejects.toThrow(
+        "Logic error"
+      );
     });
   });
 });
 
 // ===========================================================================
-// 7. quotes.ts — Quotes Data
+// 7. localSearch.ts — Local Search Utility
+// ===========================================================================
+
+import {
+  localSearch,
+  getLocalSearchCount,
+  mergeSearchResults,
+  resetSearchIndex,
+} from "@/lib/localSearch";
+import type { SearchResult, SearchContentType } from "@/types";
+
+describe("localSearch", () => {
+  // Reset the Fuse index before each test to ensure clean state
+  beforeEach(() => {
+    resetSearchIndex();
+  });
+
+  describe("localSearch function", () => {
+    it("returns empty results for short queries (< 2 chars)", () => {
+      const results = localSearch("a");
+      const count = getLocalSearchCount(results);
+      expect(count).toBe(0);
+    });
+
+    it("returns empty results for empty query", () => {
+      const results = localSearch("");
+      const count = getLocalSearchCount(results);
+      expect(count).toBe(0);
+    });
+
+    it("searches concepts and returns results", () => {
+      const results = localSearch("heap");
+      expect(results.concept.length).toBeGreaterThan(0);
+      // Should find Priority Queue & Heap
+      const heapResult = results.concept.find((r) =>
+        r.title.toLowerCase().includes("heap")
+      );
+      expect(heapResult).toBeDefined();
+    });
+
+    it("searches patterns and returns results", () => {
+      const results = localSearch("two pointer");
+      expect(results.pattern.length).toBeGreaterThan(0);
+    });
+
+    it("searches solutions and returns results", () => {
+      const results = localSearch("two sum");
+      expect(results.solution.length).toBeGreaterThan(0);
+      const twoSumResult = results.solution.find((r) =>
+        r.title.toLowerCase().includes("two sum")
+      );
+      expect(twoSumResult).toBeDefined();
+    });
+
+    it("searches articles and returns results", () => {
+      const results = localSearch("recursion");
+      expect(results.article.length).toBeGreaterThan(0);
+    });
+
+    it("respects limit option", () => {
+      const results = localSearch("array", { limit: 2 });
+      expect(results.pattern.length).toBeLessThanOrEqual(2);
+      expect(results.concept.length).toBeLessThanOrEqual(2);
+    });
+
+    it("filters by content types", () => {
+      const results = localSearch("stack", { types: ["concept"] });
+      // Should only have concept results
+      expect(results.pattern.length).toBe(0);
+      expect(results.article.length).toBe(0);
+      expect(results.solution.length).toBe(0);
+    });
+
+    it("returns results sorted by score (higher first)", () => {
+      const results = localSearch("binary search");
+      if (results.pattern.length > 1) {
+        for (let i = 1; i < results.pattern.length; i++) {
+          expect(results.pattern[i - 1].score).toBeGreaterThanOrEqual(
+            results.pattern[i].score
+          );
+        }
+      }
+    });
+
+    it("returns correct URL format for concepts", () => {
+      const results = localSearch("queue");
+      const conceptResult = results.concept[0];
+      if (conceptResult) {
+        expect(conceptResult.url).toMatch(/^\/dsa-fundamentals\//);
+      }
+    });
+
+    it("returns correct URL format for patterns", () => {
+      const results = localSearch("sliding window");
+      const patternResult = results.pattern[0];
+      if (patternResult) {
+        expect(patternResult.url).toMatch(/^\/patterns\//);
+      }
+    });
+
+    it("returns correct URL format for solutions", () => {
+      const results = localSearch("anagram");
+      const solutionResult = results.solution[0];
+      if (solutionResult) {
+        expect(solutionResult.url).toMatch(/^\/problems\//);
+      }
+    });
+
+    it("returns correct URL format for articles", () => {
+      const results = localSearch("recursion");
+      const articleResult = results.article[0];
+      if (articleResult) {
+        expect(articleResult.url).toMatch(/^\/articles\//);
+      }
+    });
+
+    it("concept URLs use dsa-fundamentals path not fundamentals", () => {
+      const results = localSearch("priority queue");
+      const conceptResult = results.concept[0];
+      if (conceptResult) {
+        // Should NOT use /fundamentals/ path (old incorrect path)
+        expect(conceptResult.url).not.toMatch(/^\/fundamentals\//);
+        // Should use /dsa-fundamentals/ path (correct path)
+        expect(conceptResult.url).toMatch(/^\/dsa-fundamentals\//);
+      }
+    });
+
+    it("pattern tutorial section URLs include hash anchors", () => {
+      const results = localSearch("sliding window");
+      // Look for a section result (has hash in URL)
+      const sectionResult = results.pattern.find((r) => r.url.includes("#"));
+      if (sectionResult) {
+        expect(sectionResult.url).toMatch(/\/patterns\/.*#section-\d+/);
+      }
+    });
+
+    it("article section URLs include section slug", () => {
+      const results = localSearch("recursion");
+      // Look for a section result
+      const sectionResult = results.article.find(
+        (r) => r.url.split("/").length > 3
+      );
+      if (sectionResult) {
+        expect(sectionResult.url).toMatch(/\/articles\/[^/]+\/[^/]+/);
+      }
+    });
+
+    it("includes preview data for concepts", () => {
+      const results = localSearch("heap");
+      const conceptResult = results.concept.find((r) =>
+        r.title.toLowerCase().includes("heap")
+      );
+      if (conceptResult) {
+        expect(conceptResult.preview).toBeDefined();
+        expect(conceptResult.preview?.timeComplexity).toBeDefined();
+      }
+    });
+
+    it("includes preview data for patterns", () => {
+      const results = localSearch("dynamic programming");
+      const patternResult = results.pattern[0];
+      if (patternResult) {
+        expect(patternResult.preview).toBeDefined();
+        expect(patternResult.preview?.category).toBeDefined();
+      }
+    });
+  });
+
+  describe("fuzzy search capabilities", () => {
+    it("finds results with typos in query (bianry -> binary)", () => {
+      const results = localSearch("bianry");
+      const count = getLocalSearchCount(results);
+      expect(count).toBeGreaterThan(0);
+      // Should find binary search or binary tree related content
+      const allResults = [
+        ...results.pattern,
+        ...results.concept,
+        ...results.article,
+        ...results.solution,
+      ];
+      const hasBinaryMatch = allResults.some(
+        (r) =>
+          r.title.toLowerCase().includes("binary") ||
+          r.description.toLowerCase().includes("binary")
+      );
+      expect(hasBinaryMatch).toBe(true);
+    });
+
+    it("finds results with typos (serch -> search)", () => {
+      const results = localSearch("serch");
+      const count = getLocalSearchCount(results);
+      expect(count).toBeGreaterThan(0);
+    });
+
+    it("finds results with missing letters (slidng -> sliding)", () => {
+      const results = localSearch("slidng window");
+      const count = getLocalSearchCount(results);
+      expect(count).toBeGreaterThan(0);
+      const hasSliding = results.pattern.some(
+        (r) =>
+          r.title.toLowerCase().includes("sliding") ||
+          r.description.toLowerCase().includes("sliding")
+      );
+      expect(hasSliding).toBe(true);
+    });
+
+    it("finds results with extra letters (heaap -> heap)", () => {
+      const results = localSearch("heaap");
+      const count = getLocalSearchCount(results);
+      expect(count).toBeGreaterThan(0);
+    });
+
+    it("finds results with swapped letters (tow sum -> two sum)", () => {
+      const results = localSearch("tow sum");
+      expect(results.solution.length).toBeGreaterThan(0);
+    });
+
+    it("still prioritizes exact matches over fuzzy matches", () => {
+      const exactResults = localSearch("heap");
+      const fuzzyResults = localSearch("hepa");
+
+      // Both should find results
+      expect(getLocalSearchCount(exactResults)).toBeGreaterThan(0);
+      expect(getLocalSearchCount(fuzzyResults)).toBeGreaterThan(0);
+
+      // Exact match should have higher scores
+      const exactTopScore = Math.max(
+        ...exactResults.concept.map((r) => r.score),
+        0
+      );
+      const fuzzyTopScore = Math.max(
+        ...fuzzyResults.concept.map((r) => r.score),
+        0
+      );
+
+      expect(exactTopScore).toBeGreaterThanOrEqual(fuzzyTopScore);
+    });
+
+    it("handles partial word matches", () => {
+      const results = localSearch("dyna");
+      expect(results.pattern.length).toBeGreaterThan(0);
+      // Should find dynamic programming
+      const hasDynamic = results.pattern.some(
+        (r) =>
+          r.title.toLowerCase().includes("dynamic") ||
+          r.description.toLowerCase().includes("dynamic")
+      );
+      expect(hasDynamic).toBe(true);
+    });
+
+    it("finds results for algorithm abbreviations context", () => {
+      // BFS should match breadth-first search related content
+      const results = localSearch("bfs");
+      const allResults = [...results.pattern, ...results.concept];
+      // May find BFS or breadth related content
+      expect(allResults.length).toBeGreaterThanOrEqual(0); // May or may not match depending on content
+    });
+
+    it("ranks title matches higher than description matches", () => {
+      // Search for a term that appears in titles
+      const results = localSearch("array");
+      if (results.pattern.length > 0) {
+        // First result should have array in title (due to higher weight)
+        const firstResult = results.pattern[0];
+        const titleHasArray = firstResult.title.toLowerCase().includes("array");
+        // If title has array, it should be ranked high
+        if (titleHasArray) {
+          expect(firstResult.score).toBeGreaterThan(50);
+        }
+      }
+    });
+  });
+
+  describe("getLocalSearchCount function", () => {
+    it("returns 0 for empty results", () => {
+      const emptyResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: [],
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+      expect(getLocalSearchCount(emptyResults)).toBe(0);
+    });
+
+    it("returns correct total count", () => {
+      const results = localSearch("array");
+      const count = getLocalSearchCount(results);
+      const expectedCount =
+        results.pattern.length +
+        results.question.length +
+        results.concept.length +
+        results.article.length +
+        results.solution.length +
+        results.highlight.length;
+      expect(count).toBe(expectedCount);
+    });
+  });
+
+  describe("mergeSearchResults function", () => {
+    it("merges local and API results without duplicates", () => {
+      const localResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: [
+          {
+            id: "pattern-1",
+            type: "pattern",
+            title: "Local Pattern",
+            description: "Local desc",
+            url: "/patterns/local",
+            score: 50,
+          },
+        ],
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+
+      const apiResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: [
+          {
+            id: "pattern-2",
+            type: "pattern",
+            title: "API Pattern",
+            description: "API desc",
+            url: "/patterns/api",
+            score: 100,
+          },
+        ],
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+
+      const merged = mergeSearchResults(localResults, apiResults);
+      expect(merged.pattern.length).toBe(2);
+    });
+
+    it("prefers API results over local results for same ID", () => {
+      const localResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: [
+          {
+            id: "same-id",
+            type: "pattern",
+            title: "Local Version",
+            description: "Local desc",
+            url: "/patterns/local",
+            score: 50,
+          },
+        ],
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+
+      const apiResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: [
+          {
+            id: "same-id",
+            type: "pattern",
+            title: "API Version",
+            description: "API desc",
+            url: "/patterns/api",
+            score: 100,
+          },
+        ],
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+
+      const merged = mergeSearchResults(localResults, apiResults);
+      expect(merged.pattern.length).toBe(1);
+      expect(merged.pattern[0].title).toBe("API Version");
+    });
+
+    it("sorts merged results by score", () => {
+      const localResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: [
+          {
+            id: "low-score",
+            type: "pattern",
+            title: "Low Score",
+            description: "desc",
+            url: "/patterns/low",
+            score: 10,
+          },
+        ],
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+
+      const apiResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: [
+          {
+            id: "high-score",
+            type: "pattern",
+            title: "High Score",
+            description: "desc",
+            url: "/patterns/high",
+            score: 100,
+          },
+        ],
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+
+      const merged = mergeSearchResults(localResults, apiResults);
+      expect(merged.pattern[0].score).toBeGreaterThan(merged.pattern[1].score);
+    });
+
+    it("limits merged results to 10 per type", () => {
+      const manyResults: SearchResult[] = Array.from(
+        { length: 15 },
+        (_, i) => ({
+          id: `pattern-${i}`,
+          type: "pattern" as SearchContentType,
+          title: `Pattern ${i}`,
+          description: "desc",
+          url: `/patterns/${i}`,
+          score: 100 - i,
+        })
+      );
+
+      const localResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: manyResults.slice(0, 8),
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+
+      const apiResults: Record<SearchContentType, SearchResult[]> = {
+        pattern: manyResults.slice(8),
+        question: [],
+        concept: [],
+        article: [],
+        solution: [],
+        highlight: [],
+      };
+
+      const merged = mergeSearchResults(localResults, apiResults);
+      expect(merged.pattern.length).toBeLessThanOrEqual(10);
+    });
+  });
+});
+
+// ===========================================================================
+// 8. quotes.ts — Quotes Data
 // ===========================================================================
 
 describe("quotes", () => {

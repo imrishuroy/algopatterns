@@ -27,7 +27,9 @@ export function QuickActions({
   onHintUsed,
   onResult,
 }: QuickActionsProps) {
-  const [loading, setLoading] = useState<"hint" | "review" | "explain" | null>(null);
+  const [loading, setLoading] = useState<"hint" | "review" | "explain" | null>(
+    null
+  );
 
   const getHint = async () => {
     if (!code.trim()) return;
@@ -103,7 +105,12 @@ export function QuickActions({
         {loading === "hint" ? (
           <Spinner />
         ) : (
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -123,7 +130,12 @@ export function QuickActions({
         {loading === "review" ? (
           <Spinner />
         ) : (
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -144,7 +156,12 @@ export function QuickActions({
           {loading === "explain" ? (
             <Spinner />
           ) : (
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

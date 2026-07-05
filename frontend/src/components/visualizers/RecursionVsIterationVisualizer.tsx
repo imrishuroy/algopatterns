@@ -52,7 +52,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 
 export default function RecursionVsIterationVisualizer() {
   const [input, setInput] = useState(5);
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [recursionStep, setRecursionStep] = useState(0);
   const [iterationStep, setIterationStep] = useState(0);
   const [speed, setSpeed] = useState(800);

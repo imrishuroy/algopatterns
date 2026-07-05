@@ -71,62 +71,46 @@ const mockFreePlan: Plan = {
 describe("PricingCard", () => {
   describe("plan display", () => {
     it("should display plan name", () => {
-      render(
-        <PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("Pro Monthly")).toBeInTheDocument();
     });
 
     it("should display formatted price for INR", () => {
-      render(
-        <PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("₹299")).toBeInTheDocument();
     });
 
     it("should display monthly billing label", () => {
-      render(
-        <PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("/month")).toBeInTheDocument();
     });
 
     it("should display yearly billing label", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("/year")).toBeInTheDocument();
     });
 
     it("should display one-time billing label for lifetime", () => {
-      render(
-        <PricingCard plan={mockLifetimePlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockLifetimePlan} onSelect={vi.fn()} />);
       expect(screen.getByText(/one-time/)).toBeInTheDocument();
     });
   });
 
   describe("original price and savings", () => {
     it("should display strikethrough original price", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
       const strikethroughPrice = screen.getByText("₹3,588");
       expect(strikethroughPrice).toBeInTheDocument();
       expect(strikethroughPrice).toHaveClass("line-through");
     });
 
     it("should display savings percentage badge", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("Save 67%")).toBeInTheDocument();
     });
 
     it("should not display original price if not provided", () => {
-      render(
-        <PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />);
       const strikethroughElements = document.querySelectorAll(".line-through");
       expect(strikethroughElements.length).toBe(0);
     });
@@ -134,53 +118,39 @@ describe("PricingCard", () => {
 
   describe("recommended badge", () => {
     it("should display Most Popular badge for recommended plan", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("Most Popular")).toBeInTheDocument();
     });
 
     it("should not display badge for non-recommended plan", () => {
-      render(
-        <PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockMonthlyPlan} onSelect={vi.fn()} />);
       expect(screen.queryByText("Most Popular")).not.toBeInTheDocument();
     });
   });
 
   describe("features list", () => {
     it("should display unlimited patterns for pro plan", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("All patterns")).toBeInTheDocument();
     });
 
     it("should display limited patterns for free plan", () => {
-      render(
-        <PricingCard plan={mockFreePlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockFreePlan} onSelect={vi.fn()} />);
       expect(screen.getByText("3 patterns")).toBeInTheDocument();
     });
 
     it("should display unlimited visualizers for pro plan", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("All visualizers")).toBeInTheDocument();
     });
 
     it("should display limited visualizers for free plan", () => {
-      render(
-        <PricingCard plan={mockFreePlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockFreePlan} onSelect={vi.fn()} />);
       expect(screen.getByText("2 visualizers")).toBeInTheDocument();
     });
 
     it("should display feature items with checkmarks for included features", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("Quiz history")).toBeInTheDocument();
       expect(screen.getByText("Code playground")).toBeInTheDocument();
       expect(screen.getByText("Progress sync")).toBeInTheDocument();
@@ -191,26 +161,24 @@ describe("PricingCard", () => {
 
   describe("lifetime plan", () => {
     it("should display future updates message for lifetime plan", () => {
-      render(
-        <PricingCard plan={mockLifetimePlan} onSelect={vi.fn()} />
-      );
-      expect(screen.getByText("All future updates included")).toBeInTheDocument();
+      render(<PricingCard plan={mockLifetimePlan} onSelect={vi.fn()} />);
+      expect(
+        screen.getByText("All future updates included")
+      ).toBeInTheDocument();
     });
 
     it("should display future updates message for all paid plans", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
-      expect(screen.getByText("All future updates included")).toBeInTheDocument();
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
+      expect(
+        screen.getByText("All future updates included")
+      ).toBeInTheDocument();
     });
   });
 
   describe("button interactions", () => {
     it("should call onSelect when button is clicked", () => {
       const onSelect = vi.fn();
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={onSelect} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={onSelect} />);
 
       fireEvent.click(screen.getByText("Upgrade Now"));
       expect(onSelect).toHaveBeenCalledWith(mockYearlyPlan);
@@ -254,16 +222,12 @@ describe("PricingCard", () => {
     });
 
     it("should display Get Started for free plan", () => {
-      render(
-        <PricingCard plan={mockFreePlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockFreePlan} onSelect={vi.fn()} />);
       expect(screen.getByText("Get Started")).toBeInTheDocument();
     });
 
     it("should display Upgrade Now for paid plans", () => {
-      render(
-        <PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />
-      );
+      render(<PricingCard plan={mockYearlyPlan} onSelect={vi.fn()} />);
       expect(screen.getByText("Upgrade Now")).toBeInTheDocument();
     });
   });

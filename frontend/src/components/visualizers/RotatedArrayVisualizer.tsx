@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion } from "framer-motion";
 
 interface Step {
@@ -36,7 +42,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 export default function RotatedArrayVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(900);
   const [nums] = useState([4, 5, 6, 7, 0, 1, 2]);
   const [target] = useState(0);
@@ -262,7 +271,10 @@ export default function RotatedArrayVisualizer() {
               const inRange = isInSearchRange(idx);
 
               return (
-                <div key={`num-${num}-${idx}`} className="flex flex-col items-center">
+                <div
+                  key={`num-${num}-${idx}`}
+                  className="flex flex-col items-center"
+                >
                   <motion.div
                     animate={{
                       backgroundColor: isFound

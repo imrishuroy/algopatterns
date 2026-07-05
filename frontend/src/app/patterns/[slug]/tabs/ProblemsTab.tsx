@@ -45,7 +45,9 @@ export default function ProblemsTab({
   const [sortBy, setSortBy] = useState<SortOption>("difficulty");
   // Restore scroll position when returning from problem page
   useEffect(() => {
-    const savedScroll = sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${patternId}`);
+    const savedScroll = sessionStorage.getItem(
+      `${SCROLL_STORAGE_KEY}_${patternId}`
+    );
     if (savedScroll) {
       const scrollTop = parseInt(savedScroll, 10);
       // Use requestAnimationFrame to ensure DOM is ready
@@ -58,7 +60,10 @@ export default function ProblemsTab({
 
   // Save scroll position before navigating to problem
   const saveScrollPosition = () => {
-    sessionStorage.setItem(`${SCROLL_STORAGE_KEY}_${patternId}`, window.scrollY.toString());
+    sessionStorage.setItem(
+      `${SCROLL_STORAGE_KEY}_${patternId}`,
+      window.scrollY.toString()
+    );
   };
 
   const filteredAndSorted = useMemo(() => {

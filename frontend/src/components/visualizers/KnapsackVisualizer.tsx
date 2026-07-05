@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useReducer, useMemo, startTransition } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  useMemo,
+  startTransition,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Item {
@@ -39,62 +46,65 @@ const items: Item[] = [
 ];
 
 function generateSteps() {
-    const n = items.length;
-    const steps: {
-      i: number;
-      j: number;
-      value: number;
-      take: boolean;
-      skipValue: number;
-      takeValue: number;
-      formula: string;
-    }[] = [];
+  const n = items.length;
+  const steps: {
+    i: number;
+    j: number;
+    value: number;
+    take: boolean;
+    skipValue: number;
+    takeValue: number;
+    formula: string;
+  }[] = [];
 
-    const dp: number[][] = Array(n + 1)
-      .fill(null)
-      .map(() => Array(capacity + 1).fill(0));
+  const dp: number[][] = Array(n + 1)
+    .fill(null)
+    .map(() => Array(capacity + 1).fill(0));
 
-    for (let i = 1; i <= n; i++) {
-      for (let w = 0; w <= capacity; w++) {
-        const item = items[i - 1];
-        const skipValue = dp[i - 1][w];
+  for (let i = 1; i <= n; i++) {
+    for (let w = 0; w <= capacity; w++) {
+      const item = items[i - 1];
+      const skipValue = dp[i - 1][w];
 
-        if (item.weight <= w) {
-          const takeValue = dp[i - 1][w - item.weight] + item.value;
-          const take = takeValue > skipValue;
-          dp[i][w] = Math.max(skipValue, takeValue);
+      if (item.weight <= w) {
+        const takeValue = dp[i - 1][w - item.weight] + item.value;
+        const take = takeValue > skipValue;
+        dp[i][w] = Math.max(skipValue, takeValue);
 
-          steps.push({
-            i,
-            j: w,
-            value: dp[i][w],
-            take,
-            skipValue,
-            takeValue,
-            formula: take
-              ? `TAKE ${item.name}: ${takeValue} > ${skipValue}`
-              : `SKIP ${item.name}: ${skipValue} ≥ ${takeValue}`,
-          });
-        } else {
-          dp[i][w] = skipValue;
-          steps.push({
-            i,
-            j: w,
-            value: dp[i][w],
-            take: false,
-            skipValue,
-            takeValue: 0,
-            formula: `Can't fit ${item.name} (weight ${item.weight} > capacity ${w})`,
-          });
-        }
+        steps.push({
+          i,
+          j: w,
+          value: dp[i][w],
+          take,
+          skipValue,
+          takeValue,
+          formula: take
+            ? `TAKE ${item.name}: ${takeValue} > ${skipValue}`
+            : `SKIP ${item.name}: ${skipValue} ≥ ${takeValue}`,
+        });
+      } else {
+        dp[i][w] = skipValue;
+        steps.push({
+          i,
+          j: w,
+          value: dp[i][w],
+          take: false,
+          skipValue,
+          takeValue: 0,
+          formula: `Can't fit ${item.name} (weight ${item.weight} > capacity ${w})`,
+        });
       }
     }
-
-    return { steps, dp };
   }
 
+  return { steps, dp };
+}
+
 export default function KnapsackVisualizer() {
-  const [{ step, isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ step, isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(600);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
   const [dpTable, setDpTable] = useState<number[][]>([]);
@@ -400,7 +410,10 @@ export default function KnapsackVisualizer() {
 
             {/* Rows */}
             {Array.from({ length: items.length + 1 }).map((_, i) => (
-              <div key={`row-${i === 0 ? 'empty' : items[i - 1].name}-${i}`} className="flex">
+              <div
+                key={`row-${i === 0 ? "empty" : items[i - 1].name}-${i}`}
+                className="flex"
+              >
                 <div className="w-20 h-12 flex items-center justify-center text-gray-400 text-sm">
                   {i === 0 ? "∅" : items[i - 1].name}
                 </div>

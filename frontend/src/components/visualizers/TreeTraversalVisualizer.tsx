@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion } from "framer-motion";
 
 interface TreeNode {
@@ -48,7 +54,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 export default function TreeTraversalVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(800);
   const [traversalType, setTraversalType] = useState<TraversalType>("preorder");
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);

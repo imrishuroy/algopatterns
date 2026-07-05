@@ -517,7 +517,7 @@ export default function StepByStepExecutor({
                   const isActive = lineNum === step.lineNumber;
                   return (
                     <div
-                      key={`line-${lineNum}-${line.slice(0, 20).replace(/\s+/g, '')}`}
+                      key={`line-${lineNum}-${line.slice(0, 20).replace(/\s+/g, "")}`}
                       className={`flex transition-all duration-200 ${
                         isActive ? "bg-yellow-500/20 -mx-4 px-4 rounded-md" : ""
                       }`}

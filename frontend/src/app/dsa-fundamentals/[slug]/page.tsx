@@ -70,7 +70,7 @@ export const generateMetadata = async ({
       canonical: `${siteUrl}/dsa-fundamentals/${slug}`,
     },
   };
-}
+};
 
 interface PageProps {
   params: Promise<{ slug: string }>;

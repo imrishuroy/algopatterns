@@ -80,12 +80,30 @@ export default function PatternsPage() {
           >
             DSA Algorithm Patterns
           </h1>
-          <p className="text-sm md:text-base" style={{ color: "var(--text-2)" }}>
+          <p
+            className="text-sm md:text-base"
+            style={{ color: "var(--text-2)" }}
+          >
             {patterns.length} patterns — master them to solve any coding
             interview problem
           </p>
         </div>
-        <Suspense fallback={<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{patterns.slice(0, 6).map((p) => (<div key={p.id} className="h-40 animate-pulse" style={{ background: "var(--bg-surface)", borderRadius: "var(--radius-xl)" }} />))}</div>}>
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {patterns.slice(0, 6).map((p) => (
+                <div
+                  key={p.id}
+                  className="h-40 animate-pulse"
+                  style={{
+                    background: "var(--bg-surface)",
+                    borderRadius: "var(--radius-xl)",
+                  }}
+                />
+              ))}
+            </div>
+          }
+        >
           <PatternsListClient patterns={patterns} />
         </Suspense>
       </div>

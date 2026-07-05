@@ -88,14 +88,26 @@ export default function AccountPage() {
             href="/"
             className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             <span>Back to Dashboard</span>
           </Link>
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">Account Settings</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">
+          Account Settings
+        </h1>
 
         {/* Profile Section */}
         <section className="bg-gray-900 border border-gray-800 rounded-md p-6 mb-6">
@@ -103,7 +115,9 @@ export default function AccountPage() {
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-gray-800 gap-1">
               <span className="text-gray-400">Name</span>
-              <span className="text-white break-all">{user?.name || "Not set"}</span>
+              <span className="text-white break-all">
+                {user?.name || "Not set"}
+              </span>
             </div>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-gray-800 gap-1">
               <span className="text-gray-400">Email</span>
@@ -234,7 +248,9 @@ export default function AccountPage() {
             />
             <FeatureItem
               label="Solutions Access"
-              value={features.has_solutions_access ? "Enabled" : "Not available"}
+              value={
+                features.has_solutions_access ? "Enabled" : "Not available"
+              }
               enabled={features.has_solutions_access}
             />
             <FeatureItem

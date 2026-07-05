@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Phase = "tree" | "memo" | "table" | "optimized";
@@ -9,7 +15,12 @@ const houses = [2, 7, 9, 3, 1];
 
 const generateTableSteps = () => {
   const n = houses.length;
-  const steps: { i: number; value: number; formula: string; robOrSkip: string }[] = [];
+  const steps: {
+    i: number;
+    value: number;
+    formula: string;
+    robOrSkip: string;
+  }[] = [];
 
   if (n === 0) return steps;
 
@@ -51,7 +62,13 @@ const generateTableSteps = () => {
 
 const generateOptimizedSteps = () => {
   const n = houses.length;
-  const steps: { i: number; prev2: number; prev1: number; curr?: number; formula: string }[] = [];
+  const steps: {
+    i: number;
+    prev2: number;
+    prev1: number;
+    curr?: number;
+    formula: string;
+  }[] = [];
 
   if (n === 0) return steps;
 
@@ -112,8 +129,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Back"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
 
@@ -135,7 +162,11 @@ const Controls = ({
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-green-600/20"
           title="Play"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -147,8 +178,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Forward"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
 
@@ -157,15 +198,27 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-all ml-2"
         title="Reset"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </button>
     </div>
 
     <div className="flex items-center justify-center gap-4">
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Speed</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Speed
+        </span>
         <div className="flex gap-1">
           {[
             { value: 1000, label: "0.5x" },
@@ -188,7 +241,9 @@ const Controls = ({
       </div>
 
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Step</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Step
+        </span>
         <span className="text-sm font-mono text-white">
           {step} <span className="text-gray-500">/</span> {total}
         </span>
@@ -197,17 +252,26 @@ const Controls = ({
   </div>
 );
 
-const HousesDisplay = ({ highlightIndex, robbed }: { highlightIndex?: number; robbed?: Set<number> }) => (
+const HousesDisplay = ({
+  highlightIndex,
+  robbed,
+}: {
+  highlightIndex?: number;
+  robbed?: Set<number>;
+}) => (
   <div className="flex justify-center gap-2 mb-4">
     {houses.map((value, houseIndex) => (
-      <div key={`house-${value}-${houseIndex}`} className="flex flex-col items-center">
+      <div
+        key={`house-${value}-${houseIndex}`}
+        className="flex flex-col items-center"
+      >
         <div
           className={`w-14 h-12 flex items-center justify-center rounded-t-lg border-2 transition-all ${
             highlightIndex === houseIndex
               ? "bg-blue-600 border-blue-400"
               : robbed?.has(houseIndex)
-              ? "bg-green-600 border-green-400"
-              : "bg-gray-800 border-gray-600"
+                ? "bg-green-600 border-green-400"
+                : "bg-gray-800 border-gray-600"
           }`}
         >
           <span className="text-lg font-bold text-white">${value}</span>
@@ -229,12 +293,16 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
       <div className="bg-gray-800/30 rounded-lg p-6 w-full">
         <div className="text-center mb-4">
-          <div className="text-sm text-gray-400 mb-2">Decision at house {currentIndex}:</div>
+          <div className="text-sm text-gray-400 mb-2">
+            Decision at house {currentIndex}:
+          </div>
           <div className="flex justify-center gap-8">
             <div className="flex flex-col items-center">
               <div className="w-20 h-20 rounded-lg bg-green-600/30 border-2 border-green-500 flex flex-col items-center justify-center">
                 <span className="text-xs text-green-400">ROB</span>
-                <span className="text-lg font-bold text-green-300">${houses[currentIndex]}</span>
+                <span className="text-lg font-bold text-green-300">
+                  ${houses[currentIndex]}
+                </span>
               </div>
               <span className="text-xs text-gray-500 mt-2">+ skip to i+2</span>
             </div>
@@ -250,13 +318,15 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
         </div>
 
         <div className="text-center text-sm text-gray-400 bg-gray-800/50 px-4 py-2 rounded-lg font-mono mt-4">
-          rob({currentIndex}) = max(${houses[currentIndex]} + rob({currentIndex + 2}), rob({currentIndex + 1}))
+          rob({currentIndex}) = max(${houses[currentIndex]} + rob(
+          {currentIndex + 2}), rob({currentIndex + 1}))
         </div>
       </div>
 
       <div className="flex gap-6 text-sm text-gray-400">
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-green-500 rounded-full" /> rob (take value)
+          <span className="w-3 h-3 bg-green-500 rounded-full" /> rob (take
+          value)
         </span>
         <span className="flex items-center gap-2">
           <span className="w-3 h-3 bg-red-500 rounded-full" /> skip (take 0)
@@ -271,7 +341,13 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
   );
 };
 
-const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType<typeof generateTableSteps> }) => {
+const TablePhase = ({
+  step,
+  tableSteps,
+}: {
+  step: number;
+  tableSteps: ReturnType<typeof generateTableSteps>;
+}) => {
   const currentDp = useMemo(() => {
     const dp: (number | null)[] = Array(houses.length).fill(null);
     for (let s = 0; s < Math.min(step, tableSteps.length); s++) {
@@ -281,7 +357,8 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
     return dp;
   }, [step, tableSteps]);
 
-  const currentStep = step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
   const robbedHouses = useMemo(() => {
     const robbed = new Set<number>();
     if (currentStep) {
@@ -299,7 +376,9 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
       <HousesDisplay highlightIndex={currentStep?.i} robbed={robbedHouses} />
 
       <div className="text-center">
-        <div className="text-sm text-gray-500 mb-3">dp[] array (max money up to house i)</div>
+        <div className="text-sm text-gray-500 mb-3">
+          dp[] array (max money up to house i)
+        </div>
         <div className="flex gap-2 justify-center">
           {Array.from({ length: houses.length }, (_, i) => {
             const isCurrent = currentStep && currentStep.i === i;
@@ -312,8 +391,8 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
                     isCurrent
                       ? "bg-blue-600 border-blue-400 text-white font-bold"
                       : value !== null
-                      ? "bg-gray-800 border-gray-600 text-gray-300"
-                      : "bg-gray-900/50 border-gray-700 text-gray-600"
+                        ? "bg-gray-800 border-gray-600 text-gray-300"
+                        : "bg-gray-900/50 border-gray-700 text-gray-600"
                   }`}
                 >
                   {value !== null ? value : "?"}
@@ -337,15 +416,24 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: ReturnType
   );
 };
 
-const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps: ReturnType<typeof generateOptimizedSteps> }) => {
-  const currentStep = step > 0 && step <= optimizedSteps.length ? optimizedSteps[step - 1] : null;
+const OptimizedPhase = ({
+  step,
+  optimizedSteps,
+}: {
+  step: number;
+  optimizedSteps: ReturnType<typeof generateOptimizedSteps>;
+}) => {
+  const currentStep =
+    step > 0 && step <= optimizedSteps.length ? optimizedSteps[step - 1] : null;
 
   return (
     <div className="flex flex-col items-center gap-6">
       <HousesDisplay highlightIndex={currentStep?.i} />
 
       <div className="text-center">
-        <div className="text-sm text-gray-500 mb-4">Only 2 variables needed</div>
+        <div className="text-sm text-gray-500 mb-4">
+          Only 2 variables needed
+        </div>
         <div className="flex gap-8 justify-center">
           <div className="flex flex-col items-center">
             <div className="text-xs text-gray-500 mb-2">prev2</div>
@@ -375,7 +463,8 @@ const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps
 
       {currentStep && (
         <div className="text-base text-gray-400 text-center font-mono bg-gray-800/50 px-6 py-3 rounded-lg">
-          {currentStep.i > 0 ? `i = ${currentStep.i}: ` : ""}{currentStep.formula}
+          {currentStep.i > 0 ? `i = ${currentStep.i}: ` : ""}
+          {currentStep.formula}
         </div>
       )}
 
@@ -386,7 +475,8 @@ const OptimizedPhase = ({ step, optimizedSteps }: { step: number; optimizedSteps
   );
 };
 
-export default function HouseRobberVisualizer() { // skipcq: JS-0067
+export default function HouseRobberVisualizer() {
+  // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "optimized"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Decision Tree",
@@ -457,9 +547,11 @@ export default function HouseRobberVisualizer() { // skipcq: JS-0067
               }`}
             >
               <span className="flex items-center gap-2">
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
-                  currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
-                }`}>
+                <span
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
+                    currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
+                  }`}
+                >
                   {index + 1}
                 </span>
                 {phaseLabels[phase]}
@@ -494,15 +586,22 @@ export default function HouseRobberVisualizer() { // skipcq: JS-0067
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {currentPhase === "tree" && <TreePhase step={step} showMemo={false} />}
+          {currentPhase === "tree" && (
+            <TreePhase step={step} showMemo={false} />
+          )}
           {currentPhase === "memo" && <TreePhase step={step} showMemo />}
-          {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
-          {currentPhase === "optimized" && <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />}
+          {currentPhase === "table" && (
+            <TablePhase step={step} tableSteps={tableSteps} />
+          )}
+          {currentPhase === "optimized" && (
+            <OptimizedPhase step={step} optimizedSteps={optimizedSteps} />
+          )}
         </motion.div>
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        houses = [{houses.join(", ")}] | f(i) = max(nums[i] + f(i-2), f(i-1)) | Answer: 12
+        houses = [{houses.join(", ")}] | f(i) = max(nums[i] + f(i-2), f(i-1)) |
+        Answer: 12
       </div>
     </div>
   );

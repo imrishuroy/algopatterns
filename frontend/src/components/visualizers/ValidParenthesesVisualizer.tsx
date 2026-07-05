@@ -13,7 +13,10 @@ export default function ValidParenthesesVisualizer() {
   const [message, setMessage] = useState("Click Play to validate parentheses");
 
   const input = "([{}])";
-  const pairs: Record<string, string> = useMemo(() => ({ ")": "(", "]": "[", "}": "{" }), []);
+  const pairs: Record<string, string> = useMemo(
+    () => ({ ")": "(", "]": "[", "}": "{" }),
+    []
+  );
 
   const reset = useCallback(() => {
     setCurrentIdx(-1);

@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion } from "framer-motion";
 
 type CellState = "water" | "land" | "visiting" | "visited";
@@ -53,7 +59,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 
 export default function GridBFSVisualizer() {
   const [mode, setMode] = useState<Mode>("bfs");
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(300);
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [queue, setQueue] = useState<[number, number][]>([]);
@@ -92,23 +101,26 @@ export default function GridBFSVisualizer() {
     });
   }, [initGrid]);
 
-  const getNeighbors = useCallback((r: number, c: number): [number, number][] => {
-    const dirs = [
-      [0, 1],
-      [0, -1],
-      [1, 0],
-      [-1, 0],
-    ];
-    const neighbors: [number, number][] = [];
-    for (const [dr, dc] of dirs) {
-      const nr = r + dr;
-      const nc = c + dc;
-      if (nr >= 0 && nr < grid.length && nc >= 0 && nc < grid[0].length) {
-        neighbors.push([nr, nc]);
+  const getNeighbors = useCallback(
+    (r: number, c: number): [number, number][] => {
+      const dirs = [
+        [0, 1],
+        [0, -1],
+        [1, 0],
+        [-1, 0],
+      ];
+      const neighbors: [number, number][] = [];
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr >= 0 && nr < grid.length && nc >= 0 && nc < grid[0].length) {
+          neighbors.push([nr, nc]);
+        }
       }
-    }
-    return neighbors;
-  }, [grid]);
+      return neighbors;
+    },
+    [grid]
+  );
 
   useEffect(() => {
     if (!isPlaying || grid.length === 0) return;
@@ -313,7 +325,7 @@ export default function GridBFSVisualizer() {
           <div className="inline-block p-4 bg-gray-800/50 rounded-md">
             {grid.map((row, rowIndex) => (
               <div
-                key={`row${rowIndex}-${row.map(c => c.state).join('')}`} // skipcq: JS-0437
+                key={`row${rowIndex}-${row.map((c) => c.state).join("")}`} // skipcq: JS-0437
                 className="flex gap-1 mb-1"
               >
                 {row.map((cell) => (

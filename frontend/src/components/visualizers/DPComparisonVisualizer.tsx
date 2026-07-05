@@ -298,7 +298,7 @@ export default function DPComparisonVisualizer() {
               <div className="flex flex-wrap gap-1">
                 {Array.from({ length: n + 1 }).map((_, i) => (
                   <motion.div
-                    key={`memo-${i}-${memoCache.get(i) ?? 'empty'}`}
+                    key={`memo-${i}-${memoCache.get(i) ?? "empty"}`}
                     animate={{
                       scale: memoCache.has(i) ? 1 : 0.8,
                       opacity: memoCache.has(i) ? 1 : 0.3,
@@ -354,7 +354,7 @@ export default function DPComparisonVisualizer() {
               <div className="flex gap-1">
                 {tabArray.map((val, i) => (
                   <motion.div
-                    key={`tab-${i}-${val ?? 'null'}`}
+                    key={`tab-${i}-${val ?? "null"}`}
                     animate={{
                       scale: i === tabIndex - 1 ? 1.2 : 1,
                       backgroundColor:

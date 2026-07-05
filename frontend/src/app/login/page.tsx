@@ -8,7 +8,12 @@ import { GoogleButton } from "@/components/ui/GoogleButton";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, loginWithGoogle, isAuthenticated, isLoading: authLoading } = useAuth();
+  const {
+    login,
+    loginWithGoogle,
+    isAuthenticated,
+    isLoading: authLoading,
+  } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -71,10 +76,15 @@ export default function LoginPage() {
             </div>
           )}
 
-          <GoogleButton onClick={handleGoogleLogin} isLoading={isGoogleLoading} />
+          <GoogleButton
+            onClick={handleGoogleLogin}
+            isLoading={isGoogleLoading}
+          />
 
           <div className="my-6 flex justify-center">
-            <span className="text-sm text-gray-400">or continue with email</span>
+            <span className="text-sm text-gray-400">
+              or continue with email
+            </span>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

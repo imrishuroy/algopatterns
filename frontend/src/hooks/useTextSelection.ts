@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback, startTransition, type RefObject } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  startTransition,
+  type RefObject,
+} from "react";
 
 export interface SelectionInfo {
   text: string;
@@ -50,7 +56,8 @@ export function useTextSelection(
         const range = sel.getRangeAt(0);
 
         // Check if selection is within or overlaps with container
-        const selectionInContainer = container.contains(range.commonAncestorContainer) ||
+        const selectionInContainer =
+          container.contains(range.commonAncestorContainer) ||
           container.contains(range.startContainer) ||
           container.contains(range.endContainer);
 

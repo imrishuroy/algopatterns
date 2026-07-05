@@ -130,29 +130,26 @@ export default function DSAFundamentalsClient({
                 className="flex rounded-md p-1"
                 style={{ background: "var(--bg-elevated)" }}
               >
-                {(
-                  Object.keys(languageLabels) as SupportedLanguage[]
-                ).map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => setLanguage(lang)}
-                    className={`px-3 py-1.5 text-sm rounded-md transition-all ${
-                      language === lang
-                        ? "text-white"
-                        : "hover:opacity-80"
-                    }`}
-                    style={{
-                      background:
-                        language === lang
-                          ? "var(--accent-gradient)"
-                          : "transparent",
-                      color:
-                        language === lang ? "white" : "var(--text-2)",
-                    }}
-                  >
-                    {languageLabels[lang]}
-                  </button>
-                ))}
+                {(Object.keys(languageLabels) as SupportedLanguage[]).map(
+                  (lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setLanguage(lang)}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-all ${
+                        language === lang ? "text-white" : "hover:opacity-80"
+                      }`}
+                      style={{
+                        background:
+                          language === lang
+                            ? "var(--accent-gradient)"
+                            : "transparent",
+                        color: language === lang ? "white" : "var(--text-2)",
+                      }}
+                    >
+                      {languageLabels[lang]}
+                    </button>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -214,10 +211,7 @@ export default function DSAFundamentalsClient({
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {filteredConcepts.length === 0 ? (
-          <div
-            className="text-center py-16"
-            style={{ color: "var(--text-3)" }}
-          >
+          <div className="text-center py-16" style={{ color: "var(--text-3)" }}>
             <p className="text-lg">No concepts found matching your criteria.</p>
             <button
               onClick={() => {
@@ -293,7 +287,8 @@ function ConceptCard({ concept }: { concept: Concept }) {
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = "var(--border-2)";
-          e.currentTarget.style.boxShadow = "var(--shadow-lg), var(--shadow-glow)";
+          e.currentTarget.style.boxShadow =
+            "var(--shadow-lg), var(--shadow-glow)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.borderColor = "var(--border-1)";

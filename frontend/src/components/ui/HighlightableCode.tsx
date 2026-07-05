@@ -115,11 +115,17 @@ export function HighlightableCode({
           10,
           Math.min(
             containerRect.width - 180,
-            selection.rect.left - containerRect.left + selection.rect.width / 2 - 80
+            selection.rect.left -
+              containerRect.left +
+              selection.rect.width / 2 -
+              80
           )
         ),
       };
-      console.log("[Highlight] Selection detected:", selection.text.substring(0, 50));
+      console.log(
+        "[Highlight] Selection detected:",
+        selection.text.substring(0, 50)
+      );
       console.log("[Highlight] Toolbar position:", newPosition);
       setToolbarPosition(newPosition);
       setActiveHighlight(null);

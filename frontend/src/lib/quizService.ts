@@ -8,7 +8,7 @@ import type {
   CompleteAttemptResponse,
   AttemptHistoryResponse,
   QuizAttempt,
-} from '@/types/quiz';
+} from "@/types/quiz";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,16 +28,16 @@ async function fetchApi<T>(
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options.headers,
     },
-    credentials: 'include',
+    credentials: "include",
   });
 
   const json: ApiResponse<T> = await response.json();
 
   if (!response.ok || !json.success) {
-    throw new Error(json.error?.message || 'Request failed');
+    throw new Error(json.error?.message || "Request failed");
   }
 
   return json.data as T;
@@ -50,16 +50,16 @@ export const quizService = {
   ): Promise<GetQuestionsResponse> {
     const params = new URLSearchParams();
     if (sectionSlug) {
-      params.set('section', sectionSlug);
+      params.set("section", sectionSlug);
     }
     const query = params.toString();
-    const endpoint = `/api/v1/quiz/questions/${patternId}${query ? `?${query}` : ''}`;
+    const endpoint = `/api/v1/quiz/questions/${patternId}${query ? `?${query}` : ""}`;
     return fetchApi<GetQuestionsResponse>(endpoint);
   },
 
   startAttempt(req: StartAttemptRequest): Promise<StartAttemptResponse> {
-    return fetchApi<StartAttemptResponse>('/api/v1/quiz/attempts', {
-      method: 'POST',
+    return fetchApi<StartAttemptResponse>("/api/v1/quiz/attempts", {
+      method: "POST",
       body: JSON.stringify(req),
     });
   },
@@ -71,7 +71,7 @@ export const quizService = {
     return fetchApi<SubmitResponseResponse>(
       `/api/v1/quiz/attempts/${attemptId}/responses`,
       {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(req),
       }
     );
@@ -84,7 +84,7 @@ export const quizService = {
     return fetchApi<CompleteAttemptResponse>(
       `/api/v1/quiz/attempts/${attemptId}/complete`,
       {
-        method: 'PATCH',
+        method: "PATCH",
         body: JSON.stringify(req),
       }
     );
@@ -101,14 +101,14 @@ export const quizService = {
     cursor?: string
   ): Promise<AttemptHistoryResponse> {
     const params = new URLSearchParams();
-    if (patternId) params.set('pattern_id', patternId);
-    if (sectionSlug) params.set('section_slug', sectionSlug);
-    if (limit) params.set('limit', String(limit));
-    if (cursor) params.set('cursor', cursor);
+    if (patternId) params.set("pattern_id", patternId);
+    if (sectionSlug) params.set("section_slug", sectionSlug);
+    if (limit) params.set("limit", String(limit));
+    if (cursor) params.set("cursor", cursor);
 
     const query = params.toString();
     return fetchApi<AttemptHistoryResponse>(
-      `/api/v1/quiz/attempts${query ? `?${query}` : ''}`
+      `/api/v1/quiz/attempts${query ? `?${query}` : ""}`
     );
   },
 };

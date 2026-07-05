@@ -6,7 +6,8 @@ import PatternRecognitionClient from "./PatternRecognitionClient";
 const siteUrl = siteConfig.url;
 
 export const metadata: Metadata = {
-  title: "Pattern Recognition Guide - Identify the Right Algorithm | AlgoPatterns",
+  title:
+    "Pattern Recognition Guide - Identify the Right Algorithm | AlgoPatterns",
   description:
     "Learn to identify the correct algorithm pattern for any coding problem. Constraint-based lookups, pattern cheatsheets, and keyword-to-algorithm mappings for FAANG interview prep.",
   keywords: [
@@ -20,7 +21,8 @@ export const metadata: Metadata = {
     "algorithm decision tree",
   ],
   openGraph: {
-    title: "Pattern Recognition Guide - Identify the Right Algorithm | AlgoPatterns",
+    title:
+      "Pattern Recognition Guide - Identify the Right Algorithm | AlgoPatterns",
     description:
       "Constraint-based algorithm lookups, pattern cheatsheets, and keyword-to-algorithm mappings for coding interviews.",
     type: "article",

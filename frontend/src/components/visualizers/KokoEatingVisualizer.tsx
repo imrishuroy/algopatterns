@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion } from "framer-motion";
 
 interface Step {
@@ -35,7 +41,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 export default function KokoEatingVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(1000);
   const [piles] = useState([3, 6, 7, 11]);
   const [hours] = useState(8);
@@ -206,7 +215,10 @@ export default function KokoEatingVisualizer() {
           <div className="text-sm text-gray-400 mb-2">Banana Piles:</div>
           <div className="flex gap-3 justify-center">
             {piles.map((pile, idx) => (
-              <div key={`pile-${pile}-${idx}`} className="flex flex-col items-center">
+              <div
+                key={`pile-${pile}-${idx}`}
+                className="flex flex-col items-center"
+              >
                 <div className="text-2xl mb-1">🍌</div>
                 <motion.div
                   animate={{

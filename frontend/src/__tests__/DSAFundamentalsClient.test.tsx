@@ -77,7 +77,11 @@ const mockConcepts: Concept[] = [
   },
 ];
 
-const mockCategories = ["Data Structures", "Collections & Maps", "Algorithm Idioms"];
+const mockCategories = [
+  "Data Structures",
+  "Collections & Maps",
+  "Algorithm Idioms",
+];
 
 describe("DSAFundamentalsClient", () => {
   beforeEach(() => {
@@ -86,7 +90,10 @@ describe("DSAFundamentalsClient", () => {
 
   it("renders page title", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     expect(screen.getByText("DSA Fundamentals")).toBeInTheDocument();
@@ -94,17 +101,25 @@ describe("DSAFundamentalsClient", () => {
 
   it("renders subtitle", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     expect(
-      screen.getByText("Essential concepts and code snippets for coding interviews")
+      screen.getByText(
+        "Essential concepts and code snippets for coding interviews"
+      )
     ).toBeInTheDocument();
   });
 
   it("renders all concept cards", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     expect(screen.getByText("Priority Queue & Heap")).toBeInTheDocument();
@@ -114,20 +129,28 @@ describe("DSAFundamentalsClient", () => {
 
   it("renders category headers in grouped view", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     const categoryHeaders = screen.getAllByRole("heading", { level: 2 });
     const headerTexts = categoryHeaders.map((h) => h.textContent);
 
     expect(headerTexts.some((t) => t?.includes("Data Structures"))).toBe(true);
-    expect(headerTexts.some((t) => t?.includes("Collections & Maps"))).toBe(true);
+    expect(headerTexts.some((t) => t?.includes("Collections & Maps"))).toBe(
+      true
+    );
     expect(headerTexts.some((t) => t?.includes("Algorithm Idioms"))).toBe(true);
   });
 
   it("renders language selector", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     expect(screen.getByText("Java")).toBeInTheDocument();
@@ -138,15 +161,23 @@ describe("DSAFundamentalsClient", () => {
 
   it("renders search input", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
-    expect(screen.getByPlaceholderText("Search concepts...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Search concepts...")
+    ).toBeInTheDocument();
   });
 
   it("renders category filter dropdown", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     expect(screen.getByText("All Categories")).toBeInTheDocument();
@@ -154,7 +185,10 @@ describe("DSAFundamentalsClient", () => {
 
   it("filters concepts by search query", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     const searchInput = screen.getByPlaceholderText("Search concepts...");
@@ -166,7 +200,10 @@ describe("DSAFundamentalsClient", () => {
 
   it("filters concepts by category", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     const categorySelect = screen.getByRole("combobox");
@@ -178,7 +215,10 @@ describe("DSAFundamentalsClient", () => {
 
   it("shows no results message when search has no matches", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     const searchInput = screen.getByPlaceholderText("Search concepts...");
@@ -191,7 +231,10 @@ describe("DSAFundamentalsClient", () => {
 
   it("shows clear filters button when no results", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     const searchInput = screen.getByPlaceholderText("Search concepts...");
@@ -202,7 +245,10 @@ describe("DSAFundamentalsClient", () => {
 
   it("clears filters when Clear filters button is clicked", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     const searchInput = screen.getByPlaceholderText("Search concepts...");
@@ -217,16 +263,25 @@ describe("DSAFundamentalsClient", () => {
 
   it("concept cards link to correct detail pages", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     const heapCard = screen.getByText("Priority Queue & Heap").closest("a");
-    expect(heapCard).toHaveAttribute("href", "/dsa-fundamentals/priority-queue-heap");
+    expect(heapCard).toHaveAttribute(
+      "href",
+      "/dsa-fundamentals/priority-queue-heap"
+    );
   });
 
   it("displays problem count on cards", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     expect(screen.getAllByText(/1 problem/)).toHaveLength(3);
@@ -234,7 +289,10 @@ describe("DSAFundamentalsClient", () => {
 
   it("displays key points count on cards", () => {
     render(
-      <DSAFundamentalsClient concepts={mockConcepts} categories={mockCategories} />
+      <DSAFundamentalsClient
+        concepts={mockConcepts}
+        categories={mockCategories}
+      />
     );
 
     expect(screen.getAllByText(/1 key point/)).toHaveLength(3);

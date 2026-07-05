@@ -1,10 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePatternProgress } from "@/contexts/PatternProgressContext";
 import { Pattern } from "@/types";
-import { ChevronLeft, ChevronRight, Menu, X, CheckCircle2, Circle, FileQuestion } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  X,
+  CheckCircle2,
+  Circle,
+  FileQuestion,
+} from "lucide-react";
 
 interface CourseSidebarProps {
   pattern: Pattern;
@@ -19,10 +27,22 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { isCompleted, getProgress } = usePatternProgress();
+  const sectionRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
   const sections = pattern.tutorial || [];
   const totalSections = sections.length;
   const progress = getProgress(pattern.id, totalSections);
+
+  // Scroll the current section into view when it changes
+  useEffect(() => {
+    const currentRef = sectionRefs.current.get(currentSectionIndex);
+    if (currentRef && typeof currentRef.scrollIntoView === "function") {
+      currentRef.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [currentSectionIndex]);
 
   const handleSectionClick = (index: number) => {
     onSectionChange?.(index);
@@ -45,9 +65,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
         <h2 className="font-semibold text-white text-lg leading-tight">
           {pattern.category}
         </h2>
-        <p className="text-sm text-gray-400 mt-1">
-          {pattern.difficulty}
-        </p>
+        <p className="text-sm text-gray-400 mt-1">{pattern.difficulty}</p>
       </div>
 
       {/* Progress Bar */}
@@ -76,12 +94,16 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
           return (
             <button
               key={`${pattern.id}-section-${section.title}-${index}`}
+              ref={(el) => {
+                if (el) sectionRefs.current.set(index, el);
+              }}
               onClick={() => handleSectionClick(index)}
               className={`
                 w-full flex items-start gap-3 p-3 rounded-lg text-left transition-all
-                ${isCurrent
-                  ? "bg-indigo-500/10 border border-indigo-500/30"
-                  : "hover:bg-gray-800/50 border border-transparent"
+                ${
+                  isCurrent
+                    ? "bg-indigo-500/10 border border-indigo-500/30"
+                    : "hover:bg-gray-800/50 border border-transparent"
                 }
               `}
             >
@@ -120,19 +142,27 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
 
         {/* Take Quiz - Final item (index = sections.length) */}
         <button
+          ref={(el) => {
+            if (el) sectionRefs.current.set(sections.length, el);
+          }}
           onClick={() => handleSectionClick(sections.length)}
           className={`
             w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all mt-2
-            ${currentSectionIndex === sections.length
-              ? "bg-indigo-500/10 border border-indigo-500/30"
-              : "hover:bg-gray-800/50 border border-transparent"
+            ${
+              currentSectionIndex === sections.length
+                ? "bg-indigo-500/10 border border-indigo-500/30"
+                : "hover:bg-gray-800/50 border border-transparent"
             }
           `}
         >
           <span className="flex-shrink-0">
-            <FileQuestion className={`w-5 h-5 ${currentSectionIndex === sections.length ? "text-indigo-400" : "text-indigo-400/70"}`} />
+            <FileQuestion
+              className={`w-5 h-5 ${currentSectionIndex === sections.length ? "text-indigo-400" : "text-indigo-400/70"}`}
+            />
           </span>
-          <span className={`text-sm font-medium ${currentSectionIndex === sections.length ? "text-white" : "text-indigo-400"}`}>
+          <span
+            className={`text-sm font-medium ${currentSectionIndex === sections.length ? "text-white" : "text-indigo-400"}`}
+          >
             Take Quiz
           </span>
           {currentSectionIndex === sections.length && (

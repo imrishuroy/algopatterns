@@ -105,9 +105,7 @@ function LoadingFallback() {
           <h1 className="text-xl font-bold text-white dark:text-white mb-2">
             Loading
           </h1>
-          <p className="text-gray-400 dark:text-gray-400">
-            Please wait...
-          </p>
+          <p className="text-gray-400 dark:text-gray-400">Please wait...</p>
         </div>
       </div>
     </div>

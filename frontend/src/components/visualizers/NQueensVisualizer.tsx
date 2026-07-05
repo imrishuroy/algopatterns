@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useReducer, startTransition } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  startTransition,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type BoardState = ("." | "Q" | "X")[][];
@@ -36,7 +42,10 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 export default function NQueensVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, { step: 0, isPlaying: false });
+  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
+    step: 0,
+    isPlaying: false,
+  });
   const [speed, setSpeed] = useState(600);
   const [n] = useState(4);
   const [board, setBoard] = useState<BoardState>([]);
@@ -58,21 +67,24 @@ export default function NQueensVisualizer() {
     return b.map((row) => [...row]);
   };
 
-  const isSafe = useCallback((b: BoardState, row: number, col: number): boolean => {
-    // Check column above
-    for (let i = 0; i < row; i++) {
-      if (b[i][col] === "Q") return false;
-    }
-    // Check upper-left diagonal
-    for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
-      if (b[i][j] === "Q") return false;
-    }
-    // Check upper-right diagonal
-    for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
-      if (b[i][j] === "Q") return false;
-    }
-    return true;
-  }, [n]);
+  const isSafe = useCallback(
+    (b: BoardState, row: number, col: number): boolean => {
+      // Check column above
+      for (let i = 0; i < row; i++) {
+        if (b[i][col] === "Q") return false;
+      }
+      // Check upper-left diagonal
+      for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+        if (b[i][j] === "Q") return false;
+      }
+      // Check upper-right diagonal
+      for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
+        if (b[i][j] === "Q") return false;
+      }
+      return true;
+    },
+    [n]
+  );
 
   const generateSteps = useCallback(() => {
     const allSteps: Step[] = [];
@@ -299,7 +311,7 @@ export default function NQueensVisualizer() {
             <AnimatePresence>
               {solutions.map((sol, idx) => (
                 <motion.div
-                  key={`solution-${sol.join('')}-${idx}`}
+                  key={`solution-${sol.join("")}-${idx}`}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="p-2 bg-green-500/20 border border-green-500/50 rounded-md"

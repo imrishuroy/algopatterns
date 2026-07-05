@@ -57,7 +57,9 @@ export const PatternProgressProvider: React.FC<{
         const response = await apiClient.getPatternProgress();
         if (response.success && response.data?.progress) {
           const serverProgress: ProgressState = {};
-          for (const [patternId, indices] of Object.entries(response.data.progress)) {
+          for (const [patternId, indices] of Object.entries(
+            response.data.progress
+          )) {
             serverProgress[patternId] = new Set(indices);
           }
           setProgress(serverProgress);

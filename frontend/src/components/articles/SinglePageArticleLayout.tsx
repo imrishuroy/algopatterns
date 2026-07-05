@@ -106,17 +106,33 @@ export default function SinglePageArticleLayout({
         } fixed top-0 left-0 w-72 h-screen z-30 transition-transform duration-300 hidden lg:block`}
       >
         <div className="h-full overflow-y-auto border-r border-gray-800 bg-gray-950">
-          <div className="p-4 pt-6">
+          <div className="p-4 pt-20">
+            {/* Back Button */}
+            <Link
+              href="/articles"
+              className="inline-flex items-center gap-2 text-sm mb-6 transition-colors hover:opacity-80"
+              style={{ color: "var(--text-3)" }}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back to Articles
+            </Link>
+
             {/* Article Info */}
             <div className="mb-6">
-              <Link
-                href="/articles"
-                className="text-xs text-indigo-400 hover:text-indigo-300 mb-2 inline-block"
-              >
-                &larr; All Articles
-              </Link>
               <h2 className="text-lg font-bold text-white">{article.title}</h2>
-              <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+              <div className="flex items-center gap-2 mt-3 text-xs text-gray-500">
                 <span
                   className={`px-2 py-0.5 rounded-md border ${getDifficultyColor(article.difficulty)}`}
                 >
@@ -227,15 +243,31 @@ export default function SinglePageArticleLayout({
       <main
         className={`${sidebarOpen ? "lg:ml-72" : "lg:ml-0"} transition-[margin] duration-300`}
       >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6 lg:pt-8 pb-8">
           {/* Mobile Header */}
           <div className="lg:hidden mb-8">
+            {/* Back Button - mobile only */}
             <Link
               href="/articles"
-              className="text-sm text-indigo-400 hover:text-indigo-300 mb-4 inline-block"
+              className="inline-flex items-center gap-2 text-sm mb-6 transition-colors hover:opacity-80"
+              style={{ color: "var(--text-3)" }}
             >
-              &larr; All Articles
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back to Articles
             </Link>
+
             <div className="flex items-center gap-3 mb-3">
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium border ${getDifficultyColor(article.difficulty)}`}

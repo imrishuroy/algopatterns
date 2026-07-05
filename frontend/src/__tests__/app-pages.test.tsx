@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, act, waitFor, cleanup } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+  cleanup,
+} from "@testing-library/react";
 import React from "react";
 import type { User, Subscription, Plan, PlanFeatures } from "@/types";
 
@@ -9,7 +16,13 @@ import type { User, Subscription, Plan, PlanFeatures } from "@/types";
 
 const mockUseSearchParams = vi.fn(() => new URLSearchParams());
 vi.mock("next/navigation", () => {
-  const mockRouter = { push: vi.fn(), replace: vi.fn(), back: vi.fn(), prefetch: vi.fn(), refresh: vi.fn() };
+  const mockRouter = {
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    prefetch: vi.fn(),
+    refresh: vi.fn(),
+  };
   return {
     useRouter: () => mockRouter,
     usePathname: () => "",
@@ -19,20 +32,34 @@ vi.mock("next/navigation", () => {
 });
 
 vi.mock("next/link", () => ({
-  default: ({ children, href, className, ...props }: { children: React.ReactNode; href: string; className?: string; [key: string]: unknown }) =>
-    React.createElement("a", { href, className, ...props }, children),
+  default: ({
+    children,
+    href,
+    className,
+    ...props
+  }: {
+    children: React.ReactNode;
+    href: string;
+    className?: string;
+    [key: string]: unknown;
+  }) => React.createElement("a", { href, className, ...props }, children),
 }));
 
 vi.mock("next/image", () => ({
-  default: ({ alt, className, ...props }: { alt?: string; className?: string; [key: string]: unknown }) =>
-    React.createElement("img", { alt, className, ...props }),
+  default: ({
+    alt,
+    className,
+    ...props
+  }: {
+    alt?: string;
+    className?: string;
+    [key: string]: unknown;
+  }) => React.createElement("img", { alt, className, ...props }),
 }));
 
 vi.mock("next/script", () => ({
   default: () => null,
 }));
-
-
 
 vi.mock("next/font/google", () => ({
   Geist: () => ({ variable: "--font-geist-sans" }),
@@ -64,7 +91,8 @@ const mockAuth: {
 };
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => mockAuth,
-  AuthProvider: ({ children }: { children: React.ReactNode }) => React.createElement(React.Fragment, null, children),
+  AuthProvider: ({ children }: { children: React.ReactNode }) =>
+    React.createElement(React.Fragment, null, children),
 }));
 
 // ── SubscriptionContext ──
@@ -163,17 +191,31 @@ vi.mock("@/contexts/LanguageContext", () => ({
 
 // ── Child component mocks ──
 vi.mock("@/components/layout/Header", () => ({
-  default: () => React.createElement("header", { "data-testid": "header" }, "Header"),
+  default: () =>
+    React.createElement("header", { "data-testid": "header" }, "Header"),
 }));
 vi.mock("@/components/layout/Footer", () => ({
-  default: () => React.createElement("footer", { "data-testid": "footer" }, "Footer"),
+  default: () =>
+    React.createElement("footer", { "data-testid": "footer" }, "Footer"),
 }));
 vi.mock("@/components/patterns/Dashboard", () => ({
   default: ({ questions }: { questions: unknown[] }) =>
-    React.createElement("div", { "data-testid": "dashboard" }, `Dashboard: ${questions.length} questions`),
+    React.createElement(
+      "div",
+      { "data-testid": "dashboard" },
+      `Dashboard: ${questions.length} questions`
+    ),
 }));
 vi.mock("@/components/ui/GoogleButton", () => ({
-  GoogleButton: ({ onClick, isLoading, text }: { onClick?: () => void; isLoading?: boolean; text?: string }) =>
+  GoogleButton: ({
+    onClick,
+    isLoading,
+    text,
+  }: {
+    onClick?: () => void;
+    isLoading?: boolean;
+    text?: string;
+  }) =>
     React.createElement(
       "button",
       { "data-testid": "google-button", onClick, disabled: isLoading },
@@ -181,21 +223,40 @@ vi.mock("@/components/ui/GoogleButton", () => ({
     ),
 }));
 vi.mock("@/components/pricing/PricingCard", () => ({
-  PricingCard: ({ plan, onSelect }: { plan: { id: string; name: string }; onSelect: (plan: unknown) => void }) =>
+  PricingCard: ({
+    plan,
+    onSelect,
+  }: {
+    plan: { id: string; name: string };
+    onSelect: (plan: unknown) => void;
+  }) =>
     React.createElement(
       "button",
-      { "data-testid": `pricing-card-${plan.id}`, onClick: () => onSelect(plan) },
+      {
+        "data-testid": `pricing-card-${plan.id}`,
+        onClick: () => onSelect(plan),
+      },
       plan.name
     ),
 }));
 vi.mock("@/components/pricing/CheckoutModal", () => ({
   CheckoutModal: ({ isOpen }: { isOpen?: boolean }) =>
     isOpen
-      ? React.createElement("div", { "data-testid": "checkout-modal" }, "Checkout Modal")
+      ? React.createElement(
+          "div",
+          { "data-testid": "checkout-modal" },
+          "Checkout Modal"
+        )
       : null,
 }));
 vi.mock("@/components/articles/SinglePageArticleLayout", () => ({
-  default: ({ article, sectionComponents }: { article: { slug: string }; sectionComponents: Record<string, unknown> }) =>
+  default: ({
+    article,
+    sectionComponents,
+  }: {
+    article: { slug: string };
+    sectionComponents: Record<string, unknown>;
+  }) =>
     React.createElement(
       "div",
       { "data-testid": "article-layout" },
@@ -203,10 +264,23 @@ vi.mock("@/components/articles/SinglePageArticleLayout", () => ({
     ),
 }));
 vi.mock("@/components/ui/CodeBlock", () => ({
-  default: ({ code }: { code?: string }) => React.createElement("pre", { "data-testid": "code-block" }, code?.slice(0, 50)),
+  default: ({ code }: { code?: string }) =>
+    React.createElement(
+      "pre",
+      { "data-testid": "code-block" },
+      code?.slice(0, 50)
+    ),
 }));
 vi.mock("@/components/ui/LanguageToggle", () => ({
-  default: ({ currentLang, _onChange, languages }: { currentLang?: string; _onChange?: (lang: string) => void; languages?: string[] }) =>
+  default: ({
+    currentLang,
+    _onChange,
+    languages,
+  }: {
+    currentLang?: string;
+    _onChange?: (lang: string) => void;
+    languages?: string[];
+  }) =>
     React.createElement(
       "div",
       { "data-testid": "language-toggle" },
@@ -214,21 +288,34 @@ vi.mock("@/components/ui/LanguageToggle", () => ({
     ),
 }));
 vi.mock("@/components/seo/JsonLd", () => ({
- JsonLdScript: () => null,
- WebsiteJsonLd: () => null,
- OrganizationJsonLd: () => null,
- FAQJsonLd: () => null,
- ArticleJsonLd: () => null,
- BreadcrumbJsonLd: () => null,
+  JsonLdScript: () => null,
+  WebsiteJsonLd: () => null,
+  OrganizationJsonLd: () => null,
+  FAQJsonLd: () => null,
+  ArticleJsonLd: () => null,
+  BreadcrumbJsonLd: () => null,
 }));
 
 // ── Data mocks ──
 vi.mock("@/lib/questions", () => ({
   questions: [
-    { id: "q1", name: "Test Question", category: "Arrays & Strings", companies: ["Google"] },
-    { id: "q2", name: "Test Question 2", category: "Two Pointers", companies: ["Amazon"] },
+    {
+      id: "q1",
+      name: "Test Question",
+      category: "Arrays & Strings",
+      companies: ["Google"],
+    },
+    {
+      id: "q2",
+      name: "Test Question 2",
+      category: "Two Pointers",
+      companies: ["Amazon"],
+    },
   ],
-  categoryToPatternId: { "Arrays & Strings": "arrays-strings", "Two Pointers": "two-pointers" },
+  categoryToPatternId: {
+    "Arrays & Strings": "arrays-strings",
+    "Two Pointers": "two-pointers",
+  },
 }));
 
 const mockArticles: {
@@ -241,7 +328,13 @@ const mockArticles: {
   difficulty: "intermediate" | "beginner" | "advanced";
   estimatedTime: string;
   tags: string[];
-  sections: { slug: string; title: string; description: string; order: number; estimatedTime: string }[];
+  sections: {
+    slug: string;
+    title: string;
+    description: string;
+    order: number;
+    estimatedTime: string;
+  }[];
 }[] = [
   {
     title: "Mastering Recursion",
@@ -254,8 +347,20 @@ const mockArticles: {
     estimatedTime: "2 hours",
     tags: ["Recursion", "Fundamentals"],
     sections: [
-      { slug: "fundamentals", title: "Fundamentals", description: "Basics", order: 1, estimatedTime: "20 min" },
-      { slug: "types", title: "Types", description: "Types of recursion", order: 2, estimatedTime: "25 min" },
+      {
+        slug: "fundamentals",
+        title: "Fundamentals",
+        description: "Basics",
+        order: 1,
+        estimatedTime: "20 min",
+      },
+      {
+        slug: "types",
+        title: "Types",
+        description: "Types of recursion",
+        order: 2,
+        estimatedTime: "25 min",
+      },
     ],
   },
   {
@@ -269,32 +374,54 @@ const mockArticles: {
     estimatedTime: "30 min",
     tags: ["Algorithms", "DP"],
     sections: [
-      { slug: "quick-comparison", title: "Quick Comparison", description: "Side-by-side", order: 1, estimatedTime: "5 min" },
-      { slug: "key-differences", title: "Key Differences", description: "Visual examples", order: 2, estimatedTime: "8 min" },
+      {
+        slug: "quick-comparison",
+        title: "Quick Comparison",
+        description: "Side-by-side",
+        order: 1,
+        estimatedTime: "5 min",
+      },
+      {
+        slug: "key-differences",
+        title: "Key Differences",
+        description: "Visual examples",
+        order: 2,
+        estimatedTime: "8 min",
+      },
     ],
   },
 ];
 
 vi.mock("@/content/articles", () => ({
   articles: mockArticles,
-  getArticleBySlug: (slug: string) => mockArticles.find((a: { slug: string }) => a.slug === slug),
+  getArticleBySlug: (slug: string) =>
+    mockArticles.find((a: { slug: string }) => a.slug === slug),
 }));
 
 vi.mock("@/content/articles/recursion/sections", () => ({
-  sections: { fundamentals: () => React.createElement("div", null, "Fundamentals Content") },
+  sections: {
+    fundamentals: () =>
+      React.createElement("div", null, "Fundamentals Content"),
+  },
 }));
 
 vi.mock("@/content/articles/algorithm-paradigms/sections", () => ({
-  sections: { "quick-comparison": () => React.createElement("div", null, "Quick Comparison Content") },
+  sections: {
+    "quick-comparison": () =>
+      React.createElement("div", null, "Quick Comparison Content"),
+  },
 }));
 
 // ── Global stubs ──
 beforeEach(() => {
-  vi.stubGlobal("IntersectionObserver", vi.fn(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-  })));
+  vi.stubGlobal(
+    "IntersectionObserver",
+    vi.fn(() => ({
+      observe: vi.fn(),
+      unobserve: vi.fn(),
+      disconnect: vi.fn(),
+    }))
+  );
   vi.stubGlobal("scrollTo", vi.fn());
   mockAuth.user = null;
   mockAuth.isAuthenticated = false;
@@ -323,14 +450,19 @@ describe("Home page", () => {
   it("renders the Dashboard with questions", async () => {
     const Home = (await import("@/app/page")).default;
     render(React.createElement(Home));
-    expect(screen.getByTestId("dashboard")).toHaveTextContent("Dashboard: 2 questions");
+    expect(screen.getByTestId("dashboard")).toHaveTextContent(
+      "Dashboard: 2 questions"
+    );
   });
 
   it("has correct metadata exports", async () => {
     const mod = await import("@/app/page");
-    const title = typeof mod.metadata.title === "object" && mod.metadata.title !== null && "absolute" in mod.metadata.title
-      ? (mod.metadata.title as { absolute: string }).absolute
-      : String(mod.metadata.title);
+    const title =
+      typeof mod.metadata.title === "object" &&
+      mod.metadata.title !== null &&
+      "absolute" in mod.metadata.title
+        ? (mod.metadata.title as { absolute: string }).absolute
+        : String(mod.metadata.title);
     expect(title).toContain("AlgoPatterns");
     expect(mod.metadata.description).toContain("Master");
   });
@@ -349,13 +481,20 @@ describe("Login page", () => {
   it("renders the login form with all elements", async () => {
     const LoginPage = (await import("@/app/login/page")).default;
     render(React.createElement(LoginPage));
-    expect(screen.getByRole("heading", { name: /welcome back/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /welcome back/i })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /sign in/i })
+    ).toBeInTheDocument();
     expect(screen.getByText(/continue with email/i)).toBeInTheDocument();
     expect(screen.getByText(/don't have an account/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /create one/i })).toHaveAttribute("href", "/register");
+    expect(screen.getByRole("link", { name: /create one/i })).toHaveAttribute(
+      "href",
+      "/register"
+    );
     expect(screen.getByText(/continue as guest/i)).toHaveAttribute("href", "/");
     expect(screen.getByTestId("google-button")).toBeInTheDocument();
   });
@@ -387,13 +526,22 @@ describe("Login page", () => {
   it("displays error message after failed login", async () => {
     mockAuth.isLoading = false;
     mockAuth.isAuthenticated = false;
-    mockAuth.login.mockResolvedValue({ success: false, error: "Invalid credentials" });
+    mockAuth.login.mockResolvedValue({
+      success: false,
+      error: "Invalid credentials",
+    });
     const LoginPage = (await import("@/app/login/page")).default;
     render(React.createElement(LoginPage));
     await act(async () => {
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "test@test.com" } });
-      fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "wrong" } });
-      fireEvent.submit(screen.getByRole("button", { name: /sign in/i }).closest("form")!);
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: "test@test.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/password/i), {
+        target: { value: "wrong" },
+      });
+      fireEvent.submit(
+        screen.getByRole("button", { name: /sign in/i }).closest("form")!
+      );
     });
     await waitFor(() => {
       expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
@@ -405,9 +553,15 @@ describe("Login page", () => {
     const LoginPage = (await import("@/app/login/page")).default;
     render(React.createElement(LoginPage));
     await act(async () => {
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "test@test.com" } });
-      fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "password" } });
-      fireEvent.submit(screen.getByRole("button", { name: /sign in/i }).closest("form")!);
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: "test@test.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/password/i), {
+        target: { value: "password" },
+      });
+      fireEvent.submit(
+        screen.getByRole("button", { name: /sign in/i }).closest("form")!
+      );
     });
     await waitFor(() => {
       expect(useRouter().push).toHaveBeenCalledWith("/");
@@ -439,9 +593,15 @@ describe("Login page", () => {
     const LoginPage = (await import("@/app/login/page")).default;
     const { container } = render(React.createElement(LoginPage));
     await act(async () => {
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "test@test.com" } });
-      fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "password" } });
-      fireEvent.submit(screen.getByRole("button", { name: /sign in/i }).closest("form")!);
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: "test@test.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/password/i), {
+        target: { value: "password" },
+      });
+      fireEvent.submit(
+        screen.getByRole("button", { name: /sign in/i }).closest("form")!
+      );
     });
     expect(container.querySelector('button[type="submit"]')).toBeDisabled();
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
@@ -461,16 +621,25 @@ describe("Register page", () => {
   it("renders the registration form with all elements", async () => {
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
-    expect(screen.getByRole("heading", { name: /create an account/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /create an account/i })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /create account/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /create account/i })
+    ).toBeInTheDocument();
     expect(screen.getByText(/already have an account/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /sign in/i })).toHaveAttribute("href", "/login");
+    expect(screen.getByRole("link", { name: /sign in/i })).toHaveAttribute(
+      "href",
+      "/login"
+    );
     expect(screen.getByText(/continue as guest/i)).toHaveAttribute("href", "/");
-    expect(screen.getByTestId("google-button")).toHaveTextContent("Sign up with Google");
+    expect(screen.getByTestId("google-button")).toHaveTextContent(
+      "Sign up with Google"
+    );
   });
 
   it("shows loading spinner when authLoading is true", async () => {
@@ -491,11 +660,21 @@ describe("Register page", () => {
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
     await act(async () => {
-      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: "Test" } });
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "test@test.com" } });
-      fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: "password123" } });
-      fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: "different" } });
-      fireEvent.submit(screen.getByRole("button", { name: /create account/i }).closest("form")!);
+      fireEvent.change(screen.getByLabelText(/name/i), {
+        target: { value: "Test" },
+      });
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: "test@test.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/^password$/i), {
+        target: { value: "password123" },
+      });
+      fireEvent.change(screen.getByLabelText(/confirm password/i), {
+        target: { value: "different" },
+      });
+      fireEvent.submit(
+        screen.getByRole("button", { name: /create account/i }).closest("form")!
+      );
     });
     expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
   });
@@ -504,13 +683,25 @@ describe("Register page", () => {
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
     await act(async () => {
-      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: "Test" } });
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "test@test.com" } });
-      fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: "short" } });
-      fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: "short" } });
-      fireEvent.submit(screen.getByRole("button", { name: /create account/i }).closest("form")!);
+      fireEvent.change(screen.getByLabelText(/name/i), {
+        target: { value: "Test" },
+      });
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: "test@test.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/^password$/i), {
+        target: { value: "short" },
+      });
+      fireEvent.change(screen.getByLabelText(/confirm password/i), {
+        target: { value: "short" },
+      });
+      fireEvent.submit(
+        screen.getByRole("button", { name: /create account/i }).closest("form")!
+      );
     });
-    expect(screen.getByText("Password must be at least 8 characters")).toBeInTheDocument();
+    expect(
+      screen.getByText("Password must be at least 8 characters")
+    ).toBeInTheDocument();
   });
 
   it("handles successful registration", async () => {
@@ -518,11 +709,21 @@ describe("Register page", () => {
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
     await act(async () => {
-      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: "Test" } });
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "test@test.com" } });
-      fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: "password123" } });
-      fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: "password123" } });
-      fireEvent.submit(screen.getByRole("button", { name: /create account/i }).closest("form")!);
+      fireEvent.change(screen.getByLabelText(/name/i), {
+        target: { value: "Test" },
+      });
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: "test@test.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/^password$/i), {
+        target: { value: "password123" },
+      });
+      fireEvent.change(screen.getByLabelText(/confirm password/i), {
+        target: { value: "password123" },
+      });
+      fireEvent.submit(
+        screen.getByRole("button", { name: /create account/i }).closest("form")!
+      );
     });
     await waitFor(() => {
       expect(useRouter().push).toHaveBeenCalledWith("/");
@@ -530,15 +731,28 @@ describe("Register page", () => {
   });
 
   it("handles registration error", async () => {
-    mockAuth.register.mockResolvedValue({ success: false, error: "Email already exists" });
+    mockAuth.register.mockResolvedValue({
+      success: false,
+      error: "Email already exists",
+    });
     const RegisterPage = (await import("@/app/register/page")).default;
     render(React.createElement(RegisterPage));
     await act(async () => {
-      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: "Test" } });
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "existing@test.com" } });
-      fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: "password123" } });
-      fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: "password123" } });
-      fireEvent.submit(screen.getByRole("button", { name: /create account/i }).closest("form")!);
+      fireEvent.change(screen.getByLabelText(/name/i), {
+        target: { value: "Test" },
+      });
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: "existing@test.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/^password$/i), {
+        target: { value: "password123" },
+      });
+      fireEvent.change(screen.getByLabelText(/confirm password/i), {
+        target: { value: "password123" },
+      });
+      fireEvent.submit(
+        screen.getByRole("button", { name: /create account/i }).closest("form")!
+      );
     });
     await waitFor(() => {
       expect(screen.getByText("Email already exists")).toBeInTheDocument();
@@ -550,11 +764,21 @@ describe("Register page", () => {
     const RegisterPage = (await import("@/app/register/page")).default;
     const { container } = render(React.createElement(RegisterPage));
     await act(async () => {
-      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: "Test" } });
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "test@test.com" } });
-      fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: "password123" } });
-      fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: "password123" } });
-      fireEvent.submit(screen.getByRole("button", { name: /create account/i }).closest("form")!);
+      fireEvent.change(screen.getByLabelText(/name/i), {
+        target: { value: "Test" },
+      });
+      fireEvent.change(screen.getByLabelText(/email/i), {
+        target: { value: "test@test.com" },
+      });
+      fireEvent.change(screen.getByLabelText(/^password$/i), {
+        target: { value: "password123" },
+      });
+      fireEvent.change(screen.getByLabelText(/confirm password/i), {
+        target: { value: "password123" },
+      });
+      fireEvent.submit(
+        screen.getByRole("button", { name: /create account/i }).closest("form")!
+      );
     });
     expect(container.querySelector('button[type="submit"]')).toBeDisabled();
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
@@ -575,14 +799,26 @@ describe("Register page", () => {
 describe("Root layout", () => {
   it("renders children wrapped with providers and layout", async () => {
     const RootLayout = (await import("@/app/layout")).default;
-    render(React.createElement(RootLayout, null, React.createElement("div", { "data-testid": "child" }, "Content")));
+    render(
+      React.createElement(
+        RootLayout,
+        null,
+        React.createElement("div", { "data-testid": "child" }, "Content")
+      )
+    );
     expect(screen.getByTestId("header")).toBeInTheDocument();
     expect(screen.getByTestId("child")).toHaveTextContent("Content");
   });
 
   it("skips html element check (jsdom limitation)", async () => {
     const RootLayout = (await import("@/app/layout")).default;
-    render(React.createElement(RootLayout, null, React.createElement("div", { "data-testid": "child" }, "test")));
+    render(
+      React.createElement(
+        RootLayout,
+        null,
+        React.createElement("div", { "data-testid": "child" }, "test")
+      )
+    );
     expect(screen.getByTestId("child")).toHaveTextContent("test");
     expect(screen.getByTestId("header")).toBeInTheDocument();
   });
@@ -590,7 +826,9 @@ describe("Root layout", () => {
   it("has metadata export", async () => {
     const mod = await import("@/app/layout");
     expect(mod.metadata).toBeDefined();
-    expect((mod.metadata.title as { default: string }).default).toContain("AlgoPatterns");
+    expect((mod.metadata.title as { default: string }).default).toContain(
+      "AlgoPatterns"
+    );
   });
 });
 
@@ -600,7 +838,12 @@ describe("Root layout", () => {
 
 describe("Account page", () => {
   beforeEach(() => {
-    mockAuth.user = { id: "user-1", email: "test@test.com", name: "Test User", emailVerified: true };
+    mockAuth.user = {
+      id: "user-1",
+      email: "test@test.com",
+      name: "Test User",
+      emailVerified: true,
+    };
     mockAuth.isAuthenticated = true;
     mockAuth.isLoading = false;
     mockSub.isLoading = false;
@@ -622,7 +865,9 @@ describe("Account page", () => {
   it("renders the account page with profile info", async () => {
     const AccountPage = (await import("@/app/account/page")).default;
     render(React.createElement(AccountPage));
-    expect(screen.getByRole("heading", { name: /account settings/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /account settings/i })
+    ).toBeInTheDocument();
     expect(screen.getByText(/test@test.com/)).toBeInTheDocument();
     expect(screen.getByText(/Test User/)).toBeInTheDocument();
     expect(screen.getByText(/back to dashboard/i)).toBeInTheDocument();
@@ -668,8 +913,12 @@ describe("Account page", () => {
     render(React.createElement(AccountPage));
     fireEvent.click(screen.getByText(/cancel subscription/i));
     expect(screen.getByText(/we're sorry to see you go/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /confirm cancel/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /keep subscription/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /confirm cancel/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /keep subscription/i })
+    ).toBeInTheDocument();
   });
 
   it("shows cancelled subscription message when cancel_at_period_end is true", async () => {
@@ -684,7 +933,9 @@ describe("Account page", () => {
     };
     const AccountPage = (await import("@/app/account/page")).default;
     render(React.createElement(AccountPage));
-    expect(screen.getByText(/your subscription has been cancelled/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/your subscription has been cancelled/i)
+    ).toBeInTheDocument();
   });
 
   it("shows lifetime access message for pro_lifetime plan", async () => {
@@ -696,7 +947,9 @@ describe("Account page", () => {
     };
     const AccountPage = (await import("@/app/account/page")).default;
     render(React.createElement(AccountPage));
-    expect(screen.getByText(/lifetime access - no renewal required/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/lifetime access - no renewal required/i)
+    ).toBeInTheDocument();
   });
 
   it("shows loading state when auth is loading", async () => {
@@ -755,12 +1008,17 @@ describe("Account page", () => {
     fireEvent.click(screen.getByText(/cancel subscription/i));
     expect(screen.getByText(/we're sorry to see you go/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /keep subscription/i }));
-    expect(screen.queryByText(/we're sorry to see you go/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/we're sorry to see you go/i)
+    ).not.toBeInTheDocument();
   });
 
   it("handles cancel subscription error", async () => {
     mockSub.isPro = true;
-    mockSub.cancelSubscription.mockResolvedValue({ success: false, error: "Failed to cancel" });
+    mockSub.cancelSubscription.mockResolvedValue({
+      success: false,
+      error: "Failed to cancel",
+    });
     mockSub.subscription = {
       plan_id: "pro_monthly",
       status: "active",
@@ -792,7 +1050,9 @@ describe("Account page", () => {
     fireEvent.click(screen.getByText(/cancel subscription/i));
     fireEvent.click(screen.getByRole("button", { name: /confirm cancel/i }));
     await waitFor(() => {
-      expect(screen.queryByText(/we're sorry to see you go/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/we're sorry to see you go/i)
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -802,7 +1062,9 @@ describe("Account page", () => {
     expect(screen.getByText(/your features/i)).toBeInTheDocument();
     expect(screen.getByText(/3 patterns/)).toBeInTheDocument();
     expect(screen.getByText(/2 visualizers/)).toBeInTheDocument();
-    expect(screen.getAllByText(/not available/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/not available/i).length).toBeGreaterThanOrEqual(
+      1
+    );
   });
 
   it("shows unlimited for -1 feature values", async () => {
@@ -834,18 +1096,98 @@ describe("Pricing page", () => {
     mockAuth.isAuthenticated = true;
     mockSub.isLoading = false;
     mockSub.plans = [
-      { id: "free", name: "Free", price: 0, currency: "INR", billing_period: "monthly", features: { max_patterns: 3, max_visualizers: 2, has_quiz_history: false, has_code_playground: false, has_progress_sync: false, has_highlighting: false, has_solutions_access: false, has_offline_export: false, quiz_questions_per_pattern: 3 } },
-      { id: "pro_monthly", name: "Pro Monthly", price: 49900, currency: "INR", billing_period: "monthly", savings_percentage: 0, features: { max_patterns: -1, max_visualizers: -1, has_quiz_history: true, has_code_playground: true, has_progress_sync: true, has_highlighting: true, has_solutions_access: true, has_offline_export: false, quiz_questions_per_pattern: -1 }, is_recommended: true },
-      { id: "pro_yearly", name: "Pro Yearly", price: 249900, currency: "INR", billing_period: "yearly", savings_percentage: 50, original_price: 499900, features: { max_patterns: -1, max_visualizers: -1, has_quiz_history: true, has_code_playground: true, has_progress_sync: true, has_highlighting: true, has_solutions_access: true, has_offline_export: true, quiz_questions_per_pattern: -1 } },
-      { id: "pro_lifetime", name: "Pro Lifetime", price: 999900, currency: "INR", billing_period: "lifetime", savings_percentage: 80, original_price: 4999900, features: { max_patterns: -1, max_visualizers: -1, has_quiz_history: true, has_code_playground: true, has_progress_sync: true, has_highlighting: true, has_solutions_access: true, has_offline_export: true, quiz_questions_per_pattern: -1 } },
+      {
+        id: "free",
+        name: "Free",
+        price: 0,
+        currency: "INR",
+        billing_period: "monthly",
+        features: {
+          max_patterns: 3,
+          max_visualizers: 2,
+          has_quiz_history: false,
+          has_code_playground: false,
+          has_progress_sync: false,
+          has_highlighting: false,
+          has_solutions_access: false,
+          has_offline_export: false,
+          quiz_questions_per_pattern: 3,
+        },
+      },
+      {
+        id: "pro_monthly",
+        name: "Pro Monthly",
+        price: 49900,
+        currency: "INR",
+        billing_period: "monthly",
+        savings_percentage: 0,
+        features: {
+          max_patterns: -1,
+          max_visualizers: -1,
+          has_quiz_history: true,
+          has_code_playground: true,
+          has_progress_sync: true,
+          has_highlighting: true,
+          has_solutions_access: true,
+          has_offline_export: false,
+          quiz_questions_per_pattern: -1,
+        },
+        is_recommended: true,
+      },
+      {
+        id: "pro_yearly",
+        name: "Pro Yearly",
+        price: 249900,
+        currency: "INR",
+        billing_period: "yearly",
+        savings_percentage: 50,
+        original_price: 499900,
+        features: {
+          max_patterns: -1,
+          max_visualizers: -1,
+          has_quiz_history: true,
+          has_code_playground: true,
+          has_progress_sync: true,
+          has_highlighting: true,
+          has_solutions_access: true,
+          has_offline_export: true,
+          quiz_questions_per_pattern: -1,
+        },
+      },
+      {
+        id: "pro_lifetime",
+        name: "Pro Lifetime",
+        price: 999900,
+        currency: "INR",
+        billing_period: "lifetime",
+        savings_percentage: 80,
+        original_price: 4999900,
+        features: {
+          max_patterns: -1,
+          max_visualizers: -1,
+          has_quiz_history: true,
+          has_code_playground: true,
+          has_progress_sync: true,
+          has_highlighting: true,
+          has_solutions_access: true,
+          has_offline_export: true,
+          quiz_questions_per_pattern: -1,
+        },
+      },
     ];
-    mockSub.subscription = { plan_id: "free", status: "active", features: mockSub.features };
+    mockSub.subscription = {
+      plan_id: "free",
+      status: "active",
+      features: mockSub.features,
+    };
   });
 
   it("renders pricing page with header", async () => {
     const PricingPage = (await import("@/app/pricing/page")).default;
     render(React.createElement(PricingPage));
-    expect(screen.getByRole("heading", { name: /choose your plan/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /choose your plan/i })
+    ).toBeInTheDocument();
     expect(screen.getByText(/why upgrade to pro/i)).toBeInTheDocument();
     expect(screen.getByText(/lifetime access promise/i)).toBeInTheDocument();
   });
@@ -900,7 +1242,9 @@ describe("Pricing page", () => {
   it("renders Why Upgrade section with feature highlights", async () => {
     const PricingPage = (await import("@/app/pricing/page")).default;
     render(React.createElement(PricingPage));
-    expect(screen.getAllByText(/all patterns/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/all patterns/i).length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getByText(/interactive visualizers/i)).toBeInTheDocument();
     expect(screen.getByText(/complete solutions/i)).toBeInTheDocument();
   });
@@ -913,8 +1257,20 @@ describe("Pricing page", () => {
 describe("Pricing layout", () => {
   it("renders children", async () => {
     const PricingLayout = (await import("@/app/pricing/layout")).default;
-    render(React.createElement(PricingLayout, null, React.createElement("div", { "data-testid": "pricing-child" }, "Pricing Content")));
-    expect(screen.getByTestId("pricing-child")).toHaveTextContent("Pricing Content");
+    render(
+      React.createElement(
+        PricingLayout,
+        null,
+        React.createElement(
+          "div",
+          { "data-testid": "pricing-child" },
+          "Pricing Content"
+        )
+      )
+    );
+    expect(screen.getByTestId("pricing-child")).toHaveTextContent(
+      "Pricing Content"
+    );
   });
 
   it("has correct metadata", async () => {
@@ -931,20 +1287,30 @@ describe("Pricing layout", () => {
 
 describe("Interview Cheatsheet page", () => {
   it("renders the main heading and intro", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
-    expect(screen.getByRole("heading", { name: /interview cheat sheet/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /interview cheat sheet/i })
+    ).toBeInTheDocument();
     expect(screen.getByText(/quick revision guide/i)).toBeInTheDocument();
   });
 
   it("renders the Golden Rule section", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
-    expect(screen.getByText(/the golden rule: check constraints first/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/the golden rule: check constraints first/i)
+    ).toBeInTheDocument();
   });
 
   it("renders constraints table", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/n ≤ 15/)).toBeInTheDocument();
     expect(screen.getByText(/n ≤ 1,000,000/)).toBeInTheDocument();
@@ -952,17 +1318,25 @@ describe("Interview Cheatsheet page", () => {
   });
 
   it("renders pattern selector table", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/quick pattern selector/i)).toBeInTheDocument();
     expect(screen.getByText(/sorted array, find pair/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/two pointers/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/two pointers/i).length).toBeGreaterThanOrEqual(
+      1
+    );
   });
 
   it("renders all 14 pattern cards", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
-    expect(screen.getByText(/all patterns with templates/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/all patterns with templates/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/1\. Two Pointers/)).toBeInTheDocument();
     expect(screen.getByText(/2\. Sliding Window/)).toBeInTheDocument();
     expect(screen.getByText(/3\. Prefix Sum/)).toBeInTheDocument();
@@ -971,50 +1345,70 @@ describe("Interview Cheatsheet page", () => {
   });
 
   it("expands a pattern card when clicked", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
-    expect(screen.queryByText(/Reduces O\(n²\) brute force/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Reduces O\(n²\) brute force/)
+    ).not.toBeInTheDocument();
     fireEvent.click(screen.getByText(/1\. Two Pointers/));
     expect(screen.getByText(/Reduces O\(n²\) brute force/)).toBeInTheDocument();
     expect(screen.getByText(/Two Sum II/)).toBeInTheDocument();
   });
 
   it("collapses a pattern card when clicked again", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
     fireEvent.click(screen.getByText(/1\. Two Pointers/));
     expect(screen.getByText(/Reduces O\(n²\) brute force/)).toBeInTheDocument();
     fireEvent.click(screen.getByText(/1\. Two Pointers/));
-    expect(screen.queryByText(/Reduces O\(n²\) brute force/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Reduces O\(n²\) brute force/)
+    ).not.toBeInTheDocument();
   });
 
   it("renders keyword to algorithm section", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/keyword to algorithm/i)).toBeInTheDocument();
     expect(screen.getByText(/Top K \/ Kth largest/)).toBeInTheDocument();
   });
 
   it("renders decision tree section", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/quick decision tree/i)).toBeInTheDocument();
     expect(screen.getByText(/is it about ARRAYS/i)).toBeInTheDocument();
   });
 
   it("renders complexity reference table", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/complexity reference/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Two Pointers/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Two Pointers/).length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getAllByText(/O\(n\)/).length).toBeGreaterThan(0);
   });
 
   it("renders common mistakes section", async () => {
-    const CheatsheetPage = (await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")).default;
+    const CheatsheetPage = (
+      await import("@/app/interview-cheatsheet/InterviewCheatsheetClient")
+    ).default;
     render(React.createElement(CheatsheetPage));
     expect(screen.getByText(/common mistakes to avoid/i)).toBeInTheDocument();
-    expect(screen.getByText(/Forgetting to sort the array first/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Forgetting to sort the array first/)
+    ).toBeInTheDocument();
   });
 });
 
@@ -1024,9 +1418,22 @@ describe("Interview Cheatsheet page", () => {
 
 describe("Interview Cheatsheet layout", () => {
   it("renders children", async () => {
-    const CheatLayout = (await import("@/app/interview-cheatsheet/layout")).default;
-    render(React.createElement(CheatLayout, null, React.createElement("div", { "data-testid": "cheat-child" }, "Cheat Sheet Content")));
-    expect(screen.getByTestId("cheat-child")).toHaveTextContent("Cheat Sheet Content");
+    const CheatLayout = (await import("@/app/interview-cheatsheet/layout"))
+      .default;
+    render(
+      React.createElement(
+        CheatLayout,
+        null,
+        React.createElement(
+          "div",
+          { "data-testid": "cheat-child" },
+          "Cheat Sheet Content"
+        )
+      )
+    );
+    expect(screen.getByTestId("cheat-child")).toHaveTextContent(
+      "Cheat Sheet Content"
+    );
   });
 
   it("has correct metadata", async () => {
@@ -1034,7 +1441,7 @@ describe("Interview Cheatsheet layout", () => {
     // was overridden by page metadata and caused duplicate FAQJsonLd structured data).
     const mod = await import("@/app/interview-cheatsheet/page");
     expect(mod.metadata.title).toContain("Interview Cheatsheet");
-    expect((mod.metadata.description as string)).toContain("cheatsheet");
+    expect(mod.metadata.description as string).toContain("cheatsheet");
   });
 });
 
@@ -1044,13 +1451,19 @@ describe("Interview Cheatsheet layout", () => {
 
 describe("Pattern Recognition page", () => {
   it("renders the main heading", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
-    expect(screen.getByRole("heading", { name: /pattern recognition guide/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /pattern recognition guide/i })
+    ).toBeInTheDocument();
   });
 
   it("renders tab navigation", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     expect(screen.getByText(/quick cheatsheet/i)).toBeInTheDocument();
     expect(screen.getByText(/by constraints/i)).toBeInTheDocument();
@@ -1059,15 +1472,21 @@ describe("Pattern Recognition page", () => {
   });
 
   it("shows cheatsheet tab by default", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
-    expect(screen.getByText(/the golden rule: check constraints first/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/the golden rule: check constraints first/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/quick pattern lookup/i)).toBeInTheDocument();
     expect(screen.getByText(/simple decision flow/i)).toBeInTheDocument();
   });
 
   it("switches to constraints tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by constraints/i));
     expect(screen.getByText(/n ≤ 20/)).toBeInTheDocument();
@@ -1077,46 +1496,66 @@ describe("Pattern Recognition page", () => {
   });
 
   it("switches between constraint size options", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by constraints/i));
     fireEvent.click(screen.getByText(/n ≤ 3000/));
     expect(screen.getByText(/nested loops are ok/i)).toBeInTheDocument();
     fireEvent.click(screen.getByText(/n > 10⁶/));
-    expect(screen.getByText(/binary search or math formulas only/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/binary search or math formulas only/i)
+    ).toBeInTheDocument();
   });
 
   it("switches to patterns tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by pattern/i));
     expect(screen.getByText(/two pointers/i)).toBeInTheDocument();
     expect(screen.getByText(/sliding window/i)).toBeInTheDocument();
-    expect(screen.getByText(/click a pattern above to see details/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/click a pattern above to see details/i)
+    ).toBeInTheDocument();
   });
 
   it("shows pattern detail when a pattern is selected", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by pattern/i));
     fireEvent.click(screen.getByText(/two pointers/i));
-    expect(screen.getByText(/sorted array, find pairs, palindrome check/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/sorted array, find pairs, palindrome check/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/two sum ii/i)).toBeInTheDocument();
     expect(screen.getByText(/container with most water/i)).toBeInTheDocument();
   });
 
   it("deselects pattern when clicked again", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by pattern/i));
     fireEvent.click(screen.getByRole("button", { name: /two pointers/i }));
-    expect(screen.getByText(/sorted array, find pairs, palindrome check/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/sorted array, find pairs, palindrome check/i)
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /two pointers/i }));
-    expect(screen.getByText(/click a pattern above to see details/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/click a pattern above to see details/i)
+    ).toBeInTheDocument();
   });
 
   it("switches to keywords tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     fireEvent.click(screen.getByText(/by keywords/i));
     expect(screen.getByText(/dynamic programming/i)).toBeInTheDocument();
@@ -1125,26 +1564,36 @@ describe("Pattern Recognition page", () => {
   });
 
   it("displays input-to-pattern mappings in cheatsheet tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
-    expect(screen.getAllByText(/sorted array/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/sorted array/i).length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getByText(/unsorted array/i)).toBeInTheDocument();
     expect(screen.getAllByText(/tree/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it("displays output-to-pattern mappings in cheatsheet tab", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     expect(screen.getByText(/all combinations\/subsets/i)).toBeInTheDocument();
     expect(screen.getByText(/shortest path/i)).toBeInTheDocument();
   });
 
   it("displays 4-step decision flow", async () => {
-    const Page = (await import("@/app/pattern-recognition/PatternRecognitionClient")).default;
+    const Page = (
+      await import("@/app/pattern-recognition/PatternRecognitionClient")
+    ).default;
     render(React.createElement(Page));
     expect(screen.getByText(/check n/i)).toBeInTheDocument();
     expect(screen.getByText(/look at input type/i)).toBeInTheDocument();
-    expect(screen.getByText(/check what output is needed/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/check what output is needed/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/spot keywords/i)).toBeInTheDocument();
   });
 });
@@ -1157,8 +1606,12 @@ describe("Articles index page", () => {
   it("renders the page header", async () => {
     const ArticlesPage = (await import("@/app/articles/page")).default;
     render(React.createElement(ArticlesPage));
-    expect(screen.getByRole("heading", { name: "Articles", level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(/deep dives into programming concepts/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Articles", level: 1 })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/deep dives into programming concepts/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/back to home/i)).toBeInTheDocument();
   });
 
@@ -1172,7 +1625,9 @@ describe("Articles index page", () => {
   it("renders article metadata (difficulty, time, author, tags)", async () => {
     const ArticlesPage = (await import("@/app/articles/page")).default;
     render(React.createElement(ArticlesPage));
-    expect(screen.getAllByText(/intermediate/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/intermediate/).length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getAllByText(/2 hours/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/RK/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Rishu Kumar/).length).toBeGreaterThanOrEqual(1);
@@ -1182,7 +1637,9 @@ describe("Articles index page", () => {
   it("renders sections preview for each article", async () => {
     const ArticlesPage = (await import("@/app/articles/page")).default;
     render(React.createElement(ArticlesPage));
-    expect(screen.getAllByText(/fundamentals/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/fundamentals/i).length).toBeGreaterThanOrEqual(
+      1
+    );
     expect(screen.getByText(/types/i)).toBeInTheDocument();
   });
 
@@ -1191,15 +1648,22 @@ describe("Articles index page", () => {
     render(React.createElement(ArticlesPage));
     const recursionLink = screen.getByText(/mastering recursion/i).closest("a");
     expect(recursionLink).toHaveAttribute("href", "/articles/recursion");
-    const paradigmsLink = screen.getByText(/recursion vs backtracking/i).closest("a");
-    expect(paradigmsLink).toHaveAttribute("href", "/articles/algorithm-paradigms");
+    const paradigmsLink = screen
+      .getByText(/recursion vs backtracking/i)
+      .closest("a");
+    expect(paradigmsLink).toHaveAttribute(
+      "href",
+      "/articles/algorithm-paradigms"
+    );
   });
 
   it("renders 'More Articles Coming Soon' section", async () => {
     const ArticlesPage = (await import("@/app/articles/page")).default;
     render(React.createElement(ArticlesPage));
     expect(screen.getByText(/more articles coming soon/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /get notified/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /get notified/i })
+    ).toBeInTheDocument();
   });
 });
 
@@ -1210,9 +1674,13 @@ describe("Articles index page", () => {
 describe("Article detail page", () => {
   it("renders ArticleOverviewContent for a valid slug", async () => {
     const ArticlePage = (await import("@/app/articles/[slug]/page")).default;
-    const element = await ArticlePage({ params: Promise.resolve({ slug: "recursion" }) });
+    const element = await ArticlePage({
+      params: Promise.resolve({ slug: "recursion" }),
+    });
     render(element);
-    expect(screen.getByTestId("article-layout")).toHaveTextContent("Article: recursion");
+    expect(screen.getByTestId("article-layout")).toHaveTextContent(
+      "Article: recursion"
+    );
   });
 
   it("calls notFound for an unknown slug", async () => {
@@ -1225,7 +1693,10 @@ describe("Article detail page", () => {
   it("generates static params from articles", async () => {
     const mod = await import("@/app/articles/[slug]/page");
     const params = mod.generateStaticParams();
-    expect(params).toEqual([{ slug: "recursion" }, { slug: "algorithm-paradigms" }]);
+    expect(params).toEqual([
+      { slug: "recursion" },
+      { slug: "algorithm-paradigms" },
+    ]);
   });
 });
 
@@ -1235,30 +1706,44 @@ describe("Article detail page", () => {
 
 describe("ArticleOverviewContent", () => {
   it("renders SinglePageArticleLayout with correct article", async () => {
-    const ArticleOverviewContent = (await import("@/app/articles/[slug]/ArticleOverviewContent")).default;
+    const ArticleOverviewContent = (
+      await import("@/app/articles/[slug]/ArticleOverviewContent")
+    ).default;
     const article = mockArticles[0];
     render(React.createElement(ArticleOverviewContent, { article }));
-    expect(screen.getByTestId("article-layout")).toHaveTextContent("Article: recursion");
+    expect(screen.getByTestId("article-layout")).toHaveTextContent(
+      "Article: recursion"
+    );
   });
 
   it("maps section components for recursion article", async () => {
-    const ArticleOverviewContent = (await import("@/app/articles/[slug]/ArticleOverviewContent")).default;
+    const ArticleOverviewContent = (
+      await import("@/app/articles/[slug]/ArticleOverviewContent")
+    ).default;
     const article = mockArticles[0];
     render(React.createElement(ArticleOverviewContent, { article }));
     await waitFor(() => {
-      expect(screen.getByTestId("article-layout")).toHaveTextContent("Article: recursion");
+      expect(screen.getByTestId("article-layout")).toHaveTextContent(
+        "Article: recursion"
+      );
     });
   });
 
   it("returns empty section components for unknown slug", async () => {
-    const ArticleOverviewContent = (await import("@/app/articles/[slug]/ArticleOverviewContent")).default;
+    const ArticleOverviewContent = (
+      await import("@/app/articles/[slug]/ArticleOverviewContent")
+    ).default;
     const unknownArticle = {
       ...mockArticles[0],
       slug: "unknown-article",
     };
-    render(React.createElement(ArticleOverviewContent, { article: unknownArticle }));
+    render(
+      React.createElement(ArticleOverviewContent, { article: unknownArticle })
+    );
     await waitFor(() => {
-      expect(screen.getByTestId("article-layout")).toHaveTextContent("Sections: 0");
+      expect(screen.getByTestId("article-layout")).toHaveTextContent(
+        "Sections: 0"
+      );
     });
   });
 });
@@ -1281,11 +1766,14 @@ describe("Google callback page", () => {
 
   it("shows loading state while processing callback", async () => {
     mockAuth.handleGoogleCallback.mockResolvedValue({ success: true });
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     await waitFor(() => {
       expect(screen.getByText(/completing sign in/i)).toBeInTheDocument();
-      expect(screen.getByText(/please wait while we complete your Google sign in/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/please wait while we complete your Google sign in/i)
+      ).toBeInTheDocument();
     });
     await act(async () => {
       await expect(mockAuth.handleGoogleCallback).toHaveBeenCalled();
@@ -1296,10 +1784,13 @@ describe("Google callback page", () => {
     const searchParams = new URLSearchParams();
     searchParams.set("error", "access_denied");
     mockUseSearchParams.mockReturnValue(searchParams);
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     await waitFor(() => {
-      expect(screen.getByText(/Google login was cancelled or failed/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Google login was cancelled or failed/i)
+      ).toBeInTheDocument();
       expect(screen.getByText(/login failed/i)).toBeInTheDocument();
     });
   });
@@ -1307,7 +1798,8 @@ describe("Google callback page", () => {
   it("shows error when code and state are missing", async () => {
     const searchParams = new URLSearchParams();
     mockUseSearchParams.mockReturnValue(searchParams);
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     await waitFor(() => {
       expect(screen.getByText(/invalid callback/i)).toBeInTheDocument();
@@ -1316,7 +1808,8 @@ describe("Google callback page", () => {
 
   it("redirects when already authenticated", async () => {
     mockAuth.isAuthenticated = true;
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     await waitFor(() => {
       expect(useRouter().push).toHaveBeenCalledWith("/");
@@ -1325,16 +1818,21 @@ describe("Google callback page", () => {
 
   it("calls handleGoogleCallback on mount", async () => {
     mockAuth.handleGoogleCallback.mockResolvedValue({ success: true });
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     await waitFor(() => {
-      expect(mockAuth.handleGoogleCallback).toHaveBeenCalledWith("test-code", "test-state");
+      expect(mockAuth.handleGoogleCallback).toHaveBeenCalledWith(
+        "test-code",
+        "test-state"
+      );
     });
   });
 
   it("navigates to home on successful callback", async () => {
     mockAuth.handleGoogleCallback.mockResolvedValue({ success: true });
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     await waitFor(() => {
       expect(useRouter().push).toHaveBeenCalledWith("/");
@@ -1342,8 +1840,12 @@ describe("Google callback page", () => {
   });
 
   it("shows error on failed callback", async () => {
-    mockAuth.handleGoogleCallback.mockResolvedValue({ success: false, error: "Token exchange failed" });
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    mockAuth.handleGoogleCallback.mockResolvedValue({
+      success: false,
+      error: "Token exchange failed",
+    });
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     await waitFor(() => {
       expect(screen.getByText(/token exchange failed/i)).toBeInTheDocument();
@@ -1354,7 +1856,8 @@ describe("Google callback page", () => {
     const searchParams = new URLSearchParams();
     searchParams.set("error", "access_denied");
     mockUseSearchParams.mockReturnValue(searchParams);
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     await waitFor(() => {
       const backBtn = screen.getByText(/back to login/i);
@@ -1364,7 +1867,8 @@ describe("Google callback page", () => {
 
   it("renders the callback content inside Suspense", async () => {
     mockAuth.handleGoogleCallback.mockResolvedValue({ success: true });
-    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page")).default;
+    const GoogleCallbackPage = (await import("@/app/auth/google/callback/page"))
+      .default;
     render(React.createElement(GoogleCallbackPage));
     expect(screen.getByText(/completing sign in/i)).toBeInTheDocument();
   });
@@ -1376,42 +1880,70 @@ describe("Google callback page", () => {
 
 describe("Expand Around Center guide", () => {
   it("renders the breadcrumb", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/← back to problems/i)).toBeInTheDocument();
   });
 
   it("renders the main heading with badges", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
-    expect(screen.getByRole("heading", { name: /expand around center pattern/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /expand around center pattern/i })
+    ).toBeInTheDocument();
     expect(screen.getAllByText(/medium/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/string pattern/i)).toBeInTheDocument();
   });
 
   it("renders table of contents with all links", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/in this guide/i)).toBeInTheDocument();
     expect(screen.getAllByText(/core idea/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/key insight: types of centers/i).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/key insight: types of centers/i).length
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/algorithm/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/complexity analysis/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/code template/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/problems to practice/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/when to use \/ not use/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/common mistakes/i).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/complexity analysis/i).length
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/code template/i).length).toBeGreaterThanOrEqual(
+      1
+    );
+    expect(
+      screen.getAllByText(/problems to practice/i).length
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/when to use \/ not use/i).length
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/common mistakes/i).length
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("renders core idea section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
-    expect(screen.getByText(/a palindrome reads the same forwards and backwards/i)).toBeInTheDocument();
-    expect(screen.getByText(/think of it like dropping a pebble in water/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/a palindrome reads the same forwards and backwards/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/think of it like dropping a pebble in water/i)
+    ).toBeInTheDocument();
   });
 
   it("renders key insight section with odd and even length palindromes", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/odd length palindromes/i)).toBeInTheDocument();
     expect(screen.getByText(/even length palindromes/i)).toBeInTheDocument();
@@ -1419,56 +1951,94 @@ describe("Expand Around Center guide", () => {
   });
 
   it("renders algorithm steps", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
-    expect(screen.getByText(/for each index i from 0 to n-1:/i)).toBeInTheDocument();
-    expect(screen.getByText(/call expand\(i, i\) for odd-length palindromes/i)).toBeInTheDocument();
-    expect(screen.getByText(/call expand\(i, i\+1\) for even-length palindromes/i)).toBeInTheDocument();
-    expect(screen.getByText(/in expand\(\): while characters match, expand outward/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/for each index i from 0 to n-1:/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/call expand\(i, i\) for odd-length palindromes/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/call expand\(i, i\+1\) for even-length palindromes/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/in expand\(\): while characters match, expand outward/i)
+    ).toBeInTheDocument();
   });
 
   it("renders complexity analysis section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/time: O\(n²\)/i)).toBeInTheDocument();
     expect(screen.getByText(/space: O\(1\)/i)).toBeInTheDocument();
   });
 
   it("renders code template with language toggle", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
     expect(screen.getByTestId("language-toggle")).toBeInTheDocument();
     expect(screen.getByTestId("code-block")).toBeInTheDocument();
   });
 
   it("renders problems to practice section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
-    expect(screen.getAllByText(/palindromic substrings/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/longest palindromic substring/i).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/palindromic substrings/i).length
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/longest palindromic substring/i).length
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/valid palindrome ii/i)).toBeInTheDocument();
   });
 
   it("renders when to use / not use section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
     expect(screen.getByText(/use this pattern/i)).toBeInTheDocument();
-    expect(screen.getByText(/don't use \(use dp instead\)/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/don't use \(use dp instead\)/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/key distinction:/i)).toBeInTheDocument();
   });
 
   it("renders common mistakes section", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
-    expect(screen.getByText(/forgetting the even-length case/i)).toBeInTheDocument();
-    expect(screen.getByText(/wrong boundary checks in expand\(\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/confusing substring vs subsequence/i)).toBeInTheDocument();
-    expect(screen.getByText(/off-by-one in calculating start\/end indices/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/forgetting the even-length case/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/wrong boundary checks in expand\(\)/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/confusing substring vs subsequence/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/off-by-one in calculating start\/end indices/i)
+    ).toBeInTheDocument();
   });
 
   it("renders advanced note about Manacher's algorithm", async () => {
-    const Guide = (await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")).default;
+    const Guide = (
+      await import("@/app/guides/expand-around-center/ExpandAroundCenterClient")
+    ).default;
     render(React.createElement(Guide));
-    expect(screen.getByText(/advanced: manacher's algorithm/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/advanced: manacher's algorithm/i)
+    ).toBeInTheDocument();
   });
 });

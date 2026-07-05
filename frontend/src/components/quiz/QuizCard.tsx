@@ -41,8 +41,8 @@ export default function QuizCard({
                 Test Your Knowledge
               </h3>
               <p className="text-gray-400 text-sm">
-                Take a quick {questionCount} question quiz to test what you&apos;ve
-                learned.
+                Take a quick {questionCount} question quiz to test what
+                you&apos;ve learned.
               </p>
             </div>
           </div>

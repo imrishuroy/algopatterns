@@ -84,7 +84,8 @@ export function ConflictDialog({
                 Server Version
               </span>
               <span className="text-xs text-gray-500">
-                v{serverHighlight.version} · {formatDate(serverHighlight.updatedAt)}
+                v{serverHighlight.version} ·{" "}
+                {formatDate(serverHighlight.updatedAt)}
               </span>
             </div>
             <div className="px-4 py-3 bg-gray-800/50">

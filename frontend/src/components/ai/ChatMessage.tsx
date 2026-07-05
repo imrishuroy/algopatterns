@@ -19,7 +19,10 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
             : "bg-gray-800 text-gray-200 border border-gray-700"
         }`}
       >
-        <MessageContent content={message.content} isStreaming={message.isStreaming} />
+        <MessageContent
+          content={message.content}
+          isStreaming={message.isStreaming}
+        />
         {message.isStreaming && (
           <span className="inline-block w-1.5 h-3.5 ml-0.5 bg-indigo-400 animate-pulse" />
         )}
@@ -28,13 +31,28 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
   );
 }
 
-function MessageContent({ content, isStreaming }: { content: string; isStreaming?: boolean }) {
+function MessageContent({
+  content,
+  isStreaming,
+}: {
+  content: string;
+  isStreaming?: boolean;
+}) {
   if (!content && isStreaming) {
     return (
       <div className="flex items-center gap-1 py-1">
-        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+        <span
+          className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
+          style={{ animationDelay: "0ms" }}
+        />
+        <span
+          className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
+          style={{ animationDelay: "150ms" }}
+        />
+        <span
+          className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
+          style={{ animationDelay: "300ms" }}
+        />
       </div>
     );
   }
@@ -55,7 +73,9 @@ function MessageContent({ content, isStreaming }: { content: string; isStreaming
                 className="bg-gray-900 rounded-md p-2 my-2 overflow-x-auto text-xs font-mono"
               >
                 {lang && (
-                  <div className="text-[10px] text-gray-500 mb-1 uppercase">{lang}</div>
+                  <div className="text-[10px] text-gray-500 mb-1 uppercase">
+                    {lang}
+                  </div>
                 )}
                 <code className="text-gray-300">{code.trim()}</code>
               </pre>
@@ -141,7 +161,10 @@ function FormattedText({ text }: { text: string }) {
       flushParagraph();
       elements.push(
         // skipcq: JS-0437
-        <h3 key={`h3-${i}`} className="font-semibold text-white mt-3 mb-1 text-base">
+        <h3
+          key={`h3-${i}`}
+          className="font-semibold text-white mt-3 mb-1 text-base"
+        >
           {formatInlineText(trimmed.slice(3))}
         </h3>
       );
@@ -149,7 +172,10 @@ function FormattedText({ text }: { text: string }) {
       flushParagraph();
       elements.push(
         // skipcq: JS-0437
-        <h2 key={`h2-${i}`} className="font-bold text-white mt-3 mb-2 text-base">
+        <h2
+          key={`h2-${i}`}
+          className="font-bold text-white mt-3 mb-2 text-base"
+        >
           {formatInlineText(trimmed.slice(2))}
         </h2>
       );
@@ -202,7 +228,8 @@ function FormattedText({ text }: { text: string }) {
   return elements;
 }
 
-function formatInlineText(text: string): React.ReactNode { // skipcq: JS-R1005
+function formatInlineText(text: string): React.ReactNode {
+  // skipcq: JS-R1005
   // Handle bold, italic, inline code
   const parts: React.ReactNode[] = [];
   let remaining = text;
@@ -225,7 +252,9 @@ function formatInlineText(text: string): React.ReactNode { // skipcq: JS-R1005
     }
 
     // Italic *text* or _text_
-    const italicMatch = remaining.match(/^([\s\S]*?)(?:\*([^*]+)\*|_([^_]+)_)([\s\S]*)/);
+    const italicMatch = remaining.match(
+      /^([\s\S]*?)(?:\*([^*]+)\*|_([^_]+)_)([\s\S]*)/
+    );
     if (italicMatch) {
       if (italicMatch[1]) {
         parts.push(...processInlineCode(italicMatch[1], keyIndex++));

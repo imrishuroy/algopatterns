@@ -147,29 +147,29 @@ export function PricingCard({
         )}
 
         <button
-        onClick={() => onSelect(plan)}
-        disabled={isCurrentPlan || isLoading || isDowngrade}
-        className={`w-full py-3 px-4 rounded-md font-semibold transition-colors ${
-          isCurrentPlan
-            ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-            : isDowngrade
-              ? "bg-gray-800 text-gray-500 cursor-not-allowed"
-              : plan.is_recommended
-                ? "bg-emerald-500 hover:bg-emerald-600 text-white"
-                : "bg-gray-700 hover:bg-gray-600 text-white"
-        }`}
-      >
-        {isCurrentPlan
-          ? "Current Plan"
-          : isLoading
-            ? "Loading..."
-            : isDowngrade
-              ? "Current plan is better"
-              : plan.id === "free"
-                ? "Get Started"
-                : canUpgrade
-                  ? "Upgrade Now"
-                  : "Get Started"}
+          onClick={() => onSelect(plan)}
+          disabled={isCurrentPlan || isLoading || isDowngrade}
+          className={`w-full py-3 px-4 rounded-md font-semibold transition-colors ${
+            isCurrentPlan
+              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+              : isDowngrade
+                ? "bg-gray-800 text-gray-500 cursor-not-allowed"
+                : plan.is_recommended
+                  ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                  : "bg-gray-700 hover:bg-gray-600 text-white"
+          }`}
+        >
+          {isCurrentPlan
+            ? "Current Plan"
+            : isLoading
+              ? "Loading..."
+              : isDowngrade
+                ? "Current plan is better"
+                : plan.id === "free"
+                  ? "Get Started"
+                  : canUpgrade
+                    ? "Upgrade Now"
+                    : "Get Started"}
         </button>
       </div>
     </div>

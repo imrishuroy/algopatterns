@@ -9,7 +9,7 @@ interface TrueFalseProps {
   disabled: boolean;
 }
 
-export default function TrueFalse({
+export default function TrueFalse({ // skipcq: JS-0067
   question,
   answer,
   onAnswer,

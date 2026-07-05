@@ -224,7 +224,7 @@ export default function DPTransformationVisualizer() {
         callStack.pop();
         completed.push({
           call: traceItem.call,
-          result: traceItem.result!,
+          result: traceItem.result ?? 0,
           stepIdx: idx,
         });
       }
@@ -293,8 +293,7 @@ export default function DPTransformationVisualizer() {
           >
             <span className="text-red-400 font-medium">Duplicate work!</span>
             <span className="text-red-300 ml-2">
-              {currentStep!.call} is being computed again{" "}
-              {/* skipcq: JS-0339 */}
+              {currentStep?.call} is being computed again{" "}
             </span>
           </motion.div>
         )}

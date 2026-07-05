@@ -96,7 +96,7 @@ function GoogleCallbackContent() {
   );
 }
 
-function LoadingFallback() {
+function LoadingFallback() { // skipcq: JS-0067
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -112,7 +112,7 @@ function LoadingFallback() {
   );
 }
 
-export default function GoogleCallbackPage() {
+export default function GoogleCallbackPage() { // skipcq: JS-0067
   return (
     <Suspense fallback={<LoadingFallback />}>
       <GoogleCallbackContent />

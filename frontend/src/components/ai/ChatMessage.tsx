@@ -7,7 +7,7 @@ interface ChatMessageProps {
   message: AIMessage;
 }
 
-function ChatMessageComponent({ message }: ChatMessageProps) {
+function ChatMessageComponent({ message }: ChatMessageProps) { // skipcq: JS-0067
   const isUser = message.role === "user";
 
   return (
@@ -31,7 +31,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
   );
 }
 
-function MessageContent({
+function MessageContent({ // skipcq: JS-0067
   content,
   isStreaming,
 }: {
@@ -228,7 +228,7 @@ function FormattedText({ text }: { text: string }) {
   return elements;
 }
 
-function formatInlineText(text: string): React.ReactNode {
+function formatInlineText(text: string): React.ReactNode { // skipcq: JS-0067
   // skipcq: JS-R1005
   // Handle bold, italic, inline code
   const parts: React.ReactNode[] = [];

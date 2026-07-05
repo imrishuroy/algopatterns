@@ -31,15 +31,15 @@ func (h *SearchHandler) RegisterRoutes(r *gin.RouterGroup) {
 		search.GET("", h.authMW.OptionalAuth(), h.Search)
 
 		// Authenticated endpoints
-		search.GET("/history", h.authMW.RequireAuth(), h.GetHistory)
+		search.GET("/history", h.authMW.RequireAuth(), h.ListHistory)
 		search.POST("/history", h.authMW.RequireAuth(), h.AddToHistory)
 		search.DELETE("/history", h.authMW.RequireAuth(), h.ClearHistory)
 
-		search.GET("/recent", h.authMW.RequireAuth(), h.GetRecentViews)
+		search.GET("/recent", h.authMW.RequireAuth(), h.ListRecentViews)
 		search.POST("/track-view", h.authMW.RequireAuth(), h.TrackView)
 		search.DELETE("/recent", h.authMW.RequireAuth(), h.ClearRecentViews)
 
-		search.GET("/favorites", h.authMW.RequireAuth(), h.GetFavorites)
+		search.GET("/favorites", h.authMW.RequireAuth(), h.ListFavorites)
 		search.POST("/favorites", h.authMW.RequireAuth(), h.AddFavorite)
 		search.DELETE("/favorites/:id", h.authMW.RequireAuth(), h.RemoveFavorite)
 		search.GET("/favorites/check", h.authMW.RequireAuth(), h.CheckFavorite)
@@ -70,8 +70,8 @@ func (h *SearchHandler) Search(c *gin.Context) {
 	response.OK(c, results)
 }
 
-// GetHistory returns search history for the authenticated user
-func (h *SearchHandler) GetHistory(c *gin.Context) {
+// ListHistory returns search history for the authenticated user
+func (h *SearchHandler) ListHistory(c *gin.Context) {
 	userID := getUserID(c)
 	if userID == nil {
 		response.Unauthorized(c, "Authentication required")
@@ -142,8 +142,8 @@ func (h *SearchHandler) ClearHistory(c *gin.Context) {
 	response.NoContent(c)
 }
 
-// GetRecentViews returns recently viewed content
-func (h *SearchHandler) GetRecentViews(c *gin.Context) {
+// ListRecentViews returns recently viewed content
+func (h *SearchHandler) ListRecentViews(c *gin.Context) {
 	userID := getUserID(c)
 	if userID == nil {
 		response.Unauthorized(c, "Authentication required")
@@ -210,8 +210,8 @@ func (h *SearchHandler) ClearRecentViews(c *gin.Context) {
 	response.NoContent(c)
 }
 
-// GetFavorites returns favorites for the authenticated user
-func (h *SearchHandler) GetFavorites(c *gin.Context) {
+// ListFavorites returns favorites for the authenticated user
+func (h *SearchHandler) ListFavorites(c *gin.Context) {
 	userID := getUserID(c)
 	if userID == nil {
 		response.Unauthorized(c, "Authentication required")

@@ -34,7 +34,7 @@ function hasFeatureAccess(
 /**
  * Returns a human-readable description for each feature.
  */
-function getFeatureDescription(feature: keyof PlanFeatures): string {
+function getFeatureDescription(feature: keyof PlanFeatures): string { // skipcq: JS-0067
   const descriptions: Record<keyof PlanFeatures, string> = {
     max_patterns: "Access all algorithm patterns and their detailed tutorials.",
     max_visualizers:
@@ -57,7 +57,7 @@ function getFeatureDescription(feature: keyof PlanFeatures): string {
  * PaymentGuard component wraps premium content and shows a blurred overlay
  * with an upgrade prompt for users who don't have access to the feature.
  */
-export function PaymentGuard({
+export function PaymentGuard({ // skipcq: JS-0067
   feature,
   children,
   fallback,

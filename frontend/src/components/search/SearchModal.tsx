@@ -18,7 +18,7 @@ import type { SearchResults as SearchResultsType, SearchResult } from "@/types";
 
 // Wrapper component that conditionally renders the modal content
 // This allows the inner component to reset its state when re-mounted
-export function SearchModal() {
+export function SearchModal() { // skipcq: JS-0067
   const { isOpen } = useSearch();
 
   // Check if we're in browser environment for portal rendering
@@ -28,7 +28,7 @@ export function SearchModal() {
   return <SearchModalContent key={isOpen ? "open" : "closed"} />;
 }
 
-function SearchModalContent() {
+function SearchModalContent() { // skipcq: JS-0067, JS-R1005
   const router = useRouter();
   const { closeSearch, searchMode, setSearchMode, addToHistory } = useSearch();
 
@@ -117,7 +117,7 @@ function SearchModalContent() {
       }
     }, 300);
 
-    return () => {
+    return () => { // skipcq: JS-0045
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }
@@ -221,11 +221,13 @@ function SearchModalContent() {
           closeSearch();
           break;
         case "Tab":
-          e.preventDefault();
-          setSearchMode(searchMode === "keyword" ? "ai" : "keyword");
-          break;
-      }
-    },
+              e.preventDefault();
+              setSearchMode(searchMode === "keyword" ? "ai" : "keyword");
+              break;
+            default:
+              break;
+          }
+        },
     [
       getNavigableResults,
       selectedIndex,

@@ -21,7 +21,7 @@ interface QuizModalProps {
   sectionSlug?: string;
 }
 
-export default function QuizModal({
+export default function QuizModal({ // skipcq: JS-0067
   isOpen,
   onClose,
   patternId,

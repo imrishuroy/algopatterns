@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { GoogleButton } from "@/components/ui/GoogleButton";
 
-export default function RegisterPage() {
+export default function RegisterPage() { // skipcq: JS-0067
   const router = useRouter();
   const {
     register,

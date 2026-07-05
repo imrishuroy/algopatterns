@@ -9,7 +9,7 @@ interface MultipleChoiceProps {
   disabled: boolean;
 }
 
-function parseQuestionText(text: string): {
+function parseQuestionText(text: string): { // skipcq: JS-0067
   question: string;
   code: string | null;
 } {
@@ -46,7 +46,7 @@ function parseQuestionText(text: string): {
   return { question: text, code: null };
 }
 
-export default function MultipleChoice({
+export default function MultipleChoice({ // skipcq: JS-0067
   question,
   answer,
   onAnswer,

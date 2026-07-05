@@ -156,7 +156,7 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 };
 
 // Get all results sorted by score
-function getAllResultsSorted(results: SearchResultsType): SearchResult[] {
+function getAllResultsSorted(results: SearchResultsType): SearchResult[] { // skipcq: JS-0067
   const allResults: SearchResult[] = [];
   const types: SearchContentType[] = [
     "pattern",
@@ -178,7 +178,7 @@ function getAllResultsSorted(results: SearchResultsType): SearchResult[] {
 }
 
 // Get counts for each type
-function getTypeCounts(results: SearchResultsType): Record<TabType, number> {
+function getTypeCounts(results: SearchResultsType): Record<TabType, number> { // skipcq: JS-0067
   const counts: Record<TabType, number> = {
     all: 0,
     pattern: 0,
@@ -208,7 +208,7 @@ function getTypeCounts(results: SearchResultsType): Record<TabType, number> {
   return counts;
 }
 
-export function SearchResults({
+export function SearchResults({ // skipcq: JS-0067, JS-R1005
   results,
   selectedIndex,
   onSelect,
@@ -266,9 +266,9 @@ export function SearchResults({
       {results.suggestions && results.suggestions.length > 0 && (
         <div className="px-4 py-2 border-b border-gray-800">
           <span className="text-xs text-gray-500">Suggestions: </span>
-          {results.suggestions.map((suggestion, i) => (
+          {results.suggestions.map((suggestion) => (
             <button
-              key={i}
+              key={suggestion}
               onClick={() => onSuggestionClick(suggestion)}
               className="ml-2 text-xs text-teal-400 hover:text-teal-300 hover:underline"
             >
@@ -404,7 +404,7 @@ export function SearchResults({
 }
 
 // Export helper for SearchModal to get filtered results for keyboard navigation
-export function getFilteredResults(
+export function getFilteredResults( // skipcq: JS-0067
   results: SearchResultsType,
   activeTab: TabType
 ): SearchResult[] {

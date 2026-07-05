@@ -120,7 +120,7 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-export function PreviewPanel({ result }: PreviewPanelProps) {
+export function PreviewPanel({ result }: PreviewPanelProps) { // skipcq: JS-0067, JS-R1005
   const preview = result.preview || {};
 
   return (

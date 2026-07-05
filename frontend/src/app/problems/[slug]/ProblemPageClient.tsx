@@ -1871,7 +1871,7 @@ export default function ProblemPageClient({ params }: PageProps) {
                     ) : (
                       hints.map((hint, i) => (
                         <div
-                          key={i}
+                          key={hint.slice(0, 40)}
                           className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden"
                         >
                           <button
@@ -2531,7 +2531,7 @@ export default function ProblemPageClient({ params }: PageProps) {
                 ) : (
                   hints.map((hint, i) => (
                     <div
-                      key={i}
+                      key={hint.slice(0, 40)}
                       className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden"
                     >
                       <button
@@ -2612,9 +2612,9 @@ export default function ProblemPageClient({ params }: PageProps) {
                       <div className="text-gray-300 text-sm space-y-2">
                         <p>{solutions[slug].approach}</p>
                         <ol className="list-decimal list-inside space-y-1 text-gray-400 mt-3">
-                          {solutions[slug].steps.map((step, i) => (
-                            <li key={i}>{step}</li>
-                          ))}
+                          {solutions[slug].steps.map((step) => (
+                                <li key={step}>{step}</li>
+                              ))}
                         </ol>
                       </div>
                     </div>

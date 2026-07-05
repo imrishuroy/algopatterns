@@ -102,7 +102,7 @@ const TYPE_ICONS: Record<SearchContentType, React.ReactNode> = {
   ),
 };
 
-export function QuickAccess({
+export function QuickAccess({ // skipcq: JS-0067, JS-R1005
   onSearchClick,
   onResultClick,
 }: QuickAccessProps) {

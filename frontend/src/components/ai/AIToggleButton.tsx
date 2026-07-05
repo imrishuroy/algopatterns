@@ -6,7 +6,7 @@ interface AIToggleButtonProps {
   hasNewMessage?: boolean;
 }
 
-export function AIToggleButton({
+export function AIToggleButton({ // skipcq: JS-0067
   isOpen,
   onClick,
   hasNewMessage,

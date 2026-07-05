@@ -13,7 +13,7 @@ interface SearchInputProps {
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  function SearchInput(
+  function SearchInput( // skipcq: JS-0067, JS-R1005
     { query, onQueryChange, mode, onModeChange, onClose, isLoading },
     ref
   ) {

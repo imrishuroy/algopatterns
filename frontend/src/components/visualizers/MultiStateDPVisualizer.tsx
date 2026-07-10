@@ -179,12 +179,12 @@ const MultiStateDPVisualizer = () => {
       if (newMax === num) {
         decision = "start";
         explanation = `${num} alone (${num}) beats extending. Start fresh!`;
-      } else if (newMax === num * currMin) {
-        decision = "extendMin";
-        explanation = `${num} × min(${currMin}) = ${num * currMin}. Negative × Negative = Positive!`;
-      } else {
+      } else if (newMax === num * temp) {
         decision = "extendMax";
         explanation = `${num} × max(${temp}) = ${num * temp}. Extend the product.`;
+      } else {
+        decision = "extendMin";
+        explanation = `${num} × min(${currMin}) = ${num * currMin}. Negative × Negative = Positive!`;
       }
 
       currMax = newMax;

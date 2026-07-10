@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Phase = "concept" | "postorder" | "result";
+type Phase = "concept" | "postorder";
 
 interface TreeNode {
   id: number;
@@ -21,13 +21,19 @@ interface TreeNode {
 }
 
 const buildTree = (): TreeNode[] => {
+  // Tree structure matching article example:
+  //         3 (id:0)
+  //        / \
+  //       2   3   (id:1, id:2)
+  //        \   \
+  //         3   1  (id:3, id:4)
+  // Answer: 7 (root 3 + grandchild 3 + grandchild 1)
   return [
     { id: 0, val: 3, children: [1, 2], parent: null },
-    { id: 1, val: 2, children: [3, 4], parent: 0 },
-    { id: 2, val: 3, children: [5], parent: 0 },
+    { id: 1, val: 2, children: [3], parent: 0 },
+    { id: 2, val: 3, children: [4], parent: 0 },
     { id: 3, val: 3, children: [], parent: 1 },
-    { id: 4, val: 1, children: [], parent: 1 },
-    { id: 5, val: 1, children: [], parent: 2 },
+    { id: 4, val: 1, children: [], parent: 2 },
   ];
 };
 
@@ -227,12 +233,11 @@ const TreeVisualization = ({
   const nodeRadius = 22;
 
   const positions: { x: number; y: number }[] = [
-    { x: 200, y: 30 },
-    { x: 100, y: 90 },
-    { x: 300, y: 90 },
-    { x: 50, y: 160 },
-    { x: 150, y: 160 },
-    { x: 300, y: 160 },
+    { x: 200, y: 30 },   // root (id:0, val:3)
+    { x: 100, y: 100 },  // left child (id:1, val:2)
+    { x: 300, y: 100 },  // right child (id:2, val:3)
+    { x: 100, y: 170 },  // left grandchild (id:3, val:3)
+    { x: 300, y: 170 },  // right grandchild (id:4, val:1)
   ];
 
   return (
@@ -285,7 +290,7 @@ const TreeVisualization = ({
   );
 };
 
-const ConceptPhase = ({ tree }: { tree: TreeNode[] }) => (
+const ConceptPhase = ({ tree, onStartAnimation }: { tree: TreeNode[]; onStartAnimation: () => void }) => (
   <div className="flex flex-col items-center gap-6">
     <TreeVisualization tree={tree} computedNodes={new Set()} />
     <div className="bg-gray-800/30 rounded-lg p-6 max-w-lg">
@@ -313,6 +318,12 @@ const ConceptPhase = ({ tree }: { tree: TreeNode[] }) => (
           Process bottom-up (postorder): leaves first, then parents
         </div>
       </div>
+      <button
+        onClick={onStartAnimation}
+        className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-all"
+      >
+        Start Animation
+      </button>
     </div>
   </div>
 );
@@ -321,10 +332,12 @@ const PostorderPhase = ({
   tree,
   step,
   dpSteps,
+  answer,
 }: {
   tree: TreeNode[];
   step: number;
   dpSteps: ReturnType<typeof generateDPSteps>["steps"];
+  answer: number;
 }) => {
   const computedNodes = useMemo(() => {
     const set = new Set<number>();
@@ -347,6 +360,9 @@ const PostorderPhase = ({
     return table;
   }, [step, dpSteps, tree]);
 
+  const isComplete = step >= dpSteps.length && step > 0;
+  const rootDp = dpTable[0];
+
   return (
     <div className="flex flex-col items-center gap-6">
       <TreeVisualization
@@ -363,16 +379,19 @@ const PostorderPhase = ({
           {tree.map((node) => {
             const dp = dpTable[node.id];
             const isCurrent = currentStep?.nodeId === node.id;
+            const isRoot = node.id === 0 && isComplete;
             return (
               <div
                 key={node.id}
                 className={`flex flex-col items-center p-2 rounded-lg border-2 ${
                   isCurrent
                     ? "border-blue-500 bg-blue-600/20"
-                    : "border-gray-700 bg-gray-800/50"
+                    : isRoot
+                      ? "border-green-500 bg-green-600/20"
+                      : "border-gray-700 bg-gray-800/50"
                 }`}
               >
-                <div className="text-xs text-gray-500">Node {node.val}</div>
+                <div className="text-xs text-gray-500">Node {node.val}{node.id === 0 ? " (root)" : ""}</div>
                 <div className="flex gap-2 mt-1">
                   <div className="text-xs">
                     <span className="text-green-400">inc:</span>
@@ -395,6 +414,19 @@ const PostorderPhase = ({
         </div>
       )}
 
+      {isComplete && rootDp.include !== null && rootDp.exclude !== null && (
+        <div className="text-sm text-center bg-green-600/20 px-6 py-3 rounded-lg">
+          <div className="text-green-400 font-bold mb-1">
+            Answer: max(include, exclude) = max({rootDp.include}, {rootDp.exclude}) = {answer}
+          </div>
+          <div className="text-gray-400 text-xs">
+            {answer === rootDp.include
+              ? "Optimal: Include root 3 + grandchildren (3 + 1) = 7"
+              : "Optimal: Exclude root, include children"}
+          </div>
+        </div>
+      )}
+
       <div className="text-sm text-gray-500">
         Postorder: process children before parent (bottom-up)
       </div>
@@ -405,11 +437,10 @@ const PostorderPhase = ({
 // skipcq: JS-0067
 export default function TreeDPVisualizer() {
   // skipcq: JS-0067
-  const phases: Phase[] = ["concept", "postorder", "result"];
+  const phases: Phase[] = ["concept", "postorder"];
   const phaseLabels: Record<Phase, string> = {
     concept: "Concept",
     postorder: "Postorder DP",
-    result: "Result",
   };
 
   const [currentPhase, setCurrentPhase] = useState<Phase>("concept");
@@ -426,8 +457,8 @@ export default function TreeDPVisualizer() {
 
   const getMaxSteps = useCallback(
     (phase: Phase) => {
-      if (phase === "postorder" || phase === "result") return dpSteps.length;
-      return 1;
+      if (phase === "postorder") return dpSteps.length;
+      return 0; // concept phase is static, no steps
     },
     [dpSteps.length]
   );
@@ -484,23 +515,25 @@ export default function TreeDPVisualizer() {
           ))}
         </div>
       </div>
-      <div className="mb-6">
-        <Controls
-          isPlaying={isPlaying}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onStep={() => step < maxSteps && setStep((s) => s + 1)}
-          onBack={() => step > 0 && setStep((s) => s - 1)}
-          onReset={() => {
-            setStep(0);
-            setIsPlaying(false);
-          }}
-          speed={speed}
-          onSpeedChange={setSpeed}
-          step={step}
-          total={maxSteps}
-        />
-      </div>
+      {currentPhase !== "concept" && (
+        <div className="mb-6">
+          <Controls
+            isPlaying={isPlaying}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onStep={() => step < maxSteps && setStep((s) => s + 1)}
+            onBack={() => step > 0 && setStep((s) => s - 1)}
+            onReset={() => {
+              setStep(0);
+              setIsPlaying(false);
+            }}
+            speed={speed}
+            onSpeedChange={setSpeed}
+            step={step}
+            total={maxSteps}
+          />
+        </div>
+      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentPhase}
@@ -508,14 +541,14 @@ export default function TreeDPVisualizer() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {currentPhase === "concept" && <ConceptPhase tree={tree} />}
-          {(currentPhase === "postorder" || currentPhase === "result") && (
-            <PostorderPhase tree={tree} step={step} dpSteps={dpSteps} />
+          {currentPhase === "concept" && <ConceptPhase tree={tree} onStartAnimation={() => goToPhase("postorder")} />}
+          {currentPhase === "postorder" && (
+            <PostorderPhase tree={tree} step={step} dpSteps={dpSteps} answer={answer} />
           )}
         </motion.div>
       </AnimatePresence>
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        Tree values = [{tree.map((n) => n.val).join(", ")}] | Max sum = {answer}
+        Tree = [3, 2, 3, null, 3, null, 1] | Max sum = {answer} | Optimal: root(3) + grandchildren(3+1)
       </div>
     </div>
   );

@@ -281,44 +281,161 @@ const DistanceMatrix = () => (
   </div>
 );
 
-const ConceptPhase = () => (
-  <div className="flex flex-col items-center gap-6">
-    <MaskDisplay mask={0} visited={new Set([0])} />
-    <DistanceMatrix />
-    <div className="bg-gray-800/30 rounded-lg p-6 max-w-lg">
-      <div className="text-center mb-4">
-        <div className="text-white font-medium mb-2">TSP with Bitmask DP</div>
-        <div className="text-sm text-gray-400">
-          Visit all cities exactly once, return to start, minimize cost
-        </div>
+const conceptSteps: {
+  title: string;
+  description: string;
+  mask: number;
+  highlight: number[];
+  code: string | null;
+}[] = [
+  {
+    title: "What is a Bitmask?",
+    description: "A bitmask encodes a SET as an integer. Each bit represents whether an item is included.",
+    mask: 0,
+    highlight: [],
+    code: null,
+  },
+  {
+    title: "4 Cities = 4 Bits",
+    description: "With 4 cities {A, B, C, D}, we use 4 bits. Bit i = 1 means city i is visited.",
+    mask: 0,
+    highlight: [0, 1, 2, 3],
+    code: "mask = 0000 (decimal 0) → no cities visited",
+  },
+  {
+    title: "Visit City A (bit 0)",
+    description: "Set bit 0 to mark city A as visited. Use: mask | (1 << 0)",
+    mask: 1,
+    highlight: [0],
+    code: "mask | (1 << 0) = 0000 | 0001 = 0001",
+  },
+  {
+    title: "Visit City C (bit 2)",
+    description: "Set bit 2 to mark city C as visited. Use: mask | (1 << 2)",
+    mask: 5,
+    highlight: [0, 2],
+    code: "mask | (1 << 2) = 0001 | 0100 = 0101",
+  },
+  {
+    title: "Check if City B Visited",
+    description: "Check bit 1: (mask & (1 << 1)) == 0 means NOT visited.",
+    mask: 5,
+    highlight: [1],
+    code: "(0101 & 0010) == 0 → B not visited ✓",
+  },
+  {
+    title: "Why (mask, pos) State?",
+    description: "Same visited set, different current city = different cost to continue. We need BOTH.",
+    mask: 7,
+    highlight: [0, 1, 2],
+    code: "dp[mask][pos] = min cost with visited=mask, at city pos",
+  },
+  {
+    title: "The Recurrence",
+    description: "From current state, try each unvisited city. Update the new state with better cost.",
+    mask: 15,
+    highlight: [0, 1, 2, 3],
+    code: "dp[mask|next][next] = min(..., dp[mask][pos] + dist[pos][next])",
+  },
+];
+
+const ConceptPhase = ({ step }: { step: number }) => {
+  const currentStep = conceptSteps[Math.min(step, conceptSteps.length - 1)];
+  const displayMask = step === 0 ? 0 : currentStep.mask;
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex justify-center gap-2 mb-2">
+        {cities.map((city, idx) => {
+          const isSet = (displayMask & (1 << idx)) !== 0;
+          const isHighlighted = currentStep.highlight.includes(idx);
+          return (
+            <motion.div
+              key={`concept-city-${city}`}
+              className="flex flex-col items-center"
+              animate={{
+                scale: isHighlighted ? 1.1 : 1,
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div
+                className={`w-14 h-14 flex items-center justify-center rounded-full font-mono font-bold text-lg border-2 transition-all ${
+                  isSet
+                    ? "bg-green-600 border-green-400 text-white"
+                    : isHighlighted
+                      ? "bg-gray-700 border-yellow-400 text-yellow-400"
+                      : "bg-gray-800 border-gray-600 text-gray-400"
+                }`}
+                animate={{
+                  backgroundColor: isSet ? "#16a34a" : isHighlighted ? "#374151" : "#1f2937",
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                {city}
+              </motion.div>
+              <motion.div
+                className={`text-sm mt-1 font-mono ${isSet ? "text-green-400" : "text-gray-500"}`}
+                animate={{ color: isSet ? "#4ade80" : "#6b7280" }}
+              >
+                {(displayMask >> idx) & 1}
+              </motion.div>
+              <div className="text-xs text-gray-600">bit {idx}</div>
+            </motion.div>
+          );
+        })}
       </div>
-      <div className="text-sm text-gray-400 space-y-2">
-        <div>
-          <span className="text-blue-400">State:</span> dp[mask][pos] = min cost
-          to reach pos with visited set = mask
-        </div>
-        <div>
-          <span className="text-green-400">Mask:</span> bit i = 1 means city i
-          is visited
-        </div>
-        <div className="font-mono bg-gray-800 p-2 rounded text-xs mt-2">
-          dp[newMask][next] = min(dp[newMask][next], dp[mask][pos] +
-          dist[pos][next])
-        </div>
-        <div className="text-gray-500 text-xs mt-2">
-          Answer: min(dp[1111][pos] + dist[pos][0]) for all pos
-        </div>
-      </div>
+
+      <motion.div
+        className="text-center font-mono text-lg"
+        key={`mask-${displayMask}`}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <span className="text-gray-500">mask = </span>
+        <span className="text-blue-400">{displayMask.toString(2).padStart(n, "0")}</span>
+        <span className="text-gray-600"> ({displayMask})</span>
+      </motion.div>
+
+      <motion.div
+        className="bg-gray-800/50 rounded-xl p-6 max-w-lg text-center"
+        key={`step-${step}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="text-white font-medium text-lg mb-2">{currentStep.title}</div>
+        <div className="text-gray-400 text-sm mb-4">{currentStep.description}</div>
+        {currentStep.code && (
+          <div className="font-mono text-xs bg-gray-900 text-green-400 p-3 rounded-lg">
+            {currentStep.code}
+          </div>
+        )}
+      </motion.div>
+
+      {step >= conceptSteps.length - 1 && (
+        <motion.div
+          className="text-sm text-blue-400"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          Now see it in action → click &quot;TSP Steps&quot; tab
+        </motion.div>
+      )}
+
+      <DistanceMatrix />
     </div>
-  </div>
-);
+  );
+};
 
 const TSPPhase = ({
   step,
   tspSteps,
+  answer,
 }: {
   step: number;
   tspSteps: ReturnType<typeof generateTSPSteps>["steps"];
+  answer: number;
 }) => {
   const currentStep =
     step > 0 && step <= tspSteps.length ? tspSteps[step - 1] : null;
@@ -410,6 +527,13 @@ const TSPPhase = ({
         </div>
       )}
 
+      {step >= tspSteps.length && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: Min tour cost = {answer}</span>
+          <span className="text-gray-400 ml-2">(tour: A → B → D → C → A)</span>
+        </div>
+      )}
+
       <div className="text-sm text-gray-500">
         Process by increasing popcount: fewer visited cities first
       </div>
@@ -438,7 +562,7 @@ export default function BitmaskDPVisualizer() {
   const getMaxSteps = useCallback(
     (phase: Phase) => {
       if (phase === "tsp" || phase === "result") return tspSteps.length;
-      return 1;
+      return conceptSteps.length;
     },
     [tspSteps.length]
   );
@@ -517,9 +641,9 @@ export default function BitmaskDPVisualizer() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {currentPhase === "concept" && <ConceptPhase />}
+          {currentPhase === "concept" && <ConceptPhase step={step} />}
           {(currentPhase === "tsp" || currentPhase === "result") && (
-            <TSPPhase step={step} tspSteps={tspSteps} />
+            <TSPPhase step={step} tspSteps={tspSteps} answer={answer} />
           )}
         </motion.div>
       </AnimatePresence>

@@ -12,6 +12,142 @@ import { motion, AnimatePresence } from "framer-motion";
 type Phase = "tree" | "memo" | "table" | "binary";
 
 const nums = [10, 9, 2, 5, 3, 7, 101, 18];
+const treeNums = [2, 5, 3];
+
+interface RecursionStep {
+  index: number;
+  prevIndex: number;
+  action: string;
+  result: number | null;
+  phase: "enter" | "return";
+}
+
+interface MemoStep {
+  index: number;
+  prevIndex: number;
+  value: number;
+  action: string;
+  fromCache: boolean;
+}
+
+const generateRecursionSteps = (): RecursionStep[] => {
+  const steps: RecursionStep[] = [];
+
+  const solve = (index: number, prevIndex: number): number => {
+    const prevVal = prevIndex === -1 ? "-∞" : String(treeNums[prevIndex]);
+
+    if (index >= treeNums.length) {
+      steps.push({
+        index,
+        prevIndex,
+        action: `solve(${index}, ${prevIndex}): Base case, return 0`,
+        result: 0,
+        phase: "return",
+      });
+      return 0;
+    }
+
+    const currentNum = treeNums[index];
+    const prevValue = prevIndex === -1 ? -Infinity : treeNums[prevIndex];
+    const canTake = currentNum > prevValue;
+
+    steps.push({
+      index,
+      prevIndex,
+      action: `solve(${index}, ${prevIndex}): At ${currentNum}, prev=${prevVal}. ${canTake ? "Can take or skip." : "Can only skip."}`,
+      result: null,
+      phase: "enter",
+    });
+
+    let result: number;
+    if (canTake) {
+      const take = 1 + solve(index + 1, index);
+      const skip = solve(index + 1, prevIndex);
+      result = Math.max(take, skip);
+      steps.push({
+        index,
+        prevIndex,
+        action: `solve(${index}, ${prevIndex}): take=${take}, skip=${skip}. Return ${result}`,
+        result,
+        phase: "return",
+      });
+    } else {
+      result = solve(index + 1, prevIndex);
+      steps.push({
+        index,
+        prevIndex,
+        action: `solve(${index}, ${prevIndex}): Only skip. Return ${result}`,
+        result,
+        phase: "return",
+      });
+    }
+
+    return result;
+  };
+
+  solve(0, -1);
+  return steps;
+};
+
+const generateMemoSteps = (): {
+  steps: MemoStep[];
+} => {
+  const n = treeNums.length;
+  const memo: (number | null)[][] = Array.from({ length: n + 1 }, () =>
+    Array(n + 1).fill(null)
+  );
+  const steps: MemoStep[] = [];
+
+  const solve = (index: number, prevIndex: number): number => {
+    if (index >= n) {
+      return 0;
+    }
+
+    if (memo[index][prevIndex + 1] !== null) {
+      steps.push({
+        index,
+        prevIndex,
+        value: memo[index][prevIndex + 1] as number,
+        action: `Cache hit! memo[${index}][${prevIndex + 1}] = ${memo[index][prevIndex + 1]}`,
+        fromCache: true,
+      });
+      return memo[index][prevIndex + 1] as number;
+    }
+
+    const prevValue = prevIndex === -1 ? -Infinity : treeNums[prevIndex];
+    const currentNum = treeNums[index];
+
+    let result: number;
+    if (currentNum > prevValue) {
+      const take = 1 + solve(index + 1, index);
+      const skip = solve(index + 1, prevIndex);
+      result = Math.max(take, skip);
+      steps.push({
+        index,
+        prevIndex,
+        value: result,
+        action: `Compute memo[${index}][${prevIndex + 1}]: take=${take}, skip=${skip}. Store ${result}.`,
+        fromCache: false,
+      });
+    } else {
+      result = solve(index + 1, prevIndex);
+      steps.push({
+        index,
+        prevIndex,
+        value: result,
+        action: `Can't take ${currentNum} (prev=${prevValue}). Skip. Store ${result}.`,
+        fromCache: false,
+      });
+    }
+
+    memo[index][prevIndex + 1] = result;
+    return result;
+  };
+
+  solve(0, -1);
+
+  return { steps };
+};
 
 const generateTableSteps = () => {
   const n = nums.length;
@@ -81,6 +217,390 @@ const generateBinarySteps = () => {
   }
 
   return { steps, finalLen: tails.length };
+};
+
+interface TreeNodeData {
+  id: number;
+  label: string;
+  x: number;
+  y: number;
+  result: number | null;
+  parentId: number | null;
+  edgeLabel: string;
+}
+
+const buildRecursionTreeData = (): { nodes: TreeNodeData[]; visitOrder: number[] } => {
+  const nodes: TreeNodeData[] = [];
+  const visitOrder: number[] = [];
+
+  nodes.push({ id: 0, label: "(0,-)", x: 350, y: 35, result: null, parentId: null, edgeLabel: "" });
+
+  nodes.push({ id: 1, label: "(1,0)", x: 175, y: 100, result: null, parentId: 0, edgeLabel: "take 2" });
+  nodes.push({ id: 2, label: "(1,-)", x: 525, y: 100, result: null, parentId: 0, edgeLabel: "skip" });
+
+  nodes.push({ id: 3, label: "(2,1)", x: 90, y: 165, result: null, parentId: 1, edgeLabel: "take 5" });
+  nodes.push({ id: 4, label: "(2,0)", x: 260, y: 165, result: null, parentId: 1, edgeLabel: "skip" });
+  nodes.push({ id: 5, label: "(2,1)", x: 440, y: 165, result: null, parentId: 2, edgeLabel: "take 5" });
+  nodes.push({ id: 6, label: "(2,-)", x: 610, y: 165, result: null, parentId: 2, edgeLabel: "skip" });
+
+  visitOrder.push(0);
+  visitOrder.push(1);
+  visitOrder.push(3);
+  nodes[3].result = 0;
+  visitOrder.push(3);
+  visitOrder.push(4);
+  nodes[4].result = 1;
+  visitOrder.push(4);
+  nodes[1].result = 2;
+  visitOrder.push(1);
+  visitOrder.push(2);
+  visitOrder.push(5);
+  nodes[5].result = 0;
+  visitOrder.push(5);
+  visitOrder.push(6);
+  nodes[6].result = 1;
+  visitOrder.push(6);
+  nodes[2].result = 1;
+  visitOrder.push(2);
+  nodes[0].result = 2;
+  visitOrder.push(0);
+
+  return { nodes, visitOrder };
+};
+
+const TreePhase = ({
+  step,
+  recursionSteps,
+}: {
+  step: number;
+  recursionSteps: RecursionStep[];
+}) => {
+  const { nodes, visitOrder } = useMemo(() => buildRecursionTreeData(), []);
+  const currentStep = step > 0 ? recursionSteps[step - 1] : null;
+
+  const visitedSet = useMemo(() => {
+    const set = new Set<number>();
+    for (let i = 0; i < Math.min(step, visitOrder.length); i++) {
+      set.add(visitOrder[i]);
+    }
+    return set;
+  }, [step, visitOrder]);
+
+  const currentNodeId = step > 0 && step <= visitOrder.length ? visitOrder[step - 1] : null;
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="text-sm text-gray-400">
+        Array: [{treeNums.join(", ")}] | Node: (index, prev)
+      </div>
+
+      <svg width="700" height="220" className="mx-auto">
+        {nodes.map((node) => {
+          if (node.parentId === null) return null;
+          const parent = nodes.find(n => n.id === node.parentId);
+          if (!parent) return null;
+
+          const isVisited = visitedSet.has(node.id);
+          return (
+            <g key={`edge-${node.id}`} opacity={isVisited ? 1 : 0.2}>
+              <line
+                x1={parent.x}
+                y1={parent.y + 22}
+                x2={node.x}
+                y2={node.y - 22}
+                stroke="#4b5563"
+                strokeWidth="2"
+              />
+              <text
+                x={(parent.x + node.x) / 2}
+                y={(parent.y + node.y) / 2}
+                fill="#d1d5db"
+                fontSize="11"
+                textAnchor="middle"
+                fontWeight="500"
+              >
+                {node.edgeLabel}
+              </text>
+            </g>
+          );
+        })}
+
+        {nodes.map((node) => {
+          const isVisited = visitedSet.has(node.id);
+          const isCurrent = node.id === currentNodeId;
+          const hasResult = node.result !== null && isVisited;
+
+          let fill = "#1f2937";
+          let stroke = "#4b5563";
+          if (isCurrent) {
+            fill = "#2563eb";
+            stroke = "#60a5fa";
+          } else if (hasResult) {
+            fill = "#166534";
+            stroke = "#22c55e";
+          } else if (isVisited) {
+            fill = "#374151";
+            stroke = "#6b7280";
+          }
+
+          return (
+            <g key={`node-${node.id}`} opacity={isVisited ? 1 : 0.2}>
+              <circle cx={node.x} cy={node.y} r="24" fill={fill} stroke={stroke} strokeWidth="2" />
+              <text x={node.x} y={node.y + 5} fill="white" fontSize="13" textAnchor="middle" fontFamily="monospace" fontWeight="500">
+                {node.label}
+              </text>
+              {hasResult && (
+                <text x={node.x + 28} y={node.y + 5} fill="#86efac" fontSize="12" fontWeight="bold">
+                  ={node.result}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+
+      {currentStep && (
+        <div className="text-sm text-center bg-gray-800/50 px-4 py-2 rounded-lg max-w-lg">
+          <span className="text-gray-300">{currentStep.action}</span>
+        </div>
+      )}
+
+      {step >= recursionSteps.length && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: LIS length = 2</span>
+          <span className="text-gray-400 ml-2">(e.g., [2, 5] or [2, 3])</span>
+        </div>
+      )}
+
+      <div className="text-xs text-gray-500 text-center">
+        Each node: take current element or skip. Green = computed result.
+      </div>
+    </div>
+  );
+};
+
+const buildMemoTreeData = (): { nodes: TreeNodeData[]; visitOrder: { nodeId: number; fromCache: boolean }[] } => {
+  const nodes: TreeNodeData[] = [];
+  const visitOrder: { nodeId: number; fromCache: boolean }[] = [];
+
+  nodes.push({ id: 0, label: "(0,-)", x: 250, y: 35, result: null, parentId: null, edgeLabel: "" });
+  nodes.push({ id: 1, label: "(1,0)", x: 125, y: 100, result: null, parentId: 0, edgeLabel: "take 2" });
+  nodes.push({ id: 2, label: "(1,-)", x: 375, y: 100, result: null, parentId: 0, edgeLabel: "skip" });
+  nodes.push({ id: 3, label: "(2,1)", x: 65, y: 165, result: null, parentId: 1, edgeLabel: "take 5" });
+  nodes.push({ id: 4, label: "(2,0)", x: 185, y: 165, result: null, parentId: 1, edgeLabel: "skip" });
+  nodes.push({ id: 5, label: "(2,1)", x: 315, y: 165, result: null, parentId: 2, edgeLabel: "take 5" });
+  nodes.push({ id: 6, label: "(2,-)", x: 435, y: 165, result: null, parentId: 2, edgeLabel: "skip" });
+
+  visitOrder.push({ nodeId: 0, fromCache: false });
+  visitOrder.push({ nodeId: 1, fromCache: false });
+  visitOrder.push({ nodeId: 3, fromCache: false });
+  nodes[3].result = 0;
+  visitOrder.push({ nodeId: 3, fromCache: false });
+  visitOrder.push({ nodeId: 4, fromCache: false });
+  nodes[4].result = 1;
+  visitOrder.push({ nodeId: 4, fromCache: false });
+  nodes[1].result = 2;
+  visitOrder.push({ nodeId: 1, fromCache: false });
+  visitOrder.push({ nodeId: 2, fromCache: false });
+  visitOrder.push({ nodeId: 5, fromCache: true });
+  nodes[5].result = 0;
+  visitOrder.push({ nodeId: 6, fromCache: false });
+  nodes[6].result = 1;
+  visitOrder.push({ nodeId: 6, fromCache: false });
+  nodes[2].result = 1;
+  visitOrder.push({ nodeId: 2, fromCache: false });
+  nodes[0].result = 2;
+  visitOrder.push({ nodeId: 0, fromCache: false });
+
+  return { nodes, visitOrder };
+};
+
+const MemoPhase = ({
+  step,
+  memoSteps,
+}: {
+  step: number;
+  memoSteps: MemoStep[];
+}) => {
+  const currentStep = step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
+  const visibleSteps = memoSteps.slice(0, step);
+
+  const { nodes, visitOrder } = useMemo(() => buildMemoTreeData(), []);
+
+  const visitedInfo = useMemo(() => {
+    const info = new Map<number, { visited: boolean; fromCache: boolean; result: number | null }>();
+    for (let i = 0; i < Math.min(step, visitOrder.length); i++) {
+      const v = visitOrder[i];
+      const node = nodes.find(n => n.id === v.nodeId);
+      info.set(v.nodeId, { visited: true, fromCache: v.fromCache, result: node?.result ?? null });
+    }
+    return info;
+  }, [step, visitOrder, nodes]);
+
+  const currentNodeId = step > 0 && step <= visitOrder.length ? visitOrder[step - 1].nodeId : null;
+
+  const currentMemo = useMemo(() => {
+    const memo: (number | null)[][] = Array.from(
+      { length: treeNums.length },
+      () => Array(treeNums.length + 1).fill(null)
+    );
+    for (const st of visibleSteps) {
+      if (!st.fromCache) {
+        memo[st.index][st.prevIndex + 1] = st.value;
+      }
+    }
+    return memo;
+  }, [visibleSteps]);
+
+  const cacheHits = visibleSteps.filter(s => s.fromCache).length;
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="text-sm text-gray-400">
+        Array: [{treeNums.join(", ")}] | Yellow = cache hit (pruned subtree)
+      </div>
+
+      <div className="flex gap-6 items-start flex-wrap justify-center">
+        <div>
+          <div className="text-xs text-gray-500 text-center mb-2">Recursion Tree</div>
+          <svg width="500" height="210" className="mx-auto">
+            {nodes.map((node) => {
+              if (node.parentId === null) return null;
+              const parent = nodes.find(n => n.id === node.parentId);
+              if (!parent) return null;
+
+              const info = visitedInfo.get(node.id);
+              const isVisited = !!info?.visited;
+              const isCacheHit = info?.fromCache;
+
+              return (
+                <g key={`memo-edge-${node.id}`} opacity={isVisited ? 1 : 0.2}>
+                  <line
+                    x1={parent.x}
+                    y1={parent.y + 20}
+                    x2={node.x}
+                    y2={node.y - 20}
+                    stroke={isCacheHit ? "#ca8a04" : "#4b5563"}
+                    strokeWidth="2"
+                    strokeDasharray={isCacheHit ? "5,3" : "none"}
+                  />
+                  <text
+                    x={(parent.x + node.x) / 2}
+                    y={(parent.y + node.y) / 2}
+                    fill="#d1d5db"
+                    fontSize="10"
+                    textAnchor="middle"
+                    fontWeight="500"
+                  >
+                    {node.edgeLabel}
+                  </text>
+                </g>
+              );
+            })}
+
+            {nodes.map((node) => {
+              const info = visitedInfo.get(node.id);
+              const isVisited = !!info?.visited;
+              const isCacheHit = info?.fromCache;
+              const isCurrent = node.id === currentNodeId;
+
+              let fill = "#1f2937";
+              let stroke = "#4b5563";
+              if (isCurrent) {
+                fill = isCacheHit ? "#854d0e" : "#2563eb";
+                stroke = isCacheHit ? "#ca8a04" : "#60a5fa";
+              } else if (isCacheHit) {
+                fill = "#854d0e";
+                stroke = "#ca8a04";
+              } else if (isVisited && node.result !== null) {
+                fill = "#166534";
+                stroke = "#22c55e";
+              } else if (isVisited) {
+                fill = "#374151";
+                stroke = "#6b7280";
+              }
+
+              return (
+                <g key={`memo-node-${node.id}`} opacity={isVisited ? 1 : 0.2}>
+                  <circle cx={node.x} cy={node.y} r="22" fill={fill} stroke={stroke} strokeWidth="2" />
+                  <text x={node.x} y={node.y + 5} fill="white" fontSize="12" textAnchor="middle" fontFamily="monospace" fontWeight="500">
+                    {node.label}
+                  </text>
+                  {isVisited && node.result !== null && (
+                    <text x={node.x + 26} y={node.y + 5} fill={isCacheHit ? "#fde047" : "#86efac"} fontSize="11" fontWeight="bold">
+                      ={node.result}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+
+        <div>
+          <div className="text-xs text-gray-500 text-center mb-2">Memo Table</div>
+          <table className="border-collapse">
+            <thead>
+              <tr>
+                <th className="w-7 h-5 text-xs text-gray-500">i\p</th>
+                {Array.from({ length: treeNums.length + 1 }, (_, p) => (
+                  <th key={`memo-h-${p}`} className="w-7 h-5 text-xs text-gray-500">{p - 1}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {currentMemo.map((row, rowIndex) => (
+                <tr key={`memo-r-${rowIndex}`}>
+                  <td className="w-7 h-7 text-xs text-gray-500 text-center">{rowIndex}</td>
+                  {row.map((val, colIndex) => {
+                    const isCurrentCell = currentStep && currentStep.index === rowIndex && currentStep.prevIndex + 1 === colIndex;
+                    const isCacheHit = currentStep?.fromCache && isCurrentCell;
+
+                    return (
+                      <td
+                        key={`memo-c-${rowIndex}-${colIndex}`}
+                        className={`w-7 h-7 border border-gray-700 text-center font-mono text-xs transition-all ${
+                          isCurrentCell
+                            ? isCacheHit ? "bg-yellow-600/30 border-yellow-500" : "bg-blue-600/30 border-blue-500"
+                            : val !== null ? "bg-green-600/20" : "bg-gray-800/50"
+                        }`}
+                      >
+                        {val !== null ? val : "-"}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {currentStep && (
+        <div className={`text-sm text-center font-mono px-4 py-2 rounded-lg ${
+          currentStep.fromCache ? "bg-yellow-600/20 text-yellow-400" : "bg-blue-600/20 text-blue-300"
+        }`}>
+          {currentStep.action}
+        </div>
+      )}
+
+      <div className="flex gap-4 text-sm">
+        <div className="text-gray-400">Computed: <span className="text-green-400">{step - cacheHits}</span></div>
+        <div className="text-gray-400">Cache hits: <span className="text-yellow-400">{cacheHits}</span></div>
+      </div>
+
+      {step >= memoSteps.length && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: LIS length = 2</span>
+          <span className="text-gray-400 ml-2">(e.g., [2, 5] or [2, 3])</span>
+        </div>
+      )}
+
+      <div className="text-xs text-gray-500 text-center">
+        Yellow nodes = cache hit, skips recomputing subtree. Green = freshly computed.
+      </div>
+    </div>
+  );
 };
 
 const Controls = ({
@@ -309,6 +829,12 @@ const TablePhase = ({
           {currentStep.formula}
         </div>
       )}
+      {step >= tableSteps.length && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: LIS length = {Math.max(...currentDp)}</span>
+          <span className="text-gray-400 ml-2">(e.g., [2, 3, 7, 101])</span>
+        </div>
+      )}
       <div className="text-sm text-gray-500">
         For each i, check all j &lt; i where nums[j] &lt; nums[i]
       </div>
@@ -360,6 +886,12 @@ const BinaryPhase = ({
           Processing {currentStep.num}: {currentStep.action}
         </div>
       )}
+      {step >= binarySteps.length && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: LIS length = {binarySteps[binarySteps.length - 1]?.tails.length || 0}</span>
+          <span className="text-gray-400 ml-2">(e.g., [2, 3, 7, 101])</span>
+        </div>
+      )}
       <div className="text-sm text-gray-500 text-center max-w-md">
         O(n log n): Binary search to find position, then append or replace.
         tails.length = LIS length.
@@ -375,8 +907,8 @@ export default function LISVisualizer() {
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion",
     memo: "Memoization",
-    table: "O(n²) DP",
-    binary: "O(n log n)",
+    table: "Tabulation",
+    binary: "Binary Search",
   };
 
   const [currentPhase, setCurrentPhase] = useState<Phase>("table");
@@ -387,14 +919,18 @@ export default function LISVisualizer() {
 
   const { steps: tableSteps, maxLen } = useMemo(() => generateTableSteps(), []);
   const { steps: binarySteps } = useMemo(() => generateBinarySteps(), []);
+  const recursionSteps = useMemo(() => generateRecursionSteps(), []);
+  const { steps: memoSteps } = useMemo(() => generateMemoSteps(), []);
 
   const getMaxSteps = useCallback(
     (phase: Phase) => {
       if (phase === "table") return tableSteps.length;
       if (phase === "binary") return binarySteps.length;
+      if (phase === "tree") return recursionSteps.length;
+      if (phase === "memo") return memoSteps.length;
       return nums.length;
     },
-    [tableSteps.length, binarySteps.length]
+    [tableSteps.length, binarySteps.length, recursionSteps.length, memoSteps.length]
   );
 
   const maxSteps = getMaxSteps(currentPhase);
@@ -420,7 +956,7 @@ export default function LISVisualizer() {
   };
 
   return (
-    <div className="p-6 bg-gray-900 rounded-xl w-full max-w-4xl mx-auto">
+    <div className="p-6 bg-gray-900 rounded-xl w-full max-w-5xl mx-auto">
       <div className="text-center mb-4">
         <div className="text-lg font-medium text-white">
           Longest Increasing Subsequence (LIS)
@@ -473,8 +1009,11 @@ export default function LISVisualizer() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {(currentPhase === "tree" || currentPhase === "memo") && (
-            <TablePhase step={0} tableSteps={tableSteps} />
+          {currentPhase === "tree" && (
+            <TreePhase step={step} recursionSteps={recursionSteps} />
+          )}
+          {currentPhase === "memo" && (
+            <MemoPhase step={step} memoSteps={memoSteps} />
           )}
           {currentPhase === "table" && (
             <TablePhase step={step} tableSteps={tableSteps} />

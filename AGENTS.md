@@ -96,6 +96,29 @@ Use plain, simple comments. Never use decorative dividers made of box-drawing ch
 // Sub-section description
 ```
 
+### Content writing style (applies to all markdown articles, tutorials, and educational content in patterns.json)
+
+Never use em dashes (`—`) between words. They read as AI-generated. Use natural punctuation instead:
+
+| Instead of | Use |
+|------------|-----|
+| `label — explanation` | `label: explanation` |
+| `clause — continuation` | `clause, continuation` |
+| `text — aside` | `text (aside)` |
+| `sentence — new thought` | `sentence. New thought.` |
+
+```markdown
+// Bad
+**Time:** O(n^2) — each pair computed once.
+- **Burst Balloons** — requires the last-burst insight.
+The subsequence does not need to be contiguous — elements can be skipped.
+
+// Good
+**Time:** O(n^2). Each pair computed once.
+- **Burst Balloons**: requires the last-burst insight.
+The subsequence does not need to be contiguous (elements can be skipped).
+```
+
 ## Next.js 16 — breaking changes
 
 Read `node_modules/next/dist/docs/` before writing any code. APIs and conventions may differ from older Next.js.

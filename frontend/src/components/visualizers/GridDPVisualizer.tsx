@@ -406,6 +406,74 @@ const MinPathPhase = ({
   );
 };
 
+const generateSpaceOptimizedSteps = () => {
+  const steps: { row: number; dp: number[]; formula: string }[] = [];
+  const dp = new Array(cols).fill(1);
+  steps.push({
+    row: 0,
+    dp: [...dp],
+    formula: "Initialize dp = [1, 1, 1] (first row: only one path to each cell)",
+  });
+  for (let r = 1; r < rows; r++) {
+    for (let c = 1; c < cols; c++) {
+      dp[c] = dp[c] + dp[c - 1];
+    }
+    steps.push({
+      row: r,
+      dp: [...dp],
+      formula: `Process row ${r}: dp = [${dp.join(", ")}]  (dp[0] stays 1; dp[j] = old dp[j] + dp[j-1])`,
+    });
+  }
+  return steps;
+};
+
+const SpaceOptimizedPhase = ({
+  step,
+  spaceSteps,
+}: {
+  step: number;
+  spaceSteps: ReturnType<typeof generateSpaceOptimizedSteps>;
+}) => {
+  const currentStep =
+    step > 0 && step <= spaceSteps.length ? spaceSteps[step - 1] : null;
+  const displayDp = currentStep ? currentStep.dp : new Array(cols).fill(0);
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="text-center">
+        <div className="text-sm text-gray-500 mb-2">Rolling 1D Array</div>
+        <div
+          className="inline-grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+        >
+          {displayDp.map((val, c) => (
+            <div
+              // skipcq: JS-0437
+              key={`space-cell-${c}-${val}`}
+              className={`w-16 h-16 flex flex-col items-center justify-center rounded font-mono border-2 transition-all ${
+                currentStep
+                  ? "bg-purple-700 border-purple-400 text-white font-bold"
+                  : "bg-gray-900/50 border-gray-700 text-gray-600"
+              }`}
+            >
+              <span className="text-xs text-gray-400">dp[{c}]</span>
+              <span className="text-lg">{currentStep ? val : ""}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {currentStep && (
+        <div className="text-sm text-center font-mono bg-gray-800/50 text-gray-400 px-6 py-3 rounded-lg max-w-lg">
+          {currentStep.formula}
+        </div>
+      )}
+      <div className="text-sm text-gray-500">
+        dp[j] = dp[j] + dp[j-1] &nbsp;|&nbsp; dp[j] before update = value from row above
+      </div>
+    </div>
+  );
+};
+
 // skipcq: JS-0067
 export default function GridDPVisualizer() {
   // skipcq: JS-0067
@@ -430,14 +498,15 @@ export default function GridDPVisualizer() {
     () => generateMinPathSteps(),
     []
   );
+  const spaceSteps = useMemo(() => generateSpaceOptimizedSteps(), []);
 
   const getMaxSteps = useCallback(
     (phase: Phase) => {
       if (phase === "paths") return pathSteps.length;
       if (phase === "minpath") return minPathSteps.length;
-      return rows;
+      return spaceSteps.length;
     },
-    [pathSteps.length, minPathSteps.length]
+    [pathSteps.length, minPathSteps.length, spaceSteps.length]
   );
 
   const maxSteps = getMaxSteps(currentPhase);
@@ -523,7 +592,7 @@ export default function GridDPVisualizer() {
             <MinPathPhase step={step} minPathSteps={minPathSteps} />
           )}
           {currentPhase === "table" && (
-            <MinPathPhase step={step} minPathSteps={minPathSteps} />
+            <SpaceOptimizedPhase step={step} spaceSteps={spaceSteps} />
           )}
         </motion.div>
       </AnimatePresence>

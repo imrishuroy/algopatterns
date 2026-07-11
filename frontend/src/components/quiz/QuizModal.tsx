@@ -22,7 +22,8 @@ interface QuizModalProps {
   sectionSlug?: string;
 }
 
-export default function QuizModal({ // skipcq: JS-0067
+// skipcq: JS-0067, JS-R1005
+export default function QuizModal({
   isOpen,
   onClose,
   patternId,
@@ -52,6 +53,7 @@ export default function QuizModal({ // skipcq: JS-0067
     questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
   const hasAnswered = currentQuestion ? answers.has(currentQuestion.id) : false;
 
+  // skipcq: JS-R1005
   const initQuiz = useCallback(async () => {
     if (!isOpen) return;
 

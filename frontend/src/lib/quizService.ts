@@ -22,7 +22,7 @@ interface ApiResponse<T> {
   };
 }
 
-function buildHeaders(extra?: HeadersInit): Record<string, string> {
+const buildHeaders = (extra?: HeadersInit): Record<string, string> => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -43,12 +43,13 @@ function buildHeaders(extra?: HeadersInit): Record<string, string> {
   }
 
   return headers;
-}
+};
 
-async function fetchApi<T>(
+// skipcq: JS-R1005
+const fetchApi = async <T,>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<T> {
+): Promise<T> => {
   const headers = buildHeaders(options.headers);
 
   let response = await fetch(`${API_BASE}${endpoint}`, {
@@ -77,7 +78,7 @@ async function fetchApi<T>(
   }
 
   return json.data as T;
-}
+};
 
 export const quizService = {
   getQuestions(

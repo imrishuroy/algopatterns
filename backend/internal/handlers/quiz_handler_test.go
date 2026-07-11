@@ -81,7 +81,7 @@ func makeQuizQuestions(patternID string, n int) []models.QuizQuestion {
 
 func quizAuthService() *services.AuthService {
 	return services.NewAuthService(nil, nil, &config.AuthConfig{
-		JWTSecret:           "quiz-handler-test-secret",
+		JWTSecret:           uuid.NewString(),
 		AccessTokenDuration: 15 * time.Minute,
 	})
 }

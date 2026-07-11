@@ -320,7 +320,7 @@ export function SearchResults({ // skipcq: JS-0067, JS-R1005
           </div>
         ) : (
           <div className="space-y-0.5">
-            // skipcq: JS-R1005
+            {/* skipcq: JS-R1005 */}
             {filteredResults.map((result, index) => {
               const config = TYPE_CONFIG[result.type];
               const isSelected = index === selectedIndex;

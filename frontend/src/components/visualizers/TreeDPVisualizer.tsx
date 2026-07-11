@@ -430,7 +430,7 @@ const TreeSVG = ({
   );
 };
 
-const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] }) => { // skipcq: JS-R1005
+const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] }) => { // skipcq: JS-0415, JS-R1005
   const currentStep = step > 0 && step <= steps.length ? steps[step - 1] : null;
 
   const computedNodes = useMemo(() => {
@@ -451,7 +451,7 @@ const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] })
     return map;
   }, [step, steps]);
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400 text-center max-w-md">
         Why does Tree DP need state PAIRS? Single value loses critical info.

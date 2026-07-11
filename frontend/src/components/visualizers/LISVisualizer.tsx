@@ -415,7 +415,7 @@ const buildMemoTreeData = (): { nodes: TreeNodeData[]; visitOrder: { nodeId: num
   return { nodes, visitOrder };
 };
 
-const MemoPhase = ({ // skipcq: JS-R1005
+const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
   step,
   memoSteps,
 }: {
@@ -454,7 +454,7 @@ const MemoPhase = ({ // skipcq: JS-R1005
 
   const cacheHits = visibleSteps.filter(s => s.fromCache).length;
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400">
         Array: [{treeNums.join(", ")}] | Yellow = cache hit (pruned subtree)
@@ -549,8 +549,11 @@ const MemoPhase = ({ // skipcq: JS-R1005
               </tr>
             </thead>
             <tbody>
-              {currentMemo.map((row, rowIndex) => ( // skipcq: JS-0437 
-                <tr key={`memo-r-${rowIndex}`}>
+              {currentMemo.map((row, rowIndex) => ( 
+                <tr
+                  // skipcq: JS-0437
+                  key={`memo-r-${rowIndex}`}
+                  >
                   <td className="w-7 h-7 text-xs text-gray-500 text-center">{rowIndex}</td>
                   {row.map((val, colIndex) => { // skipcq: JS-R1005
                     const isCurrentCell = currentStep && currentStep.index === rowIndex && currentStep.prevIndex + 1 === colIndex;

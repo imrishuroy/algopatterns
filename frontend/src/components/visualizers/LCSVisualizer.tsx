@@ -627,8 +627,11 @@ const MemoizationPhase = ({ // skipcq: JS-R1005
             </tr>
           </thead>
           <tbody>
-            {memoTable.map((row, rowIdx) => ( // skipcq: JS-0437 
-              <tr key={`row-${rowIdx}`}>
+            {memoTable.map((row, rowIdx) => ( 
+              <tr
+                // skipcq: JS-0437
+                key={`row-${rowIdx}`}
+                >
                 <td
                   className={`w-8 h-8 text-xs font-mono text-center ${
                     currentStep?.i === rowIdx ? "text-blue-400" : "text-gray-500"
@@ -641,8 +644,11 @@ const MemoizationPhase = ({ // skipcq: JS-R1005
                     currentStep?.i === rowIdx && currentStep?.j === colIdx;
                   const isCacheHit = isCurrent && currentStep?.fromCache;
 
-                  return ( // skipcq: JS-0437 
-                    <td key={`cell-${rowIdx}-${colIdx}`} className="p-0.5">
+                  return ( 
+                    <td
+                      // skipcq: JS-0437
+                      key={`cell-${rowIdx}-${colIdx}`}
+                      className="p-0.5">
                       <div
                         className={`w-7 h-7 flex items-center justify-center rounded font-mono text-xs border transition-all ${
                           isCurrent
@@ -771,16 +777,22 @@ const TabulationPhase = ({ // skipcq: JS-R1005
               <td className="w-9 h-9 text-xs text-gray-500 font-mono text-center">
                 ε
               </td>
-              {currentDp[0].map((val, colIdx) => ( // skipcq: JS-0437 
-                <td key={`r0-c${colIdx}`} className="p-0.5">
+              {currentDp[0].map((val, colIdx) => ( 
+                <td
+                  // skipcq: JS-0437
+                  key={`r0-c${colIdx}`}
+                  className="p-0.5">
                   <div className="w-8 h-8 flex items-center justify-center bg-gray-800/50 border border-gray-700 rounded font-mono text-xs text-gray-500">
                     {val}
                   </div>
                 </td>
               ))}
             </tr>
-            {text1.split("").map((rowChar, rowIndex) => ( // skipcq: JS-0437 
-              <tr key={`row-${rowIndex}`}>
+            {text1.split("").map((rowChar, rowIndex) => ( 
+              <tr
+                // skipcq: JS-0437
+                key={`row-${rowIndex}`}
+                >
                 <td
                   className={`w-9 h-9 text-sm font-mono font-bold text-center ${
                     currentStep?.i === rowIndex + 1 ? "text-blue-400" : "text-gray-400"
@@ -796,8 +808,11 @@ const TabulationPhase = ({ // skipcq: JS-R1005
                   );
                   const isFilled = stepIdx >= 0 && stepIdx < step;
 
-                  return ( // skipcq: JS-0437 
-                    <td key={`r${rowIndex + 1}-c${colIdx}`} className="p-0.5">
+                  return ( 
+                    <td
+                      // skipcq: JS-0437
+                      key={`r${rowIndex + 1}-c${colIdx}`}
+                      className="p-0.5">
                       <div
                         className={`w-8 h-8 flex items-center justify-center rounded font-mono text-sm font-bold border-2 transition-all ${
                           isCurrentCell

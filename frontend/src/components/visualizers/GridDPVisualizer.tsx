@@ -443,7 +443,7 @@ const RecursionPhase = ({ // skipcq: JS-R1005
   );
 };
 
-const MemoPhase = ({ // skipcq: JS-R1005
+const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
   step,
   memoSteps,
 }: {
@@ -467,7 +467,7 @@ const MemoPhase = ({ // skipcq: JS-R1005
 
   const cacheHits = visibleSteps.filter(s => s.fromCache).length;
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400">
         3x3 Grid | Yellow = cache hit (no recomputation needed)

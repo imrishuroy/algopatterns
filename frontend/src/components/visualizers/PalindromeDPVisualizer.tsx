@@ -561,8 +561,11 @@ const TreePhase = ({ // skipcq: JS-R1005
         {treeStr.split("").map((c, idx) => { // skipcq: JS-R1005
           const isHighlighted = currentStep && idx >= currentStep.i && idx <= currentStep.j;
           const isOuter = currentStep && (idx === currentStep.i || idx === currentStep.j);
-          return ( // skipcq: JS-0437 
-            <div key={`tree-char-${idx}`} className="flex flex-col items-center">
+          return ( 
+            <div
+              // skipcq: JS-0437
+              key={`tree-char-${idx}`}
+              className="flex flex-col items-center">
               <div className="text-xs text-gray-500">{idx}</div>
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-lg ${
@@ -664,7 +667,7 @@ const TreePhase = ({ // skipcq: JS-R1005
   );
 };
 
-const MemoPhase = ({ // skipcq: JS-R1005
+const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
   step,
   memoSteps,
 }: {
@@ -702,7 +705,7 @@ const MemoPhase = ({ // skipcq: JS-R1005
 
   const cacheHits = visibleSteps.filter((s) => s.fromCache).length;
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400">
         LPS on &quot;{treeStr}&quot; | Yellow = cache hit (saved computation!)
@@ -711,8 +714,11 @@ const MemoPhase = ({ // skipcq: JS-R1005
       <div className="flex gap-1 justify-center mb-2">
         {treeStr.split("").map((c, idx) => {
           const isHighlighted = currentStep && idx >= currentStep.i && idx <= currentStep.j;
-          return ( // skipcq: JS-0437 
-            <div key={`memo-char-${idx}`} className="flex flex-col items-center">
+          return ( 
+            <div
+              // skipcq: JS-0437
+              key={`memo-char-${idx}`}
+              className="flex flex-col items-center">
               <div className="text-xs text-gray-500">{idx}</div>
               <div className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-lg ${isHighlighted ? "bg-blue-600/50 text-white" : "bg-gray-800 text-gray-300"}`}>
                 {c}
@@ -801,8 +807,11 @@ const MemoPhase = ({ // skipcq: JS-R1005
               </tr>
             </thead>
             <tbody>
-              {currentMemo.map((row, rowIndex) => ( // skipcq: JS-0437 
-                <tr key={`memo-r-${rowIndex}`}>
+              {currentMemo.map((row, rowIndex) => ( 
+                <tr
+                  // skipcq: JS-0437
+                  key={`memo-r-${rowIndex}`}
+                  >
                   <td className="w-8 h-10 text-xs text-gray-500 text-center">{rowIndex}</td>
                   {row.map((val, colIndex) => { // skipcq: JS-R1005
                     const isValid = colIndex >= rowIndex;
@@ -937,8 +946,11 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[
           else if (isInner) bgColor = currentStep.innerResult ? "bg-green-600/40" : currentStep.innerResult === false ? "bg-red-600/40" : "bg-blue-600/30";
           else if (isInRange) bgColor = "bg-blue-600/30";
 
-          return ( // skipcq: JS-0437 
-            <div key={`table-char-${idx}`} className="flex flex-col items-center">
+          return ( 
+            <div
+              // skipcq: JS-0437
+              key={`table-char-${idx}`}
+              className="flex flex-col items-center">
               <div className="text-xs text-gray-500">{idx}</div>
               <div className={`w-11 h-11 flex items-center justify-center rounded font-mono font-bold text-lg text-white ${bgColor}`}>{c}</div>
             </div>
@@ -952,14 +964,20 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[
             <thead>
               <tr>
                 <th className="p-1 text-gray-500 w-7 text-xs">i\j</th>
-                {str.split("").map((c, colIdx) => ( // skipcq: JS-0437 
-                  <th key={`th-${colIdx}`} className="p-1 text-gray-400 w-9 text-xs"><div>{colIdx}</div><div className="text-gray-600">{c}</div></th>
+                {str.split("").map((c, colIdx) => ( 
+                  <th
+                    // skipcq: JS-0437
+                    key={`th-${colIdx}`}
+                    className="p-1 text-gray-400 w-9 text-xs"><div>{colIdx}</div><div className="text-gray-600">{c}</div></th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {str.split("").map((rowChar, rowIdx) => ( // skipcq: JS-0437 
-                <tr key={`tr-${rowIdx}`}>
+              {str.split("").map((rowChar, rowIdx) => ( 
+                <tr
+                  // skipcq: JS-0437
+                  key={`tr-${rowIdx}`}
+                  >
                   <td className="p-1 text-gray-400 font-mono text-xs"><span className="text-gray-600">{rowChar}</span> {rowIdx}</td>
                   {str.split("").map((_, colIdx) => { // skipcq: JS-R1005
                     const isCurrent = currentStep && currentStep.i === rowIdx && currentStep.j === colIdx;
@@ -967,8 +985,11 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[
                     const value = dpTable[rowIdx]?.[colIdx];
                     const isValid = colIdx >= rowIdx;
 
-                    return ( // skipcq: JS-0437 
-                      <td key={`td-${rowIdx}-${colIdx}`} className="p-0.5">
+                    return ( 
+                      <td
+                        // skipcq: JS-0437
+                        key={`td-${rowIdx}-${colIdx}`}
+                        className="p-0.5">
                         <div className={`w-9 h-9 flex items-center justify-center border-2 rounded font-mono text-xs ${
                           !isValid ? "bg-gray-900/20 border-gray-800/50"
                             : isCurrent ? value ? "bg-green-600 border-green-400 text-white font-bold" : "bg-red-600 border-red-400 text-white font-bold"
@@ -1035,8 +1056,11 @@ const ExpandPhase = ({ step, expandSteps }: { step: number; expandSteps: ExpandS
           else if (isInPalin) { bgColor = "bg-purple-600"; if (isPointer) borderColor = "border-white"; }
           else if (isCenter) { bgColor = "bg-yellow-600/50"; }
 
-          return ( // skipcq: JS-0437 
-            <div key={`expand-char-${idx}`} className="flex flex-col items-center">
+          return ( 
+            <div
+              // skipcq: JS-0437
+              key={`expand-char-${idx}`}
+              className="flex flex-col items-center">
               <div className="text-xs text-gray-500">{idx}</div>
               <div className={`w-11 h-11 flex items-center justify-center rounded font-mono font-bold text-lg text-white border-2 ${bgColor} ${borderColor}`}>{c}</div>
               {isPointer && <div className="text-xs text-blue-400 mt-1">{idx === currentStep.left ? "L" : "R"}</div>}

@@ -427,7 +427,7 @@ const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
   );
 };
 
-const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] }) => { // skipcq: JS-R1005
+const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] }) => { // skipcq: JS-0415, JS-R1005
   const currentStep = step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
   const visibleSteps = memoSteps.slice(0, step);
 
@@ -445,7 +445,7 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
 
   const cacheHits = visibleSteps.filter(s => s.fromCache).length;
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay
         highlightRange={currentStep ? { l: currentStep.l, r: currentStep.r } : undefined}
@@ -530,7 +530,7 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
   );
 };
 
-const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[] }) => { // skipcq: JS-R1005
+const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[] }) => { // skipcq: JS-0415, JS-R1005
   const dpTable = useMemo(() => {
     const dp: number[][] = Array(n + 2)
       .fill(null)
@@ -544,7 +544,7 @@ const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: Table
 
   const currentStep = step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay
         highlightRange={

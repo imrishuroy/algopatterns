@@ -513,7 +513,7 @@ const SubsetPhase = ({ // skipcq: JS-R1005
   );
 };
 
-const AssignmentPhase = ({ // skipcq: JS-R1005
+const AssignmentPhase = ({ // skipcq: JS-0415, JS-R1005
   step,
   assignmentSteps,
   answer,
@@ -538,7 +538,7 @@ const AssignmentPhase = ({ // skipcq: JS-R1005
     return dp;
   }, [step, assignmentSteps, currentStep, nJobs]);
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-6">
       <div className="text-center">
         <div className="text-sm text-gray-400 mb-2">
@@ -564,8 +564,11 @@ const AssignmentPhase = ({ // skipcq: JS-R1005
                   <td className="p-1.5 text-gray-400 font-mono">{p}</td>
                   {assignmentCost[pi].map((cost, ji) => {
                     const isCurrentChoice = currentStep?.person === pi && currentStep?.job === ji;
-                    return ( // skipcq: JS-0437 
-                      <td key={`cost-${p}-${ji}`} className="p-1">
+                    return ( 
+                      <td
+                        // skipcq: JS-0437
+                        key={`cost-${p}-${ji}`}
+                        className="p-1">
                         <div className={`w-10 h-8 flex items-center justify-center rounded text-xs ${
                           isCurrentChoice
                             ? "bg-blue-600 border-2 border-blue-400 text-white font-bold"
@@ -591,6 +594,7 @@ const AssignmentPhase = ({ // skipcq: JS-R1005
               const isCurrent = currentStep?.jobMask === mask;
               return (
                 <div
+                  // skipcq: JS-0437
                   key={`dp-${mask}`}
                   className={`px-2 py-1 rounded font-mono ${
                     isCurrent
@@ -629,7 +633,7 @@ const AssignmentPhase = ({ // skipcq: JS-R1005
   );
 };
 
-const TSPPhase = ({ // skipcq: JS-R1005
+const TSPPhase = ({ // skipcq: JS-0415, JS-R1005
   step,
   tspSteps,
   answer,
@@ -660,7 +664,7 @@ const TSPPhase = ({ // skipcq: JS-R1005
     return Array.from(masks).sort((a, b) => a - b).slice(-6);
   }, [step, tspSteps]);
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-6">
       <div className="text-center">
         <div className="text-sm text-gray-400 mb-2">
@@ -693,8 +697,11 @@ const TSPPhase = ({ // skipcq: JS-R1005
               {cities.map((c, i) => (
                 <tr key={`city-r-${c}`}>
                   <td className="p-1.5 text-gray-400 font-mono">{c}</td>
-                  {dist[i].map((d, j) => ( // skipcq: JS-0437 
-                    <td key={`dist-${c}-${j}`} className="p-1">
+                  {dist[i].map((d, j) => ( 
+                    <td
+                      // skipcq: JS-0437
+                      key={`dist-${c}-${j}`}
+                      className="p-1">
                       <div className={`w-10 h-8 flex items-center justify-center rounded text-xs ${
                         i === j ? "bg-gray-900/50 text-gray-600" : "bg-gray-800 text-gray-300"
                       }`}>

@@ -577,7 +577,7 @@ const TablePhase = ({
   );
 };
 
-const SpaceOptPhase = ({ // skipcq: JS-R1005
+const SpaceOptPhase = ({ // skipcq: JS-0415, JS-R1005
   step,
   maxSteps,
   spaceOptSteps,
@@ -589,7 +589,7 @@ const SpaceOptPhase = ({ // skipcq: JS-R1005
   const currentState = step > 0 ? spaceOptSteps[step - 1]?.dpState : Array(capacity + 1).fill(0);
   const currentStep = step > 0 ? spaceOptSteps[step - 1] : null;
 
-  return ( // skipcq: JS-0415 
+  return (
     <div className="flex flex-col items-center gap-6">
       <div className="text-sm text-gray-400 mb-2">
         1D Array (updated in-place, right to left)

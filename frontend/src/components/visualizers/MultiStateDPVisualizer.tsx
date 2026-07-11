@@ -269,7 +269,7 @@ const generatePaintSteps = (): PaintStep[] => {
   return result;
 };
 
-const Controls = ({
+const Controls = ({ // skipcq: JS-0415
   isPlaying,
   onPlay,
   onPause,
@@ -291,7 +291,7 @@ const Controls = ({
   onSpeedChange: (s: number) => void;
   step: number;
   total: number;
-}) => ( // skipcq: JS-0415 
+}) => (
   <div className="flex flex-col gap-4">
     <div className="flex items-center justify-center gap-2">
       <button
@@ -400,8 +400,11 @@ const ProductPhase = ({ step, steps }: { step: number; steps: ProductStep[] }) =
       </div>
 
       <div className="flex gap-2 justify-center">
-        {productNums.map((num, idx) => ( // skipcq: JS-R1005 // skipcq: JS-0437 
-          <div key={`prod-${idx}`} className="flex flex-col items-center">
+        {productNums.map((num, idx) => ( // skipcq: JS-R1005 
+          <div
+            // skipcq: JS-0437
+            key={`prod-${idx}`}
+            className="flex flex-col items-center">
             <div className="text-xs text-gray-500 mb-1">{idx}</div>
             <motion.div
               animate={{
@@ -478,8 +481,11 @@ const CooldownPhase = ({ step, steps }: { step: number; steps: CooldownStep[] })
       </div>
 
       <div className="flex gap-2 justify-center">
-        {stockPrices.map((price, idx) => ( // skipcq: JS-R1005 // skipcq: JS-0437 
-          <div key={`cool-${idx}`} className="flex flex-col items-center">
+        {stockPrices.map((price, idx) => ( // skipcq: JS-R1005 
+          <div
+            // skipcq: JS-0437
+            key={`cool-${idx}`}
+            className="flex flex-col items-center">
             <div className="text-xs text-gray-500 mb-1">Day {idx}</div>
             <motion.div
               animate={{
@@ -583,8 +589,11 @@ const FeePhase = ({ step, steps }: { step: number; steps: FeeStep[] }) => { // s
       </div>
 
       <div className="flex gap-2 justify-center">
-        {feePrices.map((price, idx) => ( // skipcq: JS-R1005 // skipcq: JS-0437 
-          <div key={`fee-${idx}`} className="flex flex-col items-center">
+        {feePrices.map((price, idx) => ( // skipcq: JS-R1005 
+          <div
+            // skipcq: JS-0437
+            key={`fee-${idx}`}
+            className="flex flex-col items-center">
             <div className="text-xs text-gray-500 mb-1">Day {idx}</div>
             <motion.div
               animate={{
@@ -664,8 +673,11 @@ const PaintPhase = ({ step, steps }: { step: number; steps: PaintStep[] }) => { 
       </div>
 
       <div className="flex gap-4 justify-center">
-        {houseCosts.map((costs, idx) => ( // skipcq: JS-0437 
-          <div key={`house-${idx}`} className="flex flex-col items-center">
+        {houseCosts.map((costs, idx) => ( 
+          <div
+            // skipcq: JS-0437
+            key={`house-${idx}`}
+            className="flex flex-col items-center">
             <motion.div
               animate={{
                 scale: currentStep && idx === currentStep.house ? 1.1 : 1,
@@ -679,6 +691,7 @@ const PaintPhase = ({ step, steps }: { step: number; steps: PaintStep[] }) => { 
             <div className="flex gap-1 mt-2">
               {costs.map((cost, cIdx) => (
                 <div
+                  // skipcq: JS-0437
                   key={`cost-${idx}-${cIdx}`} // skipcq: JS-0437
                   className={`w-5 h-5 rounded text-xs flex items-center justify-center ${colorClasses[cIdx].bg} ${currentStep && idx === currentStep.house && cIdx === currentStep.chosen ? "ring-2 ring-white" : ""}`}
                 >
@@ -693,8 +706,11 @@ const PaintPhase = ({ step, steps }: { step: number; steps: PaintStep[] }) => { 
       <div className="mt-4">
         <div className="text-xs text-gray-500 text-center mb-2">Min cost to paint houses 0..i ending with each color:</div>
         <div className="flex gap-4 justify-center">
-          {colors.map((color, cIdx) => ( // skipcq: JS-0437 
-            <div key={`dp-${cIdx}`} className={`p-3 rounded-lg text-center min-w-[80px] bg-${color.toLowerCase()}-500/10 border ${colorClasses[cIdx].border}`}>
+          {colors.map((color, cIdx) => ( 
+            <div
+              // skipcq: JS-0437
+              key={`dp-${cIdx}`}
+              className={`p-3 rounded-lg text-center min-w-[80px] bg-${color.toLowerCase()}-500/10 border ${colorClasses[cIdx].border}`}>
               <div className={`text-xs ${colorClasses[cIdx].text} mb-1`}>{color}</div>
               <motion.div
                 key={currentStep?.dp[cIdx]}

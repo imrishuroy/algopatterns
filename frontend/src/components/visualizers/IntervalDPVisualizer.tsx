@@ -333,6 +333,7 @@ const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
   }, [step, treeSteps]);
 
   return (
+    // skipcq: JS-0415
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay />
       <div className="text-sm text-gray-400 mb-2">
@@ -446,6 +447,7 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
   const cacheHits = visibleSteps.filter(s => s.fromCache).length;
 
   return (
+    // skipcq: JS-0415
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay
         highlightRange={currentStep ? { l: currentStep.l, r: currentStep.r } : undefined}

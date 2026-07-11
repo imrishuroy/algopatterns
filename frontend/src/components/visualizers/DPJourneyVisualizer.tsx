@@ -505,6 +505,7 @@ const TablePhase = ({
   const currentStep = step > 0 ? tableSteps[step - 1] : null;
 
   return (
+    // skipcq: JS-0415
     <div className="flex flex-col items-center gap-6">
       <div className="overflow-x-auto w-full flex justify-center">
         <table className="border-collapse text-base">

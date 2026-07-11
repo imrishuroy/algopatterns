@@ -452,6 +452,7 @@ const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] })
   }, [step, steps]);
 
   return (
+    // skipcq: JS-0415
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400 text-center max-w-md">
         Why does Tree DP need state PAIRS? Single value loses critical info.

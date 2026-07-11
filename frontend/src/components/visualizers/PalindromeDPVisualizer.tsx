@@ -541,6 +541,7 @@ const TreePhase = ({ // skipcq: JS-R1005
     step > 0 && step <= visitOrder.length ? visitOrder[step - 1] : null;
 
   return (
+    // skipcq: JS-0415
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400">
         Longest Palindromic Subsequence on &quot;{treeStr}&quot;

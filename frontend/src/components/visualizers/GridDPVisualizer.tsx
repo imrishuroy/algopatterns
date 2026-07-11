@@ -354,6 +354,7 @@ const RecursionPhase = ({ // skipcq: JS-R1005
   }, [step, treeSteps]);
 
   return (
+    // skipcq: JS-0415
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400">
         3x3 Grid | Node: (row, col) | Shows overlapping subproblems

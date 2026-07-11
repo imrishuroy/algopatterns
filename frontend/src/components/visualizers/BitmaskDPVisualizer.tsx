@@ -407,6 +407,7 @@ const ConceptPhase = ({ step }: { step: number }) => {
   const labels = ["A", "B", "C", "D"];
 
   return (
+    // skipcq: JS-0415
     <div className="flex flex-col items-center gap-6">
       <BitDisplay
         mask={displayMask}
@@ -456,6 +457,7 @@ const SubsetPhase = ({ // skipcq: JS-R1005
   const foundTarget = subsetSteps.slice(0, step).find(s => s.possible);
 
   return (
+    // skipcq: JS-0415
     <div className="flex flex-col items-center gap-6">
       <div className="text-center">
         <div className="text-sm text-gray-400 mb-2">

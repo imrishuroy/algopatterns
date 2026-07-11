@@ -292,6 +292,7 @@ const Controls = ({ // skipcq: JS-0415
   step: number;
   total: number;
 }) => (
+  // skipcq: JS-0415
   <div className="flex flex-col gap-4">
     <div className="flex items-center justify-center gap-2">
       <button

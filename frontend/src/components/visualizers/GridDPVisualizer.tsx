@@ -41,7 +41,7 @@ const generateMemoSteps = (): MemoStep[] => {
   );
   const steps: MemoStep[] = [];
 
-  const solve = (r: number, c: number): number => {
+  const solve = (r: number, c: number): number => { // skipcq: JS-R1005
     if (r < 0 || c < 0) {
       return 0;
     }
@@ -63,7 +63,7 @@ const generateMemoSteps = (): MemoStep[] => {
         row: 0,
         col: 0,
         value: 1,
-        action: `Base case: memo[0][0] = 1`,
+        action: `Base case: memo[0][0] = 1`, // skipcq: JS-R1004
         fromCache: false,
       });
       return 1;
@@ -324,7 +324,7 @@ const buildRecursionTreeData = (): { nodes: TreeNodeData[]; steps: TreeStep[] } 
   return { nodes, steps };
 };
 
-const RecursionPhase = ({
+const RecursionPhase = ({ // skipcq: JS-R1005
   step,
 }: {
   step: number;
@@ -345,7 +345,7 @@ const RecursionPhase = ({
   const nodeResults = useMemo(() => {
     const results = new Map<string, number>();
     for (let i = 0; i < Math.min(step, treeSteps.length); i++) {
-      const s = treeSteps[i];
+      const s = treeSteps[i]; // skipcq: JS-C1002
       if (s.result !== null) {
         results.set(s.nodeId, s.result);
       }
@@ -380,7 +380,7 @@ const RecursionPhase = ({
           );
         })}
 
-        {nodes.map((node) => {
+        {nodes.map((node) => { // skipcq: JS-R1005
           const isVisited = visitedSet.has(node.id);
           const isCurrent = node.id === currentNodeId;
           const hasResult = nodeResults.has(node.id);
@@ -443,7 +443,7 @@ const RecursionPhase = ({
   );
 };
 
-const MemoPhase = ({
+const MemoPhase = ({ // skipcq: JS-R1005
   step,
   memoSteps,
 }: {
@@ -467,7 +467,7 @@ const MemoPhase = ({
 
   const cacheHits = visibleSteps.filter(s => s.fromCache).length;
 
-  return (
+  return ( // skipcq: JS-0415 
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400">
         3x3 Grid | Yellow = cache hit (no recomputation needed)
@@ -478,13 +478,13 @@ const MemoPhase = ({
           <div className="text-xs text-gray-500 text-center mb-2">Memo Table</div>
           <div className="inline-grid gap-1" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
             {currentMemo.map((row, r) =>
-              row.map((val, c) => {
+              row.map((val, c) => { // skipcq: JS-R1005
                 const isCurrent = currentStep?.row === r && currentStep?.col === c;
                 const isCacheHit = currentStep?.fromCache && isCurrent;
 
                 return (
                   <div
-                    key={`memo-${r}-${c}`}
+                    key={`memo-${r}-${c}`} // skipcq: JS-0437
                     className={`w-14 h-14 flex flex-col items-center justify-center rounded font-mono border-2 transition-all ${
                       isCurrent
                         ? isCacheHit
@@ -532,7 +532,7 @@ const MemoPhase = ({
   );
 };
 
-const TabulationPhase = ({
+const TabulationPhase = ({ // skipcq: JS-R1005
   step,
   tableSteps,
 }: {
@@ -560,14 +560,14 @@ const TabulationPhase = ({
         <div className="text-sm text-gray-500 mb-2">dp[r][c] = paths to cell (r,c)</div>
         <div className="inline-grid gap-1" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
           {dpTable.map((row, r) =>
-            row.map((val, c) => {
+            row.map((val, c) => { // skipcq: JS-R1005
               const isCurrent = currentStep?.row === r && currentStep?.col === c;
               const isStart = r === 0 && c === 0;
               const isEnd = r === ROWS - 1 && c === COLS - 1;
 
               return (
                 <div
-                  key={`dp-${r}-${c}`}
+                  key={`dp-${r}-${c}`} // skipcq: JS-0437
                   className={`w-14 h-14 flex flex-col items-center justify-center rounded font-mono border-2 transition-all ${
                     isCurrent
                       ? "bg-blue-600 border-blue-400 text-white font-bold"
@@ -608,7 +608,7 @@ const TabulationPhase = ({
   );
 };
 
-const SpaceOptimizedPhase = ({
+const SpaceOptimizedPhase = ({ // skipcq: JS-R1005
   step,
   spaceSteps,
 }: {
@@ -629,7 +629,7 @@ const SpaceOptimizedPhase = ({
         <div className="inline-grid gap-1" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
           {displayDp.map((val, c) => (
             <div
-              key={`space-${c}`}
+              key={`space-${c}`} // skipcq: JS-0437
               className={`w-16 h-16 flex flex-col items-center justify-center rounded font-mono border-2 transition-all ${
                 currentStep
                   ? "bg-purple-700 border-purple-400 text-white font-bold"

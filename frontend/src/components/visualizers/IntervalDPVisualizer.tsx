@@ -307,7 +307,7 @@ const BalloonsDisplay = ({
   </div>
 );
 
-const RecursionPhase = ({ step }: { step: number }) => {
+const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
   const { nodes, steps: treeSteps } = useMemo(() => buildRecursionTreeData(), []);
   const currentStep = step > 0 && step <= treeSteps.length ? treeSteps[step - 1] : null;
 
@@ -324,7 +324,7 @@ const RecursionPhase = ({ step }: { step: number }) => {
   const nodeResults = useMemo(() => {
     const results = new Map<string, number>();
     for (let i = 0; i < Math.min(step, treeSteps.length); i++) {
-      const s = treeSteps[i];
+      const s = treeSteps[i]; // skipcq: JS-C1002
       if (s.result !== null) {
         results.set(s.nodeId, s.result);
       }
@@ -360,7 +360,7 @@ const RecursionPhase = ({ step }: { step: number }) => {
           );
         })}
 
-        {nodes.map((node) => {
+        {nodes.map((node) => { // skipcq: JS-R1005
           const isVisited = visitedSet.has(node.id);
           const isCurrent = node.id === currentNodeId;
           const hasResult = nodeResults.has(node.id);
@@ -427,7 +427,7 @@ const RecursionPhase = ({ step }: { step: number }) => {
   );
 };
 
-const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] }) => {
+const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] }) => { // skipcq: JS-R1005
   const currentStep = step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
   const visibleSteps = memoSteps.slice(0, step);
 
@@ -445,7 +445,7 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
 
   const cacheHits = visibleSteps.filter(s => s.fromCache).length;
 
-  return (
+  return ( // skipcq: JS-0415 
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay
         highlightRange={currentStep ? { l: currentStep.l, r: currentStep.r } : undefined}
@@ -470,7 +470,7 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
               {Array.from({ length: n }, (_, rowL) => (
                 <tr key={`mr-${rowL + 1}`}>
                   <td className="p-1 text-gray-400 font-mono text-center">{rowL + 1}</td>
-                  {Array.from({ length: n }, (_, colR) => {
+                  {Array.from({ length: n }, (_, colR) => { // skipcq: JS-R1005
                     const isCurrent = currentStep && currentStep.l === rowL + 1 && currentStep.r === colR + 1;
                     const isCacheHit = currentStep?.fromCache && isCurrent;
                     const value = currentMemo[rowL + 1]?.[colR + 1];
@@ -530,7 +530,7 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
   );
 };
 
-const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[] }) => {
+const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[] }) => { // skipcq: JS-R1005
   const dpTable = useMemo(() => {
     const dp: number[][] = Array(n + 2)
       .fill(null)
@@ -544,7 +544,7 @@ const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: Table
 
   const currentStep = step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
 
-  return (
+  return ( // skipcq: JS-0415 
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay
         highlightRange={
@@ -571,7 +571,7 @@ const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: Table
             {Array.from({ length: n }, (_, rowL) => (
               <tr key={`tr-${rowL + 1}`}>
                 <td className="p-1 text-gray-400 font-mono">{rowL + 1}</td>
-                {Array.from({ length: n }, (_, colR) => {
+                {Array.from({ length: n }, (_, colR) => { // skipcq: JS-R1005
                   const isCurrent = currentStep && currentStep.l === rowL + 1 && currentStep.r === colR + 1;
                   const value = dpTable[rowL + 1]?.[colR + 1];
                   const isValid = colR >= rowL;

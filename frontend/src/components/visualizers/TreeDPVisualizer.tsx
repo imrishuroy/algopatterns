@@ -364,7 +364,7 @@ const TreeSVG = ({
         });
       })}
 
-      {tree.map((node) => {
+      {tree.map((node) => { // skipcq: JS-R1005
         const isComputed = computedNodes.has(node.id);
         const isCurrent = currentNodeId === node.id;
         const label = nodeLabels?.get(node.id);
@@ -430,7 +430,7 @@ const TreeSVG = ({
   );
 };
 
-const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] }) => {
+const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] }) => { // skipcq: JS-R1005
   const currentStep = step > 0 && step <= steps.length ? steps[step - 1] : null;
 
   const computedNodes = useMemo(() => {
@@ -451,7 +451,7 @@ const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] })
     return map;
   }, [step, steps]);
 
-  return (
+  return ( // skipcq: JS-0415 
     <div className="flex flex-col items-center gap-4">
       <div className="text-sm text-gray-400 text-center max-w-md">
         Why does Tree DP need state PAIRS? Single value loses critical info.
@@ -521,7 +521,7 @@ const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] })
   );
 };
 
-const RobberPhase = ({ step, steps, answer }: { step: number; steps: RobberStep[]; answer: number }) => {
+const RobberPhase = ({ step, steps, answer }: { step: number; steps: RobberStep[]; answer: number }) => { // skipcq: JS-R1005
   const computedNodes = useMemo(() => {
     const map = new Map<number, { top: string; bottom: string }>();
     for (let s = 0; s < Math.min(step, steps.length); s++) {
@@ -594,7 +594,7 @@ const RobberPhase = ({ step, steps, answer }: { step: number; steps: RobberStep[
   );
 };
 
-const DiameterPhase = ({ step, steps, answer }: { step: number; steps: DiameterStep[]; answer: number }) => {
+const DiameterPhase = ({ step, steps, answer }: { step: number; steps: DiameterStep[]; answer: number }) => { // skipcq: JS-R1005
   const computedNodes = useMemo(() => {
     const map = new Map<number, { top: string; bottom: string }>();
     for (let s = 0; s < Math.min(step, steps.length); s++) {

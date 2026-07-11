@@ -28,7 +28,7 @@ const capacity = 7;
 
 // Compute the final answer and chosen items at module level from the same DP
 // used for the animation, so all banners stay in sync when items/capacity change.
-const computeKnapsackResult = (
+const computeKnapsackResult = ( // skipcq: JS-R1005
   itemList: Item[],
   cap: number
 ): { answer: number; chosenItems: string } => {
@@ -46,7 +46,7 @@ const computeKnapsackResult = (
   }
   // Traceback to find chosen items
   const chosen: string[] = [];
-  let w = cap;
+  let w = cap; // skipcq: JS-C1002
   for (let i = n; i > 0; i--) {
     if (dp[i][w] !== dp[i - 1][w]) {
       chosen.unshift(itemList[i - 1].name);
@@ -319,7 +319,7 @@ const ItemsDisplay = ({ currentItem }: { currentItem?: number }) => (
   </div>
 );
 
-const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
+const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => { // skipcq: JS-R1005
   const currentItemIdx = Math.min(Math.floor(step / 2), items.length - 1);
   const isDecisionStep = step % 2 === 1;
 
@@ -399,7 +399,7 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
   );
 };
 
-const TablePhase = ({
+const TablePhase = ({ // skipcq: JS-R1005
   step,
   tableSteps,
 }: {

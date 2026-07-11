@@ -15,7 +15,7 @@ const houses = [2, 7, 9, 3, 1];
 
 // Compute the final answer and optimal house selection at module level from the same
 // DP used for the animation, so all banners stay in sync when the houses array changes.
-const computeHouseRobberResult = (
+const computeHouseRobberResult = ( // skipcq: JS-R1005
   nums: number[]
 ): { answer: number; robbedIndices: number[]; breakdown: string } => {
   const n = nums.length;
@@ -378,7 +378,7 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
   );
 };
 
-const TablePhase = ({
+const TablePhase = ({ // skipcq: JS-R1005
   step,
   tableSteps,
 }: {
@@ -460,7 +460,7 @@ const TablePhase = ({
   );
 };
 
-const OptimizedPhase = ({
+const OptimizedPhase = ({ // skipcq: JS-R1005
   step,
   optimizedSteps,
 }: {

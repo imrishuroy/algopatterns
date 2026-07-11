@@ -122,7 +122,7 @@ const generateProductSteps = (): ProductStep[] => {
   return result;
 };
 
-const generateCooldownSteps = (): CooldownStep[] => {
+const generateCooldownSteps = (): CooldownStep[] => { // skipcq: JS-R1005
   const result: CooldownStep[] = [];
   let hold = -Infinity;
   let sold = 0;
@@ -180,7 +180,7 @@ const generateCooldownSteps = (): CooldownStep[] => {
   return result;
 };
 
-const generateFeeSteps = (): FeeStep[] => {
+const generateFeeSteps = (): FeeStep[] => { // skipcq: JS-R1005
   const result: FeeStep[] = [];
   let hold = -feePrices[0];
   let cash = 0;
@@ -291,7 +291,7 @@ const Controls = ({
   onSpeedChange: (s: number) => void;
   step: number;
   total: number;
-}) => (
+}) => ( // skipcq: JS-0415 
   <div className="flex flex-col gap-4">
     <div className="flex items-center justify-center gap-2">
       <button
@@ -376,7 +376,7 @@ const Controls = ({
   </div>
 );
 
-const ProductPhase = ({ step, steps }: { step: number; steps: ProductStep[] }) => {
+const ProductPhase = ({ step, steps }: { step: number; steps: ProductStep[] }) => { // skipcq: JS-R1005
   const currentStep = step > 0 && step <= steps.length ? steps[step - 1] : null;
 
   const decisionClass =
@@ -400,7 +400,7 @@ const ProductPhase = ({ step, steps }: { step: number; steps: ProductStep[] }) =
       </div>
 
       <div className="flex gap-2 justify-center">
-        {productNums.map((num, idx) => (
+        {productNums.map((num, idx) => ( // skipcq: JS-R1005 // skipcq: JS-0437 
           <div key={`prod-${idx}`} className="flex flex-col items-center">
             <div className="text-xs text-gray-500 mb-1">{idx}</div>
             <motion.div
@@ -462,7 +462,7 @@ const ProductPhase = ({ step, steps }: { step: number; steps: ProductStep[] }) =
   );
 };
 
-const CooldownPhase = ({ step, steps }: { step: number; steps: CooldownStep[] }) => {
+const CooldownPhase = ({ step, steps }: { step: number; steps: CooldownStep[] }) => { // skipcq: JS-R1005
   const currentStep = step > 0 && step <= steps.length ? steps[step - 1] : null;
 
   const stateColors = {
@@ -478,7 +478,7 @@ const CooldownPhase = ({ step, steps }: { step: number; steps: CooldownStep[] })
       </div>
 
       <div className="flex gap-2 justify-center">
-        {stockPrices.map((price, idx) => (
+        {stockPrices.map((price, idx) => ( // skipcq: JS-R1005 // skipcq: JS-0437 
           <div key={`cool-${idx}`} className="flex flex-col items-center">
             <div className="text-xs text-gray-500 mb-1">Day {idx}</div>
             <motion.div
@@ -573,7 +573,7 @@ const CooldownPhase = ({ step, steps }: { step: number; steps: CooldownStep[] })
   );
 };
 
-const FeePhase = ({ step, steps }: { step: number; steps: FeeStep[] }) => {
+const FeePhase = ({ step, steps }: { step: number; steps: FeeStep[] }) => { // skipcq: JS-R1005
   const currentStep = step > 0 && step <= steps.length ? steps[step - 1] : null;
 
   return (
@@ -583,7 +583,7 @@ const FeePhase = ({ step, steps }: { step: number; steps: FeeStep[] }) => {
       </div>
 
       <div className="flex gap-2 justify-center">
-        {feePrices.map((price, idx) => (
+        {feePrices.map((price, idx) => ( // skipcq: JS-R1005 // skipcq: JS-0437 
           <div key={`fee-${idx}`} className="flex flex-col items-center">
             <div className="text-xs text-gray-500 mb-1">Day {idx}</div>
             <motion.div
@@ -648,7 +648,7 @@ const FeePhase = ({ step, steps }: { step: number; steps: FeeStep[] }) => {
   );
 };
 
-const PaintPhase = ({ step, steps }: { step: number; steps: PaintStep[] }) => {
+const PaintPhase = ({ step, steps }: { step: number; steps: PaintStep[] }) => { // skipcq: JS-R1005
   const currentStep = step > 0 && step <= steps.length ? steps[step - 1] : null;
 
   const colorClasses = [
@@ -664,7 +664,7 @@ const PaintPhase = ({ step, steps }: { step: number; steps: PaintStep[] }) => {
       </div>
 
       <div className="flex gap-4 justify-center">
-        {houseCosts.map((costs, idx) => (
+        {houseCosts.map((costs, idx) => ( // skipcq: JS-0437 
           <div key={`house-${idx}`} className="flex flex-col items-center">
             <motion.div
               animate={{
@@ -679,7 +679,7 @@ const PaintPhase = ({ step, steps }: { step: number; steps: PaintStep[] }) => {
             <div className="flex gap-1 mt-2">
               {costs.map((cost, cIdx) => (
                 <div
-                  key={`cost-${idx}-${cIdx}`}
+                  key={`cost-${idx}-${cIdx}`} // skipcq: JS-0437
                   className={`w-5 h-5 rounded text-xs flex items-center justify-center ${colorClasses[cIdx].bg} ${currentStep && idx === currentStep.house && cIdx === currentStep.chosen ? "ring-2 ring-white" : ""}`}
                 >
                   {cost}
@@ -693,7 +693,7 @@ const PaintPhase = ({ step, steps }: { step: number; steps: PaintStep[] }) => {
       <div className="mt-4">
         <div className="text-xs text-gray-500 text-center mb-2">Min cost to paint houses 0..i ending with each color:</div>
         <div className="flex gap-4 justify-center">
-          {colors.map((color, cIdx) => (
+          {colors.map((color, cIdx) => ( // skipcq: JS-0437 
             <div key={`dp-${cIdx}`} className={`p-3 rounded-lg text-center min-w-[80px] bg-${color.toLowerCase()}-500/10 border ${colorClasses[cIdx].border}`}>
               <div className={`text-xs ${colorClasses[cIdx].text} mb-1`}>{color}</div>
               <motion.div

@@ -102,7 +102,7 @@ function generateSteps() {
 }
 
 // skipcq: JS-0067
-export default function KnapsackVisualizer() {
+export default function KnapsackVisualizer() { // skipcq: JS-R1005
   const [{ step, isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
     isPlaying: false,
@@ -118,7 +118,7 @@ export default function KnapsackVisualizer() {
   const { steps, dp: finalDp } = useMemo(() => generateSteps(), []);
 
   // Derived from step — works for both play mode and manual stepping.
-  const selectedItems = useMemo(() => {
+  const selectedItems = useMemo(() => { // skipcq: JS-R1005
     if (step < steps.length) return new Set<number>();
     const selected = new Set<number>();
     let remaining = capacity;

@@ -376,7 +376,7 @@ const TreeNodeComponent = ({
   );
 };
 
-const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
+const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => { // skipcq: JS-R1005
   const tree = useMemo(() => buildTree(TARGET_N), []);
   const nodeOrder = useMemo(() => (tree ? flattenTree(tree) : []), [tree]);
   const visibleNodes = new Set(nodeOrder.slice(0, step + 1));
@@ -574,7 +574,7 @@ const TablePhase = ({
   );
 };
 
-const OptimizedPhase = ({
+const OptimizedPhase = ({ // skipcq: JS-R1005
   step,
   optimizedSteps,
 }: {

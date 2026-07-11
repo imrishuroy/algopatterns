@@ -13,6 +13,35 @@ type Phase = "tree" | "memo" | "table" | "optimized";
 
 const houses = [2, 7, 9, 3, 1];
 
+// Compute the final answer and optimal house selection at module level from the same
+// DP used for the animation, so all banners stay in sync when the houses array changes.
+const computeHouseRobberResult = ( // skipcq: JS-R1005
+  nums: number[]
+): { answer: number; robbedIndices: number[]; breakdown: string } => {
+  const n = nums.length;
+  if (n === 0) return { answer: 0, robbedIndices: [], breakdown: "" };
+  const dp: number[] = [nums[0]];
+  if (n > 1) dp.push(Math.max(nums[0], nums[1]));
+  for (let i = 2; i < n; i++) dp.push(Math.max(nums[i] + dp[i - 2], dp[i - 1]));
+  // Traceback to find which houses were robbed
+  const robbed: number[] = [];
+  let i = n - 1;
+  while (i >= 0) {
+    if (i === 0) { robbed.push(0); break; }
+    if (i === 1) { robbed.push(dp[1] === nums[1] ? 1 : 0); break; }
+    if (nums[i] + dp[i - 2] >= dp[i - 1]) { robbed.push(i); i -= 2; }
+    else i -= 1;
+  }
+  robbed.sort((a, b) => a - b);
+  const breakdown = robbed.map((idx) => `$${nums[idx]}`).join(" + ");
+  return { answer: dp[n - 1], robbedIndices: robbed, breakdown };
+};
+const {
+  answer: HOUSE_ROBBER_ANSWER,
+  robbedIndices: HOUSE_ROBBER_INDICES,
+  breakdown: HOUSE_ROBBER_BREAKDOWN,
+} = computeHouseRobberResult(houses);
+
 const generateTableSteps = () => {
   const n = houses.length;
   const steps: {
@@ -338,11 +367,18 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
           </span>
         )}
       </div>
+
+      {step >= houses.length && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: Max money = {HOUSE_ROBBER_ANSWER}</span>
+          <span className="text-gray-400 ml-2">(rob houses {HOUSE_ROBBER_INDICES.join(", ")}: {HOUSE_ROBBER_BREAKDOWN})</span>
+        </div>
+      )}
     </div>
   );
 };
 
-const TablePhase = ({
+const TablePhase = ({ // skipcq: JS-R1005
   step,
   tableSteps,
 }: {
@@ -413,11 +449,18 @@ const TablePhase = ({
       <div className="text-sm text-gray-500 text-center">
         dp[i] = max(nums[i] + dp[i-2], dp[i-1]) = max(rob, skip)
       </div>
+
+      {step >= tableSteps.length && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
+          <span className="text-green-400 font-bold">Answer: Max money = {HOUSE_ROBBER_ANSWER}</span>
+          <span className="text-gray-400 ml-2">(rob houses {HOUSE_ROBBER_INDICES.join(", ")}: {HOUSE_ROBBER_BREAKDOWN})</span>
+        </div>
+      )}
     </div>
   );
 };
 
-const OptimizedPhase = ({
+const OptimizedPhase = ({ // skipcq: JS-R1005
   step,
   optimizedSteps,
 }: {
@@ -472,6 +515,13 @@ const OptimizedPhase = ({
       <div className="text-sm text-gray-500 text-center max-w-md">
         Space O(1): curr = max(prev1, nums[i] + prev2), then slide window.
       </div>
+
+      {step >= optimizedSteps.length && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
+          <span className="text-green-400 font-bold">Answer: Max money = {HOUSE_ROBBER_ANSWER}</span>
+          <span className="text-gray-400 ml-2">(rob houses {HOUSE_ROBBER_INDICES.join(", ")}: {HOUSE_ROBBER_BREAKDOWN})</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -603,7 +653,7 @@ export default function HouseRobberVisualizer() {
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
         houses = [{houses.join(", ")}] | f(i) = max(nums[i] + f(i-2), f(i-1)) |
-        Answer: 12
+        Answer: {HOUSE_ROBBER_ANSWER}
       </div>
     </div>
   );

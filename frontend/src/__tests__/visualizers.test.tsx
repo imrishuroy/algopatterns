@@ -66,6 +66,11 @@ import StepByStepExecutor from "@/components/visualizers/StepByStepExecutor";
 import TrieInsertVisualizer from "@/components/visualizers/TrieInsertVisualizer";
 import LinkedListReversalVisualizer from "@/components/visualizers/LinkedListReversalVisualizer";
 import GridBFSVisualizer from "@/components/visualizers/GridBFSVisualizer";
+import BitmaskDPVisualizer from "@/components/visualizers/BitmaskDPVisualizer";
+import GridDPVisualizer from "@/components/visualizers/GridDPVisualizer";
+import LISVisualizer from "@/components/visualizers/LISVisualizer";
+import MultiStateDPVisualizer from "@/components/visualizers/MultiStateDPVisualizer";
+import TreeDPVisualizer from "@/components/visualizers/TreeDPVisualizer";
 
 beforeEach(() => {
   cleanup();
@@ -168,6 +173,62 @@ describe("Shared visualizer UI pattern", () => {
     expect(screen.getByText("Prev")).toBeInTheDocument();
     expect(screen.getByText("Next")).toBeInTheDocument();
     expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+});
+
+describe("Dynamic programming visualizers", () => {
+  it("BitmaskDPVisualizer renders core phases and advances steps", () => {
+    render(<BitmaskDPVisualizer />);
+
+    expect(screen.getByText("Bitmask DP")).toBeInTheDocument();
+    expect(screen.getByText("Bitmask Basics")).toBeInTheDocument();
+    expect(screen.getByText("Subset Sum")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTitle("Step"));
+    expect(document.body.textContent).toContain("mask = 0");
+  });
+
+  it("GridDPVisualizer switches between tabulation and memoization", () => {
+    render(<GridDPVisualizer />);
+
+    expect(screen.getByText("Grid DP (2D Navigation)")).toBeInTheDocument();
+    expect(document.body.textContent).toContain("dp[r][c] = paths to cell");
+
+    fireEvent.click(screen.getByText("Memoization"));
+    expect(document.body.textContent).toContain("Memo Table");
+  });
+
+  it("LISVisualizer renders tabulation and binary-search phases", () => {
+    render(<LISVisualizer />);
+
+    expect(
+      screen.getByText("Longest Increasing Subsequence (LIS)")
+    ).toBeInTheDocument();
+    expect(document.body.textContent).toContain("nums = [10, 9, 2");
+
+    fireEvent.click(screen.getByText("Binary Search"));
+    expect(document.body.textContent).toContain("tails");
+  });
+
+  it("MultiStateDPVisualizer switches between state-machine examples", () => {
+    render(<MultiStateDPVisualizer />);
+
+    expect(screen.getByText("Multi-State DP")).toBeInTheDocument();
+    expect(screen.getByText("Max Product")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Paint House"));
+    expect(document.body.textContent).toContain("Paint House");
+  });
+
+  it("TreeDPVisualizer renders tree-specific phases and controls", () => {
+    render(<TreeDPVisualizer />);
+
+    expect(screen.getByText("Tree DP")).toBeInTheDocument();
+    expect(screen.getByText("Why Pairs?")).toBeInTheDocument();
+    expect(document.body.textContent).toContain("Why does Tree DP need state PAIRS?");
+
+    fireEvent.click(screen.getByText("Tree Diameter"));
+    expect(document.body.textContent).toContain("Tree Diameter");
   });
 });
 

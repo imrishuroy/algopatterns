@@ -28,6 +28,8 @@ func NewQuizHandler(service services.QuizServiceInterface, featureAccess *servic
 
 func (h *QuizHandler) RegisterRoutes(rg *gin.RouterGroup) {
 	quiz := rg.Group("/quiz")
+	// Parse Bearer token when present so Pro limits and attempt ownership work.
+	quiz.Use(h.authMW.OptionalAuth())
 	{
 		// Public endpoints (work for both authenticated and anonymous users)
 		quiz.GET("/questions/:patternId", h.ListQuestions)
@@ -78,10 +80,10 @@ func (h *QuizHandler) ListQuestions(c *gin.Context) {
 		return
 	}
 
-	// Limit questions for free users
+	// Limit returned questions for free users. Keep TotalQuestions as the full
+	// available count so clients can show "3 of 75 unlocked".
 	if !isPro && features.QuizQuestionsPerPattern > 0 && len(result.Questions) > features.QuizQuestionsPerPattern {
 		result.Questions = result.Questions[:features.QuizQuestionsPerPattern]
-		result.TotalQuestions = len(result.Questions)
 		result.IsLimited = true
 		result.LimitReason = "Upgrade to Pro to access all quiz questions"
 	}

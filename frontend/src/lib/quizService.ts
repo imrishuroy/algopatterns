@@ -9,6 +9,7 @@ import type {
   AttemptHistoryResponse,
   QuizAttempt,
 } from "@/types/quiz";
+import { apiClient } from "@/lib/api";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
@@ -21,18 +22,54 @@ interface ApiResponse<T> {
   };
 }
 
-async function fetchApi<T>(
+const buildHeaders = (extra?: HeadersInit): Record<string, string> => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (extra) {
+    const asRecord =
+      extra instanceof Headers
+        ? Object.fromEntries(extra.entries())
+        : Array.isArray(extra)
+          ? Object.fromEntries(extra)
+          : { ...(extra as Record<string, string>) };
+    Object.assign(headers, asRecord);
+  }
+
+  const token = apiClient.getAccessToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
+// skipcq: JS-R1005
+const fetchApi = async <T,>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<T> {
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+): Promise<T> => {
+  const headers = buildHeaders(options.headers);
+
+  let response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
+    headers,
     credentials: "include",
   });
+
+  // Retry once after refresh if the access token was rejected.
+  if (!response.ok && response.status === 401 && headers["Authorization"]) {
+    const newToken = await apiClient.refreshToken();
+    if (newToken) {
+      headers["Authorization"] = `Bearer ${newToken}`;
+      response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers,
+        credentials: "include",
+      });
+    }
+  }
 
   const json: ApiResponse<T> = await response.json();
 
@@ -41,7 +78,7 @@ async function fetchApi<T>(
   }
 
   return json.data as T;
-}
+};
 
 export const quizService = {
   getQuestions(

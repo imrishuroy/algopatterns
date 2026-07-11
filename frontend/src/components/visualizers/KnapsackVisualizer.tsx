@@ -102,13 +102,12 @@ function generateSteps() {
 }
 
 // skipcq: JS-0067
-export default function KnapsackVisualizer() {
+export default function KnapsackVisualizer() { // skipcq: JS-R1005
   const [{ step, isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
     isPlaying: false,
   });
   const [speed, setSpeed] = useState(600);
-  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
   const [dpTable, setDpTable] = useState<number[][]>([]);
   const [currentCell, setCurrentCell] = useState<{
     i: number;
@@ -118,25 +117,20 @@ export default function KnapsackVisualizer() {
 
   const { steps, dp: finalDp } = useMemo(() => generateSteps(), []);
 
-  const [completed, setCompleted] = useState(false);
-
-  const backtrackSolution = useCallback(
-    function backtrackSolution() {
-      const selected = new Set<number>();
-      let remaining = capacity;
-
-      for (let i = items.length; i > 0 && remaining > 0; i--) {
-        const stepIdx = (i - 1) * (capacity + 1) + remaining;
-        if (stepIdx < steps.length && steps[stepIdx]?.take) {
-          selected.add(i - 1);
-          remaining -= items[i - 1].weight;
-        }
+  // Derived from step — works for both play mode and manual stepping.
+  const selectedItems = useMemo(() => { // skipcq: JS-R1005
+    if (step < steps.length) return new Set<number>();
+    const selected = new Set<number>();
+    let remaining = capacity;
+    for (let i = items.length; i > 0 && remaining > 0; i--) {
+      const stepIdx = (i - 1) * (capacity + 1) + remaining;
+      if (stepIdx < steps.length && steps[stepIdx]?.take) {
+        selected.add(i - 1);
+        remaining -= items[i - 1].weight;
       }
-
-      setSelectedItems(selected);
-    },
-    [steps]
-  );
+    }
+    return selected;
+  }, [step, steps]);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -144,10 +138,6 @@ export default function KnapsackVisualizer() {
     if (step >= steps.length) {
       startTransition(() => {
         dispatch({ type: "STOP" });
-        if (!completed) {
-          setCompleted(true);
-          backtrackSolution();
-        }
       });
       return;
     }
@@ -168,11 +158,10 @@ export default function KnapsackVisualizer() {
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [isPlaying, step, steps, speed, completed, backtrackSolution]);
+  }, [isPlaying, step, steps, speed]);
 
   const reset = useCallback(() => {
     dispatch({ type: "RESET" });
-    setCompleted(false);
     setDpTable(
       Array(items.length + 1)
         .fill(null)
@@ -180,7 +169,6 @@ export default function KnapsackVisualizer() {
     );
     setCurrentCell(null);
     setDecision("");
-    setSelectedItems(new Set());
   }, []);
 
   useEffect(() => {
@@ -460,17 +448,24 @@ export default function KnapsackVisualizer() {
           <span>
             Progress: {step}/{steps.length} cells
           </span>
-          {step >= steps.length && (
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-green-400 font-medium"
-            >
-              ✓ Optimal solution found: $
-              {finalDp[items.length]?.[capacity] || 0}
-            </motion.span>
-          )}
         </div>
+
+        {/* Answer Display */}
+        {step >= steps.length && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mt-4 text-center bg-green-600/20 px-4 py-3 rounded-lg border border-green-500/30"
+          >
+            <span className="text-green-400 font-bold text-lg">
+              Answer: Maximum Value = ${finalDp[items.length]?.[capacity] || 0}
+            </span>
+            <div className="text-gray-400 text-sm mt-1">
+              Items: {[...selectedItems].map(i => items[i].name).join(" + ") || "None"}
+              {selectedItems.size > 0 && ` (${totalWeight}kg)`}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

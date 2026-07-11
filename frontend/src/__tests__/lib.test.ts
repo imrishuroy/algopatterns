@@ -1660,6 +1660,12 @@ describe("quizService", () => {
       json: () => Promise.resolve({ success: false, error: { code, message } }),
     });
 
+  beforeEach(() => {
+    // aiApiClient tests spy on getAccessToken; clear those mocks here.
+    vi.restoreAllMocks();
+    apiClient.setAccessToken(null);
+  });
+
   describe("getQuestions", () => {
     it("builds URL with patternId only", async () => {
       mockFetch.mockResolvedValueOnce(
@@ -1690,6 +1696,71 @@ describe("quizService", () => {
 
       const url = mockFetch.mock.calls[0][0] as string;
       expect(url).toContain("section=section-1");
+    });
+
+    it("sends Authorization header when access token is set", async () => {
+      apiClient.setAccessToken("quiz-token");
+      mockFetch.mockResolvedValueOnce(
+        successResponse({
+          patternId: "hash-map",
+          totalQuestions: 5,
+          questions: [],
+        })
+      );
+
+      await quizService.getQuestions("hash-map");
+
+      const init = mockFetch.mock.calls[0][1] as RequestInit;
+      expect((init.headers as Record<string, string>)["Authorization"]).toBe(
+        "Bearer quiz-token"
+      );
+    });
+
+    it("returns free-tier limit metadata from the API response", async () => {
+      mockFetch.mockResolvedValueOnce(
+        successResponse({
+          patternId: "dynamic-programming",
+          totalQuestions: 12,
+          questions: [{ id: "q1" }, { id: "q2" }, { id: "q3" }],
+          isLimited: true,
+          limitReason: "Upgrade to Pro to access all quiz questions",
+        })
+      );
+
+      const result = await quizService.getQuestions("dynamic-programming");
+
+      expect(result.totalQuestions).toBe(12);
+      expect(result.questions).toHaveLength(3);
+      expect(result.isLimited).toBe(true);
+      expect(result.limitReason).toBe(
+        "Upgrade to Pro to access all quiz questions"
+      );
+    });
+
+    it("refreshes once and retries when an authenticated quiz request gets 401", async () => {
+      apiClient.setAccessToken("expired-token");
+      vi.spyOn(apiClient, "refreshToken").mockResolvedValueOnce("fresh-token");
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          json: () => Promise.resolve({ success: false }),
+        })
+        .mockResolvedValueOnce(
+          successResponse({
+            patternId: "hash-map",
+            totalQuestions: 1,
+            questions: [],
+          })
+        );
+
+      await quizService.getQuestions("hash-map");
+
+      expect(apiClient.refreshToken).toHaveBeenCalledTimes(1);
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch.mock.calls[1][1].headers.Authorization).toBe(
+        "Bearer fresh-token"
+      );
     });
   });
 

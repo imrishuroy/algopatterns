@@ -51,8 +51,11 @@ export interface QuizResponse {
 export interface GetQuestionsResponse {
   patternId: string;
   sectionSlug?: string;
+  /** Full number of questions available for this pattern (before free-tier slice). */
   totalQuestions: number;
   questions: QuizQuestion[];
+  isLimited?: boolean;
+  limitReason?: string;
 }
 
 export interface StartAttemptRequest {

@@ -26,6 +26,38 @@ const items: Item[] = [
 
 const capacity = 7;
 
+// Compute the final answer and chosen items at module level from the same DP
+// used for the animation, so all banners stay in sync when items/capacity change.
+const computeKnapsackResult = ( // skipcq: JS-R1005
+  itemList: Item[],
+  cap: number
+): { answer: number; chosenItems: string } => {
+  const n = itemList.length;
+  const dp: number[][] = Array(n + 1)
+    .fill(null)
+    .map(() => Array(cap + 1).fill(0));
+  for (let i = 1; i <= n; i++) {
+    const item = itemList[i - 1];
+    for (let w = 0; w <= cap; w++) {
+      dp[i][w] = dp[i - 1][w];
+      if (item.weight <= w)
+        dp[i][w] = Math.max(dp[i][w], dp[i - 1][w - item.weight] + item.value);
+    }
+  }
+  // Traceback to find chosen items
+  const chosen: string[] = [];
+  let w = cap; // skipcq: JS-C1002
+  for (let i = n; i > 0; i--) {
+    if (dp[i][w] !== dp[i - 1][w]) {
+      chosen.unshift(itemList[i - 1].name);
+      w -= itemList[i - 1].weight;
+    }
+  }
+  return { answer: dp[n][cap], chosenItems: chosen.join(" + ") };
+};
+const { answer: KNAPSACK_ANSWER, chosenItems: KNAPSACK_ITEMS } =
+  computeKnapsackResult(items, capacity);
+
 const generateTableSteps = () => {
   const n = items.length;
   const steps: {
@@ -287,7 +319,7 @@ const ItemsDisplay = ({ currentItem }: { currentItem?: number }) => (
   </div>
 );
 
-const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
+const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => { // skipcq: JS-R1005
   const currentItemIdx = Math.min(Math.floor(step / 2), items.length - 1);
   const isDecisionStep = step % 2 === 1;
 
@@ -323,7 +355,7 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
             <div className="flex flex-col items-center">
               <div
                 className={`w-24 h-20 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
-                  !isDecisionStep && step > 0
+                  !isDecisionStep && step > 0 && step < items.length * 2
                     ? "bg-red-600/30 border-red-500"
                     : "bg-gray-800 border-gray-600"
                 }`}
@@ -356,11 +388,18 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
           </span>
         )}
       </div>
+
+      {step >= items.length * 2 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
+          <span className="text-green-400 font-bold">Answer: Maximum Value = ${KNAPSACK_ANSWER}</span>
+          <span className="text-gray-400 ml-2">(Items {KNAPSACK_ITEMS})</span>
+        </div>
+      )}
     </div>
   );
 };
 
-const TablePhase = ({
+const TablePhase = ({ // skipcq: JS-R1005
   step,
   tableSteps,
 }: {
@@ -463,6 +502,13 @@ const TablePhase = ({
         </div>
       )}
 
+      {step >= tableSteps.length && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: Maximum Value = ${KNAPSACK_ANSWER}</span>
+          <span className="text-gray-400 ml-2">(Items {KNAPSACK_ITEMS})</span>
+        </div>
+      )}
+
       <div className="text-sm text-gray-500 text-center">
         dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight] + value)
       </div>
@@ -522,6 +568,13 @@ const OptimizedPhase = ({
       {currentStep && (
         <div className="text-base text-gray-400 text-center font-mono bg-gray-800/50 px-6 py-3 rounded-lg">
           Item {items[currentStep.itemIdx].name}: {currentStep.formula}
+        </div>
+      )}
+
+      {step >= optimizedSteps.length && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: Maximum Value = ${KNAPSACK_ANSWER}</span>
+          <span className="text-gray-400 ml-2">(Items {KNAPSACK_ITEMS})</span>
         </div>
       )}
 
@@ -664,7 +717,7 @@ export default function KnapsackDPVisualizer() {
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
         Items: A(1kg,$1), B(3kg,$4), C(4kg,$5) | Capacity: {capacity}kg |
-        Answer: $9 (B+C)
+        Answer: ${KNAPSACK_ANSWER} ({KNAPSACK_ITEMS})
       </div>
     </div>
   );

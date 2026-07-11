@@ -13,6 +13,7 @@ import MultipleChoice from "./questions/MultipleChoice";
 import TrueFalse from "./questions/TrueFalse";
 import ExplanationPanel from "./questions/ExplanationPanel";
 import QuizResults from "./QuizResults";
+import { UpgradePrompt } from "@/components/pricing/UpgradePrompt";
 
 interface QuizModalProps {
   isOpen: boolean;
@@ -40,6 +41,8 @@ export default function QuizModal({ // skipcq: JS-0067
     correctCount: number;
     scorePercentage: number;
   } | null>(null);
+  const [isLimited, setIsLimited] = useState(false);
+  const [totalAvailable, setTotalAvailable] = useState(0);
 
   const questionStartTime = useRef<number>(0);
   const quizStartTime = useRef<number>(0);
@@ -61,6 +64,8 @@ export default function QuizModal({ // skipcq: JS-0067
     setShowExplanation(false);
     setShowResults(false);
     setResults(null);
+    setIsLimited(false);
+    setTotalAvailable(0);
 
     try {
       const questionsRes = await quizService.getQuestions(
@@ -74,6 +79,7 @@ export default function QuizModal({ // skipcq: JS-0067
         return;
       }
 
+      // Attempt scoring is based on questions returned, not the full catalog.
       const attemptRes = await quizService.startAttempt({
         patternId,
         sectionSlug,
@@ -81,6 +87,10 @@ export default function QuizModal({ // skipcq: JS-0067
       });
 
       setQuestions(questionsRes.questions);
+      setIsLimited(Boolean(questionsRes.isLimited));
+      setTotalAvailable(
+        questionsRes.totalQuestions ?? questionsRes.questions.length
+      );
       setAttemptId(attemptRes.attemptId);
       quizStartTime.current = Date.now();
       questionStartTime.current = Date.now();
@@ -261,19 +271,38 @@ export default function QuizModal({ // skipcq: JS-0067
           )}
 
           {!isLoading && !error && showResults && results && (
-            <QuizResults
-              totalQuestions={results.totalQuestions}
-              correctCount={results.correctCount}
-              scorePercentage={results.scorePercentage}
-              questions={questions}
-              answers={answers}
-              onRetake={handleRetake}
-              onClose={handleClose}
-            />
+            <>
+              <QuizResults
+                totalQuestions={results.totalQuestions}
+                correctCount={results.correctCount}
+                scorePercentage={results.scorePercentage}
+                questions={questions}
+                answers={answers}
+                onRetake={handleRetake}
+                onClose={handleClose}
+              />
+              {isLimited && totalAvailable > questions.length && (
+                <div className="mt-6">
+                  <UpgradePrompt
+                    feature="the full quiz"
+                    title="Unlock all quiz questions"
+                    description={`You completed a free preview (${questions.length} of ${totalAvailable} questions). Upgrade to Pro to practice the full set.`}
+                  />
+                </div>
+              )}
+            </>
           )}
 
           {!isLoading && !error && !showResults && currentQuestion && (
             <>
+              {isLimited && totalAvailable > questions.length && (
+                <div className="mb-4">
+                  <UpgradePrompt
+                    compact
+                    feature={`all ${totalAvailable} quiz questions (preview: ${questions.length})`}
+                  />
+                </div>
+              )}
               <QuestionRenderer
                 question={currentQuestion}
                 answer={answers.get(currentQuestion.id)}

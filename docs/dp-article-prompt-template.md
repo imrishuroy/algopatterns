@@ -2,11 +2,9 @@
 
 Use this prompt to generate comprehensive DP pattern articles for the algorithm learning platform.
 
----
-
 ## PROMPT
 
-I need you to write a comprehensive Dynamic Programming article for the **[PATTERN_NAME]** pattern for our algorithm learning platform. Follow this exact structure and quality standards based on our existing LIS article template.
+I need you to write a comprehensive Dynamic Programming article for the **[PATTERN_NAME]** pattern for our algorithm learning platform. Follow this exact structure and quality standards.
 
 ### Target Audience
 
@@ -36,12 +34,14 @@ I need you to write a comprehensive Dynamic Programming article for the **[PATTE
 
 - Clear one-line definition of the canonical problem
 - 2-3 examples with Input/Output/Explanation format:
+
 ```
 Input: [example input]
 Output: [expected output]
 
 Explanation: [brief explanation]
 ```
+
 - Include edge cases (empty input, single element, all same values, etc.)
 - Use SAME example throughout article for consistency
 
@@ -55,6 +55,7 @@ Explanation: [brief explanation]
 #### 5. APPROACH 1: RECURSION (Brute Force)
 
 - Pseudocode with comments:
+
 ```
 solve(state):
     if base_case: return base_value
@@ -65,12 +66,14 @@ solve(state):
     
     return result
 ```
+
 - State definition explained
 - Base case(s) explained
 - Recursive case(s) explained
-- Time complexity with WHY (e.g., "O(2^n) - each element has 2 choices")
+- Time complexity with WHY (e.g., "O(2^n). Each element has 2 choices.")
 - Space complexity
 - ASCII recursion tree showing OVERLAPPING SUBPROBLEMS:
+
 ```
 solve(0)
 ├── solve(1)
@@ -85,8 +88,8 @@ solve(0)
 - Same recursion + cache
 - Pseudocode showing memo lookup and storage
 - Explain memo key (why this uniquely identifies subproblem)
-- Time: O(...) - each state computed once
-- Space: O(...) memo + O(...) stack
+- Time: O(...). Each state computed once.
+- Space: O(...) memo + O(...) stack.
 
 #### 7. APPROACH 3: TABULATION (Bottom-Up DP)
 
@@ -120,6 +123,7 @@ solve(0)
 #### 10. EXTENDING TO OTHER PROBLEMS
 
 Structure as questions:
+
 - "What if I need to [variation]?"
   - Adaptation: [how to modify]
 - Include Quick Reference table:
@@ -156,38 +160,37 @@ Structure as questions:
 - Problem 1
 - Problem 2
 
----
-
 ### Code Templates Section
 
-Provide templates for each approach with variations:
+Provide templates for each approach with variations. Templates show pattern structure, not specific problem solution.
 
 **templates.recursion**
+
 ```java
-// [PATTERN] - Recursion
-// [Brief description]
+// [PATTERN] - Recursion Template
 // TIME: O(...), SPACE: O(...)
 
-// VARIATION 1: [Name] (e.g., MINIMIZE, MAXIMIZE, COUNT, FEASIBILITY)
-[code]
+// COUNT WAYS (e.g., Climbing Stairs)
+[code for counting]
 
-// VARIATION 2: [Name]
-[code]
+// MINIMIZE COST (e.g., Min Cost Stairs)
+[code for minimization]
 
-// VARIATION 3: [Name]
-[code]
+// MAXIMIZE VALUE (e.g., House Robber)
+[code for maximization]
+
+// FEASIBILITY (e.g., Can reach target?)
+[code for boolean check]
 ```
 
 **templates.memoization**
-Same structure with memo added
+Same structure with memo lookup/storage added
 
 **templates.tabulation**
 Same structure with iterative fill
 
 **templates.spaceOptimized**
-If applicable (e.g., O(n) instead of O(n^2))
-
----
+If applicable (e.g., O(1) instead of O(n))
 
 ### Approaches Section (Language-Specific)
 
@@ -198,23 +201,23 @@ Provide for Java and JavaScript:
 - approaches.tabulation.java / .javascript
 - approaches.spaceOptimized.java / .javascript
 
-Each should be complete, runnable code for the PRIMARY problem of this pattern.
-
----
+Each should be complete, runnable code for the PRIMARY problem of this pattern (the canonical example used throughout the article).
 
 ### Writing Style Guidelines
 
-- No fluff - Every sentence teaches something
-- Concrete over abstract - Always show examples
-- Consistent examples - Same input throughout
-- Pseudocode first - Language-agnostic understanding before code
-- Explain the WHY - Not just what, but why it works
-- Mark critical insights - Bold or "Critical:" prefix
-- Use markdown tables - For comparisons and quick reference
-- Code blocks with comments - But minimal, only non-obvious parts
-- NO horizontal rules (---) between sections
-- NO emojis unless explicitly requested
-- Use simple English words
+- No fluff. Every sentence teaches something.
+- Concrete over abstract. Always show examples.
+- Consistent examples. Same input throughout entire article.
+- Pseudocode first. Language-agnostic understanding before code.
+- Explain the WHY. Not just what, but why it works.
+- Mark critical insights. Bold or "Critical:" prefix.
+- Use markdown tables. For comparisons and quick reference.
+- Code blocks with comments. But minimal, only non-obvious parts.
+- NO horizontal rules (---) between sections.
+- NO emojis unless explicitly requested.
+- Use simple English words.
+- Use periods to end complexity statements: "Time: O(n). Each state computed once."
+- Never use em dashes between words. Use colons, commas, or periods instead.
 
 ### What NOT to Include
 
@@ -223,117 +226,239 @@ Each should be complete, runnable code for the PRIMARY problem of this pattern.
 - Don't use emojis
 - Don't add motivational text or filler
 - Don't repeat the same information in different words
-- Don't use em dashes (—) between words - use colons, commas, or periods instead
-
----
+- Don't use em dashes (—) between words
 
 ### JSON Output Format
+
+The output must be valid JSON matching this exact structure:
 
 ```json
 {
   "title": "[PATTERN_NAME]",
-  "content": "[Full markdown article]",
+  "content": "[Full markdown article - all 13 sections]",
   "templates": {
-    "recursion": "[Template code]",
-    "memoization": "[Template code]",
-    "tabulation": "[Template code]",
-    "spaceOptimized": "[Template code]"
+    "recursion": "[Java template with COUNT/MINIMIZE/MAXIMIZE/FEASIBILITY variations]",
+    "memoization": "[Java template with memo added]",
+    "tabulation": "[Java template with iterative fill]",
+    "spaceOptimized": "[Java template with O(1) space if applicable]"
   },
   "approaches": {
-    "recursion": { "java": "...", "javascript": "..." },
-    "memoization": { "java": "...", "javascript": "..." },
-    "tabulation": { "java": "...", "javascript": "..." },
-    "spaceOptimized": { "java": "...", "javascript": "..." }
+    "recursion": {
+      "java": "[Complete runnable Java code for primary problem]",
+      "javascript": "[Complete runnable JavaScript code for primary problem]"
+    },
+    "memoization": {
+      "java": "[Complete runnable Java code]",
+      "javascript": "[Complete runnable JavaScript code]"
+    },
+    "tabulation": {
+      "java": "[Complete runnable Java code]",
+      "javascript": "[Complete runnable JavaScript code]"
+    },
+    "spaceOptimized": {
+      "java": "[Complete runnable Java code]",
+      "javascript": "[Complete runnable JavaScript code]"
+    }
   },
-  "exampleName": "[Primary Problem Name]"
+  "exampleName": "[Primary Problem Name, e.g., 'Climbing Stairs']"
 }
 ```
 
----
+**Important JSON notes:**
+- Escape newlines as `\n` in content strings
+- Escape quotes as `\"` inside strings
+- No trailing commas
+- All code must be syntactically valid
 
+### Pattern-Specific Details (Fill Before Using)
+
+```
 ### Pattern-Specific Details for [PATTERN_NAME]
 
-Fill in these details before using the prompt:
-
-- **Core problem:** [One sentence description]
-- **Key state variables:** [What the DP state tracks]
-- **Typical recurrence:** [The formula pattern]
+- **Core problem:** [One sentence description of canonical problem]
+- **Key state variables:** [What the DP state tracks, e.g., dp[i] = ways to reach i]
+- **Typical recurrence:** [The formula, e.g., dp[i] = dp[i-1] + dp[i-2]]
+- **Base cases:** [List base cases, e.g., dp[0] = 1, dp[1] = 1]
 - **Common variations:**
-  - Variation 1: [description]
-  - Variation 2: [description]
-- **Related practice problems:** [List from LeetCode/similar]
-
----
+  - [Variation 1]: [brief description]
+  - [Variation 2]: [brief description]
+- **Primary example:** [The example to use throughout, e.g., n=5 for climbing stairs]
+- **Expected answer:** [What the answer should be, e.g., 8 ways]
+- **Related practice problems:**
+  - Easy: [problem names]
+  - Medium: [problem names]
+  - Hard: [problem names]
+```
 
 ### Quality Checklist Before Finalizing
 
+Content:
+- [ ] What is section: definition + when to use (3-4 sentences)
 - [ ] Foundational concept explained (if needed)
 - [ ] Problem statement with 2-3 examples including edge cases
 - [ ] Core decision/insight clearly articulated
-- [ ] Recursion with overlapping subproblems shown
-- [ ] Memoization with state explanation
+- [ ] Recursion with overlapping subproblems tree
+- [ ] Memoization with memo key explanation
 - [ ] Tabulation with fill order and base case
 - [ ] Complete step-by-step walkthrough with same example
 - [ ] Comparison table between approaches
 - [ ] Variations section with "what if" questions
 - [ ] Debugging checklist (5-7 items)
 - [ ] Common mistakes (4-6 items)
-- [ ] Practice problems by difficulty
-- [ ] Code templates with multiple variations
-- [ ] Language-specific approaches (Java + JavaScript)
-- [ ] Valid JSON structure
-- [ ] No solutions to practice problems
-- [ ] All code examples tested and verified
-- [ ] All calculations in walkthrough verified
+- [ ] Practice problems by difficulty (Easy/Medium/Hard)
 
----
+Code:
+- [ ] Templates have 4 variations (COUNT/MINIMIZE/MAXIMIZE/FEASIBILITY)
+- [ ] Approaches have Java + JavaScript for all 4 methods
+- [ ] All code syntactically valid
+- [ ] All code tested with expected inputs/outputs
+- [ ] Time/space complexity comments on each approach
 
-## EXAMPLE USAGE
+Style:
+- [ ] No em dashes (—)
+- [ ] No emojis
+- [ ] Periods after complexity statements
+- [ ] Same example used throughout
+- [ ] No horizontal rules between sections
 
-For Interval DP pattern:
+Verification:
+- [ ] All calculations in walkthrough verified manually
+- [ ] Code outputs match expected values
+- [ ] Base cases produce correct results
+- [ ] Edge cases handled (n=0, n=1, empty input)
+- [ ] Valid JSON structure (test with JSON.parse)
+
+## EXAMPLE: 1D DP (Recursive Numbers)
+
+### Pattern-Specific Details
 
 ```
-### Pattern-Specific Details for Interval DP
-
-- **Core problem:** Optimal way to merge/split a range, where cost depends on subrange results
-- **Key state variables:** dp[i][j] = optimal answer for subarray from index i to j
-- **Typical recurrence:** dp[i][j] = best over all k in [i,j) of: dp[i][k] + dp[k+1][j] + merge_cost
+- **Core problem:** Count ways to reach step n, taking 1 or 2 steps at a time
+- **Key state variables:** f(n) = number of ways to reach step n
+- **Typical recurrence:** f(n) = f(n-1) + f(n-2)
+- **Base cases:** f(0) = 1, f(1) = 1
 - **Common variations:**
-  - Matrix Chain Multiplication
-  - Burst Balloons
-  - Minimum Cost to Merge Stones
-  - Palindrome Partitioning
+  - Variable steps (1,2,3): f(n) = f(n-1) + f(n-2) + f(n-3)
+  - With costs: f(n) = min(f(n-1) + cost[n-1], f(n-2) + cost[n-2])
+  - Decision (House Robber): f(n) = max(f(n-1), f(n-2) + val[n])
+- **Primary example:** n = 5
+- **Expected answer:** 8 ways
 - **Related practice problems:**
-  - Easy: None (Interval DP is inherently medium+)
-  - Medium: Palindrome Partitioning II
-  - Hard: Burst Balloons, Strange Printer, Minimum Cost to Merge Stones
+  - Easy: Fibonacci Number, Climbing Stairs, N-th Tribonacci
+  - Medium: Min Cost Climbing Stairs, Decode Ways, House Robber
+  - Hard: Frog Jump, Knight Dialer
 ```
 
----
+### Generated Content Preview
 
-## INTERACTIVE VISUALIZER NOTES
+The article should produce values like:
+- f(0) = 1, f(1) = 1, f(2) = 2, f(3) = 3, f(4) = 5, f(5) = 8
+- Walkthrough shows: dp[2] = dp[1] + dp[0] = 1 + 1 = 2, etc.
+- Final answer: 8 ways to climb 5 stairs
 
-After article is complete, the visualizer should:
+## INTERACTIVE VISUALIZER REQUIREMENTS
 
-1. **Concept Tab** (animated steps):
-   - What is the pattern? (static intro)
-   - Key insight visualization
-   - State definition visualization
-   - Recurrence visualization
-   - 5-7 steps total, playable
+After article is complete, the visualizer component should:
 
-2. **Algorithm Tab** (step-by-step execution):
-   - Use SAME example from article
-   - Show state being computed
-   - Show values being compared
-   - Show table/array updates
-   - Highlight current cell
+### 1. Phase Tabs
 
-3. **Result Tab**:
-   - Final answer prominently displayed
-   - Optimal path/solution shown if applicable
+Four phases matching the article approaches:
+- **Recursion**: Tree visualization showing function calls
+- **Memoization**: Tree with cache hits highlighted (yellow)
+- **Tabulation**: Array/table filling animation
+- **Space Optimized**: Variable sliding animation (if applicable)
 
-4. **Answer Display**:
-   - Format: `Answer: [description] = [value]`
-   - Show after animation completes
-   - Include example solution (e.g., "tour: A → B → D → C → A")
+### 2. Controls
+
+- Play/Pause button
+- Step forward/back buttons
+- Reset button
+- Speed selector (0.5x, 1x, 2x)
+- Step counter (current / total)
+
+### 3. Each Phase Must Show
+
+- Current state being computed (highlighted)
+- Formula being applied
+- Values being compared/combined
+- Progress through steps
+
+### 4. Answer Display
+
+After animation completes, show answer prominently:
+```jsx
+{step >= maxSteps && step > 0 && (
+  <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+    <span className="text-green-400 font-bold">
+      Answer: [description] = [value]
+    </span>
+  </div>
+)}
+```
+
+Condition pattern:
+- For array-based phases: `step >= steps.length && step > 0`
+- For tree phases: `step >= nodeOrder.length - 1 && step > 0`
+
+### 5. Visualizer Data Generation
+
+Each phase needs step generation function:
+
+```javascript
+// Table phase example
+const generateTableSteps = () => {
+  const steps = [];
+  // Base cases
+  steps.push({ i: 0, value: 1, formula: "dp[0] = 1 (base case)" });
+  steps.push({ i: 1, value: 1, formula: "dp[1] = 1 (base case)" });
+  
+  // Recurrence
+  for (let i = 2; i <= TARGET_N; i++) {
+    const curr = dp[i-1] + dp[i-2];
+    steps.push({
+      i,
+      value: curr,
+      formula: `dp[${i}] = dp[${i-1}] + dp[${i-2}] = ${dp[i-1]} + ${dp[i-2]} = ${curr}`
+    });
+  }
+  return steps;
+};
+```
+
+### 6. Visual Consistency
+
+- Use same example as article (e.g., n=5 for climbing stairs)
+- Colors: Blue for current, Green for computed, Yellow for cache hit
+- Font: Monospace for values and formulas
+- Background: Dark theme (gray-800, gray-900)
+
+## FILE LOCATIONS
+
+- Article content goes in: `frontend/src/lib/patterns.json`
+  - Find `id: "dynamic-programming"` pattern
+  - Add to `tutorial` array at correct index
+- Visualizer goes in: `frontend/src/components/visualizers/[PatternName]Visualizer.tsx`
+
+## VERIFICATION COMMANDS
+
+After generating, verify with:
+
+```bash
+# Test code correctness
+node -e "
+function solve(n) { /* paste code */ }
+console.log('n=0:', solve(0));
+console.log('n=1:', solve(1));
+console.log('n=5:', solve(5));
+"
+
+# Validate JSON
+node -e "
+const content = \`[paste JSON]\`;
+JSON.parse(content);
+console.log('Valid JSON');
+"
+
+# Lint visualizer
+cd frontend && npx eslint src/components/visualizers/[Name]Visualizer.tsx
+```

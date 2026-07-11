@@ -14,6 +14,34 @@ type Phase = "tree" | "memo" | "table" | "compare";
 const coins = [1, 2, 5];
 const targetAmount = 11;
 
+// Compute the final answer and coin breakdown at module level from the same DP
+// used for the animation, so all banners stay in sync when coins/targetAmount change.
+const computeCoinChangeResult = (
+  coinList: number[],
+  amount: number
+): { answer: number; breakdown: string } => {
+  const dp: number[] = Array(amount + 1).fill(amount + 1);
+  dp[0] = 0;
+  const coinUsed: number[] = Array(amount + 1).fill(-1);
+  for (let a = 1; a <= amount; a++) {
+    for (const c of coinList) {
+      if (c <= a && dp[a - c] + 1 < dp[a]) {
+        dp[a] = dp[a - c] + 1;
+        coinUsed[a] = c;
+      }
+    }
+  }
+  const ans = dp[amount] > amount ? Infinity : dp[amount];
+  if (!isFinite(ans)) return { answer: Infinity, breakdown: "impossible" };
+  const used: number[] = [];
+  let a = amount;
+  while (a > 0) { used.push(coinUsed[a]); a -= coinUsed[a]; }
+  used.sort((x, y) => y - x);
+  return { answer: ans, breakdown: used.join(" + ") };
+};
+const { answer: COIN_CHANGE_ANSWER, breakdown: COIN_CHANGE_BREAKDOWN } =
+  computeCoinChangeResult(coins, targetAmount);
+
 const generateTableSteps = () => {
   const steps: {
     amount: number;
@@ -297,12 +325,18 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
         </div>
 
         <div className="text-center text-sm text-gray-400 bg-gray-800/50 px-4 py-2 rounded-lg font-mono mt-4">
-          f({currentAmount}) = 1 + min(
-          {coins
-            .filter((c) => c <= currentAmount)
-            .map((c) => `f(${currentAmount - c})`)
-            .join(", ") || "no valid coins"}
-          )
+          {currentAmount === 0 ? (
+            <span className="text-yellow-400">f(0) = 0 (base case: 0 coins for amount 0)</span>
+          ) : (
+            <>
+              f({currentAmount}) = 1 + min(
+              {coins
+                .filter((c) => c <= currentAmount)
+                .map((c) => `f(${currentAmount - c})`)
+                .join(", ") || "no valid coins"}
+              )
+            </>
+          )}
         </div>
       </div>
 
@@ -321,6 +355,15 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
           </span>
         )}
       </div>
+
+      {step >= targetAmount && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">
+            Answer: Minimum coins = {COIN_CHANGE_ANSWER}
+          </span>
+          <span className="text-gray-400 ml-2">({COIN_CHANGE_BREAKDOWN})</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -398,6 +441,15 @@ const TablePhase = ({
         <span className="text-green-400">FORWARD loop</span>: for each amount,
         try all coins. Each coin can be reused (unlimited).
       </div>
+
+      {step >= tableSteps.length && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">
+            Answer: Minimum coins = {currentDp[targetAmount]}
+          </span>
+          <span className="text-gray-400 ml-2">({COIN_CHANGE_BREAKDOWN})</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -408,8 +460,8 @@ const ComparePhase = ({ step }: { step: number }) => {
     []
   );
 
-  const maxSteps = Math.max(forwardSteps.length, reverseSteps.length);
-  const currentStep = Math.min(step, maxSteps);
+  const compareMaxSteps = Math.max(forwardSteps.length, reverseSteps.length);
+  const currentStep = Math.min(step, compareMaxSteps);
 
   const forwardDp = useMemo(() => {
     const dp = Array(targetAmount + 1).fill(targetAmount + 1);
@@ -505,13 +557,17 @@ const ComparePhase = ({ step }: { step: number }) => {
         </div>
       </div>
 
-      <div className="text-sm text-gray-500 text-center">
-        Final answer with FORWARD:{" "}
-        {dpForward[targetAmount] > targetAmount
-          ? "impossible"
-          : dpForward[targetAmount]}{" "}
-        coins
-      </div>
+      {step >= compareMaxSteps && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">
+            Answer: Minimum coins ={" "}
+            {dpForward[targetAmount] > targetAmount
+              ? "impossible"
+              : dpForward[targetAmount]}
+          </span>
+          <span className="text-gray-400 ml-2">({COIN_CHANGE_BREAKDOWN})</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -646,8 +702,8 @@ export default function CoinChangeVisualizer() {
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        coins = [{coins.join(", ")}] | amount = {targetAmount} | Answer: 3 coins
-        (5+5+1)
+        coins = [{coins.join(", ")}] | amount = {targetAmount} | Answer: {COIN_CHANGE_ANSWER} coins
+        ({COIN_CHANGE_BREAKDOWN})
       </div>
     </div>
   );

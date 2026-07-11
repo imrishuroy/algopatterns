@@ -25,12 +25,12 @@ interface TreeNode {
   isCacheHit?: boolean;
 }
 
-type Phase = "tree" | "memo" | "table";
+type Phase = "tree" | "memo" | "table" | "spaceOpt";
 
 const items: Item[] = [
-  { name: "A", weight: 1, value: 1 },
-  { name: "B", weight: 3, value: 4 },
-  { name: "C", weight: 4, value: 5 },
+  { name: "Phone", weight: 1, value: 1 },
+  { name: "Laptop", weight: 3, value: 4 },
+  { name: "Camera", weight: 4, value: 5 },
 ];
 
 const capacity = 7;
@@ -118,6 +118,39 @@ const generateTableSteps = () => {
         w,
         value: dp[i][w],
         explanation: `${best}: max(${skip}, ${take}) = ${dp[i][w]}`,
+      });
+    }
+  }
+
+  return steps;
+};
+
+const generateSpaceOptSteps = () => {
+  const steps: {
+    itemIndex: number;
+    w: number;
+    oldValue: number;
+    newValue: number;
+    dpState: number[];
+    explanation: string;
+  }[] = [];
+  const dp = Array(capacity + 1).fill(0);
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    for (let w = capacity; w >= item.weight; w--) {
+      const oldValue = dp[w];
+      const skip = dp[w];
+      const take = dp[w - item.weight] + item.value;
+      dp[w] = Math.max(skip, take);
+      const best = take > skip ? "take" : "skip";
+      steps.push({
+        itemIndex: i,
+        w,
+        oldValue,
+        newValue: dp[w],
+        dpState: [...dp],
+        explanation: `${item.name} at cap ${w}: ${best}, max(${skip}, ${take}) = ${dp[w]}`,
       });
     }
   }
@@ -346,7 +379,10 @@ const TreeNodeComponent = ({
   );
 };
 
-const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
+const FINAL_ANSWER = 9;
+const ANSWER_ITEMS = "Laptop + Camera";
+
+const TreePhase = ({ step, maxSteps, showMemo }: { step: number; maxSteps: number; showMemo: boolean }) => {
   const tree = useMemo(() => buildTree(items.length - 1, capacity), []);
   const nodeOrder = useMemo(() => (tree ? flattenTree(tree) : []), [tree]);
   const visibleNodes = new Set(nodeOrder.slice(0, step + 1));
@@ -431,15 +467,24 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
           </span>
         )}
       </div>
+
+      {step >= maxSteps && step > 0 && (
+        <div className="mt-4 text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: Max value = ${FINAL_ANSWER}</span>
+          <span className="text-gray-400 ml-2">({ANSWER_ITEMS})</span>
+        </div>
+      )}
     </div>
   );
 };
 
 const TablePhase = ({
   step,
+  maxSteps,
   tableSteps,
 }: {
   step: number;
+  maxSteps: number;
   tableSteps: ReturnType<typeof generateTableSteps>;
 }) => {
   const currentDp = useMemo(() => {
@@ -521,6 +566,98 @@ const TablePhase = ({
           dp[{currentStep.i}][{currentStep.w}] = {currentStep.explanation}
         </div>
       )}
+
+      {step >= maxSteps && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
+          <span className="text-green-400 font-bold">Answer: Max value = ${FINAL_ANSWER}</span>
+          <span className="text-gray-400 ml-2">({ANSWER_ITEMS})</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SpaceOptPhase = ({
+  step,
+  maxSteps,
+  spaceOptSteps,
+}: {
+  step: number;
+  maxSteps: number;
+  spaceOptSteps: ReturnType<typeof generateSpaceOptSteps>;
+}) => {
+  const currentState = step > 0 ? spaceOptSteps[step - 1]?.dpState : Array(capacity + 1).fill(0);
+  const currentStep = step > 0 ? spaceOptSteps[step - 1] : null;
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      <div className="text-sm text-gray-400 mb-2">
+        1D Array (updated in-place, right to left)
+      </div>
+      <div className="overflow-x-auto w-full flex justify-center">
+        <table className="border-collapse text-base">
+          <thead>
+            <tr>
+              <th className="p-3 text-gray-500 w-16 text-center font-medium">
+                Cap
+              </th>
+              {Array.from({ length: capacity + 1 }, (_, w) => (
+                <th
+                  key={w}
+                  className="p-3 text-gray-400 w-14 text-center font-medium"
+                >
+                  {w}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="p-3 text-gray-400 text-center font-medium">dp</td>
+              {Array.from({ length: capacity + 1 }, (_, w) => {
+                const isCurrent = currentStep && currentStep.w === w;
+                const value = currentState ? currentState[w] : 0;
+
+                return (
+                  <td
+                    key={w}
+                    className={`p-3 text-center border-2 w-14 h-14 transition-colors ${
+                      isCurrent
+                        ? "bg-blue-600 border-blue-400"
+                        : value > 0
+                          ? "bg-gray-800 border-gray-600"
+                          : "bg-gray-900/50 border-gray-700"
+                    }`}
+                  >
+                    <span
+                      className={`font-mono text-lg ${isCurrent ? "text-white font-bold" : "text-gray-300"}`}
+                    >
+                      {value}
+                    </span>
+                  </td>
+                );
+              })}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {currentStep && (
+        <div className="text-base text-gray-400 text-center font-mono bg-gray-800/50 px-6 py-3 rounded-lg">
+          {currentStep.explanation}
+        </div>
+      )}
+
+      <div className="text-xs text-gray-500 mt-2">
+        Processing right to left prevents using same item twice
+      </div>
+
+      {step >= maxSteps && step > 0 && (
+        <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
+          <span className="text-green-400 font-bold">Answer: Max value = ${FINAL_ANSWER}</span>
+          <span className="text-gray-400 ml-2">({ANSWER_ITEMS})</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -528,11 +665,12 @@ const TablePhase = ({
 // skipcq: JS-0067
 export default function DPJourneyVisualizer() {
   // skipcq: JS-0067
-  const phases: Phase[] = ["tree", "memo", "table"];
+  const phases: Phase[] = ["tree", "memo", "table", "spaceOpt"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion Tree",
-    memo: "With Memoization",
-    table: "DP Table",
+    memo: "Memoization",
+    table: "Tabulation",
+    spaceOpt: "Space Optimized",
   };
 
   const [currentPhase, setCurrentPhase] = useState<Phase>("tree");
@@ -542,6 +680,7 @@ export default function DPJourneyVisualizer() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const tableSteps = useMemo(() => generateTableSteps(), []);
+  const spaceOptSteps = useMemo(() => generateSpaceOptSteps(), []);
   const tree = useMemo(() => buildTree(items.length - 1, capacity), []);
   const treeNodeCount = useMemo(
     () => (tree ? flattenTree(tree).length : 0),
@@ -551,9 +690,10 @@ export default function DPJourneyVisualizer() {
   const getMaxSteps = useCallback(
     (phase: Phase) => {
       if (phase === "table") return tableSteps.length;
+      if (phase === "spaceOpt") return spaceOptSteps.length;
       return treeNodeCount - 1;
     },
-    [tableSteps.length, treeNodeCount]
+    [tableSteps.length, spaceOptSteps.length, treeNodeCount]
   );
 
   const maxSteps = getMaxSteps(currentPhase);
@@ -633,17 +773,20 @@ export default function DPJourneyVisualizer() {
           exit={{ opacity: 0 }}
         >
           {currentPhase === "tree" && (
-            <TreePhase step={step} showMemo={false} />
+            <TreePhase step={step} maxSteps={maxSteps} showMemo={false} />
           )}
-          {currentPhase === "memo" && <TreePhase step={step} showMemo />}
+          {currentPhase === "memo" && <TreePhase step={step} maxSteps={maxSteps} showMemo />}
           {currentPhase === "table" && (
-            <TablePhase step={step} tableSteps={tableSteps} />
+            <TablePhase step={step} maxSteps={maxSteps} tableSteps={tableSteps} />
+          )}
+          {currentPhase === "spaceOpt" && (
+            <SpaceOptPhase step={step} maxSteps={maxSteps} spaceOptSteps={spaceOptSteps} />
           )}
         </motion.div>
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        Items: A(1kg, $1), B(3kg, $4), C(4kg, $5) | Capacity: 7kg
+        Items: Phone(1kg, $1), Laptop(3kg, $4), Camera(4kg, $5) | Capacity: 7kg
       </div>
     </div>
   );

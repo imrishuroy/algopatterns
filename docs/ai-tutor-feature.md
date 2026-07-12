@@ -2539,7 +2539,6 @@ This section covers infrastructure that is **NOT required for MVP** but can be a
 │                │             │             │                                     │
 │  MANAGED       │ $10-50/mo   │ Varies      │ For zero-ops preference            │
 │  OPTIONS       │             │             │ • Upstash (serverless, Valkey)     │
-│                │             │             │ • Railway ($5/mo)                  │
 │                │             │             │ • Render ($7/mo)                   │
 │                │             │             │ • AWS ElastiCache (enterprise)     │
 │                │             │             │                                     │

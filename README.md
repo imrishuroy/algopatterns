@@ -121,8 +121,7 @@ backend/
 ├── Dockerfile                    # Multi-stage Docker build
 ├── docker-compose.yml            # App services
 ├── docker-compose.judge0.yml     # Judge0 services
-├── Makefile                      # Build automation
-└── railway.json                  # Railway deployment config
+└── Makefile                      # Build automation
 ```
 
 ## Design Documents
@@ -357,12 +356,12 @@ npm run dev
 ## Deployment
 
 ### Backend
-- **Railway** - Configured via `railway.json`
+- **GCP Cloud Run** - GitHub Actions CI/CD to Artifact Registry
 - **Docker** - Multi-stage Dockerfile included
 - **Kubernetes** - Health probes configured
 
 ### Frontend
-- **Vercel** - Automatic deployments from GitHub
+- **Cloudflare Pages** - Automatic deployments from GitHub
 
 ## Development Commands
 

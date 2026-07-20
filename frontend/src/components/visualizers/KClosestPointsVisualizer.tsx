@@ -85,7 +85,8 @@ export default function KClosestPointsVisualizer() {
         });
 
         if (point.dist < root.dist) {
-          const removed = heap.shift()!;
+          // heap is guaranteed non-empty here (checked above with root = heap[0])
+          const removed = heap.shift() as Point;
           heap.push(point);
           heap.sort((a, b) => b.dist - a.dist);
           allSteps.push({
@@ -457,7 +458,8 @@ export default function KClosestPointsVisualizer() {
                 if (isCurrentProcessing) fill = "#eab308"; // yellow - currently processing
 
                 return (
-                  <g key={`point-${idx}`}>
+                  // skipcq: JS-0437 - points array is static, using coordinates as stable key
+                  <g key={`point-${point.x}-${point.y}`}>
                     {/* Distance circle (when processing) */}
                     {isCurrentProcessing && (
                       <circle
@@ -546,7 +548,7 @@ export default function KClosestPointsVisualizer() {
 
               return (
                 <motion.div
-                  key={`input-${idx}`}
+                  key={`input-${point.x}-${point.y}`}
                   animate={{
                     scale: isCurrentProcessing ? 1.1 : 1,
                     y: isCurrentProcessing ? -4 : 0,

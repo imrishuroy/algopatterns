@@ -89,7 +89,7 @@ function buildSteps(): Step[] {
     steps.push({
       type: justUnlocked.length > 0 ? "unlock" : "pick",
       round,
-      capital: capital,
+      capital,
       minHeap: [...minHeapRemaining],
       maxHeap: sortedMax,
       justUnlocked,
@@ -104,7 +104,7 @@ function buildSteps(): Step[] {
       steps.push({
         type: "no-affordable",
         round,
-        capital: capital,
+        capital,
         minHeap: [...minHeapRemaining],
         maxHeap: [],
         justUnlocked: [],
@@ -126,7 +126,7 @@ function buildSteps(): Step[] {
     steps.push({
       type: "pick",
       round,
-      capital: capital,
+      capital,
       minHeap: [...minHeapRemaining],
       maxHeap: sortedMaxAfter,
       justUnlocked: [],
@@ -138,7 +138,7 @@ function buildSteps(): Step[] {
   steps.push({
     type: "done",
     round: K,
-    capital: capital,
+    capital,
     minHeap: [...minHeapRemaining],
     maxHeap: [...maxHeap].sort((a, b) => b.profit - a.profit),
     justUnlocked: [],
@@ -280,7 +280,7 @@ export default function IPOVisualizer() {
                     isPicked
                       ? `border-white bg-white/10 ring-2 ${PROJECT_RING[p.name]}`
                       : inMax
-                        ? `border-amber-500/60 bg-amber-500/10`
+                        ? "border-amber-500/60 bg-amber-500/10"
                         : inMin
                           ? "border-gray-600 bg-gray-800/60"
                           : "border-gray-700 bg-gray-800/30"

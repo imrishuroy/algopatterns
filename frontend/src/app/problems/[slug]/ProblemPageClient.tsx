@@ -1315,7 +1315,7 @@ export default function ProblemPageClient({ params }: PageProps) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [leftPanelWidth, isAIChatOpen]
+    [leftPanelWidth, isAIChatOpen, setLeftPanelWidth]
   );
 
   // Resizable right panel (AI Chat)
@@ -1346,7 +1346,7 @@ export default function ProblemPageClient({ params }: PageProps) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [rightPanelWidth]
+    [rightPanelWidth, setRightPanelWidth]
   );
 
   // Vertical resizer for editor/results split
@@ -1374,7 +1374,7 @@ export default function ProblemPageClient({ params }: PageProps) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [editorHeight]
+    [editorHeight, setEditorHeight]
   );
 
   // Parse hints from problem

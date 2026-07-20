@@ -44,7 +44,8 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
       focus: () => textareaRef.current?.focus(),
       setValue: (value: string) => {
         setInput(value);
-        // Also resize the textarea
+        // Resize textarea: reset to auto first, then set actual height
+        // skipcq: JS-W1032 - Intentional double assignment for auto-resize pattern
         if (textareaRef.current) {
           textareaRef.current.style.height = "auto";
           textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 100)}px`;

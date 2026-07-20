@@ -188,7 +188,7 @@ func (s *Service) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, err
 		// Convert history for classifier
 		classifierHistory := make([]ConversationTurn, len(req.History))
 		for i, h := range req.History {
-			classifierHistory[i] = ConversationTurn{Role: h.Role, Content: h.Content}
+			classifierHistory[i] = ConversationTurn(h)
 		}
 
 		// Classify intent for Omni-Tutor with conversation context
@@ -322,7 +322,7 @@ func (s *Service) ChatStream(ctx context.Context, req ChatRequest) (*StreamResul
 		// Convert history for classifier
 		classifierHistory := make([]ConversationTurn, len(req.History))
 		for i, h := range req.History {
-			classifierHistory[i] = ConversationTurn{Role: h.Role, Content: h.Content}
+			classifierHistory[i] = ConversationTurn(h)
 		}
 
 		// Classify intent for Omni-Tutor with conversation context
@@ -689,7 +689,9 @@ func (s *Service) getGlobalRAGResults(ctx context.Context, query string, intent 
 	_ = g.Wait()
 
 	// Merge and dedupe results
-	merged := append(patternResults, problemResults...)
+	merged := make([]rag.ContentEmbedding, 0, len(patternResults)+len(problemResults))
+	merged = append(merged, patternResults...)
+	merged = append(merged, problemResults...)
 	return DedupeBySourceID(merged)
 }
 

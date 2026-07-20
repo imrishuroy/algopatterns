@@ -64,7 +64,7 @@ function buildSteps(): Step[] {
     message: `Start: W = ${W0}. All ${PROJECTS.length} projects locked in min-heap (sorted by capital needed).`,
   });
 
-  let w = W0;
+  let capital = W0;
   let idx = 0;
   const maxHeap: Project[] = [];
   const minHeapRemaining = [...sorted];
@@ -72,7 +72,7 @@ function buildSteps(): Step[] {
   for (let round = 1; round <= K; round++) {
     // Unlock affordable projects
     const justUnlocked: Project[] = [];
-    while (idx < sorted.length && sorted[idx].capital <= w) {
+    while (idx < sorted.length && sorted[idx].capital <= capital) {
       justUnlocked.push(sorted[idx]);
       maxHeap.push(sorted[idx]);
       const removeIdx = minHeapRemaining.findIndex(
@@ -89,22 +89,22 @@ function buildSteps(): Step[] {
     steps.push({
       type: justUnlocked.length > 0 ? "unlock" : "pick",
       round,
-      capital: w,
+      capital: capital,
       minHeap: [...minHeapRemaining],
       maxHeap: sortedMax,
       justUnlocked,
       picked: null,
       message:
         justUnlocked.length > 0
-          ? `Round ${round}: W=${w}. Unlock ${justUnlocked.map((p) => `${p.name}(needs ${p.capital})`).join(", ")} → move to max-heap.`
-          : `Round ${round}: W=${w}. No new projects unlocked.`,
+          ? `Round ${round}: W=${capital}. Unlock ${justUnlocked.map((p) => `${p.name}(needs ${p.capital})`).join(", ")} → move to max-heap.`
+          : `Round ${round}: W=${capital}. No new projects unlocked.`,
     });
 
     if (maxHeap.length === 0) {
       steps.push({
         type: "no-affordable",
         round,
-        capital: w,
+        capital: capital,
         minHeap: [...minHeapRemaining],
         maxHeap: [],
         justUnlocked: [],
@@ -116,33 +116,34 @@ function buildSteps(): Step[] {
 
     // Pick best (highest profit)
     maxHeap.sort((a, b) => b.profit - a.profit);
-    const best = maxHeap.shift()!;
-    const prevW = w;
-    w += best.profit;
+    // maxHeap is guaranteed non-empty here (checked above)
+    const best = maxHeap.shift() as Project;
+    const prevCapital = capital;
+    capital += best.profit;
 
     const sortedMaxAfter = [...maxHeap].sort((a, b) => b.profit - a.profit);
 
     steps.push({
       type: "pick",
       round,
-      capital: w,
+      capital: capital,
       minHeap: [...minHeapRemaining],
       maxHeap: sortedMaxAfter,
       justUnlocked: [],
       picked: best,
-      message: `Pick ${best.name} (profit=${best.profit}, highest in max-heap). W: ${prevW} → ${w}.`,
+      message: `Pick ${best.name} (profit=${best.profit}, highest in max-heap). W: ${prevCapital} → ${capital}.`,
     });
   }
 
   steps.push({
     type: "done",
     round: K,
-    capital: w,
+    capital: capital,
     minHeap: [...minHeapRemaining],
     maxHeap: [...maxHeap].sort((a, b) => b.profit - a.profit),
     justUnlocked: [],
     picked: null,
-    message: `Done! Final capital = ${w} after ${K} rounds.`,
+    message: `Done! Final capital = ${capital} after ${K} rounds.`,
   });
 
   return steps;

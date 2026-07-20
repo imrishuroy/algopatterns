@@ -24,6 +24,102 @@ const intentColors: Record<Intent, string> = {
   out_of_scope: "bg-rose-500/20 text-rose-300 border-rose-500/30",
 };
 
+// Create markdown component overrides
+// Defined before ChatMessageComponent to avoid "used before defined" warning
+const createMarkdownComponents = (
+  isStreaming: boolean
+): React.ComponentPropsWithoutRef<typeof ReactMarkdown>["components"] => ({
+  p: ({ children }) => (
+    <p className="my-2 leading-relaxed text-gray-300">{children}</p>
+  ),
+  strong: ({ children }) => (
+    <strong className="font-semibold text-white">{children}</strong>
+  ),
+  em: ({ children }) => <em className="italic text-gray-200">{children}</em>,
+  h1: ({ children }) => (
+    <h3 className="mb-2 mt-4 text-lg font-bold text-white">{children}</h3>
+  ),
+  h2: ({ children }) => (
+    <h4 className="mb-1.5 mt-3 text-base font-semibold text-white">
+      {children}
+    </h4>
+  ),
+  h3: ({ children }) => (
+    <h5 className="mb-1 mt-2 text-sm font-semibold text-gray-100">
+      {children}
+    </h5>
+  ),
+  ul: ({ children }) => (
+    <ul className="my-2 list-inside list-disc space-y-0.5 text-gray-300">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="my-2 list-inside list-decimal space-y-0.5 text-gray-300">
+      {children}
+    </ol>
+  ),
+  li: ({ children }) => <li className="text-gray-300">{children}</li>,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      className="text-indigo-400 underline hover:text-indigo-300"
+      target={href?.startsWith("http") ? "_blank" : undefined}
+      rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+    >
+      {children}
+    </a>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="my-2 border-l-2 border-gray-600 pl-3 italic text-gray-400">
+      {children}
+    </blockquote>
+  ),
+  table: ({ children }) => (
+    <div className="my-3 overflow-x-auto">
+      <table className="min-w-full border border-gray-700 text-sm text-gray-300">
+        {children}
+      </table>
+    </div>
+  ),
+  th: ({ children }) => (
+    <th className="border-b border-gray-700 px-3 py-1.5 text-left font-semibold text-gray-100">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="border-b border-gray-800 px-3 py-1.5">{children}</td>
+  ),
+  hr: () => <hr className="my-3 border-gray-700" />,
+  // Code block override with Mermaid support
+  code: ({ className, children }) => {
+    const match = /language-(\w+)/.exec(className || "");
+    const lang = match ? match[1] : "";
+    const codeString = String(children).replace(/\n$/, "");
+
+    // Check if this is an inline code (no language class and short content)
+    const isInline = !className && !codeString.includes("\n");
+
+    if (isInline) {
+      return (
+        <code className="rounded bg-gray-900 px-1.5 py-0.5 text-xs text-indigo-300 font-mono">
+          {children}
+        </code>
+      );
+    }
+
+    // Mermaid diagrams
+    if (lang === "mermaid") {
+      return <MermaidBlock chart={codeString} isStreaming={isStreaming} />;
+    }
+
+    // Regular code blocks
+    return <CodeBlock language={lang || "text"} code={codeString} />;
+  },
+  // skipcq: JS-0424 - Fragment required by ReactMarkdown's pre component interface
+  pre: ({ children }) => <>{children}</>,
+});
+
 // skipcq: JS-0067
 function ChatMessageComponent({
   message,
@@ -142,99 +238,5 @@ function MessageContent({
     </div>
   );
 }
-
-// Create markdown component overrides
-const createMarkdownComponents = (
-  isStreaming: boolean
-): React.ComponentPropsWithoutRef<typeof ReactMarkdown>["components"] => ({
-  p: ({ children }) => (
-    <p className="my-2 leading-relaxed text-gray-300">{children}</p>
-  ),
-  strong: ({ children }) => (
-    <strong className="font-semibold text-white">{children}</strong>
-  ),
-  em: ({ children }) => <em className="italic text-gray-200">{children}</em>,
-  h1: ({ children }) => (
-    <h3 className="mb-2 mt-4 text-lg font-bold text-white">{children}</h3>
-  ),
-  h2: ({ children }) => (
-    <h4 className="mb-1.5 mt-3 text-base font-semibold text-white">
-      {children}
-    </h4>
-  ),
-  h3: ({ children }) => (
-    <h5 className="mb-1 mt-2 text-sm font-semibold text-gray-100">
-      {children}
-    </h5>
-  ),
-  ul: ({ children }) => (
-    <ul className="my-2 list-inside list-disc space-y-0.5 text-gray-300">
-      {children}
-    </ul>
-  ),
-  ol: ({ children }) => (
-    <ol className="my-2 list-inside list-decimal space-y-0.5 text-gray-300">
-      {children}
-    </ol>
-  ),
-  li: ({ children }) => <li className="text-gray-300">{children}</li>,
-  a: ({ href, children }) => (
-    <a
-      href={href}
-      className="text-indigo-400 underline hover:text-indigo-300"
-      target={href?.startsWith("http") ? "_blank" : undefined}
-      rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
-    >
-      {children}
-    </a>
-  ),
-  blockquote: ({ children }) => (
-    <blockquote className="my-2 border-l-2 border-gray-600 pl-3 italic text-gray-400">
-      {children}
-    </blockquote>
-  ),
-  table: ({ children }) => (
-    <div className="my-3 overflow-x-auto">
-      <table className="min-w-full border border-gray-700 text-sm text-gray-300">
-        {children}
-      </table>
-    </div>
-  ),
-  th: ({ children }) => (
-    <th className="border-b border-gray-700 px-3 py-1.5 text-left font-semibold text-gray-100">
-      {children}
-    </th>
-  ),
-  td: ({ children }) => (
-    <td className="border-b border-gray-800 px-3 py-1.5">{children}</td>
-  ),
-  hr: () => <hr className="my-3 border-gray-700" />,
-  // Code block override with Mermaid support
-  code: ({ className, children }) => {
-    const match = /language-(\w+)/.exec(className || "");
-    const lang = match ? match[1] : "";
-    const codeString = String(children).replace(/\n$/, "");
-
-    // Check if this is an inline code (no language class and short content)
-    const isInline = !className && !codeString.includes("\n");
-
-    if (isInline) {
-      return (
-        <code className="rounded bg-gray-900 px-1.5 py-0.5 text-xs text-indigo-300 font-mono">
-          {children}
-        </code>
-      );
-    }
-
-    // Mermaid diagrams
-    if (lang === "mermaid") {
-      return <MermaidBlock chart={codeString} isStreaming={isStreaming} />;
-    }
-
-    // Regular code blocks
-    return <CodeBlock language={lang || "text"} code={codeString} />;
-  },
-  pre: ({ children }) => <>{children}</>,
-});
 
 export const ChatMessage = memo(ChatMessageComponent);

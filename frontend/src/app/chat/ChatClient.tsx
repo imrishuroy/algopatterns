@@ -118,14 +118,14 @@ export const ChatClient = () => {
 
         // Create and download file
         const blob = new Blob([markdown], { type: "text/markdown" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${sessionTitle.replace(/[^a-z0-9]/gi, "-").toLowerCase()}.md`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        const downloadUrl = URL.createObjectURL(blob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = downloadUrl;
+        downloadLink.download = `${sessionTitle.replace(/[^a-z0-9]/gi, "-").toLowerCase()}.md`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(downloadUrl);
       } catch {
         // Silent fail for export errors
       }
@@ -322,6 +322,7 @@ export const ChatClient = () => {
                     return title.includes(query);
                   })
                   .map((session) => (
+                    // skipcq: JS-0357 - HistoryItem is defined below in same file
                     <HistoryItem
                       key={session.id}
                       session={session}
@@ -385,6 +386,7 @@ export const ChatClient = () => {
         <div className="flex-1 overflow-y-auto flex flex-col">
           {messages.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
+              {/* skipcq: JS-0357 - WelcomeMessage is defined below in same file */}
               <WelcomeMessage
                 userName={user?.name}
                 onQuickAction={handleQuickAction}

@@ -54,10 +54,9 @@ func (r *AIChatRepository) GetOrCreateSessionWithContext(ctx context.Context, us
 	if contextType == "" {
 		if patternID != nil && *patternID != "" {
 			contextType = "pattern"
-		} else if problemSlug != nil && *problemSlug != "" {
-			contextType = "problem"
 		} else {
-			contextType = "problem" // default
+			// Default to "problem" context for problem slugs or when neither is provided
+			contextType = "problem"
 		}
 	}
 

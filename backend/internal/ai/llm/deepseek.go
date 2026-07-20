@@ -54,7 +54,7 @@ func NewDeepSeekProvider(cfg DeepSeekConfig) *DeepSeekProvider {
 		client: &http.Client{
 			Timeout: cfg.Timeout,
 			Transport: &http.Transport{
-				DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
 					dialer := &net.Dialer{Timeout: 10 * time.Second}
 					return dialer.DialContext(ctx, "tcp4", addr)
 				},

@@ -42,15 +42,12 @@ const looksComplete = (chart: string): boolean => {
   const openBraces = (trimmed.match(/\{/g) || []).length;
   const closeBraces = (trimmed.match(/\}/g) || []).length;
 
-  if (
-    openBrackets !== closeBrackets ||
-    openParens !== closeParens ||
-    openBraces !== closeBraces
-  ) {
-    return false;
-  }
-
-  return true;
+  // Return true only if all brackets are balanced
+  return (
+    openBrackets === closeBrackets &&
+    openParens === closeParens &&
+    openBraces === closeBraces
+  );
 };
 
 export const MermaidBlock = ({
@@ -204,6 +201,7 @@ export const MermaidBlock = ({
   });
 
   return (
+    // skipcq: JS-0440 - SVG is sanitized with DOMPurify before injection
     <div
       className="my-3 rounded-lg bg-gray-900/50 p-4 [&_svg]:w-full [&_svg]:h-auto [&_svg]:max-w-full"
       dangerouslySetInnerHTML={{ __html: sanitizedSvg }}

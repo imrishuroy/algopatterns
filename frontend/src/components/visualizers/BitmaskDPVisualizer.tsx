@@ -46,7 +46,8 @@ const conceptSteps: {
 }[] = [
   {
     title: "What is a Bitmask?",
-    description: "A bitmask uses an integer to represent a SET. Each bit position indicates whether an element is included (1) or not (0).",
+    description:
+      "A bitmask uses an integer to represent a SET. Each bit position indicates whether an element is included (1) or not (0).",
     mask: 0,
     highlight: [],
     code: null,
@@ -62,7 +63,8 @@ const conceptSteps: {
   },
   {
     title: "Add Element 0",
-    description: "To add element i to the set, use OR: mask | (1 << i). Adding element 0 sets bit 0.",
+    description:
+      "To add element i to the set, use OR: mask | (1 << i). Adding element 0 sets bit 0.",
     mask: 1,
     highlight: [0],
     code: "mask | (1 << 0) = 0000 | 0001 = 0001",
@@ -78,7 +80,8 @@ const conceptSteps: {
   },
   {
     title: "Check if Element in Set",
-    description: "To check if element i is in set: (mask >> i) & 1. Or: mask & (1 << i) != 0",
+    description:
+      "To check if element i is in set: (mask >> i) & 1. Or: mask & (1 << i) != 0",
     mask: 5,
     highlight: [1],
     code: "(0101 >> 1) & 1 = 0 (element 1 NOT in set)",
@@ -94,7 +97,8 @@ const conceptSteps: {
   },
   {
     title: "Count Set Bits",
-    description: "popcount(mask) counts elements in set. mask = 0101 has 2 bits set.",
+    description:
+      "popcount(mask) counts elements in set. mask = 0101 has 2 bits set.",
     mask: 5,
     highlight: [0, 2],
     code: "popcount(0101) = 2",
@@ -102,7 +106,8 @@ const conceptSteps: {
   },
   {
     title: "Iterate All Subsets",
-    description: "Loop mask from 0 to (1 << n) - 1 to enumerate all 2^n subsets.",
+    description:
+      "Loop mask from 0 to (1 << n) - 1 to enumerate all 2^n subsets.",
     mask: 15,
     highlight: [0, 1, 2, 3],
     code: "for mask in 0..(1 << 4): // 0 to 15",
@@ -110,7 +115,8 @@ const conceptSteps: {
   },
   {
     title: "Why Bitmask DP?",
-    description: "When state depends on WHICH elements are used (not just count), use bitmask. State: dp[mask] = best answer using elements in mask.",
+    description:
+      "When state depends on WHICH elements are used (not just count), use bitmask. State: dp[mask] = best answer using elements in mask.",
     mask: 7,
     highlight: [0, 1, 2],
     code: "dp[mask] = f(dp[smaller_masks])",
@@ -119,8 +125,14 @@ const conceptSteps: {
 ];
 
 // Generate Subset Sum steps
-const generateSubsetSteps = () => { // skipcq: JS-R1005
-  const steps: { mask: number; sum: number; possible: boolean; formula: string }[] = [];
+const generateSubsetSteps = () => {
+  // skipcq: JS-R1005
+  const steps: {
+    mask: number;
+    sum: number;
+    possible: boolean;
+    formula: string;
+  }[] = [];
   const allMask = 1 << subsetNums.length;
 
   for (let mask = 0; mask < allMask; mask++) {
@@ -146,11 +158,22 @@ const generateSubsetSteps = () => { // skipcq: JS-R1005
 };
 
 // Generate Assignment Problem steps (simplified Bitmask DP)
-const generateAssignmentSteps = () => { // skipcq: JS-R1005
-  const steps: { person: number; jobMask: number; job: number; cost: number; total: number; formula: string }[] = [];
+const generateAssignmentSteps = () => {
+  // skipcq: JS-R1005
+  const steps: {
+    person: number;
+    jobMask: number;
+    job: number;
+    cost: number;
+    total: number;
+    formula: string;
+  }[] = [];
   const nPeople = assignmentCost.length;
   const dp: number[] = Array(1 << nPeople).fill(INF);
-  const parent: { mask: number; job: number }[] = Array(1 << nPeople).fill({ mask: -1, job: -1 });
+  const parent: { mask: number; job: number }[] = Array(1 << nPeople).fill({
+    mask: -1,
+    job: -1,
+  });
 
   dp[0] = 0;
   steps.push({
@@ -163,7 +186,7 @@ const generateAssignmentSteps = () => { // skipcq: JS-R1005
   });
 
   for (let person = 0; person < nPeople; person++) {
-    for (let mask = 0; mask < (1 << nPeople); mask++) {
+    for (let mask = 0; mask < 1 << nPeople; mask++) {
       const popcount = mask.toString(2).split("1").length - 1;
       if (popcount !== person) continue;
       if (dp[mask] === INF) continue;
@@ -199,7 +222,8 @@ const generateAssignmentSteps = () => { // skipcq: JS-R1005
 
 // Generate TSP steps
 const generateTSPSteps = () => {
-  const steps: { mask: number; pos: number; value: number; formula: string }[] = [];
+  const steps: { mask: number; pos: number; value: number; formula: string }[] =
+    [];
   const allMask = (1 << n) - 1;
   const dp: number[][] = Array(1 << n)
     .fill(null)
@@ -278,8 +302,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all"
         title="Back"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
       {isPlaying ? (
@@ -300,7 +334,11 @@ const Controls = ({
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 transition-all shadow-lg"
           title="Play"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -311,8 +349,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all"
         title="Step"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
       <button
@@ -320,8 +368,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-all ml-2"
         title="Reset"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </button>
     </div>
@@ -366,7 +424,8 @@ const BitDisplay = ({
   highlight?: number[];
 }) => (
   <div className="flex justify-center gap-2">
-    {Array.from({ length: bits }, (_, i) => { // skipcq: JS-R1005
+    {Array.from({ length: bits }, (_, i) => {
+      // skipcq: JS-R1005
       const isSet = (mask & (1 << i)) !== 0;
       const isHighlighted = highlight?.includes(i);
       return (
@@ -387,7 +446,9 @@ const BitDisplay = ({
           >
             {labels[i] || i}
           </motion.div>
-          <div className={`text-sm mt-1 font-mono ${isSet ? "text-green-400" : "text-gray-500"}`}>
+          <div
+            className={`text-sm mt-1 font-mono ${isSet ? "text-green-400" : "text-gray-500"}`}
+          >
             {(mask >> i) & 1}
           </div>
           <div className="text-xs text-gray-600">bit {i}</div>
@@ -423,8 +484,12 @@ const ConceptPhase = ({ step }: { step: number }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="text-white font-medium text-lg mb-2">{currentStep.title}</div>
-        <div className="text-gray-400 text-sm mb-4">{currentStep.description}</div>
+        <div className="text-white font-medium text-lg mb-2">
+          {currentStep.title}
+        </div>
+        <div className="text-gray-400 text-sm mb-4">
+          {currentStep.description}
+        </div>
         {currentStep.code && (
           <div className="font-mono text-xs bg-gray-900 text-green-400 p-3 rounded-lg">
             {currentStep.code}
@@ -434,27 +499,32 @@ const ConceptPhase = ({ step }: { step: number }) => {
 
       {step >= conceptSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Bitmask basics complete!</span>
+          <span className="text-green-400 font-bold">
+            Bitmask basics complete!
+          </span>
           <span className="text-gray-400 ml-2">Now try Subset Sum phase</span>
         </div>
       )}
 
       <div className="text-xs text-gray-500 text-center max-w-md">
-        Bitmask operations: OR (|) to add, AND (&amp;) to check/intersect, XOR (^) to toggle, NOT (~) to complement
+        Bitmask operations: OR (|) to add, AND (&amp;) to check/intersect, XOR
+        (^) to toggle, NOT (~) to complement
       </div>
     </div>
   );
 };
 
-const SubsetPhase = ({ // skipcq: JS-R1005
+const SubsetPhase = ({
+  // skipcq: JS-R1005
   step,
   subsetSteps,
 }: {
   step: number;
   subsetSteps: ReturnType<typeof generateSubsetSteps>;
 }) => {
-  const currentStep = step > 0 && step <= subsetSteps.length ? subsetSteps[step - 1] : null;
-  const foundTarget = subsetSteps.slice(0, step).find(s => s.possible);
+  const currentStep =
+    step > 0 && step <= subsetSteps.length ? subsetSteps[step - 1] : null;
+  const foundTarget = subsetSteps.slice(0, step).find((s) => s.possible);
 
   return (
     // skipcq: JS-0415
@@ -469,32 +539,42 @@ const SubsetPhase = ({ // skipcq: JS-R1005
         mask={currentStep?.mask || 0}
         bits={subsetNums.length}
         labels={subsetNums.map(String)}
-        highlight={currentStep ? Array.from({ length: subsetNums.length }, (_, i) =>
-          (currentStep.mask & (1 << i)) ? i : -1
-        ).filter(i => i >= 0) : []}
+        highlight={
+          currentStep
+            ? Array.from({ length: subsetNums.length }, (_, i) =>
+                currentStep.mask & (1 << i) ? i : -1
+              ).filter((i) => i >= 0)
+            : []
+        }
       />
 
       <div className="grid grid-cols-4 gap-2 text-xs">
-        {subsetSteps.slice(0, Math.min(step, subsetSteps.length)).map((s, idx) => (
-          <div
-            key={`subset-${s.mask}`}
-            className={`px-2 py-1 rounded font-mono ${
-              s.possible
-                ? "bg-green-600/30 border border-green-500 text-green-400"
-                : idx === step - 1
-                  ? "bg-blue-600/30 border border-blue-500 text-blue-300"
-                  : "bg-gray-800/50 text-gray-500"
-            }`}
-          >
-            {s.mask.toString(2).padStart(4, "0")}: {s.sum}
-          </div>
-        ))}
+        {subsetSteps
+          .slice(0, Math.min(step, subsetSteps.length))
+          .map((s, idx) => (
+            <div
+              key={`subset-${s.mask}`}
+              className={`px-2 py-1 rounded font-mono ${
+                s.possible
+                  ? "bg-green-600/30 border border-green-500 text-green-400"
+                  : idx === step - 1
+                    ? "bg-blue-600/30 border border-blue-500 text-blue-300"
+                    : "bg-gray-800/50 text-gray-500"
+              }`}
+            >
+              {s.mask.toString(2).padStart(4, "0")}: {s.sum}
+            </div>
+          ))}
       </div>
 
       {currentStep && (
-        <div className={`text-sm text-center font-mono px-4 py-2 rounded-lg max-w-lg ${
-          currentStep.possible ? "bg-green-600/20 text-green-400" : "bg-gray-800/50 text-gray-400"
-        }`}>
+        <div
+          className={`text-sm text-center font-mono px-4 py-2 rounded-lg max-w-lg ${
+            currentStep.possible
+              ? "bg-green-600/20 text-green-400"
+              : "bg-gray-800/50 text-gray-400"
+          }`}
+        >
           {currentStep.formula}
         </div>
       )}
@@ -502,9 +582,16 @@ const SubsetPhase = ({ // skipcq: JS-R1005
       {step >= subsetSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
           <span className="text-green-400 font-bold">
-            Answer: Subset {foundTarget ? `{${subsetNums.filter((_, i) => (foundTarget.mask & (1 << i))).join(", ")}}` : "none"} sums to {subsetTarget}
+            Answer: Subset{" "}
+            {foundTarget
+              ? `{${subsetNums.filter((_, i) => foundTarget.mask & (1 << i)).join(", ")}}`
+              : "none"}{" "}
+            sums to {subsetTarget}
           </span>
-          <span className="text-gray-400 ml-2">(checked all 2^{subsetNums.length} = {1 << subsetNums.length} subsets)</span>
+          <span className="text-gray-400 ml-2">
+            (checked all 2^{subsetNums.length} = {1 << subsetNums.length}{" "}
+            subsets)
+          </span>
         </div>
       )}
 
@@ -515,7 +602,8 @@ const SubsetPhase = ({ // skipcq: JS-R1005
   );
 };
 
-const AssignmentPhase = ({ // skipcq: JS-0415, JS-R1005
+const AssignmentPhase = ({
+  // skipcq: JS-0415, JS-R1005
   step,
   assignmentSteps,
   answer,
@@ -524,7 +612,10 @@ const AssignmentPhase = ({ // skipcq: JS-0415, JS-R1005
   assignmentSteps: ReturnType<typeof generateAssignmentSteps>["steps"];
   answer: number;
 }) => {
-  const currentStep = step > 0 && step <= assignmentSteps.length ? assignmentSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= assignmentSteps.length
+      ? assignmentSteps[step - 1]
+      : null;
   const nJobs = assignmentCost.length;
 
   const currentDp = useMemo(() => {
@@ -550,13 +641,17 @@ const AssignmentPhase = ({ // skipcq: JS-0415, JS-R1005
 
       <div className="flex gap-8 items-start flex-wrap justify-center">
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">Cost Matrix</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            Cost Matrix
+          </div>
           <table className="border-collapse text-sm">
             <thead>
               <tr>
                 <th className="p-1.5 text-gray-500"></th>
-                {jobs.map(j => (
-                  <th key={`job-h-${j}`} className="p-1.5 text-gray-400 w-10">{j}</th>
+                {jobs.map((j) => (
+                  <th key={`job-h-${j}`} className="p-1.5 text-gray-400 w-10">
+                    {j}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -565,17 +660,21 @@ const AssignmentPhase = ({ // skipcq: JS-0415, JS-R1005
                 <tr key={`person-${p}`}>
                   <td className="p-1.5 text-gray-400 font-mono">{p}</td>
                   {assignmentCost[pi].map((cost, ji) => {
-                    const isCurrentChoice = currentStep?.person === pi && currentStep?.job === ji;
-                    return ( 
+                    const isCurrentChoice =
+                      currentStep?.person === pi && currentStep?.job === ji;
+                    return (
                       <td
                         // skipcq: JS-0437
                         key={`cost-${p}-${ji}`}
-                        className="p-1">
-                        <div className={`w-10 h-8 flex items-center justify-center rounded text-xs ${
-                          isCurrentChoice
-                            ? "bg-blue-600 border-2 border-blue-400 text-white font-bold"
-                            : "bg-gray-800 text-gray-300"
-                        }`}>
+                        className="p-1"
+                      >
+                        <div
+                          className={`w-10 h-8 flex items-center justify-center rounded text-xs ${
+                            isCurrentChoice
+                              ? "bg-blue-600 border-2 border-blue-400 text-white font-bold"
+                              : "bg-gray-800 text-gray-300"
+                          }`}
+                        >
                           {cost}
                         </div>
                       </td>
@@ -588,7 +687,9 @@ const AssignmentPhase = ({ // skipcq: JS-0415, JS-R1005
         </div>
 
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">dp[mask] = min cost for jobs in mask</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            dp[mask] = min cost for jobs in mask
+          </div>
           <div className="grid grid-cols-4 gap-1 text-xs">
             {Array.from({ length: 1 << nJobs }, (_, mask) => {
               const maskBin = mask.toString(2).padStart(nJobs, "0");
@@ -629,13 +730,15 @@ const AssignmentPhase = ({ // skipcq: JS-0415, JS-R1005
       )}
 
       <div className="text-xs text-gray-500 text-center max-w-md">
-        dp[mask] = min cost when jobs in mask are assigned. Process person by person (popcount order).
+        dp[mask] = min cost when jobs in mask are assigned. Process person by
+        person (popcount order).
       </div>
     </div>
   );
 };
 
-const TSPPhase = ({ // skipcq: JS-0415, JS-R1005
+const TSPPhase = ({
+  // skipcq: JS-0415, JS-R1005
   step,
   tspSteps,
   answer,
@@ -644,7 +747,8 @@ const TSPPhase = ({ // skipcq: JS-0415, JS-R1005
   tspSteps: ReturnType<typeof generateTSPSteps>["steps"];
   answer: number;
 }) => {
-  const currentStep = step > 0 && step <= tspSteps.length ? tspSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= tspSteps.length ? tspSteps[step - 1] : null;
   const currentMask = currentStep?.mask || 1;
 
   const dpTable = useMemo(() => {
@@ -663,7 +767,9 @@ const TSPPhase = ({ // skipcq: JS-0415, JS-R1005
     for (let s = 0; s < Math.min(step, tspSteps.length); s++) {
       masks.add(tspSteps[s].mask);
     }
-    return Array.from(masks).sort((a, b) => a - b).slice(-6);
+    return Array.from(masks)
+      .sort((a, b) => a - b)
+      .slice(-6);
   }, [step, tspSteps]);
 
   return (
@@ -679,19 +785,23 @@ const TSPPhase = ({ // skipcq: JS-0415, JS-R1005
         bits={n}
         labels={cities}
         highlight={Array.from({ length: n }, (_, i) =>
-          (currentMask & (1 << i)) ? i : -1
-        ).filter(i => i >= 0)}
+          currentMask & (1 << i) ? i : -1
+        ).filter((i) => i >= 0)}
       />
 
       <div className="flex gap-8 items-start flex-wrap justify-center">
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">Distance Matrix</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            Distance Matrix
+          </div>
           <table className="border-collapse text-sm">
             <thead>
               <tr>
                 <th className="p-1.5 text-gray-500"></th>
-                {cities.map(c => (
-                  <th key={`city-h-${c}`} className="p-1.5 text-gray-400 w-10">{c}</th>
+                {cities.map((c) => (
+                  <th key={`city-h-${c}`} className="p-1.5 text-gray-400 w-10">
+                    {c}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -699,14 +809,19 @@ const TSPPhase = ({ // skipcq: JS-0415, JS-R1005
               {cities.map((c, i) => (
                 <tr key={`city-r-${c}`}>
                   <td className="p-1.5 text-gray-400 font-mono">{c}</td>
-                  {dist[i].map((d, j) => ( 
+                  {dist[i].map((d, j) => (
                     <td
                       // skipcq: JS-0437
                       key={`dist-${c}-${j}`}
-                      className="p-1">
-                      <div className={`w-10 h-8 flex items-center justify-center rounded text-xs ${
-                        i === j ? "bg-gray-900/50 text-gray-600" : "bg-gray-800 text-gray-300"
-                      }`}>
+                      className="p-1"
+                    >
+                      <div
+                        className={`w-10 h-8 flex items-center justify-center rounded text-xs ${
+                          i === j
+                            ? "bg-gray-900/50 text-gray-600"
+                            : "bg-gray-800 text-gray-300"
+                        }`}
+                      >
                         {d}
                       </div>
                     </td>
@@ -718,34 +833,42 @@ const TSPPhase = ({ // skipcq: JS-0415, JS-R1005
         </div>
 
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">dp[mask][city] = min dist</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            dp[mask][city] = min dist
+          </div>
           <table className="border-collapse text-xs">
             <thead>
               <tr>
                 <th className="p-1.5 text-gray-500 w-14">mask</th>
-                {cities.map(c => (
-                  <th key={`tsp-h-${c}`} className="p-1.5 text-gray-400 w-10">{c}</th>
+                {cities.map((c) => (
+                  <th key={`tsp-h-${c}`} className="p-1.5 text-gray-400 w-10">
+                    {c}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {relevantMasks.map(mask => (
+              {relevantMasks.map((mask) => (
                 <tr key={`mask-${mask}`}>
                   <td className="p-1.5 text-gray-400 font-mono text-xs">
                     {mask.toString(2).padStart(n, "0")}
                   </td>
-                  {cities.map((city, pos) => { // skipcq: JS-R1005
+                  {cities.map((city, pos) => {
+                    // skipcq: JS-R1005
                     const value = dpTable[mask]?.[pos];
-                    const isCurrent = currentStep?.mask === mask && currentStep?.pos === pos;
+                    const isCurrent =
+                      currentStep?.mask === mask && currentStep?.pos === pos;
                     return (
                       <td key={`tsp-dp-${mask}-${city}`} className="p-1">
-                        <div className={`w-10 h-7 flex items-center justify-center rounded font-mono text-xs ${
-                          isCurrent
-                            ? "bg-blue-600 border-2 border-blue-400 text-white font-bold"
-                            : value !== null && value < INF
-                              ? "bg-gray-800 text-gray-300"
-                              : "bg-gray-900/50 text-gray-600"
-                        }`}>
+                        <div
+                          className={`w-10 h-7 flex items-center justify-center rounded font-mono text-xs ${
+                            isCurrent
+                              ? "bg-blue-600 border-2 border-blue-400 text-white font-bold"
+                              : value !== null && value < INF
+                                ? "bg-gray-800 text-gray-300"
+                                : "bg-gray-900/50 text-gray-600"
+                          }`}
+                        >
                           {value !== null && value < INF ? value : "-"}
                         </div>
                       </td>
@@ -766,13 +889,16 @@ const TSPPhase = ({ // skipcq: JS-0415, JS-R1005
 
       {step >= tspSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Min tour cost = {answer}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Min tour cost = {answer}
+          </span>
           <span className="text-gray-400 ml-2">(A-B-D-C-A)</span>
         </div>
       )}
 
       <div className="text-xs text-gray-500 text-center max-w-md">
-        State: dp[mask][pos] = min cost to visit cities in mask, ending at pos. Process by popcount.
+        State: dp[mask][pos] = min cost to visit cities in mask, ending at pos.
+        Process by popcount.
       </div>
     </div>
   );
@@ -795,8 +921,14 @@ export default function BitmaskDPVisualizer() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const subsetSteps = useMemo(() => generateSubsetSteps(), []);
-  const { steps: assignmentSteps, answer: assignmentAnswer } = useMemo(() => generateAssignmentSteps(), []);
-  const { steps: tspSteps, answer: tspAnswer } = useMemo(() => generateTSPSteps(), []);
+  const { steps: assignmentSteps, answer: assignmentAnswer } = useMemo(
+    () => generateAssignmentSteps(),
+    []
+  );
+  const { steps: tspSteps, answer: tspAnswer } = useMemo(
+    () => generateTSPSteps(),
+    []
+  );
 
   const getMaxSteps = useCallback(
     (phase: Phase) => {
@@ -853,9 +985,11 @@ export default function BitmaskDPVisualizer() {
               }`}
             >
               <span className="flex items-center gap-1.5">
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
-                  currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
-                }`}>
+                <span
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
+                    currentPhase === phase ? "bg-blue-500" : "bg-gray-700"
+                  }`}
+                >
                   {index + 1}
                 </span>
                 {phaseLabels[phase]}
@@ -908,7 +1042,8 @@ export default function BitmaskDPVisualizer() {
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        Time: O(2^n) or O(n * 2^n). Use when n ≤ 20 and state depends on WHICH elements used.
+        Time: O(2^n) or O(n * 2^n). Use when n ≤ 20 and state depends on WHICH
+        elements used.
       </div>
     </div>
   );

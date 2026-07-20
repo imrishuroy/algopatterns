@@ -39,7 +39,8 @@ const languageLabels: Record<SupportedLanguage, string> = {
   javascript: "JavaScript",
 };
 
-export default function ConceptPageClient({ concept }: ConceptPageClientProps) { // skipcq: JS-0067
+export default function ConceptPageClient({ concept }: ConceptPageClientProps) {
+  // skipcq: JS-0067
   const { language, setLanguage } = useLanguage();
 
   const currentCode = concept.codeSnippets[language] || "";

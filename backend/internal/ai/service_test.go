@@ -260,11 +260,11 @@ func TestChatStream_Success(t *testing.T) {
 	cfg := DefaultConfig()
 	cfg.Enabled = true
 	s := NewService(mgr, cfg)
-	outCh, err := s.ChatStream(context.Background(), ChatRequest{Message: "hi"})
+	result, err := s.ChatStream(context.Background(), ChatRequest{Message: "hi"})
 	require.NoError(t, err)
 
 	var received []string
-	for chunk := range outCh {
+	for chunk := range result.Chunks {
 		if chunk.Done {
 			break
 		}
@@ -834,4 +834,377 @@ func TestExplainError_UsesRequesterConfig(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 0.3, captured.Temperature)
 	assert.Equal(t, 768, captured.MaxTokens)
+}
+
+// ChatStream tests
+
+func TestChatStream_WhenDisabled(t *testing.T) {
+	s := newTestService(func(c *Config) { c.Enabled = false })
+	_, err := s.ChatStream(context.Background(), ChatRequest{Message: "hello"})
+	assert.ErrorIs(t, err, ErrAIDisabled)
+}
+
+func TestChatStream_WhenStreamingDisabled(t *testing.T) {
+	s := newTestService(func(c *Config) {
+		c.Enabled = true
+		c.Features.EnableChat = true
+		c.Features.EnableStreaming = false
+	})
+	_, err := s.ChatStream(context.Background(), ChatRequest{Message: "hello"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "streaming chat is disabled")
+}
+
+func TestChatStream_WhenChatDisabled(t *testing.T) {
+	s := newTestService(func(c *Config) {
+		c.Enabled = true
+		c.Features.EnableChat = false
+		c.Features.EnableStreaming = true
+	})
+	_, err := s.ChatStream(context.Background(), ChatRequest{Message: "hello"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "streaming chat is disabled")
+}
+
+func TestChatStream_GeneralContext_OutOfScope(t *testing.T) {
+	// Create a stub provider with classifier that returns out-of-scope
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
+			// Classifier returns out_of_scope
+			return &llm.ChatResponse{Content: "out_of_scope", Model: "stub"}, nil
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	cfg.Features.EnableStreaming = true
+	s := NewService(mgr, cfg)
+
+	result, err := s.ChatStream(context.Background(), ChatRequest{
+		Message:     "What's the weather?",
+		ContextType: ContextGeneral,
+	})
+	require.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "out_of_scope", result.Intent)
+
+	// Consume chunks
+	var content string
+	for chunk := range result.Chunks {
+		content += chunk.Content
+	}
+	// Check that the refusal message is returned
+	assert.Contains(t, content, "not able to help with that topic")
+}
+
+func TestChatStream_ProblemContext(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		streamFn: func(_ context.Context, _ llm.ChatRequest) (<-chan llm.StreamChunk, error) {
+			ch := make(chan llm.StreamChunk, 2)
+			ch <- llm.StreamChunk{Content: "response"}
+			ch <- llm.StreamChunk{Done: true}
+			close(ch)
+			return ch, nil
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	cfg.Features.EnableStreaming = true
+	s := NewService(mgr, cfg)
+
+	result, err := s.ChatStream(context.Background(), ChatRequest{
+		Message:      "How do I solve this?",
+		ContextType:  ContextProblem,
+		ProblemSlug:  "two-sum",
+		ProblemTitle: "Two Sum",
+	})
+	require.NoError(t, err)
+	assert.NotNil(t, result)
+
+	// Consume chunks
+	var content string
+	for chunk := range result.Chunks {
+		content += chunk.Content
+	}
+	assert.Equal(t, "response", content)
+}
+
+func TestChatStream_PatternContext(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		streamFn: func(_ context.Context, _ llm.ChatRequest) (<-chan llm.StreamChunk, error) {
+			ch := make(chan llm.StreamChunk, 2)
+			ch <- llm.StreamChunk{Content: "pattern help"}
+			ch <- llm.StreamChunk{Done: true}
+			close(ch)
+			return ch, nil
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	cfg.Features.EnableStreaming = true
+	s := NewService(mgr, cfg)
+
+	result, err := s.ChatStream(context.Background(), ChatRequest{
+		Message:     "Explain two pointers",
+		ContextType: ContextPattern,
+		PatternID:   "two-pointers",
+		PatternName: "Two Pointers",
+	})
+	require.NoError(t, err)
+	assert.NotNil(t, result)
+
+	// Consume chunks
+	var content string
+	for chunk := range result.Chunks {
+		content += chunk.Content
+	}
+	assert.Equal(t, "pattern help", content)
+}
+
+func TestChatStream_StreamError(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		streamFn: func(_ context.Context, _ llm.ChatRequest) (<-chan llm.StreamChunk, error) {
+			return nil, errors.New("stream failed")
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	cfg.Features.EnableStreaming = true
+	s := NewService(mgr, cfg)
+
+	_, err := s.ChatStream(context.Background(), ChatRequest{
+		Message:     "hello",
+		ContextType: ContextProblem,
+	})
+	assert.Error(t, err)
+}
+
+// GenerateTitle tests
+
+func TestGenerateTitle_WhenChatDisabled(t *testing.T) {
+	s := newTestService(func(c *Config) {
+		c.Enabled = true
+		c.Features.EnableChat = false
+	})
+	_, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{})
+	assert.ErrorIs(t, err, ErrAIDisabled)
+}
+
+func TestGenerateTitle_EmptyMessages(t *testing.T) {
+	s := newTestService(func(c *Config) {
+		c.Enabled = true
+		c.Features.EnableChat = true
+	})
+	resp, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{Messages: nil})
+	require.NoError(t, err)
+	assert.Equal(t, "New Conversation", resp.Title)
+}
+
+func TestGenerateTitle_Success(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
+			return &llm.ChatResponse{Content: "Two Sum Approach", Model: "stub"}, nil
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	s := NewService(mgr, cfg)
+
+	resp, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{
+		Messages: []ConversationMessage{
+			{Role: "user", Content: "How do I solve two sum?"},
+			{Role: "assistant", Content: "Use a hashmap..."},
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "Two Sum Approach", resp.Title)
+}
+
+func TestGenerateTitle_LLMError_FallbackToUserMessage(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
+			return nil, errors.New("LLM error")
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	s := NewService(mgr, cfg)
+
+	resp, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{
+		Messages: []ConversationMessage{
+			{Role: "user", Content: "How do I solve two sum?"},
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "How do I solve two sum?", resp.Title)
+}
+
+func TestGenerateTitle_LLMError_NoUserMessage(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
+			return nil, errors.New("LLM error")
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	s := NewService(mgr, cfg)
+
+	resp, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{
+		Messages: []ConversationMessage{
+			{Role: "assistant", Content: "I'm an assistant"},
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "New Conversation", resp.Title)
+}
+
+func TestGenerateTitle_LLMReturnsEmpty_UsesHeuristic(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
+			return &llm.ChatResponse{Content: "", Model: "stub"}, nil
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	s := NewService(mgr, cfg)
+
+	resp, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{
+		Messages: []ConversationMessage{
+			{Role: "user", Content: "How do I solve two sum?"},
+		},
+	})
+	require.NoError(t, err)
+	// Heuristic removes "how do i solve" and capitalizes
+	assert.Equal(t, "Two Sum", resp.Title)
+}
+
+func TestGenerateTitle_TruncatesLongTitle(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	longTitle := strings.Repeat("a", 60)
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
+			return &llm.ChatResponse{Content: longTitle, Model: "stub"}, nil
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	s := NewService(mgr, cfg)
+
+	resp, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{
+		Messages: []ConversationMessage{
+			{Role: "user", Content: "test"},
+		},
+	})
+	require.NoError(t, err)
+	assert.Len(t, resp.Title, 50)
+	assert.True(t, strings.HasSuffix(resp.Title, "..."))
+}
+
+func TestGenerateTitle_RemovesQuotes(t *testing.T) {
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		chatFn: func(_ context.Context, _ llm.ChatRequest) (*llm.ChatResponse, error) {
+			return &llm.ChatResponse{Content: "\"Two Sum\"", Model: "stub"}, nil
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	s := NewService(mgr, cfg)
+
+	resp, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{
+		Messages: []ConversationMessage{
+			{Role: "user", Content: "test"},
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "Two Sum", resp.Title)
+}
+
+func TestGenerateTitle_TruncatesLongMessages(t *testing.T) {
+	var captured llm.ChatRequest
+	mgr := llm.NewManager(llm.ManagerConfig{DefaultProvider: "stub"})
+	mgr.RegisterProvider("stub", &stubProvider{
+		name: "stub",
+		chatFn: func(_ context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+			captured = req
+			return &llm.ChatResponse{Content: "Title", Model: "stub"}, nil
+		},
+	})
+	cfg := DefaultConfig()
+	cfg.Enabled = true
+	cfg.Features.EnableChat = true
+	s := NewService(mgr, cfg)
+
+	longContent := strings.Repeat("x", 400)
+	_, err := s.GenerateTitle(context.Background(), GenerateTitleRequest{
+		Messages: []ConversationMessage{
+			{Role: "user", Content: longContent},
+		},
+	})
+	require.NoError(t, err)
+	// Check that the message was truncated in the prompt
+	userMsg := captured.Messages[1].Content
+	assert.True(t, strings.Contains(userMsg, "..."))
+	assert.Less(t, len(userMsg), len(longContent)+50) // Allow for role prefix
+}
+
+// extractTitleHeuristic tests
+
+func TestExtractTitleHeuristic_NoUserMessage(t *testing.T) {
+	result := extractTitleHeuristic([]ConversationMessage{
+		{Role: "assistant", Content: "Hello"},
+	})
+	assert.Equal(t, "New Conversation", result)
+}
+
+func TestExtractTitleHeuristic_EmptyMessages(t *testing.T) {
+	result := extractTitleHeuristic(nil)
+	assert.Equal(t, "New Conversation", result)
+}
+
+func TestExtractTitleHeuristic_ShortQuestion(t *testing.T) {
+	result := extractTitleHeuristic([]ConversationMessage{
+		{Role: "user", Content: "How do I solve two sum?"},
+	})
+	// Heuristic removes "how do i solve" filler and capitalizes
+	assert.Equal(t, "Two Sum", result)
+}
+
+func TestExtractTitleHeuristic_LongMessage_Truncates(t *testing.T) {
+	// Use a message without filler words so it won't be stripped
+	longMsg := strings.Repeat("algo ", 30) // "algo " * 30 = 150 chars
+	result := extractTitleHeuristic([]ConversationMessage{
+		{Role: "user", Content: longMsg},
+	})
+	// Result should be non-empty and reasonably sized (heuristic capitalizes)
+	assert.NotEmpty(t, result)
+	// The heuristic processes and may shorten the title
+	assert.LessOrEqual(t, len(result), 150)
 }

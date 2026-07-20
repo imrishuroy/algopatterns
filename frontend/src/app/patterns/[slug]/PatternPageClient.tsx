@@ -135,7 +135,7 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
         .forEach((el) => observer.observe(el));
     }, 100);
 
-// skipcq: JS-0045
+    // skipcq: JS-0045
 
     return () => {
       // skipcq: JS-0045

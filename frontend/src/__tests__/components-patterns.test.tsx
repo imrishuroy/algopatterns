@@ -305,7 +305,8 @@ vi.mock("@/contexts/ProgressContext", () => ({
     syncFromLocal: mockSyncFromLocal,
     celebrationKey: mockCelebrationKey,
   })),
-  ProgressProvider: ({ children }: { children: ReactNode }) => children as React.ReactElement,
+  ProgressProvider: ({ children }: { children: ReactNode }) =>
+    children as React.ReactElement,
 }));
 
 let mockCompanyFilter = "";
@@ -316,7 +317,8 @@ vi.mock("@/contexts/FilterContext", () => ({
     companyFilter: mockCompanyFilter,
     setCompanyFilter: mockSetCompanyFilter,
   })),
-  FilterProvider: ({ children }: { children: ReactNode }) => children as React.ReactElement,
+  FilterProvider: ({ children }: { children: ReactNode }) =>
+    children as React.ReactElement,
 }));
 
 let mockIsPro = false;

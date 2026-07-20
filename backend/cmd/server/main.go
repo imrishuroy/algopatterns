@@ -48,7 +48,7 @@ func main() {
 
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to load configuration")
+		fatal(err, "failed to load configuration")
 	}
 
 	setupLogger(cfg.Logging)
@@ -79,7 +79,7 @@ func main() {
 			DisableMetrics:   cfg.Sentry.DisableMetrics,
 			MaxSpans:         cfg.Sentry.MaxSpans,
 		}); err != nil {
-			log.Fatal().Err(err).Msg("Failed to initialize Sentry")
+			fatal(err, "failed to initialize Sentry")
 		}
 		defer sentry.Flush(2 * time.Second)
 		log.Info().
@@ -166,16 +166,22 @@ func main() {
 		}
 
 		if cfg.AI.DeepSeekAPIKey != "" {
+			includeReasoning := true
 			llmManager.RegisterProvider("deepseek", llm.NewDeepSeekProvider(llm.DeepSeekConfig{
-				APIKey: cfg.AI.DeepSeekAPIKey,
-				Model:  cfg.AI.DeepSeekModel,
+				APIKey:           cfg.AI.DeepSeekAPIKey,
+				Model:            cfg.AI.DeepSeekModel,
+				ReasoningEffort:  cfg.AI.DeepSeekReasoningEffort,
+				IncludeReasoning: &includeReasoning,
 			}))
 		}
 
 		if cfg.AI.GroqAPIKey != "" {
+			includeReasoning := false
 			llmManager.RegisterProvider("groq", llm.NewGroqProvider(llm.GroqConfig{
-				APIKey: cfg.AI.GroqAPIKey,
-				Model:  cfg.AI.GroqModel,
+				APIKey:           cfg.AI.GroqAPIKey,
+				Model:            cfg.AI.GroqModel,
+				ReasoningEffort:  cfg.AI.GroqReasoningEffort,
+				IncludeReasoning: &includeReasoning,
 			}))
 		}
 
@@ -190,6 +196,14 @@ func main() {
 			llmManager.RegisterProvider("openai", llm.NewOpenAIProvider(llm.OpenAIConfig{
 				APIKey: cfg.AI.OpenAIAPIKey,
 				Model:  cfg.AI.OpenAIModel,
+			}))
+		}
+
+		if cfg.AI.ClineAPIKey != "" {
+			llmManager.RegisterProvider("cline", llm.NewClineProvider(llm.ClineConfig{
+				APIKey:  cfg.AI.ClineAPIKey,
+				Model:   cfg.AI.ClineModel,
+				BaseURL: cfg.AI.ClineBaseURL,
 			}))
 		}
 

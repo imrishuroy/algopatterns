@@ -4,6 +4,7 @@ export interface AIMessage {
   content: string;
   timestamp: Date;
   isStreaming?: boolean;
+  intent?: Intent;
 }
 
 export interface AISession {
@@ -15,6 +16,15 @@ export interface AISession {
 }
 
 export type ContextType = "problem" | "pattern" | "general";
+
+export type Intent =
+  | "byop"
+  | "syntax"
+  | "complexity"
+  | "diagram"
+  | "intersection"
+  | "concept"
+  | "out_of_scope";
 
 export interface HintRequest {
   problemSlug: string;
@@ -66,6 +76,7 @@ export interface ConversationMessage {
 }
 
 export interface ChatRequest {
+  sessionId?: string;
   message: string;
   problemSlug?: string;
   problemTitle?: string;
@@ -89,6 +100,7 @@ export interface ChatResponse {
   sessionId: string;
   tokensUsed: number;
   model: string;
+  intent?: Intent;
 }
 
 export type AIFeatureType = "chat" | "hint" | "review" | "explain";

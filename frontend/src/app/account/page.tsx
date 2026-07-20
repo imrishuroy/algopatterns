@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 
-export default function AccountPage() { // skipcq: JS-0067
+export default function AccountPage() {
+  // skipcq: JS-0067
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const {
@@ -360,7 +361,8 @@ export default function AccountPage() { // skipcq: JS-0067
   );
 }
 
-function FeatureItem({ // skipcq: JS-0067
+function FeatureItem({
+  // skipcq: JS-0067
   label,
   value,
   enabled,

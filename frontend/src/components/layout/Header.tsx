@@ -298,6 +298,7 @@ const Header = () => {
       free: true,
     },
     { href: "/articles", label: "Articles", free: true },
+    { href: "/chat", label: "Chat", free: true },
   ];
 
   return (

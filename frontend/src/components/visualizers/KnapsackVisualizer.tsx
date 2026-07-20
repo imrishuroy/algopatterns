@@ -102,7 +102,8 @@ function generateSteps() {
 }
 
 // skipcq: JS-0067
-export default function KnapsackVisualizer() { // skipcq: JS-R1005
+export default function KnapsackVisualizer() {
+  // skipcq: JS-R1005
   const [{ step, isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
     isPlaying: false,
@@ -118,7 +119,8 @@ export default function KnapsackVisualizer() { // skipcq: JS-R1005
   const { steps, dp: finalDp } = useMemo(() => generateSteps(), []);
 
   // Derived from step — works for both play mode and manual stepping.
-  const selectedItems = useMemo(() => { // skipcq: JS-R1005
+  const selectedItems = useMemo(() => {
+    // skipcq: JS-R1005
     if (step < steps.length) return new Set<number>();
     const selected = new Set<number>();
     let remaining = capacity;
@@ -461,7 +463,9 @@ export default function KnapsackVisualizer() { // skipcq: JS-R1005
               Answer: Maximum Value = ${finalDp[items.length]?.[capacity] || 0}
             </span>
             <div className="text-gray-400 text-sm mt-1">
-              Items: {[...selectedItems].map(i => items[i].name).join(" + ") || "None"}
+              Items:{" "}
+              {[...selectedItems].map((i) => items[i].name).join(" + ") ||
+                "None"}
               {selectedItems.size > 0 && ` (${totalWeight}kg)`}
             </div>
           </motion.div>

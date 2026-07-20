@@ -7,6 +7,7 @@ import type {
   ReviewResponse,
   ExplainRequest,
   ExplainResponse,
+  Intent,
 } from "@/types/ai";
 import type { ApiResponse } from "@/types";
 import { apiClient } from "./api";
@@ -42,13 +43,40 @@ class AIApiClient {
     return headers;
   }
 
-  async chat(req: ChatRequest): Promise<ApiResponse<ChatResponse>> {
+  // Helper to make requests with automatic 401 retry
+  private async requestWithRetry<T>(
+    url: string,
+    options: RequestInit
+  ): Promise<ApiResponse<T>> {
     const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/chat`, {
-      method: "POST",
+    const response = await fetch(url, {
+      ...options,
       headers,
       credentials: "include",
+    });
+
+    // Handle 401 by refreshing token and retrying
+    if (response.status === 401) {
+      const newToken = await apiClient.refreshToken();
+      if (newToken) {
+        const retryHeaders = this.getHeaders();
+        const retryResponse = await fetch(url, {
+          ...options,
+          headers: retryHeaders,
+          credentials: "include",
+        });
+        return retryResponse.json();
+      }
+    }
+
+    return response.json();
+  }
+
+  async chat(req: ChatRequest): Promise<ApiResponse<ChatResponse>> {
+    return this.requestWithRetry(`${API_BASE_URL}/api/v1/ai/chat`, {
+      method: "POST",
       body: JSON.stringify({
+        session_id: req.sessionId,
         message: req.message,
         problem_slug: req.problemSlug,
         problem_title: req.problemTitle,
@@ -67,19 +95,20 @@ class AIApiClient {
         error_message: req.errorMessage,
       }),
     });
-    return response.json();
   }
 
   chatStream(
     req: ChatRequest,
     onChunk: (chunk: string) => void,
     onError: (error: string) => void,
-    onDone: (sessionId?: string) => void
+    onDone: (sessionId?: string) => void,
+    onIntent?: (intent: Intent) => void
   ): () => void {
     const controller = new AbortController();
 
     const buildBody = () =>
       JSON.stringify({
+        session_id: req.sessionId,
         message: req.message,
         problem_slug: req.problemSlug,
         problem_title: req.problemTitle,
@@ -133,7 +162,8 @@ class AIApiClient {
                   retryResponse,
                   onChunk,
                   onError,
-                  onDone
+                  onDone,
+                  onIntent
                 );
                 return;
               }
@@ -147,7 +177,7 @@ class AIApiClient {
           return;
         }
 
-        await this.processStream(response, onChunk, onError, onDone);
+        await this.processStream(response, onChunk, onError, onDone, onIntent);
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
           onError((err as Error).message || "Stream connection failed");
@@ -162,7 +192,8 @@ class AIApiClient {
     response: Response,
     onChunk: (chunk: string) => void,
     onError: (error: string) => void,
-    onDone: (sessionId?: string) => void
+    onDone: (sessionId?: string) => void,
+    onIntent?: (intent: Intent) => void
   ): Promise<void> {
     const reader = response.body?.getReader();
     if (!reader) {
@@ -182,6 +213,10 @@ class AIApiClient {
       buffer = lines.pop() || "";
 
       for (const line of lines) {
+        // Handle event: intent (for Omni-Tutor intent classification)
+        if (line.startsWith("event: intent")) {
+          continue; // Next line will have the data
+        }
         // Handle both "data: {...}" and "data:{...}" formats
         if (line.startsWith("data:")) {
           const data = line.startsWith("data: ")
@@ -204,6 +239,10 @@ class AIApiClient {
           }
           try {
             const parsed = JSON.parse(data);
+            // Handle intent event data
+            if (parsed.intent && onIntent) {
+              onIntent(parsed.intent as Intent);
+            }
             if (parsed.content) {
               onChunk(parsed.content);
             }
@@ -221,11 +260,8 @@ class AIApiClient {
   }
 
   async getHint(req: HintRequest): Promise<ApiResponse<HintResponse>> {
-    const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/hint`, {
+    return this.requestWithRetry(`${API_BASE_URL}/api/v1/ai/hint`, {
       method: "POST",
-      headers,
-      credentials: "include",
       body: JSON.stringify({
         problem_slug: req.problemSlug,
         problem_title: req.problemTitle,
@@ -235,15 +271,11 @@ class AIApiClient {
         hint_level: req.hintLevel,
       }),
     });
-    return response.json();
   }
 
   async reviewCode(req: ReviewRequest): Promise<ApiResponse<ReviewResponse>> {
-    const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/review`, {
+    return this.requestWithRetry(`${API_BASE_URL}/api/v1/ai/review`, {
       method: "POST",
-      headers,
-      credentials: "include",
       body: JSON.stringify({
         problem_slug: req.problemSlug,
         problem_title: req.problemTitle,
@@ -253,17 +285,13 @@ class AIApiClient {
         focus_areas: req.focusAreas,
       }),
     });
-    return response.json();
   }
 
   async explainError(
     req: ExplainRequest
   ): Promise<ApiResponse<ExplainResponse>> {
-    const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/explain`, {
+    return this.requestWithRetry(`${API_BASE_URL}/api/v1/ai/explain`, {
       method: "POST",
-      headers,
-      credentials: "include",
       body: JSON.stringify({
         code: req.code,
         language: req.language,
@@ -272,83 +300,94 @@ class AIApiClient {
         line_number: req.lineNumber,
       }),
     });
-    return response.json();
   }
 
   async getSessions(): Promise<ApiResponse<{ sessions: AISessionData[] }>> {
-    const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(`${API_BASE_URL}/api/v1/ai/sessions`, {
+    return this.requestWithRetry(`${API_BASE_URL}/api/v1/ai/sessions`, {
       method: "GET",
-      headers,
-      credentials: "include",
     });
-    return response.json();
   }
 
   async getSessionMessages(
     sessionId: string
   ): Promise<ApiResponse<{ messages: AIMessageData[] }>> {
-    const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(
+    return this.requestWithRetry(
       `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/messages`,
-      {
-        method: "GET",
-        headers,
-        credentials: "include",
-      }
+      { method: "GET" }
     );
-    return response.json();
   }
 
   async clearSession(
     sessionId: string
   ): Promise<ApiResponse<{ cleared: boolean }>> {
-    const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(
-      `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}`,
-      {
-        method: "DELETE",
-        headers,
-        credentials: "include",
-      }
+    return this.requestWithRetry(
+      `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/messages`,
+      { method: "DELETE" }
     );
-    return response.json();
+  }
+
+  async deleteSession(
+    sessionId: string
+  ): Promise<ApiResponse<{ deleted: boolean }>> {
+    return this.requestWithRetry(
+      `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}`,
+      { method: "DELETE" }
+    );
   }
 
   async archiveSession(
     sessionId: string,
     title?: string
   ): Promise<ApiResponse<{ archived: boolean }>> {
-    const headers = await this.refreshAndGetHeaders();
-    const response = await fetch(
+    return this.requestWithRetry(
       `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/archive`,
       {
         method: "POST",
-        headers,
-        credentials: "include",
         body: JSON.stringify({ title }),
       }
     );
-    return response.json();
+  }
+
+  async updateSessionTitle(
+    sessionId: string,
+    title: string
+  ): Promise<ApiResponse<{ updated: boolean }>> {
+    return this.requestWithRetry(
+      `${API_BASE_URL}/api/v1/ai/sessions/${sessionId}/title`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ title }),
+      }
+    );
   }
 
   async getArchivedSessions(
     problemSlug?: string,
-    patternId?: string
+    patternId?: string,
+    contextType?: string,
+    includeActive?: boolean
   ): Promise<ApiResponse<{ sessions: AISessionData[] }>> {
-    const headers = await this.refreshAndGetHeaders();
     const params = new URLSearchParams();
     if (problemSlug) params.set("problem_slug", problemSlug);
     if (patternId) params.set("pattern_id", patternId);
-    const response = await fetch(
+    if (contextType) params.set("context_type", contextType);
+    if (includeActive) params.set("include_active", "true");
+    return this.requestWithRetry(
       `${API_BASE_URL}/api/v1/ai/sessions/archived?${params.toString()}`,
+      { method: "GET" }
+    );
+  }
+
+  async generateTitle(
+    messages: Array<{ role: string; content: string }>
+  ): Promise<ApiResponse<{ title: string }>> {
+    return this.requestWithRetry(
+      `${API_BASE_URL}/api/v1/ai/sessions/generate-title`,
       {
-        method: "GET",
-        headers,
-        credentials: "include",
+        method: "POST",
+        body: JSON.stringify({ messages }),
       }
     );
-    return response.json();
   }
 }
 
@@ -359,6 +398,7 @@ export interface AISessionData {
   problem_id?: string;
   problem_slug?: string;
   pattern_id?: string;
+  context_type: string;
   title?: string;
   is_archived: boolean;
   started_at: string;

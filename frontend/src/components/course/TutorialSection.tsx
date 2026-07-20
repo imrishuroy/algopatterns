@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -18,6 +18,8 @@ const APPROACH_LABELS: Record<DPApproach, string> = {
   memoization: "Memoization",
   tabulation: "Tabulation",
   spaceOptimized: "Space Optimized",
+  heap: "Heap",
+  formula: "Formula",
 };
 
 const VisualizerLoading = () => (
@@ -92,6 +94,14 @@ const KthLargestVisualizer = dynamic(
   () => import("@/components/visualizers/KthLargestVisualizer"),
   { loading: VisualizerLoading, ssr: false }
 );
+const KClosestPointsVisualizer = dynamic(
+  () => import("@/components/visualizers/KClosestPointsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const TaskSchedulerVisualizer = dynamic(
+  () => import("@/components/visualizers/TaskSchedulerVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
 const MedianFinderVisualizer = dynamic(
   () => import("@/components/visualizers/MedianFinderVisualizer"),
   { loading: VisualizerLoading, ssr: false }
@@ -106,6 +116,22 @@ const MergeIntervalsVisualizer = dynamic(
 );
 const MeetingRoomsVisualizer = dynamic(
   () => import("@/components/visualizers/MeetingRoomsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const MeetingRoomsHeapVisualizer = dynamic(
+  () => import("@/components/visualizers/MeetingRoomsHeapVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const ReorganizeStringVisualizer = dynamic(
+  () => import("@/components/visualizers/ReorganizeStringVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const IPOVisualizer = dynamic(
+  () => import("@/components/visualizers/IPOVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const SlidingWindowMedianVisualizer = dynamic(
+  () => import("@/components/visualizers/SlidingWindowMedianVisualizer"),
   { loading: VisualizerLoading, ssr: false }
 );
 const IntervalIntersectionVisualizer = dynamic(
@@ -574,8 +600,19 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
           </div>
         )}
 
+      {cat === "Heap / Priority Queue" && title.includes("K Closest") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-blue-400">▶</span> Interactive K Closest
+            Points
+          </h4>
+          <KClosestPointsVisualizer />
+        </div>
+      )}
+
       {cat === "Heap / Priority Queue" &&
-        (title.includes("Two Heaps") || title.includes("Median")) && (
+        (title.includes("Two Heaps") || title.includes("Median")) &&
+        !title.includes("Sliding Window") && (
           <div className="mt-8">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <span className="text-rose-400">▶</span> Interactive Median Finder
@@ -594,6 +631,56 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
             <MergeKListsVisualizer />
           </div>
         )}
+
+      {cat === "Heap / Priority Queue" && title.includes("Task Scheduler") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-teal-400">▶</span> Interactive Task Scheduler
+          </h4>
+          <TaskSchedulerVisualizer />
+        </div>
+      )}
+
+      {cat === "Heap / Priority Queue" && title.includes("Meeting Rooms") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-indigo-400">▶</span> Interactive Meeting Rooms
+            (Min-Heap)
+          </h4>
+          <MeetingRoomsHeapVisualizer />
+        </div>
+      )}
+
+      {cat === "Heap / Priority Queue" && title.includes("Reorganize") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-violet-400">▶</span> Interactive Reorganize
+            String
+          </h4>
+          <ReorganizeStringVisualizer />
+        </div>
+      )}
+
+      {cat === "Heap / Priority Queue" &&
+        title.includes("Sliding Window Median") && (
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-cyan-400">▶</span> Interactive Sliding
+              Window Median
+            </h4>
+            <SlidingWindowMedianVisualizer />
+          </div>
+        )}
+
+      {cat === "Heap / Priority Queue" && title.includes("IPO") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-amber-400">▶</span> Interactive IPO: Maximize
+            Capital
+          </h4>
+          <IPOVisualizer />
+        </div>
+      )}
 
       {/* Intervals Visualizers */}
       {cat === "Intervals" &&
@@ -929,28 +1016,53 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
   const { language: currentLang, setLanguage: setCurrentLang } = useLanguage();
 
   // Get available approaches from section (for code examples)
-  const availableApproaches = section.approaches
-    ? (Object.keys(section.approaches) as DPApproach[]).filter(
-        (key) =>
-          section.approaches?.[key]?.java ||
-          section.approaches?.[key]?.javascript
-      )
-    : [];
+  const availableApproaches = useMemo(
+    () =>
+      section.approaches
+        ? (Object.keys(section.approaches) as DPApproach[]).filter(
+            (key) =>
+              section.approaches?.[key]?.java ||
+              section.approaches?.[key]?.javascript
+          )
+        : [],
+    [section.approaches]
+  );
 
   // Get available templates (for pseudocode/templates)
-  const availableTemplates = section.templates
-    ? (Object.keys(section.templates) as DPApproach[]).filter(
-        (key) => section.templates?.[key]
-      )
-    : [];
+  const availableTemplates = useMemo(
+    () =>
+      section.templates
+        ? (Object.keys(section.templates) as DPApproach[]).filter(
+            (key) => section.templates?.[key]
+          )
+        : [],
+    [section.templates]
+  );
+
+  // Compute valid approach: use stored selection if valid, else first available
+  const getValidApproach = useCallback(
+    (current: DPApproach): DPApproach => {
+      if (
+        availableApproaches.length > 0 &&
+        availableApproaches.includes(current)
+      ) {
+        return current;
+      }
+      return availableApproaches[0] || availableTemplates[0] || "recursion";
+    },
+    [availableApproaches, availableTemplates]
+  );
 
   const [selectedApproach, setSelectedApproach] = useState<DPApproach>(
-    availableApproaches[0] || availableTemplates[0] || "recursion"
+    () => availableApproaches[0] || availableTemplates[0] || "recursion"
   );
 
   const [selectedTemplate, setSelectedTemplate] = useState<DPApproach>(
-    availableTemplates[0] || "recursion"
+    () => availableTemplates[0] || "recursion"
   );
+
+  // Derive the actual approach to display (handles section changes without setState in effect)
+  const effectiveApproach = getValidApproach(selectedApproach);
 
   return (
     <article className="scroll-mt-24" id={`section-${sectionIndex}`}>
@@ -1217,7 +1329,7 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
                   key={approach}
                   onClick={() => setSelectedApproach(approach)}
                   className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all ${
-                    selectedApproach === approach
+                    effectiveApproach === approach
                       ? "bg-indigo-600 text-white"
                       : "text-gray-400 hover:text-gray-300 hover:bg-gray-800 border border-gray-700"
                   }`}
@@ -1230,10 +1342,10 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
                 currentLang={currentLang}
                 onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
                 languages={Object.keys(
-                  section.approaches[selectedApproach] || {}
+                  section.approaches[effectiveApproach] || {}
                 ).filter(
                   (k) =>
-                    section.approaches?.[selectedApproach]?.[
+                    section.approaches?.[effectiveApproach]?.[
                       k as "java" | "javascript"
                     ]
                 )}
@@ -1242,18 +1354,18 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
             </div>
             <CodeBlock
               code={
-                section.approaches[selectedApproach]?.[
+                section.approaches[effectiveApproach]?.[
                   currentLang as "java" | "javascript"
                 ] ||
-                section.approaches[selectedApproach]?.java ||
-                section.approaches[selectedApproach]?.javascript ||
+                section.approaches[effectiveApproach]?.java ||
+                section.approaches[effectiveApproach]?.javascript ||
                 ""
               }
               language={currentLang}
               collapsible
               highlightable
               contentType="tutorial_code"
-              contentId={`${pattern.id}:section-${sectionIndex}:${selectedApproach}:${currentLang}`}
+              contentId={`${pattern.id}:section-${sectionIndex}:${effectiveApproach}:${currentLang}`}
             />
           </div>
         )}

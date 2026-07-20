@@ -34,64 +34,73 @@ export function useAIChat(options: UseAIChatOptions = {}) {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<AISessionData[]>([]);
   const [archivedSessions, setArchivedSessions] = useState<AISessionData[]>([]);
   const abortRef = useRef<(() => void) | null>(null);
   const historyLoadedRef = useRef<string | null>(null);
 
-  // Load chat history and archived sessions when problem/pattern changes
+  // currentSessionId is an alias for sessionId for general chat page compatibility
+  const currentSessionId = sessionId;
+
+  // Load chat history and sessions when problem/pattern changes or for general chat
   useEffect(() => {
     const loadHistory = async () => {
-      const contextKey = options.problemSlug || options.patternId;
-      if (!contextKey) return;
+      // Don't attempt until authenticated
+      if (!options.isAuthenticated) return;
+
+      const contextKey =
+        options.problemSlug || options.patternId || options.contextType || "";
 
       // Don't reload if we already loaded for this context
       if (historyLoadedRef.current === contextKey) return;
 
-      // Don't attempt until authenticated
-      if (!options.isAuthenticated) return;
-
       setIsLoadingHistory(true);
       try {
-        // Load active session and archived sessions in parallel
-        const [sessionsRes, archivedRes] = await Promise.all([
-          aiApiClient.getSessions(),
-          aiApiClient.getArchivedSessions(
-            options.problemSlug,
-            options.patternId
-          ),
-        ]);
+        // Load sessions (for general chat mode, load all sessions)
+        const sessionsRes = await aiApiClient.getSessions();
 
         if (sessionsRes.success && sessionsRes.data.sessions) {
-          // Find active session for this context
-          const session = sessionsRes.data.sessions.find((s) => {
-            if (options.problemSlug)
-              return s.problem_slug === options.problemSlug && !s.is_archived;
-            if (options.patternId)
-              return s.pattern_id === options.patternId && !s.is_archived;
-            return false;
-          });
+          // Store all sessions for general chat mode
+          setSessions(sessionsRes.data.sessions);
 
-          if (session) {
-            setSessionId(session.id);
-            const messagesRes = await aiApiClient.getSessionMessages(
-              session.id
-            );
-            if (messagesRes.success && messagesRes.data.messages) {
-              const loadedMessages: AIMessage[] = messagesRes.data.messages.map(
-                (m) => ({
-                  id: m.id,
-                  role: m.role,
-                  content: m.content,
-                  timestamp: new Date(m.created_at),
-                })
+          // For problem/pattern context, find and load the active session
+          if (options.problemSlug || options.patternId) {
+            const session = sessionsRes.data.sessions.find((s) => {
+              if (options.problemSlug)
+                return s.problem_slug === options.problemSlug && !s.is_archived;
+              if (options.patternId)
+                return s.pattern_id === options.patternId && !s.is_archived;
+              return false;
+            });
+
+            if (session) {
+              setSessionId(session.id);
+              const messagesRes = await aiApiClient.getSessionMessages(
+                session.id
               );
-              setMessages(loadedMessages);
+              if (messagesRes.success && messagesRes.data.messages) {
+                const loadedMessages: AIMessage[] =
+                  messagesRes.data.messages.map((m) => ({
+                    id: m.id,
+                    role: m.role,
+                    content: m.content,
+                    timestamp: new Date(m.created_at),
+                  }));
+                setMessages(loadedMessages);
+              }
             }
           }
         }
 
-        if (archivedRes.success && archivedRes.data.sessions) {
-          setArchivedSessions(archivedRes.data.sessions);
+        // Load archived sessions for problem/pattern context
+        if (options.problemSlug || options.patternId) {
+          const archivedRes = await aiApiClient.getArchivedSessions(
+            options.problemSlug,
+            options.patternId
+          );
+          if (archivedRes.success && archivedRes.data.sessions) {
+            setArchivedSessions(archivedRes.data.sessions);
+          }
         }
 
         historyLoadedRef.current = contextKey;
@@ -103,7 +112,12 @@ export function useAIChat(options: UseAIChatOptions = {}) {
     };
 
     loadHistory();
-  }, [options.problemSlug, options.patternId, options.isAuthenticated]);
+  }, [
+    options.problemSlug,
+    options.patternId,
+    options.contextType,
+    options.isAuthenticated,
+  ]);
 
   const sendMessage = useCallback(
     async (content: string, useStreaming = true) => {
@@ -356,6 +370,71 @@ export function useAIChat(options: UseAIChatOptions = {}) {
     }
   }, []);
 
+  // Load a session by ID (for general chat mode)
+  const loadSession = useCallback(async (targetSessionId: string) => {
+    setIsLoadingHistory(true);
+    try {
+      const messagesRes = await aiApiClient.getSessionMessages(targetSessionId);
+      if (messagesRes.success && messagesRes.data.messages) {
+        const loadedMessages: AIMessage[] = messagesRes.data.messages.map(
+          (m) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            timestamp: new Date(m.created_at),
+          })
+        );
+        setMessages(loadedMessages);
+        setSessionId(targetSessionId);
+        setError(null);
+      }
+    } catch (err) {
+      console.warn("[useAIChat] Failed to load session:", err);
+      setError("Failed to load chat session");
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  }, []);
+
+  // Delete a session
+  const deleteSession = useCallback(
+    async (targetSessionId: string) => {
+      try {
+        await aiApiClient.clearSession(targetSessionId);
+        // Remove from sessions list
+        setSessions((prev) => prev.filter((s) => s.id !== targetSessionId));
+        // If we deleted the current session, clear messages
+        if (targetSessionId === sessionId) {
+          setMessages([]);
+          setSessionId(null);
+        }
+      } catch (err) {
+        console.warn("[useAIChat] Failed to delete session:", err);
+        setError("Failed to delete chat session");
+      }
+    },
+    [sessionId]
+  );
+
+  // Rename a session
+  const renameSession = useCallback(
+    async (targetSessionId: string, newTitle: string) => {
+      try {
+        await aiApiClient.archiveSession(targetSessionId, newTitle);
+        // Update sessions list with new title
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.id === targetSessionId ? { ...s, title: newTitle } : s
+          )
+        );
+      } catch (err) {
+        console.warn("[useAIChat] Failed to rename session:", err);
+        setError("Failed to rename chat session");
+      }
+    },
+    []
+  );
+
   // Check if current session is archived (read-only)
   const isViewingArchived = sessionId
     ? archivedSessions.some((s) => s.id === sessionId)
@@ -367,12 +446,17 @@ export function useAIChat(options: UseAIChatOptions = {}) {
     isLoadingHistory,
     error,
     sessionId,
+    currentSessionId,
+    sessions,
     archivedSessions,
     isViewingArchived,
     sendMessage,
     stopStreaming,
     clearMessages,
     startNewChat,
+    loadSession,
+    deleteSession,
+    renameSession,
     loadArchivedSession,
   };
 }

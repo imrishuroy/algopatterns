@@ -268,3 +268,70 @@ func TestBuildPatternPrompt_NoHistoryNoRAG(t *testing.T) {
 	assert.Contains(t, result, "<CURRENT_PROBLEM>")
 	assert.Contains(t, result, "Description: description")
 }
+
+// TestOmniTutorSystemPrompt_CriticalRules pins the tutor behaviour rules
+// added to fix regressions observed in real exported conversations (visible
+// self-correction, runaway manual enumeration, tabulation-first recurrence,
+// silent boundary bugs, overclaimed optimality). If any of these are
+// accidentally removed in a future prompt refactor, this test fails loudly.
+func TestOmniTutorSystemPrompt_CriticalRules(t *testing.T) {
+	result := OmniTutorSystemPrompt
+	assert.Contains(t, result, "REASON SILENTLY, PRESENT CONFIDENTLY")
+	assert.Contains(t, result, `Forbidden in your visible output`)
+	assert.Contains(t, result, "ONE POINT, ONE QUESTION, STOP")
+	assert.Contains(t, result, "DO NOT STEAL THE AHA MOMENT")
+	assert.Contains(t, result, "DETECT CONFUSION")
+	assert.Contains(t, result, "ANTI-OSTENSION")
+	assert.Contains(t, result, "After the user has worked through TWO manual traces")
+	assert.Contains(t, result, "RECURRENCE NOTATION")
+	assert.Contains(t, result, "f(i, j) = max over k")
+	assert.Contains(t, result, "RECURRENCE VERIFICATION")
+	assert.Contains(t, result, "ORIGINAL ARRAY's neighbours")
+	assert.Contains(t, result, "COMPLEXITY CLAIMS")
+	assert.Contains(t, result, "SESSION CHECKPOINTING")
+	// Code review protocol prevents the AI from rewriting the user's
+	// code (regression observed in regex-matching BYOP session).
+	assert.Contains(t, result, "CODE REVIEW PROTOCOL")
+	assert.Contains(t, result, "NEVER rewrite their function")
+	assert.Contains(t, result, "NEVER paste a \"refined version\"")
+	// Verify-before-presenting catches code the AI itself failed to dry-run
+	// (regex * semantics bug in the same session).
+	assert.Contains(t, result, "VERIFY CODE BEFORE PRESENTING")
+	assert.Contains(t, result, "mentally execute it on at least one worked")
+	assert.Contains(t, result, "postfix quantifier on")
+	// Proactive visualization at BYOP stages 2 and 5
+	assert.Contains(t, result, "PROACTIVE VISUALIZATION")
+	assert.Contains(t, result, "Stage 2 (Visualization)")
+	assert.Contains(t, result, "Stage 5 (Dry Run)")
+	// Natural language rule bans robotic labels
+	assert.Contains(t, result, "SPEAK NATURALLY")
+	assert.Contains(t, result, "Observation:")
+	assert.Contains(t, result, "Question:")
+	assert.Contains(t, result, "Sure, let's dive into")
+	// Extended confusion detection triggers
+	assert.Contains(t, result, "I am not getting it")
+	assert.Contains(t, result, "not getting")
+	assert.Contains(t, result, "Do NOT repeat the same question")
+	// Code fragment ban in BOUNDARY ENFORCEMENT
+	assert.Contains(t, result, "solution fragment and is FORBIDDEN")
+	// Language placeholder is required by BuildOmniTutorPrompt for %s injection.
+	assert.Contains(t, OmniTutorSystemPrompt, "Language for code snippets: %s")
+}
+
+func TestBuildOmniTutorPrompt_AssemblesContext(t *testing.T) {
+	history := []ConversationTurn{
+		{Role: "user", Content: "burst balloons?"},
+	}
+	result := BuildOmniTutorPrompt("byop", "go", history, "rag data", "link manifest")
+	// Language is injected into the formatting rule.
+	assert.Contains(t, result, "Language for code snippets: go")
+	// Detected intent and history and RAG and links are all embedded.
+	assert.Contains(t, result, "DETECTED INTENT")
+	assert.Contains(t, result, "byop")
+	assert.Contains(t, result, "<CONVERSATION_HISTORY>")
+	assert.Contains(t, result, "[User]: burst balloons?")
+	assert.Contains(t, result, "<ALGOPATTERNS_KNOWLEDGE_BASE>")
+	assert.Contains(t, result, "rag data")
+	assert.Contains(t, result, "<INTERNAL_LINKS>")
+	assert.Contains(t, result, "link manifest")
+}

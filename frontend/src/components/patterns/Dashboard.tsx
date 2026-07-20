@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
+import { MessageSquare } from "lucide-react";
 import { Pattern, Question } from "@/types";
 import { categoryToPatternId } from "@/lib/questions";
 import PatternCard from "./PatternCard";
@@ -272,6 +274,19 @@ export default function Dashboard({ questions }: DashboardProps) {
           </button>
         </div>
       )}
+
+      {/* Floating Action Button for AI Chat */}
+      <Link
+        href="/chat"
+        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all hover:scale-110 hover:shadow-xl"
+        style={{
+          background: "var(--accent-1)",
+          color: "white",
+        }}
+        title="Ask AI Tutor"
+      >
+        <MessageSquare className="w-6 h-6" />
+      </Link>
     </div>
   );
 }

@@ -382,7 +382,15 @@ const TreeNodeComponent = ({
 const FINAL_ANSWER = 9;
 const ANSWER_ITEMS = "Laptop + Camera";
 
-const TreePhase = ({ step, maxSteps, showMemo }: { step: number; maxSteps: number; showMemo: boolean }) => {
+const TreePhase = ({
+  step,
+  maxSteps,
+  showMemo,
+}: {
+  step: number;
+  maxSteps: number;
+  showMemo: boolean;
+}) => {
   const tree = useMemo(() => buildTree(items.length - 1, capacity), []);
   const nodeOrder = useMemo(() => (tree ? flattenTree(tree) : []), [tree]);
   const visibleNodes = new Set(nodeOrder.slice(0, step + 1));
@@ -470,7 +478,9 @@ const TreePhase = ({ step, maxSteps, showMemo }: { step: number; maxSteps: numbe
 
       {step >= maxSteps && step > 0 && (
         <div className="mt-4 text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Max value = ${FINAL_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max value = ${FINAL_ANSWER}
+          </span>
           <span className="text-gray-400 ml-2">({ANSWER_ITEMS})</span>
         </div>
       )}
@@ -570,7 +580,9 @@ const TablePhase = ({
 
       {step >= maxSteps && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Max value = ${FINAL_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max value = ${FINAL_ANSWER}
+          </span>
           <span className="text-gray-400 ml-2">({ANSWER_ITEMS})</span>
         </div>
       )}
@@ -578,7 +590,8 @@ const TablePhase = ({
   );
 };
 
-const SpaceOptPhase = ({ // skipcq: JS-0415, JS-R1005
+const SpaceOptPhase = ({
+  // skipcq: JS-0415, JS-R1005
   step,
   maxSteps,
   spaceOptSteps,
@@ -587,7 +600,8 @@ const SpaceOptPhase = ({ // skipcq: JS-0415, JS-R1005
   maxSteps: number;
   spaceOptSteps: ReturnType<typeof generateSpaceOptSteps>;
 }) => {
-  const currentState = step > 0 ? spaceOptSteps[step - 1]?.dpState : Array(capacity + 1).fill(0);
+  const currentState =
+    step > 0 ? spaceOptSteps[step - 1]?.dpState : Array(capacity + 1).fill(0);
   const currentStep = step > 0 ? spaceOptSteps[step - 1] : null;
 
   return (
@@ -615,7 +629,8 @@ const SpaceOptPhase = ({ // skipcq: JS-0415, JS-R1005
           <tbody>
             <tr>
               <td className="p-3 text-gray-400 text-center font-medium">dp</td>
-              {Array.from({ length: capacity + 1 }, (_, w) => { // skipcq: JS-R1005
+              {Array.from({ length: capacity + 1 }, (_, w) => {
+                // skipcq: JS-R1005
                 const isCurrent = currentStep && currentStep.w === w;
                 const value = currentState ? currentState[w] : 0;
 
@@ -655,7 +670,9 @@ const SpaceOptPhase = ({ // skipcq: JS-0415, JS-R1005
 
       {step >= maxSteps && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
-          <span className="text-green-400 font-bold">Answer: Max value = ${FINAL_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max value = ${FINAL_ANSWER}
+          </span>
           <span className="text-gray-400 ml-2">({ANSWER_ITEMS})</span>
         </div>
       )}
@@ -776,12 +793,22 @@ export default function DPJourneyVisualizer() {
           {currentPhase === "tree" && (
             <TreePhase step={step} maxSteps={maxSteps} showMemo={false} />
           )}
-          {currentPhase === "memo" && <TreePhase step={step} maxSteps={maxSteps} showMemo />}
+          {currentPhase === "memo" && (
+            <TreePhase step={step} maxSteps={maxSteps} showMemo />
+          )}
           {currentPhase === "table" && (
-            <TablePhase step={step} maxSteps={maxSteps} tableSteps={tableSteps} />
+            <TablePhase
+              step={step}
+              maxSteps={maxSteps}
+              tableSteps={tableSteps}
+            />
           )}
           {currentPhase === "spaceOpt" && (
-            <SpaceOptPhase step={step} maxSteps={maxSteps} spaceOptSteps={spaceOptSteps} />
+            <SpaceOptPhase
+              step={step}
+              maxSteps={maxSteps}
+              spaceOptSteps={spaceOptSteps}
+            />
           )}
         </motion.div>
       </AnimatePresence>

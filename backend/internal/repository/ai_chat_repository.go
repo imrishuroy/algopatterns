@@ -21,6 +21,7 @@ type AISession struct {
 	ProblemID     *string   `json:"problem_id,omitempty"`
 	ProblemSlug   *string   `json:"problem_slug,omitempty"`
 	PatternID     *string   `json:"pattern_id,omitempty"`
+	ContextType   string    `json:"context_type"`
 	Title         *string   `json:"title,omitempty"`
 	IsArchived    bool      `json:"is_archived"`
 	StartedAt     time.Time `json:"started_at"`
@@ -42,8 +43,29 @@ type AIMessage struct {
 	CreatedAt    time.Time `json:"created_at"`
 }
 
-// GetOrCreateSession gets existing session or creates a new one for user+problem
+// GetOrCreateSession gets existing session or creates a new one for user+problem/pattern/general
 func (r *AIChatRepository) GetOrCreateSession(ctx context.Context, userID string, problemSlug *string, patternID *string) (*AISession, error) {
+	return r.GetOrCreateSessionWithContext(ctx, userID, problemSlug, patternID, "")
+}
+
+// GetOrCreateSessionWithContext gets existing session or creates a new one with explicit context type
+func (r *AIChatRepository) GetOrCreateSessionWithContext(ctx context.Context, userID string, problemSlug *string, patternID *string, contextType string) (*AISession, error) {
+	// Determine context type if not provided
+	if contextType == "" {
+		if patternID != nil && *patternID != "" {
+			contextType = "pattern"
+		} else if problemSlug != nil && *problemSlug != "" {
+			contextType = "problem"
+		} else {
+			contextType = "problem" // default
+		}
+	}
+
+	// For general context, always create a new session (no reuse)
+	if contextType == "general" {
+		return r.createGeneralSession(ctx, userID)
+	}
+
 	// First, resolve problem slug to ID if provided
 	var problemID *string
 	if problemSlug != nil && *problemSlug != "" {
@@ -57,20 +79,21 @@ func (r *AIChatRepository) GetOrCreateSession(ctx context.Context, userID string
 	// Try to find recent non-archived session (within last 24 hours)
 	var session AISession
 	query := `
-		SELECT id, user_id, problem_id, pattern_id, title, is_archived, started_at, last_message_at, message_count, total_tokens
+		SELECT id, user_id, problem_id, pattern_id, context_type, title, is_archived, started_at, last_message_at, message_count, total_tokens
 		FROM ai_sessions
 		WHERE user_id = $1
 		AND ($2::UUID IS NULL AND problem_id IS NULL OR problem_id = $2)
 		AND ($3::VARCHAR IS NULL AND pattern_id IS NULL OR pattern_id = $3)
+		AND context_type = $4
 		AND is_archived = false
 		AND last_message_at > now() - INTERVAL '24 hours'
 		ORDER BY last_message_at DESC
 		LIMIT 1
 	`
 
-	err := r.db.Pool.QueryRow(ctx, query, userID, problemID, patternID).Scan(
+	err := r.db.Pool.QueryRow(ctx, query, userID, problemID, patternID, contextType).Scan(
 		&session.ID, &session.UserID, &session.ProblemID, &session.PatternID,
-		&session.Title, &session.IsArchived, &session.StartedAt, &session.LastMessageAt,
+		&session.ContextType, &session.Title, &session.IsArchived, &session.StartedAt, &session.LastMessageAt,
 		&session.MessageCount, &session.TotalTokens,
 	)
 
@@ -84,14 +107,32 @@ func (r *AIChatRepository) GetOrCreateSession(ctx context.Context, userID string
 
 	// Create new session
 	createQuery := `
-		INSERT INTO ai_sessions (user_id, problem_id, pattern_id)
-		VALUES ($1, $2, $3)
-		RETURNING id, user_id, problem_id, pattern_id, title, is_archived, started_at, last_message_at, message_count, total_tokens
+		INSERT INTO ai_sessions (user_id, problem_id, pattern_id, context_type)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id, user_id, problem_id, pattern_id, context_type, title, is_archived, started_at, last_message_at, message_count, total_tokens
 	`
 
-	err = r.db.Pool.QueryRow(ctx, createQuery, userID, problemID, patternID).Scan(
+	err = r.db.Pool.QueryRow(ctx, createQuery, userID, problemID, patternID, contextType).Scan(
 		&session.ID, &session.UserID, &session.ProblemID, &session.PatternID,
-		&session.Title, &session.IsArchived, &session.StartedAt, &session.LastMessageAt,
+		&session.ContextType, &session.Title, &session.IsArchived, &session.StartedAt, &session.LastMessageAt,
+		&session.MessageCount, &session.TotalTokens,
+	)
+
+	return &session, err
+}
+
+// createGeneralSession always creates a new general chat session
+func (r *AIChatRepository) createGeneralSession(ctx context.Context, userID string) (*AISession, error) {
+	var session AISession
+	query := `
+		INSERT INTO ai_sessions (user_id, context_type)
+		VALUES ($1, 'general')
+		RETURNING id, user_id, problem_id, pattern_id, context_type, title, is_archived, started_at, last_message_at, message_count, total_tokens
+	`
+
+	err := r.db.Pool.QueryRow(ctx, query, userID).Scan(
+		&session.ID, &session.UserID, &session.ProblemID, &session.PatternID,
+		&session.ContextType, &session.Title, &session.IsArchived, &session.StartedAt, &session.LastMessageAt,
 		&session.MessageCount, &session.TotalTokens,
 	)
 
@@ -102,14 +143,14 @@ func (r *AIChatRepository) GetOrCreateSession(ctx context.Context, userID string
 func (r *AIChatRepository) GetSession(ctx context.Context, sessionID string, userID string) (*AISession, error) {
 	var session AISession
 	query := `
-		SELECT id, user_id, problem_id, pattern_id, title, is_archived, started_at, last_message_at, message_count, total_tokens
+		SELECT id, user_id, problem_id, pattern_id, context_type, title, is_archived, started_at, last_message_at, message_count, total_tokens
 		FROM ai_sessions
 		WHERE id = $1 AND user_id = $2
 	`
 
 	err := r.db.Pool.QueryRow(ctx, query, sessionID, userID).Scan(
 		&session.ID, &session.UserID, &session.ProblemID, &session.PatternID,
-		&session.Title, &session.IsArchived, &session.StartedAt, &session.LastMessageAt,
+		&session.ContextType, &session.Title, &session.IsArchived, &session.StartedAt, &session.LastMessageAt,
 		&session.MessageCount, &session.TotalTokens,
 	)
 
@@ -193,7 +234,7 @@ func (r *AIChatRepository) GetUserSessionsWithArchived(ctx context.Context, user
 	}
 
 	query := `
-		SELECT s.id, s.user_id, s.problem_id, p.slug, s.pattern_id, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
+		SELECT s.id, s.user_id, s.problem_id, p.slug, s.pattern_id, s.context_type, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
 		FROM ai_sessions s
 		LEFT JOIN problems p ON s.problem_id = p.id
 		WHERE s.user_id = $1
@@ -213,7 +254,7 @@ func (r *AIChatRepository) GetUserSessionsWithArchived(ctx context.Context, user
 		var s AISession
 		if err := rows.Scan(
 			&s.ID, &s.UserID, &s.ProblemID, &s.ProblemSlug, &s.PatternID,
-			&s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
+			&s.ContextType, &s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
 		); err != nil {
 			return nil, err
 		}
@@ -230,7 +271,7 @@ func (r *AIChatRepository) GetArchivedSessionsForProblem(ctx context.Context, us
 	}
 
 	query := `
-		SELECT s.id, s.user_id, s.problem_id, p.slug, s.pattern_id, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
+		SELECT s.id, s.user_id, s.problem_id, p.slug, s.pattern_id, s.context_type, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
 		FROM ai_sessions s
 		LEFT JOIN problems p ON s.problem_id = p.id
 		WHERE s.user_id = $1
@@ -251,7 +292,7 @@ func (r *AIChatRepository) GetArchivedSessionsForProblem(ctx context.Context, us
 		var s AISession
 		if err := rows.Scan(
 			&s.ID, &s.UserID, &s.ProblemID, &s.ProblemSlug, &s.PatternID,
-			&s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
+			&s.ContextType, &s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
 		); err != nil {
 			return nil, err
 		}
@@ -268,7 +309,7 @@ func (r *AIChatRepository) GetArchivedSessionsForPattern(ctx context.Context, us
 	}
 
 	query := `
-		SELECT s.id, s.user_id, s.problem_id, p.slug, s.pattern_id, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
+		SELECT s.id, s.user_id, s.problem_id, p.slug, s.pattern_id, s.context_type, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
 		FROM ai_sessions s
 		LEFT JOIN problems p ON s.problem_id = p.id
 		WHERE s.user_id = $1
@@ -289,7 +330,81 @@ func (r *AIChatRepository) GetArchivedSessionsForPattern(ctx context.Context, us
 		var s AISession
 		if err := rows.Scan(
 			&s.ID, &s.UserID, &s.ProblemID, &s.ProblemSlug, &s.PatternID,
-			&s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
+			&s.ContextType, &s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
+		); err != nil {
+			return nil, err
+		}
+		sessions = append(sessions, s)
+	}
+
+	return sessions, nil
+}
+
+// GetArchivedSessionsForGeneral retrieves archived general chat sessions
+func (r *AIChatRepository) GetArchivedSessionsForGeneral(ctx context.Context, userID string, limit int) ([]AISession, error) {
+	if limit <= 0 {
+		limit = 10
+	}
+
+	query := `
+		SELECT s.id, s.user_id, s.problem_id, NULL as slug, s.pattern_id, s.context_type, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
+		FROM ai_sessions s
+		WHERE s.user_id = $1
+		AND s.context_type = 'general'
+		AND s.is_archived = true
+		ORDER BY s.last_message_at DESC
+		LIMIT $2
+	`
+
+	rows, err := r.db.Pool.Query(ctx, query, userID, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sessions []AISession
+	for rows.Next() {
+		var s AISession
+		if err := rows.Scan(
+			&s.ID, &s.UserID, &s.ProblemID, &s.ProblemSlug, &s.PatternID,
+			&s.ContextType, &s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
+		); err != nil {
+			return nil, err
+		}
+		sessions = append(sessions, s)
+	}
+
+	return sessions, nil
+}
+
+// GetAllSessionsForGeneral retrieves all general chat sessions (both active and archived)
+func (r *AIChatRepository) GetAllSessionsForGeneral(ctx context.Context, userID string, limit int) ([]AISession, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+
+	query := `
+		SELECT s.id, s.user_id, s.problem_id, NULL as slug, s.pattern_id, s.context_type, s.title, s.is_archived, s.started_at, s.last_message_at, s.message_count, s.total_tokens
+		FROM ai_sessions s
+		WHERE s.user_id = $1
+		AND s.context_type = 'general'
+		AND s.message_count > 0
+		ORDER BY s.last_message_at DESC
+		LIMIT $2
+	`
+
+	rows, err := r.db.Pool.Query(ctx, query, userID, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sessions []AISession
+	for rows.Next() {
+		var s AISession
+		if err := rows.Scan(
+			&s.ID, &s.UserID, &s.ProblemID, &s.ProblemSlug, &s.PatternID,
+			&s.ContextType, &s.Title, &s.IsArchived, &s.StartedAt, &s.LastMessageAt, &s.MessageCount, &s.TotalTokens,
 		); err != nil {
 			return nil, err
 		}
@@ -304,8 +419,11 @@ func (r *AIChatRepository) ClearSession(ctx context.Context, sessionID string, u
 	// Verify ownership first
 	var count int
 	err := r.db.Pool.QueryRow(ctx, "SELECT COUNT(*) FROM ai_sessions WHERE id = $1 AND user_id = $2", sessionID, userID).Scan(&count)
-	if err != nil || count == 0 {
+	if err != nil {
 		return err
+	}
+	if count == 0 {
+		return pgx.ErrNoRows
 	}
 
 	_, err = r.db.Pool.Exec(ctx, "DELETE FROM ai_messages WHERE session_id = $1", sessionID)
@@ -314,6 +432,29 @@ func (r *AIChatRepository) ClearSession(ctx context.Context, sessionID string, u
 	}
 
 	_, err = r.db.Pool.Exec(ctx, "UPDATE ai_sessions SET message_count = 0, total_tokens = 0 WHERE id = $1", sessionID)
+	return err
+}
+
+// DeleteSession permanently deletes a session and all its messages
+func (r *AIChatRepository) DeleteSession(ctx context.Context, sessionID string, userID string) error {
+	// Verify ownership first
+	var count int
+	err := r.db.Pool.QueryRow(ctx, "SELECT COUNT(*) FROM ai_sessions WHERE id = $1 AND user_id = $2", sessionID, userID).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return pgx.ErrNoRows
+	}
+
+	// Delete messages first (foreign key)
+	_, err = r.db.Pool.Exec(ctx, "DELETE FROM ai_messages WHERE session_id = $1", sessionID)
+	if err != nil {
+		return err
+	}
+
+	// Delete the session
+	_, err = r.db.Pool.Exec(ctx, "DELETE FROM ai_sessions WHERE id = $1 AND user_id = $2", sessionID, userID)
 	return err
 }
 

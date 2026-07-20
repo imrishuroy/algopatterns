@@ -212,7 +212,7 @@ export default function DPTransformationVisualizer() {
 
   const stageInfo = stages[currentStage];
 
-// skipcq: JS-R1005
+  // skipcq: JS-R1005
 
   const renderRecursion = () => {
     const currentTrace = trace.slice(0, step) as RecursionTraceItem[];

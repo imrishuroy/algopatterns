@@ -225,7 +225,9 @@ describe("Dynamic programming visualizers", () => {
 
     expect(screen.getByText("Tree DP")).toBeInTheDocument();
     expect(screen.getByText("Why Pairs?")).toBeInTheDocument();
-    expect(document.body.textContent).toContain("Why does Tree DP need state PAIRS?");
+    expect(document.body.textContent).toContain(
+      "Why does Tree DP need state PAIRS?"
+    );
 
     fireEvent.click(screen.getByText("Tree Diameter"));
     expect(document.body.textContent).toContain("Tree Diameter");
@@ -814,6 +816,7 @@ const VISUALIZER_PATHS = [
   "JumpGameVisualizer",
   "KadaneVisualizer",
   "KnapsackVisualizer",
+  "KClosestPointsVisualizer",
   "KokoEatingVisualizer",
   "KthLargestVisualizer",
   "LargestRectangleVisualizer",
@@ -841,6 +844,7 @@ const VISUALIZER_PATHS = [
   "StepByStepExecutor",
   "SubarraySumKVisualizer",
   "SubsetsVisualizer",
+  "TaskSchedulerVisualizer",
   "TopologicalSortVisualizer",
   "TreeTraversalVisualizer",
   "TrieInsertVisualizer",
@@ -882,5 +886,226 @@ describe.each(VISUALIZER_PATHS)("Smoke test: %s", (name) => {
         b.textContent === "Indirect Recursion"
     );
     expect(hasControl).toBe(true);
+  });
+});
+
+// Section: New Heap Visualizers
+import IPOVisualizer from "@/components/visualizers/IPOVisualizer";
+import KClosestPointsVisualizer from "@/components/visualizers/KClosestPointsVisualizer";
+import MeetingRoomsHeapVisualizer from "@/components/visualizers/MeetingRoomsHeapVisualizer";
+import ReorganizeStringVisualizer from "@/components/visualizers/ReorganizeStringVisualizer";
+import SlidingWindowMedianVisualizer from "@/components/visualizers/SlidingWindowMedianVisualizer";
+import TaskSchedulerVisualizer from "@/components/visualizers/TaskSchedulerVisualizer";
+
+describe("IPOVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<IPOVisualizer />);
+    expect(screen.getByText(/IPO/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<IPOVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<IPOVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<IPOVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("renders projects", () => {
+    render(<IPOVisualizer />);
+    // Check that projects are displayed via heading
+    expect(
+      screen.getByRole("heading", { name: /IPO: Maximize Capital/i })
+    ).toBeInTheDocument();
+  });
+
+  it("can step through visualization", () => {
+    render(<IPOVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    // After stepping, state should change
+    expect(stepBtn).toBeInTheDocument();
+  });
+
+  it("can reset visualization", () => {
+    render(<IPOVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    const resetBtn = screen.getByText("Reset");
+    fireEvent.click(resetBtn);
+    expect(resetBtn).toBeInTheDocument();
+  });
+
+  it("renders speed slider", () => {
+    render(<IPOVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
+  });
+});
+
+describe("KClosestPointsVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<KClosestPointsVisualizer />);
+    expect(
+      screen.getByRole("heading", { name: /K Closest Points/i })
+    ).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<KClosestPointsVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<KClosestPointsVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<KClosestPointsVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("can step through visualization", () => {
+    render(<KClosestPointsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(stepBtn).toBeInTheDocument();
+  });
+});
+
+describe("MeetingRoomsHeapVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<MeetingRoomsHeapVisualizer />);
+    // Check for unique text that appears in the visualizer
+    expect(screen.getByText(/minimum meeting rooms/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<MeetingRoomsHeapVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<MeetingRoomsHeapVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<MeetingRoomsHeapVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("can step through visualization", () => {
+    render(<MeetingRoomsHeapVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(stepBtn).toBeInTheDocument();
+  });
+
+  it("renders heap size display", () => {
+    render(<MeetingRoomsHeapVisualizer />);
+    // Check for heap size label
+    expect(screen.getByText(/Heap size now/i)).toBeInTheDocument();
+  });
+});
+
+describe("ReorganizeStringVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<ReorganizeStringVisualizer />);
+    expect(screen.getByText(/Reorganize/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<ReorganizeStringVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<ReorganizeStringVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<ReorganizeStringVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("can step through visualization", () => {
+    render(<ReorganizeStringVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(stepBtn).toBeInTheDocument();
+  });
+});
+
+describe("SlidingWindowMedianVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<SlidingWindowMedianVisualizer />);
+    expect(screen.getByText(/Sliding Window Median/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<SlidingWindowMedianVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<SlidingWindowMedianVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<SlidingWindowMedianVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("can step through visualization", () => {
+    render(<SlidingWindowMedianVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(stepBtn).toBeInTheDocument();
+  });
+});
+
+describe("TaskSchedulerVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<TaskSchedulerVisualizer />);
+    expect(screen.getByText(/Task Scheduler/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<TaskSchedulerVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<TaskSchedulerVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<TaskSchedulerVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("can step through visualization", () => {
+    render(<TaskSchedulerVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(stepBtn).toBeInTheDocument();
+  });
+
+  it("renders speed slider", () => {
+    render(<TaskSchedulerVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
   });
 });

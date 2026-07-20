@@ -25,7 +25,8 @@ const TARGET_N = 5;
 // used by generateTableSteps, so banner text never drifts from the animation.
 const computeClimbingAnswer = (n: number): number => {
   if (n <= 1) return 1;
-  let prev2 = 1, prev1 = 1;
+  let prev2 = 1,
+    prev1 = 1;
   for (let i = 2; i <= n; i++) {
     const curr = prev1 + prev2;
     prev2 = prev1;
@@ -376,7 +377,8 @@ const TreeNodeComponent = ({
   );
 };
 
-const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => { // skipcq: JS-R1005
+const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
+  // skipcq: JS-R1005
   const tree = useMemo(() => buildTree(TARGET_N), []);
   const nodeOrder = useMemo(() => (tree ? flattenTree(tree) : []), [tree]);
   const visibleNodes = new Set(nodeOrder.slice(0, step + 1));
@@ -501,7 +503,9 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
       {step >= nodeOrder.length - 1 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
-          <span className="text-green-400 font-bold">Answer: f({TARGET_N}) = {CLIMBING_ANSWER} ways</span>
+          <span className="text-green-400 font-bold">
+            Answer: f({TARGET_N}) = {CLIMBING_ANSWER} ways
+          </span>
         </div>
       )}
     </div>
@@ -567,14 +571,17 @@ const TablePhase = ({
 
       {step >= tableSteps.length && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: dp[{TARGET_N}] = {CLIMBING_ANSWER} ways</span>
+          <span className="text-green-400 font-bold">
+            Answer: dp[{TARGET_N}] = {CLIMBING_ANSWER} ways
+          </span>
         </div>
       )}
     </div>
   );
 };
 
-const OptimizedPhase = ({ // skipcq: JS-R1005
+const OptimizedPhase = ({
+  // skipcq: JS-R1005
   step,
   optimizedSteps,
 }: {
@@ -631,7 +638,9 @@ const OptimizedPhase = ({ // skipcq: JS-R1005
 
       {step >= optimizedSteps.length && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: {CLIMBING_ANSWER} ways to climb {TARGET_N} stairs</span>
+          <span className="text-green-400 font-bold">
+            Answer: {CLIMBING_ANSWER} ways to climb {TARGET_N} stairs
+          </span>
         </div>
       )}
     </div>
@@ -769,7 +778,8 @@ export default function ClimbingStairsVisualizer() {
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        f(n) = f(n-1) + f(n-2) | f(0) = 1, f(1) = 1 | Answer: f({TARGET_N}) = {CLIMBING_ANSWER}
+        f(n) = f(n-1) + f(n-2) | f(0) = 1, f(1) = 1 | Answer: f({TARGET_N}) ={" "}
+        {CLIMBING_ANSWER}
       </div>
     </div>
   );

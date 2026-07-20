@@ -156,7 +156,8 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 };
 
 // Get all results sorted by score
-function getAllResultsSorted(results: SearchResultsType): SearchResult[] { // skipcq: JS-0067
+function getAllResultsSorted(results: SearchResultsType): SearchResult[] {
+  // skipcq: JS-0067
   const allResults: SearchResult[] = [];
   const types: SearchContentType[] = [
     "pattern",
@@ -178,7 +179,8 @@ function getAllResultsSorted(results: SearchResultsType): SearchResult[] { // sk
 }
 
 // Get counts for each type
-function getTypeCounts(results: SearchResultsType): Record<TabType, number> { // skipcq: JS-0067
+function getTypeCounts(results: SearchResultsType): Record<TabType, number> {
+  // skipcq: JS-0067
   const counts: Record<TabType, number> = {
     all: 0,
     pattern: 0,
@@ -208,7 +210,8 @@ function getTypeCounts(results: SearchResultsType): Record<TabType, number> { //
   return counts;
 }
 
-export function SearchResults({ // skipcq: JS-0067, JS-R1005
+export function SearchResults({
+  // skipcq: JS-0067, JS-R1005
   results,
   selectedIndex,
   onSelect,
@@ -320,7 +323,8 @@ export function SearchResults({ // skipcq: JS-0067, JS-R1005
           </div>
         ) : (
           <div className="space-y-0.5">
-            {filteredResults.map((result, index) => { // skipcq: JS-R1005
+            {filteredResults.map((result, index) => {
+              // skipcq: JS-R1005
               const config = TYPE_CONFIG[result.type];
               const isSelected = index === selectedIndex;
 

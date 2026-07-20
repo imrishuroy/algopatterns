@@ -488,3 +488,10 @@ Transform tasks into verifiable goals:
 - "Add validation" → "Write test for invalid input, make it pass"
 - "Fix bug" → "Write reproducing test, make it pass"
 - "Refactor X" → "Tests pass before and after"
+
+## Debugging
+
+When given a bug report or error, fix it autonomously:
+- Read the error, log, or failing test. Trace it to the root cause.
+- Fix it without asking for permission at each step.
+- Verify the fix. Don't mark it done until it's proven to work.

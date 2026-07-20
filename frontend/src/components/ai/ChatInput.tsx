@@ -1,6 +1,19 @@
 "use client";
 
-import { useState, useRef, useCallback, KeyboardEvent } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useImperativeHandle,
+  forwardRef,
+  useEffect,
+  KeyboardEvent,
+} from "react";
+
+export interface ChatInputHandle {
+  focus: () => void;
+  setValue: (value: string) => void;
+}
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -8,47 +21,72 @@ interface ChatInputProps {
   isLoading: boolean;
   placeholder?: string;
   disabled?: boolean;
+  defaultValue?: string;
 }
 
-export function ChatInput({
-  onSend,
-  onStop,
-  isLoading,
-  placeholder = "Ask a question...",
-  disabled = false,
-}: ChatInputProps) {
-  const [input, setInput] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleSend = useCallback(() => {
-    if (input.trim() && !isLoading && !disabled) {
-      onSend(input.trim());
-      setInput("");
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
-      }
-    }
-  }, [input, isLoading, disabled, onSend]);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        handleSend();
-      }
+export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
+  function ChatInput(
+    {
+      onSend,
+      onStop,
+      isLoading,
+      placeholder = "Ask a question...",
+      disabled = false,
+      defaultValue = "",
     },
-    [handleSend]
-  );
+    ref
+  ) {
+    const [input, setInput] = useState(defaultValue);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
-    const textarea = e.target;
-    textarea.style.height = "auto"; // skipcq: JS-W1032
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 100)}px`;
-  };
+    // Expose imperative methods
+    useImperativeHandle(ref, () => ({
+      focus: () => textareaRef.current?.focus(),
+      setValue: (value: string) => {
+        setInput(value);
+        // Also resize the textarea
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+          textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 100)}px`;
+        }
+      },
+    }));
 
-  return (
-    <div className="border-t border-gray-800 px-2 pt-2 pb-4">
+    // Sync with defaultValue when it changes externally
+    useEffect(() => {
+      if (defaultValue) {
+        setInput(defaultValue);
+      }
+    }, [defaultValue]);
+
+    const handleSend = useCallback(() => {
+      if (input.trim() && !isLoading && !disabled) {
+        onSend(input.trim());
+        setInput("");
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+        }
+      }
+    }, [input, isLoading, disabled, onSend]);
+
+    const handleKeyDown = useCallback(
+      (e: KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          handleSend();
+        }
+      },
+      [handleSend]
+    );
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setInput(e.target.value);
+      const textarea = e.target;
+      textarea.style.height = "auto"; // skipcq: JS-W1032
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 100)}px`;
+    };
+
+    return (
       <div className="flex items-stretch gap-2">
         <textarea
           ref={textareaRef}
@@ -58,13 +96,27 @@ export function ChatInput({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="flex-1 bg-gray-800 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-indigo-500 resize-none disabled:opacity-50"
-          style={{ minHeight: "36px", maxHeight: "100px" }}
+          className="flex-1 px-3 py-2 text-sm resize-none disabled:opacity-50 focus:outline-none transition-colors"
+          style={{
+            minHeight: "40px",
+            maxHeight: "100px",
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border-1)",
+            borderRadius: "var(--radius-md)",
+            color: "var(--text-1)",
+          }}
+          onFocus={(e) =>
+            (e.currentTarget.style.borderColor = "var(--border-2)")
+          }
+          onBlur={(e) =>
+            (e.currentTarget.style.borderColor = "var(--border-1)")
+          }
         />
         {isLoading ? (
           <button
             onClick={onStop}
-            className="px-3 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors flex items-center"
+            className="px-4 bg-red-600 hover:bg-red-700 text-white transition-colors flex items-center"
+            style={{ borderRadius: "var(--radius-md)" }}
             title="Stop"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -75,7 +127,14 @@ export function ChatInput({
           <button
             onClick={handleSend}
             disabled={!input.trim() || disabled}
-            className="px-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-md transition-colors flex items-center"
+            className="px-4 text-white transition-all flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              background:
+                !input.trim() || disabled
+                  ? "var(--bg-elevated)"
+                  : "var(--accent-gradient)",
+              borderRadius: "var(--radius-md)",
+            }}
             title="Send"
           >
             <svg
@@ -94,6 +153,6 @@ export function ChatInput({
           </button>
         )}
       </div>
-    </div>
-  );
-}
+    );
+  }
+);

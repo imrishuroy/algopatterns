@@ -41,23 +41,28 @@ type SentryConfig struct {
 }
 
 type AIConfig struct {
-	Enabled            bool
-	DefaultProvider    string
-	FallbackProviders  []string
-	ClaudeAPIKey       string
-	ClaudeModel        string
-	ClaudeBaseURL      string
-	DeepSeekAPIKey     string
-	DeepSeekModel      string
-	GroqAPIKey         string
-	GroqModel          string
-	NVIDIAAPIKey       string
-	NVIDIAModel        string
-	OpenAIAPIKey       string
-	OpenAIModel        string
-	EmbeddingModel     string
-	FreeRequestsPerDay int
-	MaxCodeLength      int
+	Enabled                 bool
+	DefaultProvider         string
+	FallbackProviders       []string
+	ClaudeAPIKey            string
+	ClaudeModel             string
+	ClaudeBaseURL           string
+	DeepSeekAPIKey          string
+	DeepSeekModel           string
+	DeepSeekReasoningEffort string
+	GroqAPIKey              string
+	GroqModel               string
+	GroqReasoningEffort     string
+	NVIDIAAPIKey            string
+	NVIDIAModel             string
+	OpenAIAPIKey            string
+	OpenAIModel             string
+	ClineAPIKey             string
+	ClineModel              string
+	ClineBaseURL            string
+	EmbeddingModel          string
+	FreeRequestsPerDay      int
+	MaxCodeLength           int
 }
 
 type EmailConfig struct {
@@ -207,23 +212,28 @@ func Load() (*Config, error) {
 			Enabled:      getBoolEnv("EMAIL_ENABLED", false),
 		},
 		AI: AIConfig{
-			Enabled:            getBoolEnv("AI_ENABLED", false),
-			DefaultProvider:    getEnv("AI_DEFAULT_PROVIDER", "groq"),
-			FallbackProviders:  getEnvSlice("AI_FALLBACK_PROVIDERS", []string{"deepseek", "openai"}),
-			ClaudeAPIKey:       getEnv("CLAUDE_API_KEY", ""),
-			ClaudeModel:        getEnv("CLAUDE_MODEL", "claude-sonnet-4-20250514"),
-			ClaudeBaseURL:      getEnv("CLAUDE_BASE_URL", "https://api.anthropic.com/v1"),
-			DeepSeekAPIKey:     getEnv("DEEPSEEK_API_KEY", ""),
-			DeepSeekModel:      getEnv("DEEPSEEK_MODEL", "deepseek-chat"),
-			GroqAPIKey:         getEnv("GROQ_API_KEY", ""),
-			GroqModel:          getEnv("GROQ_MODEL", "openai/gpt-oss-120b"),
-			NVIDIAAPIKey:       getEnv("NVIDIA_API_KEY", ""),
-			NVIDIAModel:        getEnv("NVIDIA_MODEL", "deepseek-ai/deepseek-v4-flash"),
-			OpenAIAPIKey:       getEnv("OPENAI_API_KEY", ""),
-			OpenAIModel:        getEnv("OPENAI_MODEL", "gpt-4o-mini"),
-			EmbeddingModel:     getEnv("EMBEDDING_MODEL", "text-embedding-3-small"),
-			FreeRequestsPerDay: getIntEnv("AI_FREE_REQUESTS_PER_DAY", 30),
-			MaxCodeLength:      getIntEnv("AI_MAX_CODE_LENGTH", 50000),
+			Enabled:                 getBoolEnv("AI_ENABLED", false),
+			DefaultProvider:         getEnv("AI_DEFAULT_PROVIDER", "cline"),
+			FallbackProviders:       getEnvSlice("AI_FALLBACK_PROVIDERS", []string{"groq", "openai"}),
+			ClaudeAPIKey:            getEnv("CLAUDE_API_KEY", ""),
+			ClaudeModel:             getEnv("CLAUDE_MODEL", "claude-sonnet-4-20250514"),
+			ClaudeBaseURL:           getEnv("CLAUDE_BASE_URL", "https://api.anthropic.com/v1"),
+			DeepSeekAPIKey:          getEnv("DEEPSEEK_API_KEY", ""),
+			DeepSeekModel:           getEnv("DEEPSEEK_MODEL", "deepseek-v4-pro"),
+			DeepSeekReasoningEffort: getEnv("DEEPSEEK_REASONING_EFFORT", ""),
+			GroqAPIKey:              getEnv("GROQ_API_KEY", ""),
+			GroqModel:               getEnv("GROQ_MODEL", "openai/gpt-oss-120b"),
+			GroqReasoningEffort:     getEnv("GROQ_REASONING_EFFORT", ""),
+			NVIDIAAPIKey:            getEnv("NVIDIA_API_KEY", ""),
+			NVIDIAModel:             getEnv("NVIDIA_MODEL", "deepseek-ai/deepseek-v4-flash"),
+			OpenAIAPIKey:            getEnv("OPENAI_API_KEY", ""),
+			OpenAIModel:             getEnv("OPENAI_MODEL", "gpt-4o-mini"),
+			ClineAPIKey:             getEnv("CLINE_API_KEY", ""),
+			ClineModel:              getEnv("CLINE_MODEL", "deepseek/deepseek-v4-flash"),
+			ClineBaseURL:            getEnv("CLINE_BASE_URL", "https://api.cline.bot/api/v1"),
+			EmbeddingModel:          getEnv("EMBEDDING_MODEL", "text-embedding-3-small"),
+			FreeRequestsPerDay:      getIntEnv("AI_FREE_REQUESTS_PER_DAY", 30),
+			MaxCodeLength:           getIntEnv("AI_MAX_CODE_LENGTH", 50000),
 		},
 		Sentry: SentryConfig{
 			DSN:              getEnv("SENTRY_DSN", ""),

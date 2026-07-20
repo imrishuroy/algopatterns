@@ -12,6 +12,41 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// testGroqResponse is a test helper for building Groq API responses
+type testGroqResponse struct {
+	ID      string           `json:"id"`
+	Object  string           `json:"object"`
+	Created int64            `json:"created"`
+	Model   string           `json:"model"`
+	Choices []testGroqChoice `json:"choices"`
+	Usage   testGroqUsage    `json:"usage,omitempty"`
+}
+
+type testGroqChoice struct {
+	Index        int             `json:"index"`
+	Message      testGroqMessage `json:"message,omitempty"`
+	Delta        testGroqDelta   `json:"delta,omitempty"`
+	FinishReason string          `json:"finish_reason,omitempty"`
+}
+
+type testGroqMessage struct {
+	Role      string `json:"role"`
+	Content   string `json:"content"`
+	Reasoning string `json:"reasoning,omitempty"`
+}
+
+type testGroqDelta struct {
+	Role      string `json:"role,omitempty"`
+	Content   string `json:"content,omitempty"`
+	Reasoning string `json:"reasoning,omitempty"`
+}
+
+type testGroqUsage struct {
+	PromptTokens     int `json:"prompt_tokens"`
+	CompletionTokens int `json:"completion_tokens"`
+	TotalTokens      int `json:"total_tokens"`
+}
+
 func TestNewGroqProviderDefaults(t *testing.T) {
 	p := NewGroqProvider(GroqConfig{APIKey: "test-key"})
 	assert.Equal(t, "https://api.groq.com/openai/v1", p.baseURL)
@@ -52,38 +87,24 @@ func TestGroqProviderChat_Success(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "gpt-model", req.Model)
 		assert.False(t, req.Stream)
+		assert.Empty(t, req.ReasoningEffort)
+		assert.Nil(t, req.IncludeReasoning)
 		assert.Len(t, req.Messages, 2)
 
-		resp := groqResponse{
+		resp := testGroqResponse{
 			ID:      "chatcmpl-123",
 			Object:  "chat.completion",
 			Created: 1234567890,
 			Model:   "gpt-model",
-			Choices: []struct {
-				Index   int `json:"index"`
-				Message struct {
-					Role    string `json:"role"`
-					Content string `json:"content"`
-				} `json:"message"`
-				FinishReason string `json:"finish_reason"`
-			}{
-				{
-					Index: 0,
-					Message: struct {
-						Role    string `json:"role"`
-						Content string `json:"content"`
-					}{
-						Role:    "assistant",
-						Content: "Hello from Groq",
-					},
-					FinishReason: "stop",
+			Choices: []testGroqChoice{{
+				Index: 0,
+				Message: testGroqMessage{
+					Role:    "assistant",
+					Content: "Hello from Groq",
 				},
-			},
-			Usage: struct {
-				PromptTokens     int `json:"prompt_tokens"`
-				CompletionTokens int `json:"completion_tokens"`
-				TotalTokens      int `json:"total_tokens"`
-			}{
+				FinishReason: "stop",
+			}},
+			Usage: testGroqUsage{
 				PromptTokens:     10,
 				CompletionTokens: 20,
 				TotalTokens:      30,
@@ -112,6 +133,42 @@ func TestGroqProviderChat_Success(t *testing.T) {
 	assert.Equal(t, 10, resp.TokensInput)
 	assert.Equal(t, 20, resp.TokensOutput)
 	assert.Equal(t, "stop", resp.FinishReason)
+}
+
+func TestGroqProviderChat_ReasoningFields(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req groqRequest
+		json.NewDecoder(r.Body).Decode(&req)
+		assert.Equal(t, "high", req.ReasoningEffort)
+		assert.False(t, *req.IncludeReasoning)
+
+		resp := testGroqResponse{
+			Model: "openai/gpt-oss-120b",
+			Choices: []testGroqChoice{{
+				Message: testGroqMessage{
+					Role:    "assistant",
+					Content: "reasoned answer",
+				},
+			}},
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+	}))
+	defer srv.Close()
+
+	p := NewGroqProvider(GroqConfig{
+		BaseURL:          srv.URL,
+		APIKey:           "key",
+		Model:            "openai/gpt-oss-120b",
+		ReasoningEffort:  "high",
+		IncludeReasoning: boolPtr(false),
+	})
+
+	resp, err := p.Chat(context.Background(), ChatRequest{
+		Messages: []Message{UserMessage("hi")},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "reasoned answer", resp.Content)
 }
 
 func TestGroqProviderChat_RateLimited(t *testing.T) {
@@ -145,19 +202,12 @@ func TestGroqProviderChat_APIError(t *testing.T) {
 
 func TestGroqProviderChat_EmptyChoices(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		resp := groqResponse{
+		resp := testGroqResponse{
 			ID:      "chatcmpl-123",
 			Object:  "chat.completion",
 			Created: 1234567890,
 			Model:   "test",
-			Choices: []struct {
-				Index   int `json:"index"`
-				Message struct {
-					Role    string `json:"role"`
-					Content string `json:"content"`
-				} `json:"message"`
-				FinishReason string `json:"finish_reason"`
-			}{},
+			Choices: []testGroqChoice{},
 		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
@@ -186,25 +236,15 @@ func TestGroqProviderChat_CustomModel(t *testing.T) {
 		json.NewDecoder(r.Body).Decode(&req)
 		assert.Equal(t, "custom-model", req.Model)
 
-		resp := groqResponse{
+		resp := testGroqResponse{
 			Model: "custom-model",
-			Choices: []struct {
-				Index   int `json:"index"`
-				Message struct {
-					Role    string `json:"role"`
-					Content string `json:"content"`
-				} `json:"message"`
-				FinishReason string `json:"finish_reason"`
-			}{
-				{
-					Index: 0,
-					Message: struct {
-						Role    string `json:"role"`
-						Content string `json:"content"`
-					}{Role: "assistant", Content: "ok"},
-					FinishReason: "stop",
+			Choices: []testGroqChoice{{
+				Message: testGroqMessage{
+					Role:    "assistant",
+					Content: "ok",
 				},
-			},
+				FinishReason: "stop",
+			}},
 		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
@@ -230,28 +270,17 @@ func TestGroqProviderChatStream_Success(t *testing.T) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		w.WriteHeader(http.StatusOK)
 
-		data, _ := json.Marshal(groqStreamResponse{
+		resp := testGroqResponse{
 			ID:      "1",
 			Object:  "chat.completion.chunk",
 			Created: 123,
 			Model:   "gpt-model",
-			Choices: []struct {
-				Index int `json:"index"`
-				Delta struct {
-					Role    string `json:"role,omitempty"`
-					Content string `json:"content,omitempty"`
-				} `json:"delta"`
-				FinishReason string `json:"finish_reason,omitempty"`
-			}{
-				{
-					Index: 0,
-					Delta: struct {
-						Role    string `json:"role,omitempty"`
-						Content string `json:"content,omitempty"`
-					}{Content: "Hello"},
-				},
-			},
-		})
+			Choices: []testGroqChoice{{
+				Index: 0,
+				Delta: testGroqDelta{Content: "Hello"},
+			}},
+		}
+		data, _ := json.Marshal(resp)
 		w.Write([]byte("data: " + string(data) + "\n\n"))
 		w.Write([]byte("data: [DONE]\n\n"))
 	}))
@@ -274,6 +303,60 @@ func TestGroqProviderChatStream_Success(t *testing.T) {
 		contents = append(contents, chunk.Content)
 	}
 	assert.Equal(t, []string{"Hello"}, contents)
+}
+
+func TestGroqProviderChatStream_SkipsReasoningChunks(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/event-stream")
+		w.WriteHeader(http.StatusOK)
+
+		// reasoning chunk (should be skipped in output)
+		resp1 := testGroqResponse{
+			ID:      "1",
+			Object:  "chat.completion.chunk",
+			Created: 123,
+			Model:   "gpt-model",
+			Choices: []testGroqChoice{{
+				Delta: testGroqDelta{Reasoning: "thinking..."},
+			}},
+		}
+		data1, _ := json.Marshal(resp1)
+		w.Write([]byte("data: " + string(data1) + "\n\n"))
+
+		// content chunk (should be forwarded)
+		resp2 := testGroqResponse{
+			ID:      "2",
+			Object:  "chat.completion.chunk",
+			Created: 124,
+			Model:   "gpt-model",
+			Choices: []testGroqChoice{{
+				Delta: testGroqDelta{Content: "answer"},
+			}},
+		}
+		data2, _ := json.Marshal(resp2)
+		w.Write([]byte("data: " + string(data2) + "\n\n"))
+
+		w.Write([]byte("data: [DONE]\n\n"))
+	}))
+	defer srv.Close()
+
+	p := NewGroqProvider(GroqConfig{BaseURL: srv.URL, APIKey: "key", Model: "gpt-model"})
+	chunks, err := p.ChatStream(context.Background(), ChatRequest{
+		Messages: []Message{UserMessage("hi")},
+	})
+	require.NoError(t, err)
+
+	var contents []string
+	for chunk := range chunks {
+		if chunk.Done {
+			break
+		}
+		if chunk.Error != nil {
+			t.Fatal(chunk.Error)
+		}
+		contents = append(contents, chunk.Content)
+	}
+	assert.Equal(t, []string{"answer"}, contents)
 }
 
 func TestGroqProviderChatStream_RateLimited(t *testing.T) {
@@ -318,29 +401,17 @@ func TestGroqProviderChatStream_FinishReason(t *testing.T) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		w.WriteHeader(http.StatusOK)
 
-		data, _ := json.Marshal(groqStreamResponse{
+		resp := testGroqResponse{
 			ID:      "1",
 			Object:  "chat.completion.chunk",
 			Created: 123,
 			Model:   "test",
-			Choices: []struct {
-				Index int `json:"index"`
-				Delta struct {
-					Role    string `json:"role,omitempty"`
-					Content string `json:"content,omitempty"`
-				} `json:"delta"`
-				FinishReason string `json:"finish_reason,omitempty"`
-			}{
-				{
-					Index: 0,
-					Delta: struct {
-						Role    string `json:"role,omitempty"`
-						Content string `json:"content,omitempty"`
-					}{Content: "Hello"},
-					FinishReason: "stop",
-				},
-			},
-		})
+			Choices: []testGroqChoice{{
+				Delta:        testGroqDelta{Content: "Hello"},
+				FinishReason: "stop",
+			}},
+		}
+		data, _ := json.Marshal(resp)
 		w.Write([]byte("data: " + string(data) + "\n\n"))
 	}))
 	defer srv.Close()
@@ -366,25 +437,15 @@ func TestGroqProviderChatStream_FinishReason(t *testing.T) {
 
 func TestGroqProviderHealthCheck(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		resp := groqResponse{
+		resp := testGroqResponse{
 			Model: "test",
-			Choices: []struct {
-				Index   int `json:"index"`
-				Message struct {
-					Role    string `json:"role"`
-					Content string `json:"content"`
-				} `json:"message"`
-				FinishReason string `json:"finish_reason"`
-			}{
-				{
-					Index: 0,
-					Message: struct {
-						Role    string `json:"role"`
-						Content string `json:"content"`
-					}{Role: "assistant", Content: "pong"},
-					FinishReason: "stop",
+			Choices: []testGroqChoice{{
+				Message: testGroqMessage{
+					Role:    "assistant",
+					Content: "pong",
 				},
-			},
+				FinishReason: "stop",
+			}},
 		}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
@@ -406,4 +467,8 @@ func TestGroqProviderHealthCheck_Failure(t *testing.T) {
 	err := p.HealthCheck(context.Background())
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "health check failed")
+}
+
+func boolPtr(b bool) *bool {
+	return &b
 }

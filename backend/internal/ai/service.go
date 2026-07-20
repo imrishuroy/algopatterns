@@ -10,6 +10,7 @@ import (
 	"github.com/imrishuroy/algopatterns/internal/ai/prompts"
 	"github.com/imrishuroy/algopatterns/internal/ai/rag"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -24,6 +25,7 @@ var (
 type Service struct {
 	llmManager *llm.Manager
 	ragService *rag.Service
+	classifier *Classifier
 	config     Config
 }
 
@@ -31,6 +33,7 @@ type Service struct {
 func NewService(llmManager *llm.Manager, config Config) *Service {
 	return &Service{
 		llmManager: llmManager,
+		classifier: NewClassifier(llmManager),
 		config:     config,
 	}
 }
@@ -40,6 +43,7 @@ func NewServiceWithRAG(llmManager *llm.Manager, ragService *rag.Service, config 
 	return &Service{
 		llmManager: llmManager,
 		ragService: ragService,
+		classifier: NewClassifier(llmManager),
 		config:     config,
 	}
 }
@@ -102,6 +106,7 @@ type ChatResponse struct {
 	SessionID  string `json:"session_id"`
 	TokensUsed int    `json:"tokens_used"`
 	Model      string `json:"model"`
+	Intent     string `json:"intent,omitempty"`
 }
 
 // HintRequest represents a hint request
@@ -176,8 +181,58 @@ func (s *Service) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, err
 
 	var systemPrompt string
 	var userContent strings.Builder
+	var intentStr string
 
-	if req.ContextType == ContextPattern {
+	switch req.ContextType {
+	case ContextGeneral:
+		// Convert history for classifier
+		classifierHistory := make([]ConversationTurn, len(req.History))
+		for i, h := range req.History {
+			classifierHistory[i] = ConversationTurn{Role: h.Role, Content: h.Content}
+		}
+
+		// Classify intent for Omni-Tutor with conversation context
+		intent, err := s.classifier.ClassifyWithHistory(ctx, req.Message, classifierHistory)
+		if err != nil {
+			log.Warn().Err(err).Msg("Intent classification failed, defaulting to concept")
+			intent = IntentConcept
+		}
+		intentStr = string(intent)
+
+		// Handle out-of-scope immediately without LLM call
+		if intent == IntentOutOfScope {
+			return &ChatResponse{
+				Content:   OutOfScopeRefusal,
+				SessionID: req.SessionID,
+				Intent:    intentStr,
+			}, nil
+		}
+
+		// Get global RAG context if needed
+		var ragContext string
+		var ragResults []rag.ContentEmbedding
+		if NeedsRAG(intent) {
+			ragResults = s.getGlobalRAGResults(ctx, req.Message, intent)
+			if s.ragService != nil {
+				ragContext = s.ragService.BuildRAGContext(ragResults)
+			}
+		}
+
+		// Build link manifest from RAG results
+		links := BuildLinkManifest(ragResults)
+		linkManifest := FormatLinkManifest(links)
+
+		systemPrompt = prompts.BuildOmniTutorPrompt(
+			intentStr,
+			req.Language,
+			turns,
+			ragContext,
+			linkManifest,
+		)
+
+		userContent.WriteString(req.Message)
+
+	case ContextPattern:
 		ragContext := s.getPatternRAGContext(ctx, req.PatternID, req.Message)
 		systemPrompt = prompts.BuildPatternChatPrompt(
 			req.PatternName,
@@ -192,7 +247,9 @@ func (s *Service) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, err
 		)
 
 		userContent.WriteString(req.Message)
-	} else {
+
+	default:
+		// ContextProblem (default)
 		ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Message+" "+req.ProblemTitle, req.Language)
 		systemPrompt = prompts.BuildChatPrompt(req.ProblemTitle, req.Language, turns, ragContext)
 
@@ -230,11 +287,18 @@ func (s *Service) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, err
 		SessionID:  req.SessionID,
 		TokensUsed: resp.TokensInput + resp.TokensOutput,
 		Model:      resp.Model,
+		Intent:     intentStr,
 	}, nil
 }
 
+// StreamResult contains the stream channel and metadata for streaming responses
+type StreamResult struct {
+	Chunks <-chan llm.StreamChunk
+	Intent string
+}
+
 // ChatStream handles a streaming chat message
-func (s *Service) ChatStream(ctx context.Context, req ChatRequest) (<-chan llm.StreamChunk, error) {
+func (s *Service) ChatStream(ctx context.Context, req ChatRequest) (*StreamResult, error) {
 	if !s.config.Enabled {
 		return nil, ErrAIDisabled
 	}
@@ -251,8 +315,60 @@ func (s *Service) ChatStream(ctx context.Context, req ChatRequest) (<-chan llm.S
 
 	var systemPrompt string
 	var userContent strings.Builder
+	var intentStr string
 
-	if req.ContextType == ContextPattern {
+	switch req.ContextType {
+	case ContextGeneral:
+		// Convert history for classifier
+		classifierHistory := make([]ConversationTurn, len(req.History))
+		for i, h := range req.History {
+			classifierHistory[i] = ConversationTurn{Role: h.Role, Content: h.Content}
+		}
+
+		// Classify intent for Omni-Tutor with conversation context
+		intent, err := s.classifier.ClassifyWithHistory(ctx, req.Message, classifierHistory)
+		if err != nil {
+			log.Warn().Err(err).Msg("Intent classification failed, defaulting to concept")
+			intent = IntentConcept
+		}
+		intentStr = string(intent)
+
+		// Handle out-of-scope with a synthetic stream
+		if intent == IntentOutOfScope {
+			chunks := make(chan llm.StreamChunk, 2)
+			go func() {
+				chunks <- llm.StreamChunk{Content: OutOfScopeRefusal}
+				chunks <- llm.StreamChunk{Done: true}
+				close(chunks)
+			}()
+			return &StreamResult{Chunks: chunks, Intent: intentStr}, nil
+		}
+
+		// Get global RAG context if needed
+		var ragContext string
+		var ragResults []rag.ContentEmbedding
+		if NeedsRAG(intent) {
+			ragResults = s.getGlobalRAGResults(ctx, req.Message, intent)
+			if s.ragService != nil {
+				ragContext = s.ragService.BuildRAGContext(ragResults)
+			}
+		}
+
+		// Build link manifest from RAG results
+		links := BuildLinkManifest(ragResults)
+		linkManifest := FormatLinkManifest(links)
+
+		systemPrompt = prompts.BuildOmniTutorPrompt(
+			intentStr,
+			req.Language,
+			turns,
+			ragContext,
+			linkManifest,
+		)
+
+		userContent.WriteString(req.Message)
+
+	case ContextPattern:
 		ragContext := s.getPatternRAGContext(ctx, req.PatternID, req.Message)
 		systemPrompt = prompts.BuildPatternChatPrompt(
 			req.PatternName,
@@ -267,7 +383,9 @@ func (s *Service) ChatStream(ctx context.Context, req ChatRequest) (<-chan llm.S
 		)
 
 		userContent.WriteString(req.Message)
-	} else {
+
+	default:
+		// ContextProblem (default)
 		ragContext := s.getRAGContext(ctx, req.ProblemSlug, req.Message+" "+req.ProblemTitle, req.Language)
 		systemPrompt = prompts.BuildChatPrompt(req.ProblemTitle, req.Language, turns, ragContext)
 
@@ -295,7 +413,12 @@ func (s *Service) ChatStream(ctx context.Context, req ChatRequest) (<-chan llm.S
 		Stream:      true,
 	}
 
-	return s.llmManager.ChatStream(ctx, llmReq)
+	chunks, err := s.llmManager.ChatStream(ctx, llmReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return &StreamResult{Chunks: chunks, Intent: intentStr}, nil
 }
 
 // GetHint provides a contextual hint
@@ -525,6 +648,51 @@ func (s *Service) getPatternRAGContext(ctx context.Context, patternID, query str
 	return s.ragService.BuildRAGContext(results)
 }
 
+// getGlobalRAGResults retrieves relevant content from all sources for Omni-Tutor
+// It runs two concurrent searches (patterns + problems) and merges the results
+func (s *Service) getGlobalRAGResults(ctx context.Context, query string, intent Intent) []rag.ContentEmbedding {
+	if s.ragService == nil || !s.config.Features.EnableRAG {
+		return nil
+	}
+
+	// Determine limits based on intent
+	patternLimit := 6
+	if intent == IntentIntersection {
+		patternLimit = 10 // need more to capture both patterns
+	}
+
+	// Concurrent two-phase search: patterns + problems
+	g, gctx := errgroup.WithContext(ctx)
+	var patternResults, problemResults []rag.ContentEmbedding
+
+	g.Go(func() error {
+		var err error
+		patternResults, err = s.ragService.SearchContext(gctx, query,
+			rag.SearchOptions{ContentType: "pattern", Limit: patternLimit, MinScore: 0.65})
+		if err != nil {
+			log.Warn().Err(err).Msg("Pattern RAG search failed in global context")
+		}
+		return nil // Non-fatal: continue even if this fails
+	})
+
+	g.Go(func() error {
+		var err error
+		problemResults, err = s.ragService.SearchContext(gctx, query,
+			rag.SearchOptions{ContentType: "problem", Limit: 4, MinScore: 0.60})
+		if err != nil {
+			log.Warn().Err(err).Msg("Problem RAG search failed in global context")
+		}
+		return nil // Non-fatal: continue even if this fails
+	})
+
+	// Wait for both searches (errors are non-fatal)
+	_ = g.Wait()
+
+	// Merge and dedupe results
+	merged := append(patternResults, problemResults...)
+	return DedupeBySourceID(merged)
+}
+
 // IsEnabled returns whether AI features are enabled
 func (s *Service) IsEnabled() bool {
 	return s.config.Enabled
@@ -565,4 +733,168 @@ func countCodeBlockLines(s string) int {
 	}
 
 	return lines
+}
+
+// GenerateTitleRequest contains the conversation to generate a title for
+type GenerateTitleRequest struct {
+	Messages []ConversationMessage
+}
+
+// GenerateTitleResponse contains the generated title
+type GenerateTitleResponse struct {
+	Title string
+}
+
+// titleGenerationPrompt is the system prompt for generating chat titles
+const titleGenerationPrompt = `You are a title generator. Given a conversation, output a 3-5 word title.
+
+Example input: "How do I solve Two Sum using a hash map?"
+Example output: Two Sum Hash Map
+
+Example input: "Help me understand binary search in a rotated array"
+Example output: Binary Search Rotated Array
+
+Example input: "What's the best way to find the median from a data stream?"
+Example output: Find Median Data Stream
+
+Output ONLY the title, nothing else. No quotes, no explanation.`
+
+// GenerateTitle generates a meaningful title for a chat session based on the conversation
+func (s *Service) GenerateTitle(ctx context.Context, req GenerateTitleRequest) (*GenerateTitleResponse, error) {
+	if !s.config.Features.EnableChat {
+		return nil, ErrAIDisabled
+	}
+
+	if len(req.Messages) == 0 {
+		return &GenerateTitleResponse{Title: "New Conversation"}, nil
+	}
+
+	// Build a summary of the conversation for title generation
+	var conversationSummary strings.Builder
+	conversationSummary.WriteString("Conversation:\n")
+
+	// Take first few messages (max 4) to keep token usage low
+	maxMessages := 4
+	if len(req.Messages) < maxMessages {
+		maxMessages = len(req.Messages)
+	}
+
+	for _, msg := range req.Messages[:maxMessages] {
+		role := "User"
+		if msg.Role == "assistant" {
+			role = "Assistant"
+		}
+		// Truncate long messages
+		content := msg.Content
+		if len(content) > 300 {
+			content = content[:300] + "..."
+		}
+		conversationSummary.WriteString(fmt.Sprintf("%s: %s\n", role, content))
+	}
+
+	messages := []llm.Message{
+		llm.SystemMessage(titleGenerationPrompt),
+		llm.UserMessage(conversationSummary.String()),
+	}
+
+	llmReq := llm.ChatRequest{
+		Messages:    messages,
+		Model:       "openai/gpt-4o-mini", // Use simpler model for title generation (reasoning models don't work well)
+		Temperature: 0.3,                  // Low temperature for consistent titles
+		MaxTokens:   30,                   // Titles are short
+	}
+
+	resp, err := s.llmManager.Chat(ctx, llmReq)
+	if err != nil {
+		log.Warn().Err(err).Msg("Failed to generate title, using fallback")
+		// Fallback to first user message truncated
+		for _, msg := range req.Messages {
+			if msg.Role == "user" {
+				title := msg.Content
+				if len(title) > 50 {
+					title = title[:47] + "..."
+				}
+				return &GenerateTitleResponse{Title: title}, nil
+			}
+		}
+		return &GenerateTitleResponse{Title: "New Conversation"}, nil
+	}
+
+	title := strings.TrimSpace(resp.Content)
+	log.Info().Str("raw_response", resp.Content).Str("title", title).Msg("LLM generated title")
+
+	// If LLM returned empty, use heuristic extraction
+	if title == "" {
+		log.Warn().Msg("LLM returned empty title, using heuristic extraction")
+		title = extractTitleHeuristic(req.Messages)
+	}
+
+	// Ensure title is not too long
+	if len(title) > 50 {
+		title = title[:47] + "..."
+	}
+	// Remove quotes if the LLM added them
+	title = strings.Trim(title, "\"'")
+
+	return &GenerateTitleResponse{Title: title}, nil
+}
+
+// extractTitleHeuristic extracts a clean title from user message without LLM
+func extractTitleHeuristic(messages []ConversationMessage) string {
+	var userMsg string
+	for _, msg := range messages {
+		if msg.Role == "user" {
+			userMsg = msg.Content
+			break
+		}
+	}
+	if userMsg == "" {
+		return "New Conversation"
+	}
+
+	// Remove common filler phrases
+	fillers := []string{
+		"help me solve this",
+		"help me solve",
+		"help me with",
+		"help me understand",
+		"how do i solve",
+		"how do you solve",
+		"how to solve",
+		"can you help with",
+		"can you explain",
+		"i need help with",
+		"i want to learn",
+		"please explain",
+		"what is the best way to",
+		"what's the best way to",
+		"solve this",
+		"question about",
+		"problem with",
+	}
+
+	title := strings.ToLower(userMsg)
+	for _, filler := range fillers {
+		title = strings.ReplaceAll(title, filler, "")
+	}
+
+	// Clean up and capitalize
+	title = strings.TrimSpace(title)
+	title = strings.Trim(title, "?!.,")
+	title = strings.TrimSpace(title)
+
+	// Capitalize first letter of each word
+	words := strings.Fields(title)
+	for i, word := range words {
+		if len(word) > 0 {
+			words[i] = strings.ToUpper(string(word[0])) + word[1:]
+		}
+	}
+	title = strings.Join(words, " ")
+
+	if title == "" {
+		return "New Conversation"
+	}
+
+	return title
 }

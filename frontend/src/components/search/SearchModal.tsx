@@ -18,7 +18,8 @@ import type { SearchResults as SearchResultsType, SearchResult } from "@/types";
 
 // Wrapper component that conditionally renders the modal content
 // This allows the inner component to reset its state when re-mounted
-export function SearchModal() { // skipcq: JS-0067
+export function SearchModal() {
+  // skipcq: JS-0067
   const { isOpen } = useSearch();
 
   // Check if we're in browser environment for portal rendering
@@ -28,7 +29,8 @@ export function SearchModal() { // skipcq: JS-0067
   return <SearchModalContent key={isOpen ? "open" : "closed"} />;
 }
 
-function SearchModalContent() { // skipcq: JS-0067, JS-R1005
+function SearchModalContent() {
+  // skipcq: JS-0067, JS-R1005
   const router = useRouter();
   const { closeSearch, searchMode, setSearchMode, addToHistory } = useSearch();
 
@@ -118,7 +120,8 @@ function SearchModalContent() { // skipcq: JS-0067, JS-R1005
       }
     }, 300);
 
-    return () => { // skipcq: JS-0045
+    return () => {
+      // skipcq: JS-0045
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }
@@ -223,13 +226,13 @@ function SearchModalContent() { // skipcq: JS-0067, JS-R1005
           closeSearch();
           break;
         case "Tab":
-              e.preventDefault();
-              setSearchMode(searchMode === "keyword" ? "ai" : "keyword");
-              break;
-            default:
-              break;
-          }
-        },
+          e.preventDefault();
+          setSearchMode(searchMode === "keyword" ? "ai" : "keyword");
+          break;
+        default:
+          break;
+      }
+    },
     [
       getNavigableResults,
       selectedIndex,
@@ -256,7 +259,7 @@ function SearchModalContent() { // skipcq: JS-0067, JS-R1005
   const showResults = query.length >= 2 && results;
   const showPreview = selectedResult && !showQuickAccess;
 
-// skipcq: JS-0415
+  // skipcq: JS-0415
 
   return createPortal(
     <div className="fixed inset-0 z-50">

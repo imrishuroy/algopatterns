@@ -5,3 +5,4 @@ export { ChatInput } from "./ChatInput";
 export { QuickActions } from "./QuickActions";
 export { PatternQuickActions } from "./PatternQuickActions";
 export { InlineAI } from "./InlineAI";
+export { MermaidBlock } from "./MermaidBlock";

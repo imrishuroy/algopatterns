@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { HighlightableCode } from "./HighlightableCode";
@@ -52,10 +52,10 @@ const customStyle = {
 
 // skipcq: JS-0067
 // skipcq: JS-R1005
-export default function CodeBlock({
+function CodeBlock({
   // skipcq: JS-0067, JS-R1005
   code,
-  language = "java",
+  language = "text",
   label,
   showCopy = true,
   collapsible = false,
@@ -66,7 +66,8 @@ export default function CodeBlock({
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(!collapsible);
 
-  const normalizedLang = languageMap[language.toLowerCase()] || "java";
+  const normalizedLang =
+    languageMap[language.toLowerCase()] || language.toLowerCase() || "text";
 
   const handleCopy = async () => {
     try {
@@ -85,11 +86,15 @@ export default function CodeBlock({
     }
   };
 
-  const displayLabel =
-    label ??
-    (normalizedLang === "cpp"
-      ? "C++"
-      : normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1));
+  // Generate display label with special cases
+  const getDisplayLabel = () => {
+    if (label) return label;
+    if (normalizedLang === "cpp") return "C++";
+    if (normalizedLang === "text") return "Code";
+    if (normalizedLang === "golang") return "Go";
+    return normalizedLang.charAt(0).toUpperCase() + normalizedLang.slice(1);
+  };
+  const displayLabel = getDisplayLabel();
 
   return (
     <div className="relative group rounded-md overflow-hidden border border-gray-800 bg-[#011627] theme-dark">
@@ -219,3 +224,9 @@ export default function CodeBlock({
     </div>
   );
 }
+
+// skipcq: JS-0067
+// Memoize so already-complete code blocks skip re-highlighting when
+// sibling content in the same markdown tree keeps streaming in. The
+// highlighter only re-runs for blocks whose `code` prop actually changed.
+export default memo(CodeBlock);

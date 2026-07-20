@@ -9,8 +9,8 @@ interface UpgradePromptProps {
   compact?: boolean;
 }
 
+// skipcq: JS-0067
 export function UpgradePrompt({
-  // skipcq: JS-0067
   feature = "this content",
   title,
   description,

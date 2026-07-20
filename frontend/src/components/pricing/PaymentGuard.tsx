@@ -58,8 +58,8 @@ function getFeatureDescription(feature: keyof PlanFeatures): string {
  * PaymentGuard component wraps premium content and shows a blurred overlay
  * with an upgrade prompt for users who don't have access to the feature.
  */
+// skipcq: JS-0067
 export function PaymentGuard({
-  // skipcq: JS-0067
   feature,
   children,
   fallback,

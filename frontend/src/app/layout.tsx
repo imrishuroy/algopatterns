@@ -37,14 +37,12 @@ const fredoka = Fredoka({
 
 export const metadata = defaultMetadata;
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-0415
 export default function RootLayout({
-  // skipcq: JS-0067
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // skipcq: JS-0415
   return (
     <html
       lang="en"

@@ -63,8 +63,8 @@ const languageLabels: Record<SupportedLanguage, string> = {
   javascript: "JavaScript",
 };
 
+// skipcq: JS-0067, JS-R1005
 export default function DSAFundamentalsClient({
-  // skipcq: JS-0067, JS-R1005
   concepts,
   categories,
 }: DSAFundamentalsClientProps) {
@@ -271,8 +271,8 @@ export default function DSAFundamentalsClient({
   );
 }
 
+// skipcq: JS-0067
 function ConceptCard({ concept }: { concept: Concept }) {
-  // skipcq: JS-0067
   const config = categoryConfig[concept.category];
   const problemCount = concept.relatedProblems?.length || 0;
 

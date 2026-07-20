@@ -84,8 +84,8 @@ function FeatureHighlight({
   );
 }
 
+// skipcq: JS-0067
 function SuccessModal({ onClose }: { onClose: () => void }) {
-  // skipcq: JS-0067
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
@@ -107,8 +107,8 @@ function SuccessModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+// skipcq: JS-0067
 function PageHeader() {
-  // skipcq: JS-0067
   return (
     <div className="text-center mb-8 md:mb-12">
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -122,8 +122,8 @@ function PageHeader() {
   );
 }
 
+// skipcq: JS-0067
 function WhyUpgradeSection() {
-  // skipcq: JS-0067
   return (
     <div className="text-center">
       <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">
@@ -150,8 +150,8 @@ function WhyUpgradeSection() {
   );
 }
 
+// skipcq: JS-0067
 function LifetimePromise() {
-  // skipcq: JS-0067
   return (
     <div className="mt-10 md:mt-16 text-center">
       <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-md p-6 md:p-8 max-w-2xl mx-auto">
@@ -168,8 +168,8 @@ function LifetimePromise() {
   );
 }
 
+// skipcq: JS-0067
 export default function PricingPage() {
-  // skipcq: JS-0067
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const { plans, subscription, isLoading, refreshSubscription } =

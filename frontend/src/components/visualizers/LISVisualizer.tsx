@@ -1121,7 +1121,6 @@ const BinaryPhase = ({
 
 // skipcq: JS-0067
 export default function LISVisualizer() {
-  // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "binary"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion",

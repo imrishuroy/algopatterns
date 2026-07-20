@@ -47,43 +47,172 @@ interface TreeNodeData {
   parentId: string | null;
 }
 
-const buildRecursionTreeData = (): { nodes: TreeNodeData[]; steps: TreeStep[] } => {
+const buildRecursionTreeData = (): {
+  nodes: TreeNodeData[];
+  steps: TreeStep[];
+} => {
   const nodes: TreeNodeData[] = [];
   const steps: TreeStep[] = [];
 
   // Simplified tree for solve(1,4) showing key structure and overlap
-  nodes.push({ id: "1,4", label: "[1,4]", x: 350, y: 30, result: null, parentId: null });
+  nodes.push({
+    id: "1,4",
+    label: "[1,4]",
+    x: 350,
+    y: 30,
+    result: null,
+    parentId: null,
+  });
 
   // Level 1: try k=1,2,3,4 as last burst
-  nodes.push({ id: "1,0+2,4-k1", label: "[2,4]", x: 150, y: 90, result: null, parentId: "1,4" });
-  nodes.push({ id: "1,1+3,4-k2", label: "[1,1]", x: 280, y: 90, result: null, parentId: "1,4" });
-  nodes.push({ id: "3,4-k2", label: "[3,4]", x: 350, y: 90, result: null, parentId: "1,4" });
-  nodes.push({ id: "1,2+4,4-k3", label: "[1,2]", x: 450, y: 90, result: null, parentId: "1,4" });
-  nodes.push({ id: "1,3-k4", label: "[1,3]", x: 550, y: 90, result: null, parentId: "1,4" });
+  nodes.push({
+    id: "1,0+2,4-k1",
+    label: "[2,4]",
+    x: 150,
+    y: 90,
+    result: null,
+    parentId: "1,4",
+  });
+  nodes.push({
+    id: "1,1+3,4-k2",
+    label: "[1,1]",
+    x: 280,
+    y: 90,
+    result: null,
+    parentId: "1,4",
+  });
+  nodes.push({
+    id: "3,4-k2",
+    label: "[3,4]",
+    x: 350,
+    y: 90,
+    result: null,
+    parentId: "1,4",
+  });
+  nodes.push({
+    id: "1,2+4,4-k3",
+    label: "[1,2]",
+    x: 450,
+    y: 90,
+    result: null,
+    parentId: "1,4",
+  });
+  nodes.push({
+    id: "1,3-k4",
+    label: "[1,3]",
+    x: 550,
+    y: 90,
+    result: null,
+    parentId: "1,4",
+  });
 
   // Level 2: subproblems
-  nodes.push({ id: "2,2", label: "[2,2]", x: 100, y: 150, result: null, parentId: "1,0+2,4-k1" });
-  nodes.push({ id: "3,4-sub", label: "[3,4]", x: 200, y: 150, result: null, parentId: "1,0+2,4-k1" });
-  nodes.push({ id: "1,1-sub", label: "[1,1]", x: 450, y: 150, result: null, parentId: "1,2+4,4-k3" });
-  nodes.push({ id: "2,2-sub", label: "[2,2]", x: 520, y: 150, result: null, parentId: "1,2+4,4-k3" });
+  nodes.push({
+    id: "2,2",
+    label: "[2,2]",
+    x: 100,
+    y: 150,
+    result: null,
+    parentId: "1,0+2,4-k1",
+  });
+  nodes.push({
+    id: "3,4-sub",
+    label: "[3,4]",
+    x: 200,
+    y: 150,
+    result: null,
+    parentId: "1,0+2,4-k1",
+  });
+  nodes.push({
+    id: "1,1-sub",
+    label: "[1,1]",
+    x: 450,
+    y: 150,
+    result: null,
+    parentId: "1,2+4,4-k3",
+  });
+  nodes.push({
+    id: "2,2-sub",
+    label: "[2,2]",
+    x: 520,
+    y: 150,
+    result: null,
+    parentId: "1,2+4,4-k3",
+  });
 
   // Steps showing exploration with repeated subproblems
-  steps.push({ nodeId: "1,4", action: "solve(1,4): Find max coins for all 4 balloons", result: null });
-  steps.push({ nodeId: "1,0+2,4-k1", action: "Try k=1 last: need solve(2,4)", result: null });
-  steps.push({ nodeId: "2,2", action: "solve(2,2): single balloon [1] = 3*1*5 = 15", result: 15 });
-  steps.push({ nodeId: "3,4-sub", action: "solve(3,4): need to solve [3,4] range", result: null });
-  steps.push({ nodeId: "3,4-sub", action: "solve(3,4) = max(40, 48) = 48", result: 48 });
-  steps.push({ nodeId: "1,0+2,4-k1", action: "solve(2,4) = 15 + 48 + merge = 159", result: 159 });
-  steps.push({ nodeId: "1,1+3,4-k2", action: "Try k=2 last: need solve(1,1) and solve(3,4)", result: null });
-  steps.push({ nodeId: "1,1+3,4-k2", action: "solve(1,1) = 1*3*1 = 3", result: 3 });
-  steps.push({ nodeId: "3,4-k2", action: "solve(3,4): REPEATED! Already computed = 48", result: 48 });
-  steps.push({ nodeId: "1,2+4,4-k3", action: "Try k=3 last: need solve(1,2)", result: null });
+  steps.push({
+    nodeId: "1,4",
+    action: "solve(1,4): Find max coins for all 4 balloons",
+    result: null,
+  });
+  steps.push({
+    nodeId: "1,0+2,4-k1",
+    action: "Try k=1 last: need solve(2,4)",
+    result: null,
+  });
+  steps.push({
+    nodeId: "2,2",
+    action: "solve(2,2): single balloon [1] = 3*1*5 = 15",
+    result: 15,
+  });
+  steps.push({
+    nodeId: "3,4-sub",
+    action: "solve(3,4): need to solve [3,4] range",
+    result: null,
+  });
+  steps.push({
+    nodeId: "3,4-sub",
+    action: "solve(3,4) = max(40, 48) = 48",
+    result: 48,
+  });
+  steps.push({
+    nodeId: "1,0+2,4-k1",
+    action: "solve(2,4) = 15 + 48 + merge = 159",
+    result: 159,
+  });
+  steps.push({
+    nodeId: "1,1+3,4-k2",
+    action: "Try k=2 last: need solve(1,1) and solve(3,4)",
+    result: null,
+  });
+  steps.push({
+    nodeId: "1,1+3,4-k2",
+    action: "solve(1,1) = 1*3*1 = 3",
+    result: 3,
+  });
+  steps.push({
+    nodeId: "3,4-k2",
+    action: "solve(3,4): REPEATED! Already computed = 48",
+    result: 48,
+  });
+  steps.push({
+    nodeId: "1,2+4,4-k3",
+    action: "Try k=3 last: need solve(1,2)",
+    result: null,
+  });
   steps.push({ nodeId: "1,1-sub", action: "solve(1,1) = 3", result: 3 });
-  steps.push({ nodeId: "2,2-sub", action: "solve(2,2): REPEATED! = 15", result: 15 });
+  steps.push({
+    nodeId: "2,2-sub",
+    action: "solve(2,2): REPEATED! = 15",
+    result: 15,
+  });
   steps.push({ nodeId: "1,2+4,4-k3", action: "solve(1,2) = 30", result: 30 });
-  steps.push({ nodeId: "1,3-k4", action: "Try k=4 last: need solve(1,3)", result: null });
-  steps.push({ nodeId: "1,3-k4", action: "solve(1,3) computed similarly...", result: 159 });
-  steps.push({ nodeId: "1,4", action: "solve(1,4) = max(all k options) = 167", result: 167 });
+  steps.push({
+    nodeId: "1,3-k4",
+    action: "Try k=4 last: need solve(1,3)",
+    result: null,
+  });
+  steps.push({
+    nodeId: "1,3-k4",
+    action: "solve(1,3) computed similarly...",
+    result: 159,
+  });
+  steps.push({
+    nodeId: "1,4",
+    action: "solve(1,4) = max(all k options) = 167",
+    result: 167,
+  });
 
   return { nodes, steps };
 };
@@ -110,7 +239,8 @@ const generateMemoSteps = (): MemoStep[] => {
 
     let maxCoins = 0;
     for (let k = l; k <= r; k++) {
-      const coins = nums[l - 1] * nums[k] * nums[r + 1] + solve(l, k - 1) + solve(k + 1, r);
+      const coins =
+        nums[l - 1] * nums[k] * nums[r + 1] + solve(l, k - 1) + solve(k + 1, r);
       maxCoins = Math.max(maxCoins, coins);
     }
 
@@ -140,7 +270,8 @@ const generateTableSteps = (): { steps: TableStep[]; answer: number } => {
     for (let l = 1; l <= n - len + 1; l++) {
       const r = l + len - 1;
       for (let k = l; k <= r; k++) {
-        const coins = nums[l - 1] * nums[k] * nums[r + 1] + dp[l][k - 1] + dp[k + 1][r];
+        const coins =
+          nums[l - 1] * nums[k] * nums[r + 1] + dp[l][k - 1] + dp[k + 1][r];
         if (coins > dp[l][r]) {
           dp[l][r] = coins;
           steps.push({
@@ -192,8 +323,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all"
         title="Back"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
       {isPlaying ? (
@@ -214,7 +355,11 @@ const Controls = ({
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 transition-all shadow-lg"
           title="Play"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -225,8 +370,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all"
         title="Step"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
       <button
@@ -234,7 +389,12 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-all ml-2"
         title="Reset"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -284,7 +444,8 @@ const BalloonsDisplay = ({
     </div>
     {balloons.map((b, idx) => {
       const pos = idx + 1;
-      const inRange = highlightRange && pos >= highlightRange.l && pos <= highlightRange.r;
+      const inRange =
+        highlightRange && pos >= highlightRange.l && pos <= highlightRange.r;
       const isK = highlightRange && pos === highlightRange.k;
       return (
         <div
@@ -307,9 +468,14 @@ const BalloonsDisplay = ({
   </div>
 );
 
-const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
-  const { nodes, steps: treeSteps } = useMemo(() => buildRecursionTreeData(), []);
-  const currentStep = step > 0 && step <= treeSteps.length ? treeSteps[step - 1] : null;
+const RecursionPhase = ({ step }: { step: number }) => {
+  // skipcq: JS-R1005
+  const { nodes, steps: treeSteps } = useMemo(
+    () => buildRecursionTreeData(),
+    []
+  );
+  const currentStep =
+    step > 0 && step <= treeSteps.length ? treeSteps[step - 1] : null;
 
   const visitedSet = useMemo(() => {
     const set = new Set<string>();
@@ -337,13 +503,14 @@ const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay />
       <div className="text-sm text-gray-400 mb-2">
-        solve(l, r) tries each k as LAST burst. Overlapping subproblems: [3,4], [2,2] computed multiple times.
+        solve(l, r) tries each k as LAST burst. Overlapping subproblems: [3,4],
+        [2,2] computed multiple times.
       </div>
 
       <svg width="700" height="200" className="mx-auto">
         {nodes.map((node) => {
           if (node.parentId === null) return null;
-          const parent = nodes.find(nd => nd.id === node.parentId);
+          const parent = nodes.find((nd) => nd.id === node.parentId);
           if (!parent) return null;
 
           const isVisited = visitedSet.has(node.id);
@@ -361,7 +528,8 @@ const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
           );
         })}
 
-        {nodes.map((node) => { // skipcq: JS-R1005
+        {nodes.map((node) => {
+          // skipcq: JS-R1005
           const isVisited = visitedSet.has(node.id);
           const isCurrent = node.id === currentNodeId;
           const hasResult = nodeResults.has(node.id);
@@ -396,11 +564,25 @@ const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
                 stroke={stroke}
                 strokeWidth="2"
               />
-              <text x={node.x} y={node.y + 5} fill="white" fontSize="11" textAnchor="middle" fontFamily="monospace" fontWeight="500">
+              <text
+                x={node.x}
+                y={node.y + 5}
+                fill="white"
+                fontSize="11"
+                textAnchor="middle"
+                fontFamily="monospace"
+                fontWeight="500"
+              >
                 {node.label}
               </text>
               {hasResult && (
-                <text x={node.x + 32} y={node.y + 5} fill="#86efac" fontSize="10" fontWeight="bold">
+                <text
+                  x={node.x + 32}
+                  y={node.y + 5}
+                  fill="#86efac"
+                  fontSize="10"
+                  fontWeight="bold"
+                >
                   ={result}
                 </text>
               )}
@@ -417,7 +599,9 @@ const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
 
       {step >= treeSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Max coins = {INTERVAL_DP_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max coins = {INTERVAL_DP_ANSWER}
+          </span>
         </div>
       )}
 
@@ -428,8 +612,16 @@ const RecursionPhase = ({ step }: { step: number }) => { // skipcq: JS-R1005
   );
 };
 
-const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] }) => { // skipcq: JS-0415, JS-R1005
-  const currentStep = step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
+const MemoPhase = ({
+  step,
+  memoSteps,
+}: {
+  step: number;
+  memoSteps: MemoStep[];
+}) => {
+  // skipcq: JS-0415, JS-R1005
+  const currentStep =
+    step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
   const visibleSteps = memoSteps.slice(0, step);
 
   const currentMemo = useMemo(() => {
@@ -444,13 +636,15 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
     return memo;
   }, [visibleSteps]);
 
-  const cacheHits = visibleSteps.filter(s => s.fromCache).length;
+  const cacheHits = visibleSteps.filter((s) => s.fromCache).length;
 
   return (
     // skipcq: JS-0415
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay
-        highlightRange={currentStep ? { l: currentStep.l, r: currentStep.r } : undefined}
+        highlightRange={
+          currentStep ? { l: currentStep.l, r: currentStep.r } : undefined
+        }
       />
       <div className="text-sm text-gray-400">
         memo[l][r] caches max coins for range [l,r]. Yellow = cache hit.
@@ -458,22 +652,32 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
 
       <div className="flex gap-6 items-start">
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">Memo Table</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            Memo Table
+          </div>
           <table className="border-collapse text-sm">
             <thead>
               <tr>
                 <th className="p-1 text-gray-500 w-8">l\r</th>
                 {Array.from({ length: n }, (_, c) => (
-                  <th key={`mh-${c + 1}`} className="p-1 text-gray-400 w-10">{c + 1}</th>
+                  <th key={`mh-${c + 1}`} className="p-1 text-gray-400 w-10">
+                    {c + 1}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {Array.from({ length: n }, (_, rowL) => (
                 <tr key={`mr-${rowL + 1}`}>
-                  <td className="p-1 text-gray-400 font-mono text-center">{rowL + 1}</td>
-                  {Array.from({ length: n }, (_, colR) => { // skipcq: JS-R1005
-                    const isCurrent = currentStep && currentStep.l === rowL + 1 && currentStep.r === colR + 1;
+                  <td className="p-1 text-gray-400 font-mono text-center">
+                    {rowL + 1}
+                  </td>
+                  {Array.from({ length: n }, (_, colR) => {
+                    // skipcq: JS-R1005
+                    const isCurrent =
+                      currentStep &&
+                      currentStep.l === rowL + 1 &&
+                      currentStep.r === colR + 1;
                     const isCacheHit = currentStep?.fromCache && isCurrent;
                     const value = currentMemo[rowL + 1]?.[colR + 1];
                     const isValid = colR >= rowL;
@@ -506,22 +710,32 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
 
         <div className="text-sm">
           <div className="text-gray-400 mb-2">Stats:</div>
-          <div className="text-gray-400">Computed: <span className="text-green-400">{step - cacheHits}</span></div>
-          <div className="text-gray-400">Cache hits: <span className="text-yellow-400">{cacheHits}</span></div>
+          <div className="text-gray-400">
+            Computed: <span className="text-green-400">{step - cacheHits}</span>
+          </div>
+          <div className="text-gray-400">
+            Cache hits: <span className="text-yellow-400">{cacheHits}</span>
+          </div>
         </div>
       </div>
 
       {currentStep && (
-        <div className={`text-sm text-center font-mono px-4 py-2 rounded-lg ${
-          currentStep.fromCache ? "bg-yellow-600/20 text-yellow-400" : "bg-blue-600/20 text-blue-300"
-        }`}>
+        <div
+          className={`text-sm text-center font-mono px-4 py-2 rounded-lg ${
+            currentStep.fromCache
+              ? "bg-yellow-600/20 text-yellow-400"
+              : "bg-blue-600/20 text-blue-300"
+          }`}
+        >
           {currentStep.action}
         </div>
       )}
 
       {step >= memoSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Max coins = {INTERVAL_DP_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max coins = {INTERVAL_DP_ANSWER}
+          </span>
         </div>
       )}
 
@@ -532,7 +746,14 @@ const MemoPhase = ({ step, memoSteps }: { step: number; memoSteps: MemoStep[] })
   );
 };
 
-const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[] }) => { // skipcq: JS-0415, JS-R1005
+const TabulationPhase = ({
+  step,
+  tableSteps,
+}: {
+  step: number;
+  tableSteps: TableStep[];
+}) => {
+  // skipcq: JS-0415, JS-R1005
   const dpTable = useMemo(() => {
     const dp: number[][] = Array(n + 2)
       .fill(null)
@@ -544,13 +765,16 @@ const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: Table
     return dp;
   }, [step, tableSteps]);
 
-  const currentStep = step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
 
   return (
     <div className="flex flex-col items-center gap-4">
       <BalloonsDisplay
         highlightRange={
-          currentStep ? { l: currentStep.l, r: currentStep.r, k: currentStep.k } : undefined
+          currentStep
+            ? { l: currentStep.l, r: currentStep.r, k: currentStep.k }
+            : undefined
         }
       />
 
@@ -559,13 +783,17 @@ const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: Table
       </div>
 
       <div className="text-center">
-        <div className="text-xs text-gray-500 mb-2">dp[l][r] = max coins bursting [l,r]</div>
+        <div className="text-xs text-gray-500 mb-2">
+          dp[l][r] = max coins bursting [l,r]
+        </div>
         <table className="border-collapse text-sm">
           <thead>
             <tr>
               <th className="p-1 text-gray-500 w-10">l\r</th>
               {Array.from({ length: n }, (_, c) => (
-                <th key={`th-${c + 1}`} className="p-1 text-gray-400 w-12">{c + 1}</th>
+                <th key={`th-${c + 1}`} className="p-1 text-gray-400 w-12">
+                  {c + 1}
+                </th>
               ))}
             </tr>
           </thead>
@@ -573,8 +801,12 @@ const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: Table
             {Array.from({ length: n }, (_, rowL) => (
               <tr key={`tr-${rowL + 1}`}>
                 <td className="p-1 text-gray-400 font-mono">{rowL + 1}</td>
-                {Array.from({ length: n }, (_, colR) => { // skipcq: JS-R1005
-                  const isCurrent = currentStep && currentStep.l === rowL + 1 && currentStep.r === colR + 1;
+                {Array.from({ length: n }, (_, colR) => {
+                  // skipcq: JS-R1005
+                  const isCurrent =
+                    currentStep &&
+                    currentStep.l === rowL + 1 &&
+                    currentStep.r === colR + 1;
                   const value = dpTable[rowL + 1]?.[colR + 1];
                   const isValid = colR >= rowL;
 
@@ -605,7 +837,8 @@ const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: Table
       {currentStep && (
         <div className="text-sm text-center">
           <div className="text-gray-400 mb-1">
-            Length {currentStep.len}: range [{currentStep.l}, {currentStep.r}], burst {balloons[currentStep.k - 1]} last
+            Length {currentStep.len}: range [{currentStep.l}, {currentStep.r}],
+            burst {balloons[currentStep.k - 1]} last
           </div>
           <div className="font-mono bg-gray-800/50 text-green-400 px-4 py-2 rounded-lg text-xs">
             {currentStep.formula}
@@ -615,7 +848,9 @@ const TabulationPhase = ({ step, tableSteps }: { step: number; tableSteps: Table
 
       {step >= tableSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Max coins = {INTERVAL_DP_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max coins = {INTERVAL_DP_ANSWER}
+          </span>
         </div>
       )}
 
@@ -644,7 +879,8 @@ const SpaceNote = () => (
           These span multiple columns and rows.
         </p>
         <p className="text-gray-500">
-          Therefore, the full O(n^2) table must be kept. No rolling-row optimization possible.
+          Therefore, the full O(n^2) table must be kept. No rolling-row
+          optimization possible.
         </p>
       </div>
     </div>
@@ -672,7 +908,10 @@ export default function IntervalDPVisualizer() {
   const [speed, setSpeed] = useState(600);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { steps: recursionTreeSteps } = useMemo(() => buildRecursionTreeData(), []);
+  const { steps: recursionTreeSteps } = useMemo(
+    () => buildRecursionTreeData(),
+    []
+  );
   const memoSteps = useMemo(() => generateMemoSteps(), []);
   const { steps: tableSteps, answer } = useMemo(() => generateTableSteps(), []);
 
@@ -763,8 +1002,12 @@ export default function IntervalDPVisualizer() {
           exit={{ opacity: 0 }}
         >
           {currentPhase === "recursion" && <RecursionPhase step={step} />}
-          {currentPhase === "memo" && <MemoPhase step={step} memoSteps={memoSteps} />}
-          {currentPhase === "tabulation" && <TabulationPhase step={step} tableSteps={tableSteps} />}
+          {currentPhase === "memo" && (
+            <MemoPhase step={step} memoSteps={memoSteps} />
+          )}
+          {currentPhase === "tabulation" && (
+            <TabulationPhase step={step} tableSteps={tableSteps} />
+          )}
           {currentPhase === "space" && <SpaceNote />}
         </motion.div>
       </AnimatePresence>

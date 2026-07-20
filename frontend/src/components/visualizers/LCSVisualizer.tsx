@@ -130,7 +130,8 @@ const generateMemoSteps = (): { steps: MemoStep[]; cacheHits: number } => {
   const memo: Map<string, number> = new Map();
   let cacheHits = 0;
 
-  const solve = (i: number, j: number, depth: number): number => { // skipcq: JS-R1005
+  const solve = (i: number, j: number, depth: number): number => {
+    // skipcq: JS-R1005
     if (i < 0 || j < 0) return 0;
 
     const key = `${i},${j}`;
@@ -458,7 +459,8 @@ const StringsDisplay = ({
   </div>
 );
 
-const RecursionPhase = ({ // skipcq: JS-R1005
+const RecursionPhase = ({
+  // skipcq: JS-R1005
   step,
   recursionSteps,
 }: {
@@ -468,7 +470,8 @@ const RecursionPhase = ({ // skipcq: JS-R1005
   const visibleSteps = recursionSteps.slice(0, step);
   const currentStep = step > 0 ? recursionSteps[step - 1] : null;
 
-  const callStack = useMemo(() => { // skipcq: JS-R1005
+  const callStack = useMemo(() => {
+    // skipcq: JS-R1005
     const stack: { i: number; j: number; result: number | null }[] = [];
     for (const s of visibleSteps) {
       if (s.type === "call") {
@@ -486,8 +489,16 @@ const RecursionPhase = ({ // skipcq: JS-R1005
   return (
     <div className="flex flex-col items-center gap-5">
       <StringsDisplay
-        highlightI={currentStep?.i !== undefined && currentStep.i >= 0 ? currentStep.i : undefined}
-        highlightJ={currentStep?.j !== undefined && currentStep.j >= 0 ? currentStep.j : undefined}
+        highlightI={
+          currentStep?.i !== undefined && currentStep.i >= 0
+            ? currentStep.i
+            : undefined
+        }
+        highlightJ={
+          currentStep?.j !== undefined && currentStep.j >= 0
+            ? currentStep.j
+            : undefined
+        }
         isMatch={currentStep?.isMatch}
       />
 
@@ -555,7 +566,8 @@ const RecursionPhase = ({ // skipcq: JS-R1005
   );
 };
 
-const MemoizationPhase = ({ // skipcq: JS-R1005
+const MemoizationPhase = ({
+  // skipcq: JS-R1005
   step,
   memoSteps,
 }: {
@@ -566,8 +578,9 @@ const MemoizationPhase = ({ // skipcq: JS-R1005
   const currentStep = step > 0 ? memoSteps[step - 1] : null;
 
   const memoTable = useMemo(() => {
-    const table: (number | null)[][] = Array.from({ length: text1.length }, () =>
-      Array(text2.length).fill(null)
+    const table: (number | null)[][] = Array.from(
+      { length: text1.length },
+      () => Array(text2.length).fill(null)
     );
     for (const s of visibleSteps) {
       if (!s.fromCache && s.i >= 0 && s.j >= 0) {
@@ -627,28 +640,32 @@ const MemoizationPhase = ({ // skipcq: JS-R1005
             </tr>
           </thead>
           <tbody>
-            {memoTable.map((row, rowIdx) => ( 
+            {memoTable.map((row, rowIdx) => (
               <tr
                 // skipcq: JS-0437
                 key={`row-${rowIdx}`}
-                >
+              >
                 <td
                   className={`w-8 h-8 text-xs font-mono text-center ${
-                    currentStep?.i === rowIdx ? "text-blue-400" : "text-gray-500"
+                    currentStep?.i === rowIdx
+                      ? "text-blue-400"
+                      : "text-gray-500"
                   }`}
                 >
                   {rowIdx}
                 </td>
-                {row.map((val, colIdx) => { // skipcq: JS-R1005
+                {row.map((val, colIdx) => {
+                  // skipcq: JS-R1005
                   const isCurrent =
                     currentStep?.i === rowIdx && currentStep?.j === colIdx;
                   const isCacheHit = isCurrent && currentStep?.fromCache;
 
-                  return ( 
+                  return (
                     <td
                       // skipcq: JS-0437
                       key={`cell-${rowIdx}-${colIdx}`}
-                      className="p-0.5">
+                      className="p-0.5"
+                    >
                       <div
                         className={`w-7 h-7 flex items-center justify-center rounded font-mono text-xs border transition-all ${
                           isCurrent
@@ -703,7 +720,8 @@ const MemoizationPhase = ({ // skipcq: JS-R1005
   );
 };
 
-const TabulationPhase = ({ // skipcq: JS-R1005
+const TabulationPhase = ({
+  // skipcq: JS-R1005
   step,
   tableSteps,
   finalAnswer,
@@ -764,7 +782,9 @@ const TabulationPhase = ({ // skipcq: JS-R1005
                 <th
                   key={`h-${idx}`} // skipcq: JS-0437
                   className={`w-9 h-9 text-sm font-mono font-bold ${
-                    currentStep?.j === idx + 1 ? "text-purple-400" : "text-gray-400"
+                    currentStep?.j === idx + 1
+                      ? "text-purple-400"
+                      : "text-gray-400"
                   }`}
                 >
                   {char}
@@ -777,42 +797,48 @@ const TabulationPhase = ({ // skipcq: JS-R1005
               <td className="w-9 h-9 text-xs text-gray-500 font-mono text-center">
                 ε
               </td>
-              {currentDp[0].map((val, colIdx) => ( 
+              {currentDp[0].map((val, colIdx) => (
                 <td
                   // skipcq: JS-0437
                   key={`r0-c${colIdx}`}
-                  className="p-0.5">
+                  className="p-0.5"
+                >
                   <div className="w-8 h-8 flex items-center justify-center bg-gray-800/50 border border-gray-700 rounded font-mono text-xs text-gray-500">
                     {val}
                   </div>
                 </td>
               ))}
             </tr>
-            {text1.split("").map((rowChar, rowIndex) => ( 
+            {text1.split("").map((rowChar, rowIndex) => (
               <tr
                 // skipcq: JS-0437
                 key={`row-${rowIndex}`}
-                >
+              >
                 <td
                   className={`w-9 h-9 text-sm font-mono font-bold text-center ${
-                    currentStep?.i === rowIndex + 1 ? "text-blue-400" : "text-gray-400"
+                    currentStep?.i === rowIndex + 1
+                      ? "text-blue-400"
+                      : "text-gray-400"
                   }`}
                 >
                   {rowChar}
                 </td>
-                {currentDp[rowIndex + 1].map((val, colIdx) => { // skipcq: JS-R1005
+                {currentDp[rowIndex + 1].map((val, colIdx) => {
+                  // skipcq: JS-R1005
                   const isCurrentCell =
-                    currentStep?.i === rowIndex + 1 && currentStep?.j === colIdx;
+                    currentStep?.i === rowIndex + 1 &&
+                    currentStep?.j === colIdx;
                   const stepIdx = tableSteps.findIndex(
                     (s) => s.i === rowIndex + 1 && s.j === colIdx
                   );
                   const isFilled = stepIdx >= 0 && stepIdx < step;
 
-                  return ( 
+                  return (
                     <td
                       // skipcq: JS-0437
                       key={`r${rowIndex + 1}-c${colIdx}`}
-                      className="p-0.5">
+                      className="p-0.5"
+                    >
                       <div
                         className={`w-8 h-8 flex items-center justify-center rounded font-mono text-sm font-bold border-2 transition-all ${
                           isCurrentCell
@@ -851,14 +877,13 @@ const TabulationPhase = ({ // skipcq: JS-R1005
         </div>
       )}
 
-      <div className="text-xs text-gray-500">
-        Time: O(m×n) | Space: O(m×n)
-      </div>
+      <div className="text-xs text-gray-500">Time: O(m×n) | Space: O(m×n)</div>
     </div>
   );
 };
 
-const SpaceOptimizedPhase = ({ // skipcq: JS-R1005
+const SpaceOptimizedPhase = ({
+  // skipcq: JS-R1005
   step,
   spaceSteps,
   finalAnswer,

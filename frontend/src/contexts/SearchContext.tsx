@@ -235,7 +235,7 @@ export function SearchProvider({ children }: SearchProviderProps) {
     [isAuthenticated, recentlyViewed]
   );
 
-// skipcq: JS-R1005
+  // skipcq: JS-R1005
 
   const addFavorite = useCallback(
     async (contentType: SearchContentType, contentId: string) => {

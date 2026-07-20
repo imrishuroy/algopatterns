@@ -51,6 +51,7 @@ describe("CourseSidebar", () => {
       toggleComplete: vi.fn(),
       getCompletedCount: vi.fn().mockReturnValue(0),
       getProgress: vi.fn().mockReturnValue(0),
+      isLoading: false,
     });
   });
 
@@ -90,6 +91,7 @@ describe("CourseSidebar", () => {
       toggleComplete: vi.fn(),
       getCompletedCount: vi.fn().mockReturnValue(2),
       getProgress: vi.fn().mockReturnValue(50),
+      isLoading: false,
     });
 
     render(
@@ -128,6 +130,7 @@ describe("CourseSidebar", () => {
       toggleComplete: vi.fn(),
       getCompletedCount: vi.fn().mockReturnValue(2),
       getProgress: vi.fn().mockReturnValue(50),
+      isLoading: false,
     });
 
     render(

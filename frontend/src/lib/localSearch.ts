@@ -226,7 +226,7 @@ function toSearchResult(item: SearchableItem, score: number): SearchResult {
       slug: item.slug,
     },
   };
-// skipcq: JS-R1005
+  // skipcq: JS-R1005
 }
 
 // Main local search function with fuzzy matching
@@ -276,7 +276,7 @@ export function localSearch(
 // skipcq: JS-0067
 export function getLocalSearchCount(
   results: Record<SearchContentType, SearchResult[]>
-// skipcq: JS-R1005
+  // skipcq: JS-R1005
 ): number {
   return Object.values(results).reduce((sum, arr) => sum + arr.length, 0);
 }

@@ -16,7 +16,8 @@ const targetAmount = 11;
 
 // Compute the final answer and coin breakdown at module level from the same DP
 // used for the animation, so all banners stay in sync when coins/targetAmount change.
-const computeCoinChangeResult = ( // skipcq: JS-R1005
+const computeCoinChangeResult = (
+  // skipcq: JS-R1005
   coinList: number[],
   amount: number
 ): { answer: number; breakdown: string } => {
@@ -35,7 +36,10 @@ const computeCoinChangeResult = ( // skipcq: JS-R1005
   if (!isFinite(ans)) return { answer: Infinity, breakdown: "impossible" };
   const used: number[] = [];
   let a = amount; // skipcq: JS-C1002
-  while (a > 0) { used.push(coinUsed[a]); a -= coinUsed[a]; }
+  while (a > 0) {
+    used.push(coinUsed[a]);
+    a -= coinUsed[a];
+  }
   used.sort((x, y) => y - x);
   return { answer: ans, breakdown: used.join(" + ") };
 };
@@ -289,7 +293,8 @@ const CoinsDisplay = ({ currentCoin }: { currentCoin?: number }) => (
   </div>
 );
 
-const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => { // skipcq: JS-R1005
+const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
+  // skipcq: JS-R1005
   const currentAmount = Math.max(0, targetAmount - step);
 
   return (
@@ -326,7 +331,9 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
         <div className="text-center text-sm text-gray-400 bg-gray-800/50 px-4 py-2 rounded-lg font-mono mt-4">
           {currentAmount === 0 ? (
-            <span className="text-yellow-400">f(0) = 0 (base case: 0 coins for amount 0)</span>
+            <span className="text-yellow-400">
+              f(0) = 0 (base case: 0 coins for amount 0)
+            </span>
           ) : (
             <>
               f({currentAmount}) = 1 + min(
@@ -368,7 +375,8 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
   );
 };
 
-const TablePhase = ({ // skipcq: JS-R1005
+const TablePhase = ({
+  // skipcq: JS-R1005
   step,
   tableSteps,
 }: {
@@ -702,8 +710,8 @@ export default function CoinChangeVisualizer() {
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        coins = [{coins.join(", ")}] | amount = {targetAmount} | Answer: {COIN_CHANGE_ANSWER} coins
-        ({COIN_CHANGE_BREAKDOWN})
+        coins = [{coins.join(", ")}] | amount = {targetAmount} | Answer:{" "}
+        {COIN_CHANGE_ANSWER} coins ({COIN_CHANGE_BREAKDOWN})
       </div>
     </div>
   );

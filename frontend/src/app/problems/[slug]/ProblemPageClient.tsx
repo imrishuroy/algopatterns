@@ -1242,7 +1242,7 @@ export default function ProblemPageClient({ params }: PageProps) {
   useEffect(() => {
     handleRunRef.current = handleRun;
     handleSubmitRef.current = handleSubmit;
-  // skipcq: JS-R1005
+    // skipcq: JS-R1005
   });
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -1315,7 +1315,7 @@ export default function ProblemPageClient({ params }: PageProps) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [leftPanelWidth, isAIChatOpen]
+    [leftPanelWidth, isAIChatOpen, setLeftPanelWidth]
   );
 
   // Resizable right panel (AI Chat)
@@ -1346,7 +1346,7 @@ export default function ProblemPageClient({ params }: PageProps) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [rightPanelWidth]
+    [rightPanelWidth, setRightPanelWidth]
   );
 
   // Vertical resizer for editor/results split
@@ -1374,7 +1374,7 @@ export default function ProblemPageClient({ params }: PageProps) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [editorHeight]
+    [editorHeight, setEditorHeight]
   );
 
   // Parse hints from problem
@@ -2617,8 +2617,8 @@ export default function ProblemPageClient({ params }: PageProps) {
                         <p>{solutions[slug].approach}</p>
                         <ol className="list-decimal list-inside space-y-1 text-gray-400 mt-3">
                           {solutions[slug].steps.map((step) => (
-                                <li key={step}>{step}</li>
-                              ))}
+                            <li key={step}>{step}</li>
+                          ))}
                         </ol>
                       </div>
                     </div>

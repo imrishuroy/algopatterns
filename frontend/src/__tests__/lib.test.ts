@@ -993,7 +993,8 @@ describe("aiApiClient", () => {
         json: () => Promise.resolve({}),
         body: {
           getReader: () => ({
-            read: async () => { // skipcq: JS-0116
+            read: async () => {
+              // skipcq: JS-0116
               if (idx < chunks.length) {
                 return {
                   done: false,

@@ -33,22 +33,25 @@ type ClaudeConfig struct {
 
 // DeepSeekConfig holds DeepSeek provider configuration
 type DeepSeekConfig struct {
-	Enabled  bool
-	BaseURL  string
-	APIKey   string
-	Model    string
-	Timeout  time.Duration
-	MaxRetry int
+	Enabled          bool
+	BaseURL          string
+	APIKey           string
+	Model            string
+	Timeout          time.Duration
+	MaxRetry         int
+	ReasoningEffort  string // "low", "medium", "high" (reasoning models only)
+	IncludeReasoning *bool  // false to suppress reasoning in response
 }
 
 // GroqConfig holds Groq provider configuration
 type GroqConfig struct {
-	Enabled  bool
-	BaseURL  string
-	APIKey   string
-	Model    string
-	Timeout  time.Duration
-	MaxRetry int
+	Enabled         bool
+	BaseURL         string
+	APIKey          string
+	Model           string
+	Timeout         time.Duration
+	MaxRetry        int
+	ReasoningEffort string // "low", "medium", "high" (GPT-OSS only)
 }
 
 // NVIDIAConfig holds NVIDIA provider configuration
@@ -114,17 +117,18 @@ func DefaultConfig() Config {
 		DeepSeek: DeepSeekConfig{
 			Enabled:  false,
 			BaseURL:  "https://api.deepseek.com/v1",
-			Model:    "deepseek-chat",
+			Model:    "deepseek-v4-pro",
 			Timeout:  60 * time.Second,
 			MaxRetry: 2,
 		},
 
 		Groq: GroqConfig{
-			Enabled:  false,
-			BaseURL:  "https://api.groq.com/openai/v1",
-			Model:    "openai/gpt-oss-120b",
-			Timeout:  60 * time.Second,
-			MaxRetry: 2,
+			Enabled:         false,
+			BaseURL:         "https://api.groq.com/openai/v1",
+			Model:           "openai/gpt-oss-120b",
+			Timeout:         60 * time.Second,
+			MaxRetry:        2,
+			ReasoningEffort: "high",
 		},
 
 		NVIDIA: NVIDIAConfig{

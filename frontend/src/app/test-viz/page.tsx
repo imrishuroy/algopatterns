@@ -15,7 +15,9 @@ const LISVisualizer = dynamic(
 export default function TestVizPage() {
   return (
     <div className="min-h-screen bg-gray-900 p-8">
-      <h1 className="text-3xl font-bold text-white mb-8">LIS Visualizer Test</h1>
+      <h1 className="text-3xl font-bold text-white mb-8">
+        LIS Visualizer Test
+      </h1>
       <LISVisualizer />
     </div>
   );

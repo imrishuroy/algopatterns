@@ -33,7 +33,8 @@ interface MemoStep {
 const generateRecursionSteps = (): RecursionStep[] => {
   const steps: RecursionStep[] = [];
 
-  const solve = (index: number, prevIndex: number): number => { // skipcq: JS-R1005
+  const solve = (index: number, prevIndex: number): number => {
+    // skipcq: JS-R1005
     const prevVal = prevIndex === -1 ? "-∞" : String(treeNums[prevIndex]);
 
     if (index >= treeNums.length) {
@@ -229,19 +230,78 @@ interface TreeNodeData {
   edgeLabel: string;
 }
 
-const buildRecursionTreeData = (): { nodes: TreeNodeData[]; visitOrder: number[] } => {
+const buildRecursionTreeData = (): {
+  nodes: TreeNodeData[];
+  visitOrder: number[];
+} => {
   const nodes: TreeNodeData[] = [];
   const visitOrder: number[] = [];
 
-  nodes.push({ id: 0, label: "(0,-)", x: 350, y: 35, result: null, parentId: null, edgeLabel: "" });
+  nodes.push({
+    id: 0,
+    label: "(0,-)",
+    x: 350,
+    y: 35,
+    result: null,
+    parentId: null,
+    edgeLabel: "",
+  });
 
-  nodes.push({ id: 1, label: "(1,0)", x: 175, y: 100, result: null, parentId: 0, edgeLabel: "take 2" });
-  nodes.push({ id: 2, label: "(1,-)", x: 525, y: 100, result: null, parentId: 0, edgeLabel: "skip" });
+  nodes.push({
+    id: 1,
+    label: "(1,0)",
+    x: 175,
+    y: 100,
+    result: null,
+    parentId: 0,
+    edgeLabel: "take 2",
+  });
+  nodes.push({
+    id: 2,
+    label: "(1,-)",
+    x: 525,
+    y: 100,
+    result: null,
+    parentId: 0,
+    edgeLabel: "skip",
+  });
 
-  nodes.push({ id: 3, label: "(2,1)", x: 90, y: 165, result: null, parentId: 1, edgeLabel: "take 5" });
-  nodes.push({ id: 4, label: "(2,0)", x: 260, y: 165, result: null, parentId: 1, edgeLabel: "skip" });
-  nodes.push({ id: 5, label: "(2,1)", x: 440, y: 165, result: null, parentId: 2, edgeLabel: "take 5" });
-  nodes.push({ id: 6, label: "(2,-)", x: 610, y: 165, result: null, parentId: 2, edgeLabel: "skip" });
+  nodes.push({
+    id: 3,
+    label: "(2,1)",
+    x: 90,
+    y: 165,
+    result: null,
+    parentId: 1,
+    edgeLabel: "take 5",
+  });
+  nodes.push({
+    id: 4,
+    label: "(2,0)",
+    x: 260,
+    y: 165,
+    result: null,
+    parentId: 1,
+    edgeLabel: "skip",
+  });
+  nodes.push({
+    id: 5,
+    label: "(2,1)",
+    x: 440,
+    y: 165,
+    result: null,
+    parentId: 2,
+    edgeLabel: "take 5",
+  });
+  nodes.push({
+    id: 6,
+    label: "(2,-)",
+    x: 610,
+    y: 165,
+    result: null,
+    parentId: 2,
+    edgeLabel: "skip",
+  });
 
   visitOrder.push(0);
   visitOrder.push(1);
@@ -268,7 +328,8 @@ const buildRecursionTreeData = (): { nodes: TreeNodeData[]; visitOrder: number[]
   return { nodes, visitOrder };
 };
 
-const TreePhase = ({ // skipcq: JS-R1005
+const TreePhase = ({
+  // skipcq: JS-R1005
   step,
   recursionSteps,
 }: {
@@ -286,7 +347,8 @@ const TreePhase = ({ // skipcq: JS-R1005
     return set;
   }, [step, visitOrder]);
 
-  const currentNodeId = step > 0 && step <= visitOrder.length ? visitOrder[step - 1] : null;
+  const currentNodeId =
+    step > 0 && step <= visitOrder.length ? visitOrder[step - 1] : null;
 
   return (
     // skipcq: JS-0415
@@ -298,7 +360,7 @@ const TreePhase = ({ // skipcq: JS-R1005
       <svg width="700" height="220" className="mx-auto">
         {nodes.map((node) => {
           if (node.parentId === null) return null;
-          const parent = nodes.find(n => n.id === node.parentId);
+          const parent = nodes.find((n) => n.id === node.parentId);
           if (!parent) return null;
 
           const isVisited = visitedSet.has(node.id);
@@ -326,7 +388,8 @@ const TreePhase = ({ // skipcq: JS-R1005
           );
         })}
 
-        {nodes.map((node) => { // skipcq: JS-R1005
+        {nodes.map((node) => {
+          // skipcq: JS-R1005
           const isVisited = visitedSet.has(node.id);
           const isCurrent = node.id === currentNodeId;
           const hasResult = node.result !== null && isVisited;
@@ -346,12 +409,33 @@ const TreePhase = ({ // skipcq: JS-R1005
 
           return (
             <g key={`node-${node.id}`} opacity={isVisited ? 1 : 0.2}>
-              <circle cx={node.x} cy={node.y} r="24" fill={fill} stroke={stroke} strokeWidth="2" />
-              <text x={node.x} y={node.y + 5} fill="white" fontSize="13" textAnchor="middle" fontFamily="monospace" fontWeight="500">
+              <circle
+                cx={node.x}
+                cy={node.y}
+                r="24"
+                fill={fill}
+                stroke={stroke}
+                strokeWidth="2"
+              />
+              <text
+                x={node.x}
+                y={node.y + 5}
+                fill="white"
+                fontSize="13"
+                textAnchor="middle"
+                fontFamily="monospace"
+                fontWeight="500"
+              >
                 {node.label}
               </text>
               {hasResult && (
-                <text x={node.x + 28} y={node.y + 5} fill="#86efac" fontSize="12" fontWeight="bold">
+                <text
+                  x={node.x + 28}
+                  y={node.y + 5}
+                  fill="#86efac"
+                  fontSize="12"
+                  fontWeight="bold"
+                >
                   ={node.result}
                 </text>
               )}
@@ -368,7 +452,9 @@ const TreePhase = ({ // skipcq: JS-R1005
 
       {step >= recursionSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: LIS length = 2</span>
+          <span className="text-green-400 font-bold">
+            Answer: LIS length = 2
+          </span>
           <span className="text-gray-400 ml-2">(e.g., [2, 5] or [2, 3])</span>
         </div>
       )}
@@ -380,17 +466,76 @@ const TreePhase = ({ // skipcq: JS-R1005
   );
 };
 
-const buildMemoTreeData = (): { nodes: TreeNodeData[]; visitOrder: { nodeId: number; fromCache: boolean }[] } => {
+const buildMemoTreeData = (): {
+  nodes: TreeNodeData[];
+  visitOrder: { nodeId: number; fromCache: boolean }[];
+} => {
   const nodes: TreeNodeData[] = [];
   const visitOrder: { nodeId: number; fromCache: boolean }[] = [];
 
-  nodes.push({ id: 0, label: "(0,-)", x: 250, y: 35, result: null, parentId: null, edgeLabel: "" });
-  nodes.push({ id: 1, label: "(1,0)", x: 125, y: 100, result: null, parentId: 0, edgeLabel: "take 2" });
-  nodes.push({ id: 2, label: "(1,-)", x: 375, y: 100, result: null, parentId: 0, edgeLabel: "skip" });
-  nodes.push({ id: 3, label: "(2,1)", x: 65, y: 165, result: null, parentId: 1, edgeLabel: "take 5" });
-  nodes.push({ id: 4, label: "(2,0)", x: 185, y: 165, result: null, parentId: 1, edgeLabel: "skip" });
-  nodes.push({ id: 5, label: "(2,1)", x: 315, y: 165, result: null, parentId: 2, edgeLabel: "take 5" });
-  nodes.push({ id: 6, label: "(2,-)", x: 435, y: 165, result: null, parentId: 2, edgeLabel: "skip" });
+  nodes.push({
+    id: 0,
+    label: "(0,-)",
+    x: 250,
+    y: 35,
+    result: null,
+    parentId: null,
+    edgeLabel: "",
+  });
+  nodes.push({
+    id: 1,
+    label: "(1,0)",
+    x: 125,
+    y: 100,
+    result: null,
+    parentId: 0,
+    edgeLabel: "take 2",
+  });
+  nodes.push({
+    id: 2,
+    label: "(1,-)",
+    x: 375,
+    y: 100,
+    result: null,
+    parentId: 0,
+    edgeLabel: "skip",
+  });
+  nodes.push({
+    id: 3,
+    label: "(2,1)",
+    x: 65,
+    y: 165,
+    result: null,
+    parentId: 1,
+    edgeLabel: "take 5",
+  });
+  nodes.push({
+    id: 4,
+    label: "(2,0)",
+    x: 185,
+    y: 165,
+    result: null,
+    parentId: 1,
+    edgeLabel: "skip",
+  });
+  nodes.push({
+    id: 5,
+    label: "(2,1)",
+    x: 315,
+    y: 165,
+    result: null,
+    parentId: 2,
+    edgeLabel: "take 5",
+  });
+  nodes.push({
+    id: 6,
+    label: "(2,-)",
+    x: 435,
+    y: 165,
+    result: null,
+    parentId: 2,
+    edgeLabel: "skip",
+  });
 
   visitOrder.push({ nodeId: 0, fromCache: false });
   visitOrder.push({ nodeId: 1, fromCache: false });
@@ -416,29 +561,39 @@ const buildMemoTreeData = (): { nodes: TreeNodeData[]; visitOrder: { nodeId: num
   return { nodes, visitOrder };
 };
 
-const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
+const MemoPhase = ({
+  // skipcq: JS-0415, JS-R1005
   step,
   memoSteps,
 }: {
   step: number;
   memoSteps: MemoStep[];
 }) => {
-  const currentStep = step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
   const visibleSteps = memoSteps.slice(0, step);
 
   const { nodes, visitOrder } = useMemo(() => buildMemoTreeData(), []);
 
   const visitedInfo = useMemo(() => {
-    const info = new Map<number, { visited: boolean; fromCache: boolean; result: number | null }>();
+    const info = new Map<
+      number,
+      { visited: boolean; fromCache: boolean; result: number | null }
+    >();
     for (let i = 0; i < Math.min(step, visitOrder.length); i++) {
       const v = visitOrder[i]; // skipcq: JS-C1002
-      const node = nodes.find(n => n.id === v.nodeId);
-      info.set(v.nodeId, { visited: true, fromCache: v.fromCache, result: node?.result ?? null });
+      const node = nodes.find((n) => n.id === v.nodeId);
+      info.set(v.nodeId, {
+        visited: true,
+        fromCache: v.fromCache,
+        result: node?.result ?? null,
+      });
     }
     return info;
   }, [step, visitOrder, nodes]);
 
-  const currentNodeId = step > 0 && step <= visitOrder.length ? visitOrder[step - 1].nodeId : null;
+  const currentNodeId =
+    step > 0 && step <= visitOrder.length ? visitOrder[step - 1].nodeId : null;
 
   const currentMemo = useMemo(() => {
     const memo: (number | null)[][] = Array.from(
@@ -453,7 +608,7 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
     return memo;
   }, [visibleSteps]);
 
-  const cacheHits = visibleSteps.filter(s => s.fromCache).length;
+  const cacheHits = visibleSteps.filter((s) => s.fromCache).length;
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -463,11 +618,14 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
 
       <div className="flex gap-6 items-start flex-wrap justify-center">
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">Recursion Tree</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            Recursion Tree
+          </div>
           <svg width="500" height="210" className="mx-auto">
-            {nodes.map((node) => { // skipcq: JS-R1005
+            {nodes.map((node) => {
+              // skipcq: JS-R1005
               if (node.parentId === null) return null;
-              const parent = nodes.find(n => n.id === node.parentId);
+              const parent = nodes.find((n) => n.id === node.parentId);
               if (!parent) return null;
 
               const info = visitedInfo.get(node.id);
@@ -499,7 +657,8 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
               );
             })}
 
-            {nodes.map((node) => { // skipcq: JS-R1005
+            {nodes.map((node) => {
+              // skipcq: JS-R1005
               const info = visitedInfo.get(node.id);
               const isVisited = !!info?.visited; // skipcq: JS-0066
               const isCacheHit = info?.fromCache;
@@ -523,12 +682,33 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
 
               return (
                 <g key={`memo-node-${node.id}`} opacity={isVisited ? 1 : 0.2}>
-                  <circle cx={node.x} cy={node.y} r="22" fill={fill} stroke={stroke} strokeWidth="2" />
-                  <text x={node.x} y={node.y + 5} fill="white" fontSize="12" textAnchor="middle" fontFamily="monospace" fontWeight="500">
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r="22"
+                    fill={fill}
+                    stroke={stroke}
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={node.x}
+                    y={node.y + 5}
+                    fill="white"
+                    fontSize="12"
+                    textAnchor="middle"
+                    fontFamily="monospace"
+                    fontWeight="500"
+                  >
                     {node.label}
                   </text>
                   {isVisited && node.result !== null && (
-                    <text x={node.x + 26} y={node.y + 5} fill={isCacheHit ? "#fde047" : "#86efac"} fontSize="11" fontWeight="bold">
+                    <text
+                      x={node.x + 26}
+                      y={node.y + 5}
+                      fill={isCacheHit ? "#fde047" : "#86efac"}
+                      fontSize="11"
+                      fontWeight="bold"
+                    >
                       ={node.result}
                     </text>
                   )}
@@ -539,25 +719,38 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
         </div>
 
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">Memo Table</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            Memo Table
+          </div>
           <table className="border-collapse">
             <thead>
               <tr>
                 <th className="w-7 h-5 text-xs text-gray-500">i\p</th>
                 {Array.from({ length: treeNums.length + 1 }, (_, p) => (
-                  <th key={`memo-h-${p}`} className="w-7 h-5 text-xs text-gray-500">{p - 1}</th>
+                  <th
+                    key={`memo-h-${p}`}
+                    className="w-7 h-5 text-xs text-gray-500"
+                  >
+                    {p - 1}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {currentMemo.map((row, rowIndex) => ( 
+              {currentMemo.map((row, rowIndex) => (
                 <tr
                   // skipcq: JS-0437
                   key={`memo-r-${rowIndex}`}
-                  >
-                  <td className="w-7 h-7 text-xs text-gray-500 text-center">{rowIndex}</td>
-                  {row.map((val, colIndex) => { // skipcq: JS-R1005
-                    const isCurrentCell = currentStep && currentStep.index === rowIndex && currentStep.prevIndex + 1 === colIndex;
+                >
+                  <td className="w-7 h-7 text-xs text-gray-500 text-center">
+                    {rowIndex}
+                  </td>
+                  {row.map((val, colIndex) => {
+                    // skipcq: JS-R1005
+                    const isCurrentCell =
+                      currentStep &&
+                      currentStep.index === rowIndex &&
+                      currentStep.prevIndex + 1 === colIndex;
                     const isCacheHit = currentStep?.fromCache && isCurrentCell;
 
                     return (
@@ -565,8 +758,12 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
                         key={`memo-c-${rowIndex}-${colIndex}`} // skipcq: JS-0437
                         className={`w-7 h-7 border border-gray-700 text-center font-mono text-xs transition-all ${
                           isCurrentCell
-                            ? isCacheHit ? "bg-yellow-600/30 border-yellow-500" : "bg-blue-600/30 border-blue-500"
-                            : val !== null ? "bg-green-600/20" : "bg-gray-800/50"
+                            ? isCacheHit
+                              ? "bg-yellow-600/30 border-yellow-500"
+                              : "bg-blue-600/30 border-blue-500"
+                            : val !== null
+                              ? "bg-green-600/20"
+                              : "bg-gray-800/50"
                         }`}
                       >
                         {val !== null ? val : "-"}
@@ -581,27 +778,38 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
       </div>
 
       {currentStep && (
-        <div className={`text-sm text-center font-mono px-4 py-2 rounded-lg ${
-          currentStep.fromCache ? "bg-yellow-600/20 text-yellow-400" : "bg-blue-600/20 text-blue-300"
-        }`}>
+        <div
+          className={`text-sm text-center font-mono px-4 py-2 rounded-lg ${
+            currentStep.fromCache
+              ? "bg-yellow-600/20 text-yellow-400"
+              : "bg-blue-600/20 text-blue-300"
+          }`}
+        >
           {currentStep.action}
         </div>
       )}
 
       <div className="flex gap-4 text-sm">
-        <div className="text-gray-400">Computed: <span className="text-green-400">{step - cacheHits}</span></div>
-        <div className="text-gray-400">Cache hits: <span className="text-yellow-400">{cacheHits}</span></div>
+        <div className="text-gray-400">
+          Computed: <span className="text-green-400">{step - cacheHits}</span>
+        </div>
+        <div className="text-gray-400">
+          Cache hits: <span className="text-yellow-400">{cacheHits}</span>
+        </div>
       </div>
 
       {step >= memoSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: LIS length = 2</span>
+          <span className="text-green-400 font-bold">
+            Answer: LIS length = 2
+          </span>
           <span className="text-gray-400 ml-2">(e.g., [2, 5] or [2, 3])</span>
         </div>
       )}
 
       <div className="text-xs text-gray-500 text-center">
-        Yellow nodes = cache hit, skips recomputing subtree. Green = freshly computed.
+        Yellow nodes = cache hit, skips recomputing subtree. Green = freshly
+        computed.
       </div>
     </div>
   );
@@ -779,7 +987,8 @@ const ArrayDisplay = ({
   </div>
 );
 
-const TablePhase = ({ // skipcq: JS-R1005
+const TablePhase = ({
+  // skipcq: JS-R1005
   step,
   tableSteps,
 }: {
@@ -835,7 +1044,9 @@ const TablePhase = ({ // skipcq: JS-R1005
       )}
       {step >= tableSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: LIS length = {Math.max(...currentDp)}</span>
+          <span className="text-green-400 font-bold">
+            Answer: LIS length = {Math.max(...currentDp)}
+          </span>
           <span className="text-gray-400 ml-2">(e.g., [2, 3, 7, 101])</span>
         </div>
       )}
@@ -846,7 +1057,8 @@ const TablePhase = ({ // skipcq: JS-R1005
   );
 };
 
-const BinaryPhase = ({ // skipcq: JS-R1005
+const BinaryPhase = ({
+  // skipcq: JS-R1005
   step,
   binarySteps,
 }: {
@@ -892,7 +1104,10 @@ const BinaryPhase = ({ // skipcq: JS-R1005
       )}
       {step >= binarySteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: LIS length = {binarySteps[binarySteps.length - 1]?.tails.length || 0}</span>
+          <span className="text-green-400 font-bold">
+            Answer: LIS length ={" "}
+            {binarySteps[binarySteps.length - 1]?.tails.length || 0}
+          </span>
           <span className="text-gray-400 ml-2">(e.g., [2, 3, 7, 101])</span>
         </div>
       )}
@@ -906,7 +1121,6 @@ const BinaryPhase = ({ // skipcq: JS-R1005
 
 // skipcq: JS-0067
 export default function LISVisualizer() {
-  // skipcq: JS-0067
   const phases: Phase[] = ["tree", "memo", "table", "binary"];
   const phaseLabels: Record<Phase, string> = {
     tree: "Recursion",
@@ -934,7 +1148,12 @@ export default function LISVisualizer() {
       if (phase === "memo") return memoSteps.length;
       return nums.length;
     },
-    [tableSteps.length, binarySteps.length, recursionSteps.length, memoSteps.length]
+    [
+      tableSteps.length,
+      binarySteps.length,
+      recursionSteps.length,
+      memoSteps.length,
+    ]
   );
 
   const maxSteps = getMaxSteps(currentPhase);

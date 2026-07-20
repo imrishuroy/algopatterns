@@ -87,7 +87,10 @@ interface WhyPairsStep {
 
 const generateRobberSteps = (): { steps: RobberStep[]; answer: number } => {
   const steps: RobberStep[] = [];
-  const dp: { inc: number; exc: number }[] = robberTree.map(() => ({ inc: 0, exc: 0 }));
+  const dp: { inc: number; exc: number }[] = robberTree.map(() => ({
+    inc: 0,
+    exc: 0,
+  }));
 
   const postorder = (id: number) => {
     const node = robberTree[id];
@@ -100,7 +103,10 @@ const generateRobberSteps = (): { steps: RobberStep[]; answer: number } => {
       phase: "visit",
     });
 
-    let leftInc = 0, leftExc = 0, rightInc = 0, rightExc = 0;
+    let leftInc = 0,
+      leftExc = 0,
+      rightInc = 0,
+      rightExc = 0;
 
     if (node.left !== null) {
       postorder(node.left);
@@ -142,7 +148,8 @@ const generateDiameterSteps = (): { steps: DiameterStep[]; answer: number } => {
   const postorder = (id: number): number => {
     const node = diameterTree[id];
 
-    let leftH = 0, rightH = 0;
+    let leftH = 0,
+      rightH = 0;
     if (node.left !== null) {
       leftH = postorder(node.left);
     }
@@ -184,7 +191,8 @@ const generateWhyPairsSteps = (): WhyPairsStep[] => {
     wrongValue: 4,
     inc: 4,
     exc: 0,
-    explanation: "Leaf 4: Single-value 'best=4'. With pairs: inc=4 (take it), exc=0 (skip it).",
+    explanation:
+      "Leaf 4: Single-value 'best=4'. With pairs: inc=4 (take it), exc=0 (skip it).",
     showsProblem: false,
   });
 
@@ -194,7 +202,8 @@ const generateWhyPairsSteps = (): WhyPairsStep[] => {
     wrongValue: 4,
     inc: 3,
     exc: 4,
-    explanation: "Node 3: Single-value 'best=max(3+0, 4)=4'. But to compute parent, we need to know: was 4 included?",
+    explanation:
+      "Node 3: Single-value 'best=max(3+0, 4)=4'. But to compute parent, we need to know: was 4 included?",
     showsProblem: true,
   });
 
@@ -204,7 +213,8 @@ const generateWhyPairsSteps = (): WhyPairsStep[] => {
     wrongValue: 4,
     inc: 6,
     exc: 4,
-    explanation: "Root 2: Can we take 2? Only if child 3 was EXCLUDED. Single-value 'best=4' loses this info!",
+    explanation:
+      "Root 2: Can we take 2? Only if child 3 was EXCLUDED. Single-value 'best=4' loses this info!",
     showsProblem: true,
   });
 
@@ -214,7 +224,8 @@ const generateWhyPairsSteps = (): WhyPairsStep[] => {
     wrongValue: 4,
     inc: 6,
     exc: 4,
-    explanation: "With pairs: inc[2]=2+exc[3]=2+4=6, exc[2]=max(inc[3],exc[3])=max(3,4)=4. Answer=max(6,4)=6!",
+    explanation:
+      "With pairs: inc[2]=2+exc[3]=2+4=6, exc[2]=max(inc[3],exc[3])=max(3,4)=4. Answer=max(6,4)=6!",
     showsProblem: false,
   });
 
@@ -251,8 +262,18 @@ const Controls = ({
         disabled={step === 0}
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
       {isPlaying ? (
@@ -271,7 +292,11 @@ const Controls = ({
           disabled={step >= total}
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 transition-all shadow-lg"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -281,16 +306,36 @@ const Controls = ({
         disabled={step >= total}
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
       <button
         onClick={onReset}
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-all ml-2"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </button>
     </div>
@@ -341,13 +386,16 @@ const TreeSVG = ({
   labelSide?: "right" | "left";
 }) => {
   const nodeRadius = 22;
-  const labelOffset = labelSide === "right" ? nodeRadius + 8 : -(nodeRadius + 8);
+  const labelOffset =
+    labelSide === "right" ? nodeRadius + 8 : -(nodeRadius + 8);
   const labelAnchor = labelSide === "right" ? "start" : "end";
 
   return (
     <svg width={width} height={height} className="mx-auto">
       {tree.map((node) => {
-        const children = [node.left, node.right].filter((c) => c !== null) as number[];
+        const children = [node.left, node.right].filter(
+          (c) => c !== null
+        ) as number[];
         return children.map((childId) => {
           const child = tree[childId];
           return (
@@ -364,7 +412,8 @@ const TreeSVG = ({
         });
       })}
 
-      {tree.map((node) => { // skipcq: JS-R1005
+      {tree.map((node) => {
+        // skipcq: JS-R1005
         const isComputed = computedNodes.has(node.id);
         const isCurrent = currentNodeId === node.id;
         const label = nodeLabels?.get(node.id);
@@ -377,7 +426,9 @@ const TreeSVG = ({
               cy={node.y}
               r={nodeRadius}
               fill={isCurrent ? "#2563EB" : isComputed ? "#059669" : "#374151"}
-              stroke={isCurrent ? "#60A5FA" : isComputed ? "#34D399" : "#6B7280"}
+              stroke={
+                isCurrent ? "#60A5FA" : isComputed ? "#34D399" : "#6B7280"
+              }
               strokeWidth={3}
               animate={{
                 scale: isCurrent ? 1.1 : 1,
@@ -430,7 +481,14 @@ const TreeSVG = ({
   );
 };
 
-const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] }) => { // skipcq: JS-0415, JS-R1005
+const WhyPairsPhase = ({
+  step,
+  steps,
+}: {
+  step: number;
+  steps: WhyPairsStep[];
+}) => {
+  // skipcq: JS-0415, JS-R1005
   const currentStep = step > 0 && step <= steps.length ? steps[step - 1] : null;
 
   const computedNodes = useMemo(() => {
@@ -460,7 +518,9 @@ const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] })
 
       <div className="flex gap-8 items-start flex-wrap justify-center">
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">Chain: 2 - 3 - 4</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            Chain: 2 - 3 - 4
+          </div>
           <TreeSVG
             tree={chainTree}
             computedNodes={computedNodes}
@@ -474,19 +534,24 @@ const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] })
 
         <div className="bg-gray-800/50 rounded-lg p-4 max-w-xs">
           <div className="text-sm text-gray-300 mb-3">
-            <span className="text-red-400 font-bold">Problem:</span> Max non-adjacent sum
+            <span className="text-red-400 font-bold">Problem:</span> Max
+            non-adjacent sum
           </div>
           <div className="text-xs text-gray-400 space-y-2">
             <div>
-              <span className="text-red-400">Wrong:</span> dp[node] = best sum for subtree
+              <span className="text-red-400">Wrong:</span> dp[node] = best sum
+              for subtree
             </div>
             <div>
-              <span className="text-green-400">Correct:</span> dp[node] = (include, exclude) pair
+              <span className="text-green-400">Correct:</span> dp[node] =
+              (include, exclude) pair
             </div>
           </div>
           <div className="mt-3 pt-3 border-t border-gray-700 text-xs">
             <div className="text-green-400">inc[n] = n.val + exc[children]</div>
-            <div className="text-red-400">exc[n] = sum(max(inc,exc) per child)</div>
+            <div className="text-red-400">
+              exc[n] = sum(max(inc,exc) per child)
+            </div>
           </div>
         </div>
       </div>
@@ -516,13 +581,23 @@ const WhyPairsPhase = ({ step, steps }: { step: number; steps: WhyPairsStep[] })
       )}
 
       <div className="text-xs text-gray-500 text-center">
-        Optimal for chain 2-3-4 is 2+4=6 (skip 3). Single-value DP cannot compute this!
+        Optimal for chain 2-3-4 is 2+4=6 (skip 3). Single-value DP cannot
+        compute this!
       </div>
     </div>
   );
 };
 
-const RobberPhase = ({ step, steps, answer }: { step: number; steps: RobberStep[]; answer: number }) => { // skipcq: JS-R1005
+const RobberPhase = ({
+  step,
+  steps,
+  answer,
+}: {
+  step: number;
+  steps: RobberStep[];
+  answer: number;
+}) => {
+  // skipcq: JS-R1005
   const computedNodes = useMemo(() => {
     const map = new Map<number, { top: string; bottom: string }>();
     for (let s = 0; s < Math.min(step, steps.length); s++) {
@@ -589,18 +664,31 @@ const RobberPhase = ({ step, steps, answer }: { step: number; steps: RobberStep[
       )}
 
       <div className="text-xs text-gray-500 text-center max-w-md">
-        Postorder traversal: process children BEFORE parent. Each node returns (include, exclude) pair.
+        Postorder traversal: process children BEFORE parent. Each node returns
+        (include, exclude) pair.
       </div>
     </div>
   );
 };
 
-const DiameterPhase = ({ step, steps, answer }: { step: number; steps: DiameterStep[]; answer: number }) => { // skipcq: JS-R1005
+const DiameterPhase = ({
+  step,
+  steps,
+  answer,
+}: {
+  step: number;
+  steps: DiameterStep[];
+  answer: number;
+}) => {
+  // skipcq: JS-R1005
   const computedNodes = useMemo(() => {
     const map = new Map<number, { top: string; bottom: string }>();
     for (let s = 0; s < Math.min(step, steps.length); s++) {
       const st = steps[s];
-      map.set(st.nodeId, { top: `h=${st.height}`, bottom: `path=${st.pathThrough}` });
+      map.set(st.nodeId, {
+        top: `h=${st.height}`,
+        bottom: `path=${st.pathThrough}`,
+      });
     }
     return map;
   }, [step, steps]);
@@ -622,14 +710,18 @@ const DiameterPhase = ({ step, steps, answer }: { step: number; steps: DiameterS
 
       <div className="flex gap-4 text-xs flex-wrap justify-center">
         <div className="text-green-400">h = subtree depth (1 for leaf)</div>
-        <div className="text-red-400">path = left_h + right_h (edges through node)</div>
+        <div className="text-red-400">
+          path = left_h + right_h (edges through node)
+        </div>
       </div>
 
       <div className="bg-gray-800/50 rounded-lg p-3 text-xs text-gray-400 max-w-md">
         <div className="font-bold text-white mb-1">Recurrence:</div>
         <div>height[n] = 1 + max(height[left], height[right])</div>
         <div>pathThrough[n] = height[left] + height[right]</div>
-        <div className="text-yellow-400 mt-1">diameter = max(pathThrough) across all nodes</div>
+        <div className="text-yellow-400 mt-1">
+          diameter = max(pathThrough) across all nodes
+        </div>
       </div>
 
       {currentStep && (
@@ -641,7 +733,9 @@ const DiameterPhase = ({ step, steps, answer }: { step: number; steps: DiameterS
         >
           {currentStep.formula}
           {currentStep.maxDiameter > 0 && (
-            <span className="text-yellow-400 ml-2">| maxDia={currentStep.maxDiameter}</span>
+            <span className="text-yellow-400 ml-2">
+              | maxDia={currentStep.maxDiameter}
+            </span>
           )}
         </motion.div>
       )}
@@ -658,7 +752,8 @@ const DiameterPhase = ({ step, steps, answer }: { step: number; steps: DiameterS
       )}
 
       <div className="text-xs text-gray-500 text-center max-w-md">
-        Each node reports HEIGHT up to parent. Diameter is tracked globally as max path through any node.
+        Each node reports HEIGHT up to parent. Diameter is tracked globally as
+        max path through any node.
       </div>
     </div>
   );
@@ -680,8 +775,14 @@ export default function TreeDPVisualizer() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const whyPairsSteps = useMemo(() => generateWhyPairsSteps(), []);
-  const { steps: robberSteps, answer: robberAnswer } = useMemo(() => generateRobberSteps(), []);
-  const { steps: diameterSteps, answer: diameterAnswer } = useMemo(() => generateDiameterSteps(), []);
+  const { steps: robberSteps, answer: robberAnswer } = useMemo(
+    () => generateRobberSteps(),
+    []
+  );
+  const { steps: diameterSteps, answer: diameterAnswer } = useMemo(
+    () => generateDiameterSteps(),
+    []
+  );
 
   const getMaxSteps = useCallback(
     (phase: Phase) => {
@@ -776,14 +877,29 @@ export default function TreeDPVisualizer() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {currentPhase === "why-pairs" && <WhyPairsPhase step={step} steps={whyPairsSteps} />}
-          {currentPhase === "robber" && <RobberPhase step={step} steps={robberSteps} answer={robberAnswer} />}
-          {currentPhase === "diameter" && <DiameterPhase step={step} steps={diameterSteps} answer={diameterAnswer} />}
+          {currentPhase === "why-pairs" && (
+            <WhyPairsPhase step={step} steps={whyPairsSteps} />
+          )}
+          {currentPhase === "robber" && (
+            <RobberPhase
+              step={step}
+              steps={robberSteps}
+              answer={robberAnswer}
+            />
+          )}
+          {currentPhase === "diameter" && (
+            <DiameterPhase
+              step={step}
+              steps={diameterSteps}
+              answer={diameterAnswer}
+            />
+          )}
         </motion.div>
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        House Robber III = {robberAnswer} | Tree Diameter = {diameterAnswer} edges | Chain 2-3-4 = 6
+        House Robber III = {robberAnswer} | Tree Diameter = {diameterAnswer}{" "}
+        edges | Chain 2-3-4 = 6
       </div>
     </div>
   );

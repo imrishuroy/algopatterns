@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -14,20 +15,24 @@ import (
 
 // DeepSeekProvider implements the Provider interface for DeepSeek API
 type DeepSeekProvider struct {
-	client   *http.Client
-	baseURL  string
-	apiKey   string
-	model    string
-	maxRetry int
+	client           *http.Client
+	baseURL          string
+	apiKey           string
+	model            string
+	maxRetry         int
+	reasoningEffort  string // "low", "medium", "high", or "" to omit
+	includeReasoning *bool  // nil to omit, false to suppress reasoning tokens
 }
 
 // DeepSeekConfig holds configuration for the DeepSeek provider
 type DeepSeekConfig struct {
-	BaseURL  string
-	APIKey   string
-	Model    string
-	Timeout  time.Duration
-	MaxRetry int
+	BaseURL          string
+	APIKey           string
+	Model            string
+	Timeout          time.Duration
+	MaxRetry         int
+	ReasoningEffort  string // "low", "medium", "high" (reasoning models only)
+	IncludeReasoning *bool  // false to suppress reasoning in response
 }
 
 // NewDeepSeekProvider creates a new DeepSeek provider
@@ -36,7 +41,7 @@ func NewDeepSeekProvider(cfg DeepSeekConfig) *DeepSeekProvider {
 		cfg.BaseURL = "https://api.deepseek.com/v1"
 	}
 	if cfg.Model == "" {
-		cfg.Model = "deepseek-chat"
+		cfg.Model = "deepseek-v4-pro"
 	}
 	if cfg.Timeout == 0 {
 		cfg.Timeout = 30 * time.Second
@@ -46,21 +51,38 @@ func NewDeepSeekProvider(cfg DeepSeekConfig) *DeepSeekProvider {
 	}
 
 	return &DeepSeekProvider{
-		client:   &http.Client{Timeout: cfg.Timeout},
-		baseURL:  cfg.BaseURL,
-		apiKey:   cfg.APIKey,
-		model:    cfg.Model,
-		maxRetry: cfg.MaxRetry,
+		client: &http.Client{
+			Timeout: cfg.Timeout,
+			Transport: &http.Transport{
+				DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
+					dialer := &net.Dialer{Timeout: 10 * time.Second}
+					return dialer.DialContext(ctx, "tcp4", addr)
+				},
+			},
+		},
+		baseURL:          cfg.BaseURL,
+		apiKey:           cfg.APIKey,
+		model:            cfg.Model,
+		maxRetry:         cfg.MaxRetry,
+		reasoningEffort:  cfg.ReasoningEffort,
+		includeReasoning: cfg.IncludeReasoning,
 	}
 }
 
 // deepseekRequest is the request format for DeepSeek API (OpenAI-compatible)
 type deepseekRequest struct {
-	Model       string    `json:"model"`
-	Messages    []Message `json:"messages"`
-	Temperature float64   `json:"temperature,omitempty"`
-	MaxTokens   int       `json:"max_tokens,omitempty"`
-	Stream      bool      `json:"stream,omitempty"`
+	Model            string         `json:"model"`
+	Messages         []Message      `json:"messages"`
+	Temperature      float64        `json:"temperature,omitempty"`
+	MaxTokens        int            `json:"max_tokens,omitempty"`
+	Stream           bool           `json:"stream,omitempty"`
+	ReasoningEffort  string         `json:"reasoning_effort,omitempty"`
+	IncludeReasoning *bool          `json:"include_reasoning,omitempty"`
+	Thinking         *thinkingParam `json:"thinking,omitempty"`
+}
+
+type thinkingParam struct {
+	Type string `json:"type"` // "enabled" or "disabled"
 }
 
 // deepseekResponse is the response format from DeepSeek API
@@ -72,8 +94,9 @@ type deepseekResponse struct {
 	Choices []struct {
 		Index   int `json:"index"`
 		Message struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
+			Role             string `json:"role"`
+			Content          string `json:"content"`
+			ReasoningContent string `json:"reasoning_content,omitempty"`
 		} `json:"message"`
 		FinishReason string `json:"finish_reason"`
 	} `json:"choices"`
@@ -81,6 +104,7 @@ type deepseekResponse struct {
 		PromptTokens     int `json:"prompt_tokens"`
 		CompletionTokens int `json:"completion_tokens"`
 		TotalTokens      int `json:"total_tokens"`
+		ReasoningTokens  int `json:"reasoning_tokens,omitempty"`
 	} `json:"usage"`
 }
 
@@ -93,8 +117,9 @@ type deepseekStreamResponse struct {
 	Choices []struct {
 		Index int `json:"index"`
 		Delta struct {
-			Role    string `json:"role,omitempty"`
-			Content string `json:"content,omitempty"`
+			Role             string `json:"role,omitempty"`
+			Content          string `json:"content,omitempty"`
+			ReasoningContent string `json:"reasoning_content,omitempty"`
 		} `json:"delta"`
 		FinishReason string `json:"finish_reason,omitempty"`
 	} `json:"choices"`
@@ -108,11 +133,18 @@ func (p *DeepSeekProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResp
 	}
 
 	deepseekReq := deepseekRequest{
-		Model:       model,
-		Messages:    req.Messages,
-		Temperature: req.Temperature,
-		MaxTokens:   req.MaxTokens,
-		Stream:      false,
+		Model:            model,
+		Messages:         req.Messages,
+		Temperature:      req.Temperature,
+		MaxTokens:        req.MaxTokens,
+		Stream:           false,
+		ReasoningEffort:  p.reasoningEffort,
+		IncludeReasoning: p.includeReasoning,
+	}
+
+	// Enable thinking for V4 Pro reasoning
+	if p.includeReasoning != nil && *p.includeReasoning {
+		deepseekReq.Thinking = &thinkingParam{Type: "enabled"}
 	}
 
 	body, err := json.Marshal(deepseekReq)
@@ -153,11 +185,12 @@ func (p *DeepSeekProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResp
 	}
 
 	return &ChatResponse{
-		Content:      deepseekResp.Choices[0].Message.Content,
-		Model:        deepseekResp.Model,
-		TokensInput:  deepseekResp.Usage.PromptTokens,
-		TokensOutput: deepseekResp.Usage.CompletionTokens,
-		FinishReason: deepseekResp.Choices[0].FinishReason,
+		Content:          deepseekResp.Choices[0].Message.Content,
+		ReasoningContent: deepseekResp.Choices[0].Message.ReasoningContent,
+		Model:            deepseekResp.Model,
+		TokensInput:      deepseekResp.Usage.PromptTokens,
+		TokensOutput:     deepseekResp.Usage.CompletionTokens,
+		FinishReason:     deepseekResp.Choices[0].FinishReason,
 	}, nil
 }
 
@@ -169,11 +202,18 @@ func (p *DeepSeekProvider) ChatStream(ctx context.Context, req ChatRequest) (<-c
 	}
 
 	deepseekReq := deepseekRequest{
-		Model:       model,
-		Messages:    req.Messages,
-		Temperature: req.Temperature,
-		MaxTokens:   req.MaxTokens,
-		Stream:      true,
+		Model:            model,
+		Messages:         req.Messages,
+		Temperature:      req.Temperature,
+		MaxTokens:        req.MaxTokens,
+		Stream:           true,
+		ReasoningEffort:  p.reasoningEffort,
+		IncludeReasoning: p.includeReasoning,
+	}
+
+	// Enable thinking for V4 Pro reasoning
+	if p.includeReasoning != nil && *p.includeReasoning {
+		deepseekReq.Thinking = &thinkingParam{Type: "enabled"}
 	}
 
 	body, err := json.Marshal(deepseekReq)
@@ -232,6 +272,11 @@ func (p *DeepSeekProvider) ChatStream(ctx context.Context, req ChatRequest) (<-c
 			}
 
 			if len(streamResp.Choices) > 0 {
+				reasoning := streamResp.Choices[0].Delta.ReasoningContent
+				if reasoning != "" {
+					chunks <- StreamChunk{ReasoningContent: reasoning}
+				}
+
 				content := streamResp.Choices[0].Delta.Content
 				if content != "" {
 					chunks <- StreamChunk{Content: content}

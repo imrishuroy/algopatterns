@@ -46,7 +46,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function DSAFundamentalsPage() { // skipcq: JS-0067
+// skipcq: JS-0067
+export default function DSAFundamentalsPage() {
   return (
     <DSAFundamentalsClient concepts={concepts} categories={conceptCategories} />
   );

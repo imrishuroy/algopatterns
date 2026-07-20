@@ -728,6 +728,7 @@ describe("useAIChat", () => {
             last_message_at: "2024-01-01T00:00:00Z",
             message_count: 1,
             total_tokens: 10,
+            context_type: "problem",
           },
         ],
       },
@@ -836,6 +837,7 @@ describe("useAIChat", () => {
             last_message_at: "2024-01-01T00:00:00Z",
             message_count: 2,
             total_tokens: 20,
+            context_type: "problem",
           },
         ],
       },
@@ -952,6 +954,7 @@ describe("useAIChat", () => {
             last_message_at: "2024-01-01T00:00:00Z",
             message_count: 1,
             total_tokens: 10,
+            context_type: "problem",
           },
         ],
       },
@@ -1002,6 +1005,7 @@ describe("useAIChat", () => {
             last_message_at: "2024-01-01T00:00:00Z",
             message_count: 1,
             total_tokens: 10,
+            context_type: "problem",
           },
         ],
       },
@@ -1032,6 +1036,7 @@ describe("useAIChat", () => {
   });
 
   it("should load chat history when patternId is provided", async () => {
+    // Mock an active (non-archived) session for the pattern
     vi.mocked(aiApiClient.getSessions).mockResolvedValue({
       success: true,
       data: {
@@ -1039,15 +1044,20 @@ describe("useAIChat", () => {
           {
             id: "pattern-session",
             user_id: "u1",
-            pattern_id: "two-pointers",
             is_archived: false,
+            pattern_id: "two-pointers",
             started_at: "2024-01-01T00:00:00Z",
             last_message_at: "2024-01-01T00:00:00Z",
             message_count: 1,
-            total_tokens: 5,
+            total_tokens: 10,
+            context_type: "pattern",
           },
         ],
       },
+    });
+    vi.mocked(aiApiClient.getArchivedSessions).mockResolvedValue({
+      success: true,
+      data: { sessions: [] },
     });
     vi.mocked(aiApiClient.getSessionMessages).mockResolvedValue({
       success: true,
@@ -1079,6 +1089,299 @@ describe("useAIChat", () => {
     expect(result.current.sessionId).toBe("pattern-session");
     expect(result.current.messages).toHaveLength(1);
     expect(result.current.messages[0].content).toBe("Pattern question");
+  });
+
+  it("should expose sessions list for general chat mode", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: {
+        sessions: [
+          {
+            id: "sess-1",
+            user_id: "u1",
+            is_archived: false,
+            title: "First Chat",
+            started_at: "2024-01-01T00:00:00Z",
+            last_message_at: "2024-01-01T00:00:00Z",
+            message_count: 5,
+            total_tokens: 100,
+            context_type: "general",
+          },
+          {
+            id: "sess-2",
+            user_id: "u1",
+            is_archived: false,
+            title: "Second Chat",
+            started_at: "2024-01-02T00:00:00Z",
+            last_message_at: "2024-01-02T00:00:00Z",
+            message_count: 3,
+            total_tokens: 50,
+            context_type: "general",
+          },
+        ],
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ contextType: "general", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isLoadingHistory).toBe(false);
+    });
+
+    expect(result.current.sessions).toHaveLength(2);
+    expect(result.current.sessions[0].title).toBe("First Chat");
+  });
+
+  it("should expose currentSessionId as alias for sessionId", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: {
+        sessions: [
+          {
+            id: "active-session",
+            user_id: "u1",
+            is_archived: false,
+            problem_slug: "test-problem",
+            started_at: "2024-01-01T00:00:00Z",
+            last_message_at: "2024-01-01T00:00:00Z",
+            message_count: 1,
+            total_tokens: 10,
+            context_type: "problem",
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.getArchivedSessions).mockResolvedValue({
+      success: true,
+      data: { sessions: [] },
+    });
+    vi.mocked(aiApiClient.getSessionMessages).mockResolvedValue({
+      success: true,
+      data: { messages: [] },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ problemSlug: "test-problem", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isLoadingHistory).toBe(false);
+    });
+
+    expect(result.current.currentSessionId).toBe(result.current.sessionId);
+    expect(result.current.currentSessionId).toBe("active-session");
+  });
+
+  it("should load a session by ID", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: { sessions: [] },
+    });
+    vi.mocked(aiApiClient.getSessionMessages).mockResolvedValue({
+      success: true,
+      data: {
+        messages: [
+          {
+            id: "msg-1",
+            session_id: "target-session",
+            role: "user",
+            content: "Hello",
+            created_at: "2024-01-01T00:00:00Z",
+          },
+          {
+            id: "msg-2",
+            session_id: "target-session",
+            role: "assistant",
+            content: "Hi there!",
+            created_at: "2024-01-01T00:00:01Z",
+          },
+        ],
+      },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ contextType: "general", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isLoadingHistory).toBe(false);
+    });
+
+    await act(async () => {
+      await result.current.loadSession("target-session");
+    });
+
+    expect(result.current.sessionId).toBe("target-session");
+    expect(result.current.messages).toHaveLength(2);
+    expect(result.current.messages[0].content).toBe("Hello");
+    expect(result.current.messages[1].content).toBe("Hi there!");
+  });
+
+  it("should delete a session and remove from list", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: {
+        sessions: [
+          {
+            id: "sess-1",
+            user_id: "u1",
+            is_archived: false,
+            title: "To Delete",
+            started_at: "2024-01-01T00:00:00Z",
+            last_message_at: "2024-01-01T00:00:00Z",
+            message_count: 1,
+            total_tokens: 10,
+            context_type: "general",
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.clearSession).mockResolvedValue({
+      success: true,
+      data: { cleared: true },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ contextType: "general", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.sessions).toHaveLength(1);
+    });
+
+    await act(async () => {
+      await result.current.deleteSession("sess-1");
+    });
+
+    expect(aiApiClient.clearSession).toHaveBeenCalledWith("sess-1");
+    expect(result.current.sessions).toHaveLength(0);
+  });
+
+  it("should clear messages when deleting current session", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: {
+        sessions: [
+          {
+            id: "current-sess",
+            user_id: "u1",
+            is_archived: false,
+            problem_slug: "test",
+            started_at: "2024-01-01T00:00:00Z",
+            last_message_at: "2024-01-01T00:00:00Z",
+            message_count: 1,
+            total_tokens: 10,
+            context_type: "problem",
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.getArchivedSessions).mockResolvedValue({
+      success: true,
+      data: { sessions: [] },
+    });
+    vi.mocked(aiApiClient.getSessionMessages).mockResolvedValue({
+      success: true,
+      data: {
+        messages: [
+          {
+            id: "msg-1",
+            session_id: "current-sess",
+            role: "user",
+            content: "Test",
+            created_at: "2024-01-01T00:00:00Z",
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.clearSession).mockResolvedValue({
+      success: true,
+      data: { cleared: true },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ problemSlug: "test", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.sessionId).toBe("current-sess");
+    });
+
+    await act(async () => {
+      await result.current.deleteSession("current-sess");
+    });
+
+    expect(result.current.sessionId).toBeNull();
+    expect(result.current.messages).toHaveLength(0);
+  });
+
+  it("should rename a session and update title in list", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: {
+        sessions: [
+          {
+            id: "sess-1",
+            user_id: "u1",
+            is_archived: false,
+            title: "Old Title",
+            started_at: "2024-01-01T00:00:00Z",
+            last_message_at: "2024-01-01T00:00:00Z",
+            message_count: 1,
+            total_tokens: 10,
+            context_type: "general",
+          },
+        ],
+      },
+    });
+    vi.mocked(aiApiClient.archiveSession).mockResolvedValue({
+      success: true,
+      data: { archived: true },
+    });
+
+    const { result } = renderHook(() =>
+      useAIChat({ contextType: "general", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.sessions).toHaveLength(1);
+    });
+
+    await act(async () => {
+      await result.current.renameSession("sess-1", "New Title");
+    });
+
+    expect(aiApiClient.archiveSession).toHaveBeenCalledWith(
+      "sess-1",
+      "New Title"
+    );
+    expect(result.current.sessions[0].title).toBe("New Title");
+  });
+
+  it("should handle loadSession error gracefully", async () => {
+    vi.mocked(aiApiClient.getSessions).mockResolvedValue({
+      success: true,
+      data: { sessions: [] },
+    });
+    vi.mocked(aiApiClient.getSessionMessages).mockRejectedValue(
+      new Error("Network error")
+    );
+
+    const { result } = renderHook(() =>
+      useAIChat({ contextType: "general", isAuthenticated: true })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isLoadingHistory).toBe(false);
+    });
+
+    await act(async () => {
+      await result.current.loadSession("nonexistent");
+    });
+
+    expect(result.current.error).toBe("Failed to load chat session");
   });
 });
 

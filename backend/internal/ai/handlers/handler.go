@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"io"
 	"net/http"
 
@@ -43,8 +44,11 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 		// Session/history endpoints
 		aiGroup.GET("/sessions", h.ListSessions)
 		aiGroup.GET("/sessions/:sessionId/messages", h.ListSessionMessages)
-		aiGroup.DELETE("/sessions/:sessionId", h.ClearSession)
+		aiGroup.DELETE("/sessions/:sessionId", h.DeleteSession)
+		aiGroup.DELETE("/sessions/:sessionId/messages", h.ClearSession)
 		aiGroup.POST("/sessions/:sessionId/archive", h.ArchiveSession)
+		aiGroup.PATCH("/sessions/:sessionId/title", h.UpdateSessionTitle)
+		aiGroup.POST("/sessions/generate-title", h.GenerateTitle)
 		aiGroup.GET("/sessions/archived", h.ListArchivedSessions)
 	}
 }
@@ -92,28 +96,44 @@ func (h *Handler) Chat(c *gin.Context) {
 	userIDStr := userID.String()
 
 	// Get or create session for persistence
-	var problemSlug *string
-	if req.ProblemSlug != "" {
-		problemSlug = &req.ProblemSlug
-	}
-	var patternID *string
-	if req.PatternID != "" {
-		patternID = &req.PatternID
+	var session *repository.AISession
+
+	// If session ID is provided, try to reuse it
+	if req.SessionID != "" {
+		existingSession, err := h.chatRepo.GetSession(c.Request.Context(), req.SessionID, userIDStr)
+		if err != nil {
+			log.Warn().Err(err).Str("sessionID", req.SessionID).Msg("Chat: Failed to get existing session, creating new")
+		} else if existingSession != nil {
+			session = existingSession
+		}
 	}
 
-	session, err := h.chatRepo.GetOrCreateSession(c.Request.Context(), userIDStr, problemSlug, patternID)
-	if err != nil {
-		log.Error().Err(err).Str("userID", userIDStr).Msg("Chat: Failed to get/create session")
-		h.handleError(c, err)
-		return
+	// If no existing session, create one
+	if session == nil {
+		var problemSlug *string
+		if req.ProblemSlug != "" {
+			problemSlug = &req.ProblemSlug
+		}
+		var patternID *string
+		if req.PatternID != "" {
+			patternID = &req.PatternID
+		}
+
+		var err error
+		session, err = h.chatRepo.GetOrCreateSessionWithContext(c.Request.Context(), userIDStr, problemSlug, patternID, req.ContextType)
+		if err != nil {
+			log.Error().Err(err).Str("userID", userIDStr).Msg("Chat: Failed to get/create session")
+			h.handleError(c, err)
+			return
+		}
 	}
 
 	// Save user message
 	msgType := "chat"
-	_, err = h.chatRepo.AddMessage(c.Request.Context(), session.ID, "user", req.Message, &msgType, nil, nil)
-	if err != nil {
-		log.Error().Err(err).Str("sessionID", session.ID).Msg("Chat: Failed to save user message")
-		h.handleError(c, err)
+	_, msgErr := h.chatRepo.AddMessage(c.Request.Context(), session.ID, "user", req.Message, &msgType, nil, nil)
+	if msgErr != nil {
+		log.Error().Err(msgErr).Str("sessionID", session.ID).Msg("Chat: Failed to save user message")
+		h.handleError(c, msgErr)
 		return
 	}
 
@@ -178,27 +198,43 @@ func (h *Handler) ChatStream(c *gin.Context) {
 	userIDStr := userID.String()
 
 	// Get or create session for persistence
-	var problemSlug *string
-	if req.ProblemSlug != "" {
-		problemSlug = &req.ProblemSlug
-	}
-	var patternID *string
-	if req.PatternID != "" {
-		patternID = &req.PatternID
+	var session *repository.AISession
+
+	// If session ID is provided, try to reuse it
+	if req.SessionID != "" {
+		existingSession, err := h.chatRepo.GetSession(c.Request.Context(), req.SessionID, userIDStr)
+		if err != nil {
+			log.Warn().Err(err).Str("sessionID", req.SessionID).Msg("ChatStream: Failed to get existing session, creating new")
+		} else if existingSession != nil {
+			session = existingSession
+		}
 	}
 
-	session, err := h.chatRepo.GetOrCreateSession(c.Request.Context(), userIDStr, problemSlug, patternID)
-	if err != nil {
-		log.Error().Err(err).Str("userID", userIDStr).Msg("ChatStream: Failed to get/create session")
-		h.handleError(c, err)
-		return
+	// If no existing session, create one
+	if session == nil {
+		var problemSlug *string
+		if req.ProblemSlug != "" {
+			problemSlug = &req.ProblemSlug
+		}
+		var patternID *string
+		if req.PatternID != "" {
+			patternID = &req.PatternID
+		}
+
+		var err error
+		session, err = h.chatRepo.GetOrCreateSessionWithContext(c.Request.Context(), userIDStr, problemSlug, patternID, req.ContextType)
+		if err != nil {
+			log.Error().Err(err).Str("userID", userIDStr).Msg("ChatStream: Failed to get/create session")
+			h.handleError(c, err)
+			return
+		}
 	}
 
 	// Save user message
 	msgType := "chat"
-	_, err = h.chatRepo.AddMessage(c.Request.Context(), session.ID, "user", req.Message, &msgType, nil, nil)
-	if err != nil {
-		h.handleError(c, err)
+	_, msgErr := h.chatRepo.AddMessage(c.Request.Context(), session.ID, "user", req.Message, &msgType, nil, nil)
+	if msgErr != nil {
+		h.handleError(c, msgErr)
 		return
 	}
 
@@ -232,9 +268,9 @@ func (h *Handler) ChatStream(c *gin.Context) {
 		ErrorMessage:       req.ErrorMessage,
 	}
 
-	chunks, err := h.service.ChatStream(c.Request.Context(), aiReq)
-	if err != nil {
-		h.handleError(c, err)
+	result, streamErr := h.service.ChatStream(c.Request.Context(), aiReq)
+	if streamErr != nil {
+		h.handleError(c, streamErr)
 		return
 	}
 
@@ -243,11 +279,16 @@ func (h *Handler) ChatStream(c *gin.Context) {
 	c.Header("Connection", "keep-alive")
 	c.Header("Transfer-Encoding", "chunked")
 
+	// Send intent as first event if present (for Omni-Tutor)
+	if result.Intent != "" {
+		c.SSEvent("intent", gin.H{"intent": result.Intent})
+	}
+
 	// Collect full response for saving
 	var fullResponse string
 
 	c.Stream(func(_ io.Writer) bool {
-		if chunk, ok := <-chunks; ok {
+		if chunk, ok := <-result.Chunks; ok {
 			if chunk.Error != nil {
 				c.SSEvent("error", gin.H{"error": chunk.Error.Error()})
 				return false
@@ -255,7 +296,9 @@ func (h *Handler) ChatStream(c *gin.Context) {
 			if chunk.Done {
 				// Save assistant response when done
 				if fullResponse != "" {
-					h.chatRepo.AddMessage(c.Request.Context(), session.ID, "assistant", fullResponse, &msgType, nil, nil)
+					if _, err := h.chatRepo.AddMessage(c.Request.Context(), session.ID, "assistant", fullResponse, &msgType, nil, nil); err != nil {
+						log.Error().Err(err).Str("session_id", session.ID).Msg("failed to save assistant message")
+					}
 				}
 				c.SSEvent("done", gin.H{"done": true, "session_id": session.ID})
 				return false
@@ -487,6 +530,29 @@ func (h *Handler) ClearSession(c *gin.Context) {
 	response.OK(c, gin.H{"cleared": true})
 }
 
+// DeleteSession permanently deletes a session and all its messages
+func (h *Handler) DeleteSession(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		response.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	sessionID := c.Param("sessionId")
+	if sessionID == "" {
+		response.BadRequest(c, "Session ID is required", nil)
+		return
+	}
+
+	err := h.chatRepo.DeleteSession(c.Request.Context(), sessionID, userID.String())
+	if err != nil {
+		response.InternalError(c)
+		return
+	}
+
+	response.OK(c, gin.H{"deleted": true})
+}
+
 // ArchiveSessionBody is the request body for archive endpoint
 type ArchiveSessionBody struct {
 	Title string `json:"title"`
@@ -525,7 +591,72 @@ func (h *Handler) ArchiveSession(c *gin.Context) {
 	response.OK(c, gin.H{"archived": true})
 }
 
-// ListArchivedSessions returns archived sessions for a problem or pattern
+// UpdateSessionTitle updates the title of a session
+func (h *Handler) UpdateSessionTitle(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		response.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	sessionID := c.Param("sessionId")
+	if sessionID == "" {
+		response.BadRequest(c, "Session ID is required", nil)
+		return
+	}
+
+	var req struct {
+		Title string `json:"title"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil || req.Title == "" {
+		response.BadRequest(c, "Title is required", nil)
+		return
+	}
+
+	err := h.chatRepo.UpdateSessionTitle(c.Request.Context(), sessionID, userID.String(), req.Title)
+	if err != nil {
+		response.InternalError(c)
+		return
+	}
+
+	response.OK(c, gin.H{"updated": true})
+}
+
+// GenerateTitle generates a meaningful title for a chat session
+func (h *Handler) GenerateTitle(c *gin.Context) {
+	_, ok := middleware.GetUserID(c)
+	if !ok {
+		response.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	var req struct {
+		Messages []ai.ConversationMessage `json:"messages" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Invalid request body", nil)
+		return
+	}
+
+	resp, err := h.service.GenerateTitle(c.Request.Context(), ai.GenerateTitleRequest{
+		Messages: req.Messages,
+	})
+
+	if err != nil {
+		if errors.Is(err, ai.ErrAIDisabled) {
+			response.BadRequest(c, "AI features are disabled", nil)
+			return
+		}
+		log.Error().Err(err).Msg("Failed to generate title")
+		response.InternalError(c)
+		return
+	}
+
+	response.OK(c, gin.H{"title": resp.Title})
+}
+
+// ListArchivedSessions returns archived sessions for a problem, pattern, or general context
 func (h *Handler) ListArchivedSessions(c *gin.Context) {
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
@@ -535,16 +666,25 @@ func (h *Handler) ListArchivedSessions(c *gin.Context) {
 
 	problemSlug := c.Query("problem_slug")
 	patternID := c.Query("pattern_id")
+	contextType := c.Query("context_type")
+	includeActive := c.Query("include_active") == "true"
 
-	if problemSlug == "" && patternID == "" {
-		response.BadRequest(c, "problem_slug or pattern_id query param is required", nil)
+	if problemSlug == "" && patternID == "" && contextType != "general" {
+		response.BadRequest(c, "problem_slug, pattern_id, or context_type=general query param is required", nil)
 		return
 	}
 
 	var sessions []repository.AISession
 	var err error
 
-	if patternID != "" {
+	if contextType == "general" {
+		if includeActive {
+			// Return all sessions (both active and archived) for ChatGPT-style UI
+			sessions, err = h.chatRepo.GetAllSessionsForGeneral(c.Request.Context(), userID.String(), 50)
+		} else {
+			sessions, err = h.chatRepo.GetArchivedSessionsForGeneral(c.Request.Context(), userID.String(), 20)
+		}
+	} else if patternID != "" {
 		sessions, err = h.chatRepo.GetArchivedSessionsForPattern(c.Request.Context(), userID.String(), patternID, 20)
 	} else {
 		sessions, err = h.chatRepo.GetArchivedSessionsForProblem(c.Request.Context(), userID.String(), problemSlug, 20)

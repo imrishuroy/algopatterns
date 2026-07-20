@@ -43,6 +43,7 @@ describe("CourseNavigation", () => {
       toggleComplete: mockToggleComplete,
       getCompletedCount: vi.fn().mockReturnValue(0),
       getProgress: vi.fn().mockReturnValue(0),
+      isLoading: false,
     });
   });
 
@@ -148,6 +149,7 @@ describe("CourseNavigation", () => {
       toggleComplete: mockToggleComplete,
       getCompletedCount: vi.fn().mockReturnValue(1),
       getProgress: vi.fn().mockReturnValue(25),
+      isLoading: false,
     });
 
     render(

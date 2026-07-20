@@ -15,7 +15,8 @@ const houses = [2, 7, 9, 3, 1];
 
 // Compute the final answer and optimal house selection at module level from the same
 // DP used for the animation, so all banners stay in sync when the houses array changes.
-const computeHouseRobberResult = ( // skipcq: JS-R1005
+const computeHouseRobberResult = (
+  // skipcq: JS-R1005
   nums: number[]
 ): { answer: number; robbedIndices: number[]; breakdown: string } => {
   const n = nums.length;
@@ -27,10 +28,18 @@ const computeHouseRobberResult = ( // skipcq: JS-R1005
   const robbed: number[] = [];
   let i = n - 1;
   while (i >= 0) {
-    if (i === 0) { robbed.push(0); break; }
-    if (i === 1) { robbed.push(dp[1] === nums[1] ? 1 : 0); break; }
-    if (nums[i] + dp[i - 2] >= dp[i - 1]) { robbed.push(i); i -= 2; }
-    else i -= 1;
+    if (i === 0) {
+      robbed.push(0);
+      break;
+    }
+    if (i === 1) {
+      robbed.push(dp[1] === nums[1] ? 1 : 0);
+      break;
+    }
+    if (nums[i] + dp[i - 2] >= dp[i - 1]) {
+      robbed.push(i);
+      i -= 2;
+    } else i -= 1;
   }
   robbed.sort((a, b) => a - b);
   const breakdown = robbed.map((idx) => `$${nums[idx]}`).join(" + ");
@@ -370,15 +379,21 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
       {step >= houses.length && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Max money = {HOUSE_ROBBER_ANSWER}</span>
-          <span className="text-gray-400 ml-2">(rob houses {HOUSE_ROBBER_INDICES.join(", ")}: {HOUSE_ROBBER_BREAKDOWN})</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max money = {HOUSE_ROBBER_ANSWER}
+          </span>
+          <span className="text-gray-400 ml-2">
+            (rob houses {HOUSE_ROBBER_INDICES.join(", ")}:{" "}
+            {HOUSE_ROBBER_BREAKDOWN})
+          </span>
         </div>
       )}
     </div>
   );
 };
 
-const TablePhase = ({ // skipcq: JS-R1005
+const TablePhase = ({
+  // skipcq: JS-R1005
   step,
   tableSteps,
 }: {
@@ -452,15 +467,21 @@ const TablePhase = ({ // skipcq: JS-R1005
 
       {step >= tableSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
-          <span className="text-green-400 font-bold">Answer: Max money = {HOUSE_ROBBER_ANSWER}</span>
-          <span className="text-gray-400 ml-2">(rob houses {HOUSE_ROBBER_INDICES.join(", ")}: {HOUSE_ROBBER_BREAKDOWN})</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max money = {HOUSE_ROBBER_ANSWER}
+          </span>
+          <span className="text-gray-400 ml-2">
+            (rob houses {HOUSE_ROBBER_INDICES.join(", ")}:{" "}
+            {HOUSE_ROBBER_BREAKDOWN})
+          </span>
         </div>
       )}
     </div>
   );
 };
 
-const OptimizedPhase = ({ // skipcq: JS-R1005
+const OptimizedPhase = ({
+  // skipcq: JS-R1005
   step,
   optimizedSteps,
 }: {
@@ -518,8 +539,13 @@ const OptimizedPhase = ({ // skipcq: JS-R1005
 
       {step >= optimizedSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
-          <span className="text-green-400 font-bold">Answer: Max money = {HOUSE_ROBBER_ANSWER}</span>
-          <span className="text-gray-400 ml-2">(rob houses {HOUSE_ROBBER_INDICES.join(", ")}: {HOUSE_ROBBER_BREAKDOWN})</span>
+          <span className="text-green-400 font-bold">
+            Answer: Max money = {HOUSE_ROBBER_ANSWER}
+          </span>
+          <span className="text-gray-400 ml-2">
+            (rob houses {HOUSE_ROBBER_INDICES.join(", ")}:{" "}
+            {HOUSE_ROBBER_BREAKDOWN})
+          </span>
         </div>
       )}
     </div>

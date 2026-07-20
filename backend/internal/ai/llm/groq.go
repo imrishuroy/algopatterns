@@ -10,24 +10,30 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 // GroqProvider implements the Provider interface for Groq API (OpenAI-compatible)
 type GroqProvider struct {
-	client   *http.Client
-	baseURL  string
-	apiKey   string
-	model    string
-	maxRetry int
+	client           *http.Client
+	baseURL          string
+	apiKey           string
+	model            string
+	maxRetry         int
+	reasoningEffort  string // "low", "medium", "high", or "" to omit
+	includeReasoning *bool  // nil to omit, false to suppress reasoning tokens
 }
 
 // GroqConfig holds configuration for the Groq provider
 type GroqConfig struct {
-	BaseURL  string
-	APIKey   string
-	Model    string
-	Timeout  time.Duration
-	MaxRetry int
+	BaseURL          string
+	APIKey           string
+	Model            string
+	Timeout          time.Duration
+	MaxRetry         int
+	ReasoningEffort  string // "low", "medium", "high" (GPT-OSS only)
+	IncludeReasoning *bool  // false to suppress reasoning in response
 }
 
 // NewGroqProvider creates a new Groq provider
@@ -46,24 +52,28 @@ func NewGroqProvider(cfg GroqConfig) *GroqProvider {
 	}
 
 	return &GroqProvider{
-		client:   &http.Client{Timeout: cfg.Timeout},
-		baseURL:  cfg.BaseURL,
-		apiKey:   cfg.APIKey,
-		model:    cfg.Model,
-		maxRetry: cfg.MaxRetry,
+		client:           &http.Client{Timeout: cfg.Timeout},
+		baseURL:          cfg.BaseURL,
+		apiKey:           cfg.APIKey,
+		model:            cfg.Model,
+		maxRetry:         cfg.MaxRetry,
+		reasoningEffort:  cfg.ReasoningEffort,
+		includeReasoning: cfg.IncludeReasoning,
 	}
 }
 
 // groqRequest is the request format for Groq API (OpenAI-compatible)
 type groqRequest struct {
-	Model       string    `json:"model"`
-	Messages    []Message `json:"messages"`
-	Temperature float64   `json:"temperature,omitempty"`
-	TopP        float64   `json:"top_p,omitempty"`
-	MaxTokens   int       `json:"max_tokens,omitempty"`
-	Stop        []string  `json:"stop,omitempty"`
-	Seed        int       `json:"seed,omitempty"`
-	Stream      bool      `json:"stream,omitempty"`
+	Model            string    `json:"model"`
+	Messages         []Message `json:"messages"`
+	Temperature      float64   `json:"temperature,omitempty"`
+	TopP             float64   `json:"top_p,omitempty"`
+	MaxTokens        int       `json:"max_completion_tokens,omitempty"`
+	Stop             []string  `json:"stop,omitempty"`
+	Seed             int       `json:"seed,omitempty"`
+	Stream           bool      `json:"stream,omitempty"`
+	ReasoningEffort  string    `json:"reasoning_effort,omitempty"`
+	IncludeReasoning *bool     `json:"include_reasoning,omitempty"`
 }
 
 // groqResponse is the response format from Groq API
@@ -75,8 +85,9 @@ type groqResponse struct {
 	Choices []struct {
 		Index   int `json:"index"`
 		Message struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
+			Role      string `json:"role"`
+			Content   string `json:"content"`
+			Reasoning string `json:"reasoning,omitempty"`
 		} `json:"message"`
 		FinishReason string `json:"finish_reason"`
 	} `json:"choices"`
@@ -96,8 +107,9 @@ type groqStreamResponse struct {
 	Choices []struct {
 		Index int `json:"index"`
 		Delta struct {
-			Role    string `json:"role,omitempty"`
-			Content string `json:"content,omitempty"`
+			Role      string `json:"role,omitempty"`
+			Content   string `json:"content,omitempty"`
+			Reasoning string `json:"reasoning,omitempty"`
 		} `json:"delta"`
 		FinishReason string `json:"finish_reason,omitempty"`
 	} `json:"choices"`
@@ -111,11 +123,13 @@ func (p *GroqProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse
 	}
 
 	groqReq := groqRequest{
-		Model:       model,
-		Messages:    req.Messages,
-		Temperature: req.Temperature,
-		MaxTokens:   req.MaxTokens,
-		Stream:      false,
+		Model:            model,
+		Messages:         req.Messages,
+		Temperature:      req.Temperature,
+		MaxTokens:        req.MaxTokens,
+		Stream:           false,
+		ReasoningEffort:  p.reasoningEffort,
+		IncludeReasoning: p.includeReasoning,
 	}
 
 	body, err := json.Marshal(groqReq)
@@ -146,8 +160,19 @@ func (p *GroqProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse
 		return nil, fmt.Errorf("API error (status %d): %s", resp.StatusCode, string(respBody))
 	}
 
+	// Read the full body for debugging
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	// Log raw response for debugging title generation
+	if len(respBody) < 2000 {
+		log.Debug().Str("raw_body", string(respBody)).Msg("Groq raw response")
+	}
+
 	var groqResp groqResponse
-	if err := json.NewDecoder(resp.Body).Decode(&groqResp); err != nil {
+	if err := json.Unmarshal(respBody, &groqResp); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
@@ -155,8 +180,20 @@ func (p *GroqProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse
 		return nil, ErrInvalidResponse
 	}
 
+	// Use content, or fall back to reasoning if content is empty
+	content := groqResp.Choices[0].Message.Content
+	if content == "" && groqResp.Choices[0].Message.Reasoning != "" {
+		content = groqResp.Choices[0].Message.Reasoning
+	}
+
+	log.Debug().
+		Str("content", content).
+		Str("reasoning", groqResp.Choices[0].Message.Reasoning).
+		Str("finish_reason", groqResp.Choices[0].FinishReason).
+		Msg("Groq parsed response")
+
 	return &ChatResponse{
-		Content:      groqResp.Choices[0].Message.Content,
+		Content:      content,
 		Model:        groqResp.Model,
 		TokensInput:  groqResp.Usage.PromptTokens,
 		TokensOutput: groqResp.Usage.CompletionTokens,
@@ -172,11 +209,13 @@ func (p *GroqProvider) ChatStream(ctx context.Context, req ChatRequest) (<-chan 
 	}
 
 	groqReq := groqRequest{
-		Model:       model,
-		Messages:    req.Messages,
-		Temperature: req.Temperature,
-		MaxTokens:   req.MaxTokens,
-		Stream:      true,
+		Model:            model,
+		Messages:         req.Messages,
+		Temperature:      req.Temperature,
+		MaxTokens:        req.MaxTokens,
+		Stream:           true,
+		ReasoningEffort:  p.reasoningEffort,
+		IncludeReasoning: p.includeReasoning,
 	}
 
 	body, err := json.Marshal(groqReq)

@@ -277,3 +277,10 @@ Transform tasks into verifiable goals:
 - "Add feature" → "Write test, make it pass"
 - "Fix bug" → "Reproduce in test, fix, verify"
 - Start dev server and test UI changes in browser before reporting complete.
+
+## Debugging
+
+When given a bug report or error, fix it autonomously:
+- Read the error, log, or failing test. Trace it to the root cause.
+- Fix it without asking for permission at each step.
+- Verify the fix. Don't mark it done until it's proven to work.

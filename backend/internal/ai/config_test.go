@@ -24,7 +24,7 @@ func TestDefaultConfig(t *testing.T) {
 	// DeepSeek config
 	assert.False(t, cfg.DeepSeek.Enabled)
 	assert.Equal(t, "https://api.deepseek.com/v1", cfg.DeepSeek.BaseURL)
-	assert.Equal(t, "deepseek-chat", cfg.DeepSeek.Model)
+	assert.Equal(t, "deepseek-v4-pro", cfg.DeepSeek.Model)
 	assert.Equal(t, 60*time.Second, cfg.DeepSeek.Timeout)
 	assert.Equal(t, 2, cfg.DeepSeek.MaxRetry)
 
@@ -88,19 +88,21 @@ func TestNVIDIAConfigDefaults(t *testing.T) {
 func TestGroqConfigCustomization(t *testing.T) {
 	cfg := DefaultConfig()
 	cfg.Groq = struct {
-		Enabled  bool
-		BaseURL  string
-		APIKey   string
-		Model    string
-		Timeout  time.Duration
-		MaxRetry int
+		Enabled         bool
+		BaseURL         string
+		APIKey          string
+		Model           string
+		Timeout         time.Duration
+		MaxRetry        int
+		ReasoningEffort string
 	}{
-		Enabled:  true,
-		BaseURL:  "https://custom.groq.com",
-		APIKey:   "test-key",
-		Model:    "custom-model",
-		Timeout:  10 * time.Second,
-		MaxRetry: 3,
+		Enabled:         true,
+		BaseURL:         "https://custom.groq.com",
+		APIKey:          "test-key",
+		Model:           "custom-model",
+		Timeout:         10 * time.Second,
+		MaxRetry:        3,
+		ReasoningEffort: "medium",
 	}
 
 	assert.True(t, cfg.Groq.Enabled)
@@ -109,6 +111,7 @@ func TestGroqConfigCustomization(t *testing.T) {
 	assert.Equal(t, "custom-model", cfg.Groq.Model)
 	assert.Equal(t, 10*time.Second, cfg.Groq.Timeout)
 	assert.Equal(t, 3, cfg.Groq.MaxRetry)
+	assert.Equal(t, "medium", cfg.Groq.ReasoningEffort)
 }
 
 func TestNVIDIAConfigCustomization(t *testing.T) {

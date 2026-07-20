@@ -79,7 +79,8 @@ const generateRecursionSteps = (): RecursionStep[] => {
 
     if (i > j) {
       steps.push({
-        i, j,
+        i,
+        j,
         action: `LPS(${i},${j}): Empty, return 0`,
         result: 0,
         phase: "return",
@@ -90,7 +91,8 @@ const generateRecursionSteps = (): RecursionStep[] => {
 
     if (i === j) {
       steps.push({
-        i, j,
+        i,
+        j,
         action: `LPS(${i},${j}): Single char "${treeStr[i]}", return 1`,
         result: 1,
         phase: "return",
@@ -104,7 +106,8 @@ const generateRecursionSteps = (): RecursionStep[] => {
     const match = leftChar === rightChar;
 
     steps.push({
-      i, j,
+      i,
+      j,
       action: `LPS(${i},${j}): "${substring}" - Check '${leftChar}' == '${rightChar}'? ${match ? "Yes!" : "No, try both sides"}`,
       result: null,
       phase: "enter",
@@ -116,7 +119,8 @@ const generateRecursionSteps = (): RecursionStep[] => {
       const inner = solve(i + 1, j - 1);
       result = 2 + inner;
       steps.push({
-        i, j,
+        i,
+        j,
         action: `LPS(${i},${j}): Match! 2 + inner(${inner}) = ${result}`,
         result,
         phase: "return",
@@ -127,7 +131,8 @@ const generateRecursionSteps = (): RecursionStep[] => {
       const right = solve(i, j - 1);
       result = Math.max(left, right);
       steps.push({
-        i, j,
+        i,
+        j,
         action: `LPS(${i},${j}): No match. max(skip left=${left}, skip right=${right}) = ${result}`,
         result,
         phase: "return",
@@ -154,7 +159,8 @@ const generateMemoSteps = (): { steps: MemoStep[] } => {
 
     if (memo[i][j] !== null) {
       steps.push({
-        i, j,
+        i,
+        j,
         value: memo[i][j] as number,
         action: `Cache hit! memo[${i}][${j}] = ${memo[i][j]}`,
         fromCache: true,
@@ -170,7 +176,8 @@ const generateMemoSteps = (): { steps: MemoStep[] } => {
       const inner = solve(i + 1, j - 1);
       result = 2 + inner;
       steps.push({
-        i, j,
+        i,
+        j,
         value: result,
         action: `'${leftChar}'=='${rightChar}': 2 + inner(${inner}) = ${result}. Store memo[${i}][${j}]`,
         fromCache: false,
@@ -180,7 +187,8 @@ const generateMemoSteps = (): { steps: MemoStep[] } => {
       const right = solve(i, j - 1);
       result = Math.max(left, right);
       steps.push({
-        i, j,
+        i,
+        j,
         value: result,
         action: `'${leftChar}'!='${rightChar}': max(${left}, ${right}) = ${result}. Store memo[${i}][${j}]`,
         fromCache: false,
@@ -195,7 +203,8 @@ const generateMemoSteps = (): { steps: MemoStep[] } => {
   return { steps };
 };
 
-const generateTableSteps = (): { steps: TableStep[]; longest: string } => { // skipcq: JS-R1005
+const generateTableSteps = (): { steps: TableStep[]; longest: string } => {
+  // skipcq: JS-R1005
   const steps: TableStep[] = [];
   const dp: boolean[][] = Array(n)
     .fill(null)
@@ -221,7 +230,8 @@ const generateTableSteps = (): { steps: TableStep[]; longest: string } => { // s
   for (let i = 0; i < n - 1; i++) {
     const match = str[i] === str[i + 1];
     dp[i][i + 1] = match;
-    if (match && 2 > longestEnd - longestStart + 1) { // skipcq: JS-0104
+    if (match && 2 > longestEnd - longestStart + 1) {
+      // skipcq: JS-0104
       longestStart = i;
       longestEnd = i + 1;
     }
@@ -282,7 +292,8 @@ const generateTableSteps = (): { steps: TableStep[]; longest: string } => { // s
   };
 };
 
-const generateExpandSteps = (): { steps: ExpandStep[]; longest: string } => { // skipcq: JS-R1005
+const generateExpandSteps = (): { steps: ExpandStep[]; longest: string } => {
+  // skipcq: JS-R1005
   const steps: ExpandStep[] = [];
   let longestPalin = str[0];
 
@@ -427,23 +438,113 @@ const buildRecursionTreeData = (): {
   const visitOrder: number[] = [];
 
   // Root: LPS(0,3) "cbbd"
-  nodes.push({ id: 0, label: "(0,3)", x: 350, y: 30, result: null, parentId: null, edgeLabel: "", i: 0, j: 3 });
+  nodes.push({
+    id: 0,
+    label: "(0,3)",
+    x: 350,
+    y: 30,
+    result: null,
+    parentId: null,
+    edgeLabel: "",
+    i: 0,
+    j: 3,
+  });
 
   // Level 1: c != d, two branches
-  nodes.push({ id: 1, label: "(1,3)", x: 175, y: 100, result: null, parentId: 0, edgeLabel: "skip c", i: 1, j: 3 });
-  nodes.push({ id: 2, label: "(0,2)", x: 525, y: 100, result: null, parentId: 0, edgeLabel: "skip d", i: 0, j: 2 });
+  nodes.push({
+    id: 1,
+    label: "(1,3)",
+    x: 175,
+    y: 100,
+    result: null,
+    parentId: 0,
+    edgeLabel: "skip c",
+    i: 1,
+    j: 3,
+  });
+  nodes.push({
+    id: 2,
+    label: "(0,2)",
+    x: 525,
+    y: 100,
+    result: null,
+    parentId: 0,
+    edgeLabel: "skip d",
+    i: 0,
+    j: 2,
+  });
 
   // Level 2 from (1,3) "bbd": b != d
-  nodes.push({ id: 3, label: "(2,3)", x: 90, y: 170, result: null, parentId: 1, edgeLabel: "skip b", i: 2, j: 3 });
-  nodes.push({ id: 4, label: "(1,2)", x: 260, y: 170, result: null, parentId: 1, edgeLabel: "skip d", i: 1, j: 2 });
+  nodes.push({
+    id: 3,
+    label: "(2,3)",
+    x: 90,
+    y: 170,
+    result: null,
+    parentId: 1,
+    edgeLabel: "skip b",
+    i: 2,
+    j: 3,
+  });
+  nodes.push({
+    id: 4,
+    label: "(1,2)",
+    x: 260,
+    y: 170,
+    result: null,
+    parentId: 1,
+    edgeLabel: "skip d",
+    i: 1,
+    j: 2,
+  });
 
   // Level 2 from (0,2) "cbb": c != b
-  nodes.push({ id: 5, label: "(1,2)", x: 440, y: 170, result: null, parentId: 2, edgeLabel: "skip c", i: 1, j: 2 });
-  nodes.push({ id: 6, label: "(0,1)", x: 610, y: 170, result: null, parentId: 2, edgeLabel: "skip b", i: 0, j: 1 });
+  nodes.push({
+    id: 5,
+    label: "(1,2)",
+    x: 440,
+    y: 170,
+    result: null,
+    parentId: 2,
+    edgeLabel: "skip c",
+    i: 1,
+    j: 2,
+  });
+  nodes.push({
+    id: 6,
+    label: "(0,1)",
+    x: 610,
+    y: 170,
+    result: null,
+    parentId: 2,
+    edgeLabel: "skip b",
+    i: 0,
+    j: 1,
+  });
 
   // Level 3: (2,3) "bd" b != d -> (3,3) and (2,2)
-  nodes.push({ id: 7, label: "(3,3)", x: 50, y: 240, result: null, parentId: 3, edgeLabel: "skip b", i: 3, j: 3 });
-  nodes.push({ id: 8, label: "(2,2)", x: 130, y: 240, result: null, parentId: 3, edgeLabel: "skip d", i: 2, j: 2 });
+  nodes.push({
+    id: 7,
+    label: "(3,3)",
+    x: 50,
+    y: 240,
+    result: null,
+    parentId: 3,
+    edgeLabel: "skip b",
+    i: 3,
+    j: 3,
+  });
+  nodes.push({
+    id: 8,
+    label: "(2,2)",
+    x: 130,
+    y: 240,
+    result: null,
+    parentId: 3,
+    edgeLabel: "skip d",
+    i: 2,
+    j: 2,
+  });
 
   // Visit order with results
   visitOrder.push(0); // enter (0,3)
@@ -487,13 +588,83 @@ const buildMemoTreeData = (): {
   const visitOrder: { nodeId: number; fromCache: boolean }[] = [];
 
   // Same tree structure
-  nodes.push({ id: 0, label: "(0,3)", x: 280, y: 30, result: null, parentId: null, edgeLabel: "", i: 0, j: 3 });
-  nodes.push({ id: 1, label: "(1,3)", x: 140, y: 95, result: null, parentId: 0, edgeLabel: "skip c", i: 1, j: 3 });
-  nodes.push({ id: 2, label: "(0,2)", x: 420, y: 95, result: null, parentId: 0, edgeLabel: "skip d", i: 0, j: 2 });
-  nodes.push({ id: 3, label: "(2,3)", x: 70, y: 160, result: null, parentId: 1, edgeLabel: "skip b", i: 2, j: 3 });
-  nodes.push({ id: 4, label: "(1,2)", x: 210, y: 160, result: null, parentId: 1, edgeLabel: "skip d", i: 1, j: 2 });
-  nodes.push({ id: 5, label: "(1,2)", x: 350, y: 160, result: null, parentId: 2, edgeLabel: "skip c", i: 1, j: 2 });
-  nodes.push({ id: 6, label: "(0,1)", x: 490, y: 160, result: null, parentId: 2, edgeLabel: "skip b", i: 0, j: 1 });
+  nodes.push({
+    id: 0,
+    label: "(0,3)",
+    x: 280,
+    y: 30,
+    result: null,
+    parentId: null,
+    edgeLabel: "",
+    i: 0,
+    j: 3,
+  });
+  nodes.push({
+    id: 1,
+    label: "(1,3)",
+    x: 140,
+    y: 95,
+    result: null,
+    parentId: 0,
+    edgeLabel: "skip c",
+    i: 1,
+    j: 3,
+  });
+  nodes.push({
+    id: 2,
+    label: "(0,2)",
+    x: 420,
+    y: 95,
+    result: null,
+    parentId: 0,
+    edgeLabel: "skip d",
+    i: 0,
+    j: 2,
+  });
+  nodes.push({
+    id: 3,
+    label: "(2,3)",
+    x: 70,
+    y: 160,
+    result: null,
+    parentId: 1,
+    edgeLabel: "skip b",
+    i: 2,
+    j: 3,
+  });
+  nodes.push({
+    id: 4,
+    label: "(1,2)",
+    x: 210,
+    y: 160,
+    result: null,
+    parentId: 1,
+    edgeLabel: "skip d",
+    i: 1,
+    j: 2,
+  });
+  nodes.push({
+    id: 5,
+    label: "(1,2)",
+    x: 350,
+    y: 160,
+    result: null,
+    parentId: 2,
+    edgeLabel: "skip c",
+    i: 1,
+    j: 2,
+  });
+  nodes.push({
+    id: 6,
+    label: "(0,1)",
+    x: 490,
+    y: 160,
+    result: null,
+    parentId: 2,
+    edgeLabel: "skip b",
+    i: 0,
+    j: 1,
+  });
 
   visitOrder.push({ nodeId: 0, fromCache: false });
   visitOrder.push({ nodeId: 1, fromCache: false });
@@ -519,7 +690,8 @@ const buildMemoTreeData = (): {
   return { nodes, visitOrder };
 };
 
-const TreePhase = ({ // skipcq: JS-R1005
+const TreePhase = ({
+  // skipcq: JS-R1005
   step,
   recursionSteps,
 }: {
@@ -527,7 +699,8 @@ const TreePhase = ({ // skipcq: JS-R1005
   recursionSteps: RecursionStep[];
 }) => {
   const { nodes, visitOrder } = useMemo(() => buildRecursionTreeData(), []);
-  const currentStep = step > 0 && step <= recursionSteps.length ? recursionSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= recursionSteps.length ? recursionSteps[step - 1] : null;
 
   const visitedSet = useMemo(() => {
     const set = new Set<number>();
@@ -559,14 +732,18 @@ const TreePhase = ({ // skipcq: JS-R1005
       </div>
 
       <div className="flex gap-1 justify-center mb-2">
-        {treeStr.split("").map((c, idx) => { // skipcq: JS-R1005
-          const isHighlighted = currentStep && idx >= currentStep.i && idx <= currentStep.j;
-          const isOuter = currentStep && (idx === currentStep.i || idx === currentStep.j);
-          return ( 
+        {treeStr.split("").map((c, idx) => {
+          // skipcq: JS-R1005
+          const isHighlighted =
+            currentStep && idx >= currentStep.i && idx <= currentStep.j;
+          const isOuter =
+            currentStep && (idx === currentStep.i || idx === currentStep.j);
+          return (
             <div
               // skipcq: JS-0437
               key={`tree-char-${idx}`}
-              className="flex flex-col items-center">
+              className="flex flex-col items-center"
+            >
               <div className="text-xs text-gray-500">{idx}</div>
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-lg ${
@@ -614,7 +791,8 @@ const TreePhase = ({ // skipcq: JS-R1005
           );
         })}
 
-        {nodes.map((node) => { // skipcq: JS-R1005
+        {nodes.map((node) => {
+          // skipcq: JS-R1005
           const isVisited = visitedSet.has(node.id);
           const isCurrent = node.id === currentNodeId;
           const hasResult = node.result !== null && isVisited;
@@ -634,12 +812,33 @@ const TreePhase = ({ // skipcq: JS-R1005
 
           return (
             <g key={`node-${node.id}`} opacity={isVisited ? 1 : 0.2}>
-              <circle cx={node.x} cy={node.y} r="22" fill={fill} stroke={stroke} strokeWidth="2" />
-              <text x={node.x} y={node.y + 5} fill="white" fontSize="12" textAnchor="middle" fontFamily="monospace" fontWeight="500">
+              <circle
+                cx={node.x}
+                cy={node.y}
+                r="22"
+                fill={fill}
+                stroke={stroke}
+                strokeWidth="2"
+              />
+              <text
+                x={node.x}
+                y={node.y + 5}
+                fill="white"
+                fontSize="12"
+                textAnchor="middle"
+                fontFamily="monospace"
+                fontWeight="500"
+              >
                 {node.label}
               </text>
               {hasResult && (
-                <text x={node.x + 26} y={node.y + 5} fill="#86efac" fontSize="11" fontWeight="bold">
+                <text
+                  x={node.x + 26}
+                  y={node.y + 5}
+                  fill="#86efac"
+                  fontSize="11"
+                  fontWeight="bold"
+                >
                   ={node.result}
                 </text>
               )}
@@ -656,7 +855,9 @@ const TreePhase = ({ // skipcq: JS-R1005
 
       {step >= recursionSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: LPS length = {PALINDROME_LPS_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: LPS length = {PALINDROME_LPS_ANSWER}
+          </span>
           <span className="text-gray-400 ml-2">(e.g., &quot;bb&quot;)</span>
         </div>
       )}
@@ -668,29 +869,39 @@ const TreePhase = ({ // skipcq: JS-R1005
   );
 };
 
-const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
+const MemoPhase = ({
+  // skipcq: JS-0415, JS-R1005
   step,
   memoSteps,
 }: {
   step: number;
   memoSteps: MemoStep[];
 }) => {
-  const currentStep = step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= memoSteps.length ? memoSteps[step - 1] : null;
   const visibleSteps = memoSteps.slice(0, step);
 
   const { nodes, visitOrder } = useMemo(() => buildMemoTreeData(), []);
 
   const visitedInfo = useMemo(() => {
-    const info = new Map<number, { visited: boolean; fromCache: boolean; result: number | null }>();
+    const info = new Map<
+      number,
+      { visited: boolean; fromCache: boolean; result: number | null }
+    >();
     for (let i = 0; i < Math.min(step, visitOrder.length); i++) {
       const v = visitOrder[i]; // skipcq: JS-C1002
       const node = nodes.find((nd) => nd.id === v.nodeId);
-      info.set(v.nodeId, { visited: true, fromCache: v.fromCache, result: node?.result ?? null });
+      info.set(v.nodeId, {
+        visited: true,
+        fromCache: v.fromCache,
+        result: node?.result ?? null,
+      });
     }
     return info;
   }, [step, visitOrder, nodes]);
 
-  const currentNodeId = step > 0 && step <= visitOrder.length ? visitOrder[step - 1].nodeId : null;
+  const currentNodeId =
+    step > 0 && step <= visitOrder.length ? visitOrder[step - 1].nodeId : null;
 
   const currentMemo = useMemo(() => {
     const memo: (number | null)[][] = Array.from({ length: treeN }, () =>
@@ -714,14 +925,18 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
 
       <div className="flex gap-1 justify-center mb-2">
         {treeStr.split("").map((c, idx) => {
-          const isHighlighted = currentStep && idx >= currentStep.i && idx <= currentStep.j;
-          return ( 
+          const isHighlighted =
+            currentStep && idx >= currentStep.i && idx <= currentStep.j;
+          return (
             <div
               // skipcq: JS-0437
               key={`memo-char-${idx}`}
-              className="flex flex-col items-center">
+              className="flex flex-col items-center"
+            >
               <div className="text-xs text-gray-500">{idx}</div>
-              <div className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-lg ${isHighlighted ? "bg-blue-600/50 text-white" : "bg-gray-800 text-gray-300"}`}>
+              <div
+                className={`w-10 h-10 flex items-center justify-center rounded font-mono font-bold text-lg ${isHighlighted ? "bg-blue-600/50 text-white" : "bg-gray-800 text-gray-300"}`}
+              >
                 {c}
               </div>
             </div>
@@ -731,9 +946,12 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
 
       <div className="flex gap-4 items-start flex-wrap justify-center">
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">Recursion Tree</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            Recursion Tree
+          </div>
           <svg width="560" height="200" className="mx-auto">
-            {nodes.map((node) => { // skipcq: JS-R1005
+            {nodes.map((node) => {
+              // skipcq: JS-R1005
               if (node.parentId === null) return null;
               const parent = nodes.find((nd) => nd.id === node.parentId);
               if (!parent) return null;
@@ -757,7 +975,8 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
               );
             })}
 
-            {nodes.map((node) => { // skipcq: JS-R1005
+            {nodes.map((node) => {
+              // skipcq: JS-R1005
               const info = visitedInfo.get(node.id);
               const isVisited = !!info?.visited; // skipcq: JS-0066
               const isCacheHit = info?.fromCache;
@@ -781,12 +1000,33 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
 
               return (
                 <g key={`memo-node-${node.id}`} opacity={isVisited ? 1 : 0.2}>
-                  <circle cx={node.x} cy={node.y} r="20" fill={fill} stroke={stroke} strokeWidth="2" />
-                  <text x={node.x} y={node.y + 4} fill="white" fontSize="11" textAnchor="middle" fontFamily="monospace" fontWeight="500">
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r="20"
+                    fill={fill}
+                    stroke={stroke}
+                    strokeWidth="2"
+                  />
+                  <text
+                    x={node.x}
+                    y={node.y + 4}
+                    fill="white"
+                    fontSize="11"
+                    textAnchor="middle"
+                    fontFamily="monospace"
+                    fontWeight="500"
+                  >
                     {node.label}
                   </text>
                   {isVisited && node.result !== null && (
-                    <text x={node.x + 24} y={node.y + 4} fill={isCacheHit ? "#fde047" : "#86efac"} fontSize="10" fontWeight="bold">
+                    <text
+                      x={node.x + 24}
+                      y={node.y + 4}
+                      fill={isCacheHit ? "#fde047" : "#86efac"}
+                      fontSize="10"
+                      fontWeight="bold"
+                    >
                       ={node.result}
                     </text>
                   )}
@@ -797,26 +1037,39 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
         </div>
 
         <div>
-          <div className="text-xs text-gray-500 text-center mb-2">Memo Table</div>
+          <div className="text-xs text-gray-500 text-center mb-2">
+            Memo Table
+          </div>
           <table className="border-collapse">
             <thead>
               <tr>
                 <th className="w-8 h-6 text-xs text-gray-500">i\j</th>
                 {Array.from({ length: treeN }, (_, j) => (
-                  <th key={`memo-h-${j}`} className="w-10 h-6 text-xs text-gray-500">{j}</th>
+                  <th
+                    key={`memo-h-${j}`}
+                    className="w-10 h-6 text-xs text-gray-500"
+                  >
+                    {j}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {currentMemo.map((row, rowIndex) => ( 
+              {currentMemo.map((row, rowIndex) => (
                 <tr
                   // skipcq: JS-0437
                   key={`memo-r-${rowIndex}`}
-                  >
-                  <td className="w-8 h-10 text-xs text-gray-500 text-center">{rowIndex}</td>
-                  {row.map((val, colIndex) => { // skipcq: JS-R1005
+                >
+                  <td className="w-8 h-10 text-xs text-gray-500 text-center">
+                    {rowIndex}
+                  </td>
+                  {row.map((val, colIndex) => {
+                    // skipcq: JS-R1005
                     const isValid = colIndex >= rowIndex;
-                    const isCurrentCell = currentStep && currentStep.i === rowIndex && currentStep.j === colIndex;
+                    const isCurrentCell =
+                      currentStep &&
+                      currentStep.i === rowIndex &&
+                      currentStep.j === colIndex;
                     const isCacheHit = currentStep?.fromCache && isCurrentCell;
 
                     return (
@@ -846,19 +1099,27 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
       </div>
 
       {currentStep && (
-        <div className={`text-sm text-center font-mono px-4 py-2 rounded-lg ${currentStep.fromCache ? "bg-yellow-600/20 text-yellow-400" : "bg-blue-600/20 text-blue-300"}`}>
+        <div
+          className={`text-sm text-center font-mono px-4 py-2 rounded-lg ${currentStep.fromCache ? "bg-yellow-600/20 text-yellow-400" : "bg-blue-600/20 text-blue-300"}`}
+        >
           {currentStep.action}
         </div>
       )}
 
       <div className="flex gap-4 text-sm">
-        <div className="text-gray-400">Computed: <span className="text-green-400">{step - cacheHits}</span></div>
-        <div className="text-gray-400">Cache hits: <span className="text-yellow-400">{cacheHits}</span></div>
+        <div className="text-gray-400">
+          Computed: <span className="text-green-400">{step - cacheHits}</span>
+        </div>
+        <div className="text-gray-400">
+          Cache hits: <span className="text-yellow-400">{cacheHits}</span>
+        </div>
       </div>
 
       {step >= memoSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: LPS length = {PALINDROME_LPS_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: LPS length = {PALINDROME_LPS_ANSWER}
+          </span>
           <span className="text-gray-400 ml-2">(e.g., &quot;bb&quot;)</span>
         </div>
       )}
@@ -867,39 +1128,131 @@ const MemoPhase = ({ // skipcq: JS-0415, JS-R1005
 };
 
 const Controls = ({
-  isPlaying, onPlay, onPause, onStep, onBack, onReset, speed, onSpeedChange, step, total,
+  isPlaying,
+  onPlay,
+  onPause,
+  onStep,
+  onBack,
+  onReset,
+  speed,
+  onSpeedChange,
+  step,
+  total,
 }: {
-  isPlaying: boolean; onPlay: () => void; onPause: () => void; onStep: () => void;
-  onBack: () => void; onReset: () => void; speed: number; onSpeedChange: (s: number) => void;
-  step: number; total: number;
+  isPlaying: boolean;
+  onPlay: () => void;
+  onPause: () => void;
+  onStep: () => void;
+  onBack: () => void;
+  onReset: () => void;
+  speed: number;
+  onSpeedChange: (s: number) => void;
+  step: number;
+  total: number;
 }) => (
   <div className="flex flex-col gap-4">
     <div className="flex items-center justify-center gap-2">
-      <button onClick={onBack} disabled={step === 0} className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all" title="Back">
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+      <button
+        onClick={onBack}
+        disabled={step === 0}
+        className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all"
+        title="Back"
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
       </button>
       {isPlaying ? (
-        <button onClick={onPause} className="w-12 h-12 flex items-center justify-center bg-yellow-600 rounded-full hover:bg-yellow-500 transition-all shadow-lg" title="Pause">
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></svg>
+        <button
+          onClick={onPause}
+          className="w-12 h-12 flex items-center justify-center bg-yellow-600 rounded-full hover:bg-yellow-500 transition-all shadow-lg"
+          title="Pause"
+        >
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <rect x="6" y="4" width="4" height="16" rx="1" />
+            <rect x="14" y="4" width="4" height="16" rx="1" />
+          </svg>
         </button>
       ) : (
-        <button onClick={onPlay} disabled={step >= total} className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 transition-all shadow-lg" title="Play">
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+        <button
+          onClick={onPlay}
+          disabled={step >= total}
+          className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 transition-all shadow-lg"
+          title="Play"
+        >
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M8 5v14l11-7z" />
+          </svg>
         </button>
       )}
-      <button onClick={onStep} disabled={step >= total} className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all" title="Step">
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+      <button
+        onClick={onStep}
+        disabled={step >= total}
+        className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-30 transition-all"
+        title="Step"
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
       </button>
-      <button onClick={onReset} className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-all ml-2" title="Reset">
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+      <button
+        onClick={onReset}
+        className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-all ml-2"
+        title="Reset"
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
+        </svg>
       </button>
     </div>
     <div className="flex items-center justify-center gap-4">
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
         <span className="text-xs text-gray-500 uppercase">Speed</span>
         <div className="flex gap-1">
-          {[{ value: 1000, label: "0.5x" }, { value: 600, label: "1x" }, { value: 300, label: "2x" }].map((opt) => (
-            <button key={opt.value} onClick={() => onSpeedChange(opt.value)} className={`px-2.5 py-1 rounded text-xs font-medium ${speed === opt.value ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"}`}>
+          {[
+            { value: 1000, label: "0.5x" },
+            { value: 600, label: "1x" },
+            { value: 300, label: "2x" },
+          ].map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => onSpeedChange(opt.value)}
+              className={`px-2.5 py-1 rounded text-xs font-medium ${speed === opt.value ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"}`}
+            >
               {opt.label}
             </button>
           ))}
@@ -907,15 +1260,26 @@ const Controls = ({
       </div>
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
         <span className="text-xs text-gray-500 uppercase">Step</span>
-        <span className="text-sm font-mono text-white">{step} <span className="text-gray-500">/</span> {total}</span>
+        <span className="text-sm font-mono text-white">
+          {step} <span className="text-gray-500">/</span> {total}
+        </span>
       </div>
     </div>
   </div>
 );
 
-const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[] }) => { // skipcq: JS-R1005
+const TablePhase = ({
+  step,
+  tableSteps,
+}: {
+  step: number;
+  tableSteps: TableStep[];
+}) => {
+  // skipcq: JS-R1005
   const dpTable = useMemo(() => {
-    const dp: (boolean | null)[][] = Array(n).fill(null).map(() => Array(n).fill(null));
+    const dp: (boolean | null)[][] = Array(n)
+      .fill(null)
+      .map(() => Array(n).fill(null));
     for (let s = 0; s < Math.min(step, tableSteps.length); s++) {
       const { i, j, isPalin } = tableSteps[s];
       dp[i][j] = isPalin;
@@ -923,7 +1287,8 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[
     return dp;
   }, [step, tableSteps]);
 
-  const currentStep = step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
+  const currentStep =
+    step > 0 && step <= tableSteps.length ? tableSteps[step - 1] : null;
   const longestPalin = useMemo(() => {
     if (!currentStep) return str[0];
     return str.substring(currentStep.longestStart, currentStep.longestEnd + 1);
@@ -932,28 +1297,47 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="bg-gray-800/30 rounded-lg p-3 text-center">
-        <div className="text-sm text-gray-400 mb-1">Longest Palindromic Substring</div>
-        <div className="font-mono text-sm text-blue-300">dp[i][j] = (s[i] == s[j]) AND dp[i+1][j-1]</div>
+        <div className="text-sm text-gray-400 mb-1">
+          Longest Palindromic Substring
+        </div>
+        <div className="font-mono text-sm text-blue-300">
+          dp[i][j] = (s[i] == s[j]) AND dp[i+1][j-1]
+        </div>
       </div>
 
       <div className="flex gap-1 justify-center mb-2">
-        {str.split("").map((c, idx) => { // skipcq: JS-R1005
-          const isInRange = currentStep && idx >= currentStep.i && idx <= currentStep.j;
-          const isOuter = currentStep && (idx === currentStep.i || idx === currentStep.j);
-          const isInner = currentStep && idx > currentStep.i && idx < currentStep.j;
+        {str.split("").map((c, idx) => {
+          // skipcq: JS-R1005
+          const isInRange =
+            currentStep && idx >= currentStep.i && idx <= currentStep.j;
+          const isOuter =
+            currentStep && (idx === currentStep.i || idx === currentStep.j);
+          const isInner =
+            currentStep && idx > currentStep.i && idx < currentStep.j;
 
           let bgColor = "bg-gray-800";
-          if (isOuter) bgColor = currentStep.outerMatch ? "bg-green-600" : "bg-red-600";
-          else if (isInner) bgColor = currentStep.innerResult ? "bg-green-600/40" : currentStep.innerResult === false ? "bg-red-600/40" : "bg-blue-600/30";
+          if (isOuter)
+            bgColor = currentStep.outerMatch ? "bg-green-600" : "bg-red-600";
+          else if (isInner)
+            bgColor = currentStep.innerResult
+              ? "bg-green-600/40"
+              : currentStep.innerResult === false
+                ? "bg-red-600/40"
+                : "bg-blue-600/30";
           else if (isInRange) bgColor = "bg-blue-600/30";
 
-          return ( 
+          return (
             <div
               // skipcq: JS-0437
               key={`table-char-${idx}`}
-              className="flex flex-col items-center">
+              className="flex flex-col items-center"
+            >
               <div className="text-xs text-gray-500">{idx}</div>
-              <div className={`w-11 h-11 flex items-center justify-center rounded font-mono font-bold text-lg text-white ${bgColor}`}>{c}</div>
+              <div
+                className={`w-11 h-11 flex items-center justify-center rounded font-mono font-bold text-lg text-white ${bgColor}`}
+              >
+                {c}
+              </div>
             </div>
           );
         })}
@@ -965,41 +1349,71 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[
             <thead>
               <tr>
                 <th className="p-1 text-gray-500 w-7 text-xs">i\j</th>
-                {str.split("").map((c, colIdx) => ( 
+                {str.split("").map((c, colIdx) => (
                   <th
                     // skipcq: JS-0437
                     key={`th-${colIdx}`}
-                    className="p-1 text-gray-400 w-9 text-xs"><div>{colIdx}</div><div className="text-gray-600">{c}</div></th>
+                    className="p-1 text-gray-400 w-9 text-xs"
+                  >
+                    <div>{colIdx}</div>
+                    <div className="text-gray-600">{c}</div>
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {str.split("").map((rowChar, rowIdx) => ( 
+              {str.split("").map((rowChar, rowIdx) => (
                 <tr
                   // skipcq: JS-0437
                   key={`tr-${rowIdx}`}
-                  >
-                  <td className="p-1 text-gray-400 font-mono text-xs"><span className="text-gray-600">{rowChar}</span> {rowIdx}</td>
-                  {str.split("").map((_, colIdx) => { // skipcq: JS-R1005
-                    const isCurrent = currentStep && currentStep.i === rowIdx && currentStep.j === colIdx;
-                    const isInnerRef = currentStep && currentStep.len > 2 && rowIdx === currentStep.i + 1 && colIdx === currentStep.j - 1;
+                >
+                  <td className="p-1 text-gray-400 font-mono text-xs">
+                    <span className="text-gray-600">{rowChar}</span> {rowIdx}
+                  </td>
+                  {str.split("").map((_, colIdx) => {
+                    // skipcq: JS-R1005
+                    const isCurrent =
+                      currentStep &&
+                      currentStep.i === rowIdx &&
+                      currentStep.j === colIdx;
+                    const isInnerRef =
+                      currentStep &&
+                      currentStep.len > 2 &&
+                      rowIdx === currentStep.i + 1 &&
+                      colIdx === currentStep.j - 1;
                     const value = dpTable[rowIdx]?.[colIdx];
                     const isValid = colIdx >= rowIdx;
 
-                    return ( 
+                    return (
                       <td
                         // skipcq: JS-0437
                         key={`td-${rowIdx}-${colIdx}`}
-                        className="p-0.5">
-                        <div className={`w-9 h-9 flex items-center justify-center border-2 rounded font-mono text-xs ${
-                          !isValid ? "bg-gray-900/20 border-gray-800/50"
-                            : isCurrent ? value ? "bg-green-600 border-green-400 text-white font-bold" : "bg-red-600 border-red-400 text-white font-bold"
-                            : isInnerRef ? "bg-blue-600/50 border-blue-400 text-white"
-                            : value === true ? "bg-green-600/30 border-green-600/50 text-green-400"
-                            : value === false ? "bg-gray-800/50 border-gray-700 text-gray-600"
-                            : "bg-gray-900/30 border-gray-700 text-gray-600"
-                        }`}>
-                          {isValid ? (value === null ? "" : value ? "T" : "F") : ""}
+                        className="p-0.5"
+                      >
+                        <div
+                          className={`w-9 h-9 flex items-center justify-center border-2 rounded font-mono text-xs ${
+                            !isValid
+                              ? "bg-gray-900/20 border-gray-800/50"
+                              : isCurrent
+                                ? value
+                                  ? "bg-green-600 border-green-400 text-white font-bold"
+                                  : "bg-red-600 border-red-400 text-white font-bold"
+                                : isInnerRef
+                                  ? "bg-blue-600/50 border-blue-400 text-white"
+                                  : value === true
+                                    ? "bg-green-600/30 border-green-600/50 text-green-400"
+                                    : value === false
+                                      ? "bg-gray-800/50 border-gray-700 text-gray-600"
+                                      : "bg-gray-900/30 border-gray-700 text-gray-600"
+                          }`}
+                        >
+                          {isValid
+                            ? value === null
+                              ? ""
+                              : value
+                                ? "T"
+                                : "F"
+                            : ""}
                         </div>
                       </td>
                     );
@@ -1012,20 +1426,28 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[
 
         <div className="bg-gray-800/30 rounded-lg p-3 min-w-[140px]">
           <div className="text-sm text-gray-400 mb-2">Longest:</div>
-          <div className="text-xl font-mono text-yellow-400">&quot;{longestPalin}&quot;</div>
+          <div className="text-xl font-mono text-yellow-400">
+            &quot;{longestPalin}&quot;
+          </div>
         </div>
       </div>
 
       {currentStep && (
-        <div className={`text-sm text-center font-mono px-4 py-2 rounded-lg max-w-lg ${currentStep.isPalin ? "bg-green-600/20 text-green-400" : "bg-gray-800/50 text-gray-400"}`}>
+        <div
+          className={`text-sm text-center font-mono px-4 py-2 rounded-lg max-w-lg ${currentStep.isPalin ? "bg-green-600/20 text-green-400" : "bg-gray-800/50 text-gray-400"}`}
+        >
           {currentStep.explanation}
         </div>
       )}
 
       {step >= tableSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Longest Substring = &quot;{longestPalin}&quot;</span>
-          <span className="text-gray-400 ml-2">(length {longestPalin.length})</span>
+          <span className="text-green-400 font-bold">
+            Answer: Longest Substring = &quot;{longestPalin}&quot;
+          </span>
+          <span className="text-gray-400 ml-2">
+            (length {longestPalin.length})
+          </span>
         </div>
       )}
 
@@ -1034,38 +1456,82 @@ const TablePhase = ({ step, tableSteps }: { step: number; tableSteps: TableStep[
   );
 };
 
-const ExpandPhase = ({ step, expandSteps }: { step: number; expandSteps: ExpandStep[] }) => { // skipcq: JS-R1005
-  const currentStep = step > 0 && step <= expandSteps.length ? expandSteps[step - 1] : null;
+const ExpandPhase = ({
+  step,
+  expandSteps,
+}: {
+  step: number;
+  expandSteps: ExpandStep[];
+}) => {
+  // skipcq: JS-R1005
+  const currentStep =
+    step > 0 && step <= expandSteps.length ? expandSteps[step - 1] : null;
 
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="bg-gray-800/30 rounded-lg p-3 text-center">
-        <div className="font-mono text-sm text-green-300">Expand from center while s[left] == s[right]</div>
-        <div className="text-xs text-gray-500 mt-1">O(1) space - no DP table needed!</div>
+        <div className="font-mono text-sm text-green-300">
+          Expand from center while s[left] == s[right]
+        </div>
+        <div className="text-xs text-gray-500 mt-1">
+          O(1) space - no DP table needed!
+        </div>
       </div>
 
       <div className="flex gap-1 justify-center mb-2">
-        {str.split("").map((c, idx) => { // skipcq: JS-R1005
-          const isCenter = currentStep && (currentStep.centerType === "single" ? idx === currentStep.center : idx === currentStep.center || idx === currentStep.center + 1);
-          const isPointer = currentStep && currentStep.action !== "stop" && (idx === currentStep.left || idx === currentStep.right);
-          const isInPalin = currentStep && currentStep.action !== "stop" && idx >= currentStep.left && idx <= currentStep.right;
-          const isMismatch = currentStep && currentStep.action === "stop" && (idx === currentStep.left || idx === currentStep.right);
+        {str.split("").map((c, idx) => {
+          // skipcq: JS-R1005
+          const isCenter =
+            currentStep &&
+            (currentStep.centerType === "single"
+              ? idx === currentStep.center
+              : idx === currentStep.center || idx === currentStep.center + 1);
+          const isPointer =
+            currentStep &&
+            currentStep.action !== "stop" &&
+            (idx === currentStep.left || idx === currentStep.right);
+          const isInPalin =
+            currentStep &&
+            currentStep.action !== "stop" &&
+            idx >= currentStep.left &&
+            idx <= currentStep.right;
+          const isMismatch =
+            currentStep &&
+            currentStep.action === "stop" &&
+            (idx === currentStep.left || idx === currentStep.right);
 
           let bgColor = "bg-gray-800";
           let borderColor = "border-transparent";
-          if (isMismatch) { bgColor = "bg-red-600/50"; borderColor = "border-red-400"; }
-          else if (isInPalin) { bgColor = "bg-purple-600"; if (isPointer) borderColor = "border-white"; }
-          else if (isCenter) { bgColor = "bg-yellow-600/50"; }
+          if (isMismatch) {
+            bgColor = "bg-red-600/50";
+            borderColor = "border-red-400";
+          } else if (isInPalin) {
+            bgColor = "bg-purple-600";
+            if (isPointer) borderColor = "border-white";
+          } else if (isCenter) {
+            bgColor = "bg-yellow-600/50";
+          }
 
-          return ( 
+          return (
             <div
               // skipcq: JS-0437
               key={`expand-char-${idx}`}
-              className="flex flex-col items-center">
+              className="flex flex-col items-center"
+            >
               <div className="text-xs text-gray-500">{idx}</div>
-              <div className={`w-11 h-11 flex items-center justify-center rounded font-mono font-bold text-lg text-white border-2 ${bgColor} ${borderColor}`}>{c}</div>
-              {isPointer && <div className="text-xs text-blue-400 mt-1">{idx === currentStep.left ? "L" : "R"}</div>}
-              {isCenter && !isPointer && <div className="text-xs text-yellow-400 mt-1">C</div>}
+              <div
+                className={`w-11 h-11 flex items-center justify-center rounded font-mono font-bold text-lg text-white border-2 ${bgColor} ${borderColor}`}
+              >
+                {c}
+              </div>
+              {isPointer && (
+                <div className="text-xs text-blue-400 mt-1">
+                  {idx === currentStep.left ? "L" : "R"}
+                </div>
+              )}
+              {isCenter && !isPointer && (
+                <div className="text-xs text-yellow-400 mt-1">C</div>
+              )}
             </div>
           );
         })}
@@ -1075,10 +1541,35 @@ const ExpandPhase = ({ step, expandSteps }: { step: number; expandSteps: ExpandS
         <div className="bg-gray-800/30 rounded-lg p-4 min-w-[220px]">
           {currentStep ? (
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-gray-400">Center:</span><span className="text-yellow-400 font-mono">{currentStep.centerType === "single" ? `${currentStep.center}` : `${currentStep.center},${currentStep.center + 1}`}</span></div>
-              <div className="flex justify-between"><span className="text-gray-400">Type:</span><span className="text-blue-400">{currentStep.centerType === "single" ? "Odd" : "Even"}</span></div>
-              <div className="flex justify-between"><span className="text-gray-400">Compare:</span><span className={`font-mono ${currentStep.isMatch ? "text-green-400" : "text-red-400"}`}>&apos;{currentStep.leftChar}&apos; {currentStep.isMatch ? "==" : "!="} &apos;{currentStep.rightChar}&apos;</span></div>
-              <div className="pt-2 border-t border-gray-700"><div className="text-purple-400 font-mono text-lg">&quot;{currentStep.currentPalin}&quot;</div></div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Center:</span>
+                <span className="text-yellow-400 font-mono">
+                  {currentStep.centerType === "single"
+                    ? `${currentStep.center}`
+                    : `${currentStep.center},${currentStep.center + 1}`}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Type:</span>
+                <span className="text-blue-400">
+                  {currentStep.centerType === "single" ? "Odd" : "Even"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Compare:</span>
+                <span
+                  className={`font-mono ${currentStep.isMatch ? "text-green-400" : "text-red-400"}`}
+                >
+                  &apos;{currentStep.leftChar}&apos;{" "}
+                  {currentStep.isMatch ? "==" : "!="} &apos;
+                  {currentStep.rightChar}&apos;
+                </span>
+              </div>
+              <div className="pt-2 border-t border-gray-700">
+                <div className="text-purple-400 font-mono text-lg">
+                  &quot;{currentStep.currentPalin}&quot;
+                </div>
+              </div>
             </div>
           ) : (
             <div className="text-gray-500 text-center py-4">Press play</div>
@@ -1087,14 +1578,21 @@ const ExpandPhase = ({ step, expandSteps }: { step: number; expandSteps: ExpandS
 
         <div className="bg-gray-800/30 rounded-lg p-4 min-w-[120px]">
           <div className="text-sm text-gray-400 mb-2">Longest:</div>
-          <div className="text-xl font-mono text-yellow-400">&quot;{currentStep?.longestSoFar || str[0]}&quot;</div>
+          <div className="text-xl font-mono text-yellow-400">
+            &quot;{currentStep?.longestSoFar || str[0]}&quot;
+          </div>
         </div>
       </div>
 
       {step >= expandSteps.length && step > 0 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Longest Substring = &quot;{expandSteps[expandSteps.length - 1]?.longestSoFar}&quot;</span>
-          <span className="text-gray-400 ml-2">(length {expandSteps[expandSteps.length - 1]?.longestSoFar.length})</span>
+          <span className="text-green-400 font-bold">
+            Answer: Longest Substring = &quot;
+            {expandSteps[expandSteps.length - 1]?.longestSoFar}&quot;
+          </span>
+          <span className="text-gray-400 ml-2">
+            (length {expandSteps[expandSteps.length - 1]?.longestSoFar.length})
+          </span>
         </div>
       )}
 
@@ -1119,7 +1617,10 @@ export default function PalindromeDPVisualizer() {
   const [speed, setSpeed] = useState(600);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { steps: tableSteps, longest: tableLongest } = useMemo(() => generateTableSteps(), []);
+  const { steps: tableSteps, longest: tableLongest } = useMemo(
+    () => generateTableSteps(),
+    []
+  );
   const { steps: expandSteps } = useMemo(() => generateExpandSteps(), []);
   const recursionSteps = useMemo(() => generateRecursionSteps(), []);
   const { steps: memoSteps } = useMemo(() => generateMemoSteps(), []);
@@ -1132,7 +1633,12 @@ export default function PalindromeDPVisualizer() {
       if (phase === "memo") return memoSteps.length;
       return 1;
     },
-    [tableSteps.length, expandSteps.length, recursionSteps.length, memoSteps.length]
+    [
+      tableSteps.length,
+      expandSteps.length,
+      recursionSteps.length,
+      memoSteps.length,
+    ]
   );
 
   const maxSteps = getMaxSteps(currentPhase);
@@ -1175,7 +1681,11 @@ export default function PalindromeDPVisualizer() {
               className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-all ${currentPhase === phase ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"}`}
             >
               <span className="flex items-center gap-1.5">
-                <span className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${currentPhase === phase ? "bg-blue-500" : "bg-gray-700"}`}>{index + 1}</span>
+                <span
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${currentPhase === phase ? "bg-blue-500" : "bg-gray-700"}`}
+                >
+                  {index + 1}
+                </span>
                 {phaseLabels[phase]}
               </span>
             </button>
@@ -1190,7 +1700,10 @@ export default function PalindromeDPVisualizer() {
           onPause={() => setIsPlaying(false)}
           onStep={() => step < maxSteps && setStep((s) => s + 1)}
           onBack={() => step > 0 && setStep((s) => s - 1)}
-          onReset={() => { setStep(0); setIsPlaying(false); }}
+          onReset={() => {
+            setStep(0);
+            setIsPlaying(false);
+          }}
           speed={speed}
           onSpeedChange={setSpeed}
           step={step}
@@ -1199,16 +1712,30 @@ export default function PalindromeDPVisualizer() {
       </div>
 
       <AnimatePresence mode="wait">
-        <motion.div key={currentPhase} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          {currentPhase === "tree" && <TreePhase step={step} recursionSteps={recursionSteps} />}
-          {currentPhase === "memo" && <MemoPhase step={step} memoSteps={memoSteps} />}
-          {currentPhase === "table" && <TablePhase step={step} tableSteps={tableSteps} />}
-          {currentPhase === "expand" && <ExpandPhase step={step} expandSteps={expandSteps} />}
+        <motion.div
+          key={currentPhase}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          {currentPhase === "tree" && (
+            <TreePhase step={step} recursionSteps={recursionSteps} />
+          )}
+          {currentPhase === "memo" && (
+            <MemoPhase step={step} memoSteps={memoSteps} />
+          )}
+          {currentPhase === "table" && (
+            <TablePhase step={step} tableSteps={tableSteps} />
+          )}
+          {currentPhase === "expand" && (
+            <ExpandPhase step={step} expandSteps={expandSteps} />
+          )}
         </motion.div>
       </AnimatePresence>
 
       <div className="mt-6 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        Substring: &quot;{str}&quot; → &quot;{tableLongest}&quot; | Subsequence: &quot;{treeStr}&quot; → &quot;bb&quot; (len 2)
+        Substring: &quot;{str}&quot; → &quot;{tableLongest}&quot; | Subsequence:
+        &quot;{treeStr}&quot; → &quot;bb&quot; (len 2)
       </div>
     </div>
   );

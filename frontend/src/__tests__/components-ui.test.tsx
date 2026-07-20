@@ -213,9 +213,11 @@ describe("CodeBlock", () => {
     expect(screen.getByText("Python")).toBeInTheDocument();
   });
 
-  it("defaults to Java for unknown languages", () => {
+  it("falls back to the raw language name (capitalized) for unknown languages", () => {
     render(<CodeBlock code={sampleCode} language="brainfuck" />);
-    expect(screen.getByText("Java")).toBeInTheDocument();
+    // Unknown languages are no longer remapped to Java; the label is the
+    // capitalized raw language name so users see what they passed in.
+    expect(screen.getByText("Brainfuck")).toBeInTheDocument();
   });
 
   it("renders copy button", () => {

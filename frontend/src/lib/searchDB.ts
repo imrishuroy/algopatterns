@@ -16,7 +16,10 @@ class SearchDBService {
 
   async init(): Promise<void> {
     if (this.db) return;
-    if (this.initPromise) { await this.initPromise; return; }
+    if (this.initPromise) {
+      await this.initPromise;
+      return;
+    }
 
     this.initPromise = new Promise((resolve) => {
       if (typeof window === "undefined" || !window.indexedDB) {

@@ -28,7 +28,8 @@ const capacity = 7;
 
 // Compute the final answer and chosen items at module level from the same DP
 // used for the animation, so all banners stay in sync when items/capacity change.
-const computeKnapsackResult = ( // skipcq: JS-R1005
+const computeKnapsackResult = (
+  // skipcq: JS-R1005
   itemList: Item[],
   cap: number
 ): { answer: number; chosenItems: string } => {
@@ -319,7 +320,8 @@ const ItemsDisplay = ({ currentItem }: { currentItem?: number }) => (
   </div>
 );
 
-const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => { // skipcq: JS-R1005
+const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
+  // skipcq: JS-R1005
   const currentItemIdx = Math.min(Math.floor(step / 2), items.length - 1);
   const isDecisionStep = step % 2 === 1;
 
@@ -391,7 +393,9 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
 
       {step >= items.length * 2 && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
-          <span className="text-green-400 font-bold">Answer: Maximum Value = ${KNAPSACK_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Maximum Value = ${KNAPSACK_ANSWER}
+          </span>
           <span className="text-gray-400 ml-2">(Items {KNAPSACK_ITEMS})</span>
         </div>
       )}
@@ -399,7 +403,8 @@ const TreePhase = ({ step, showMemo }: { step: number; showMemo: boolean }) => {
   );
 };
 
-const TablePhase = ({ // skipcq: JS-R1005
+const TablePhase = ({
+  // skipcq: JS-R1005
   step,
   tableSteps,
 }: {
@@ -504,7 +509,9 @@ const TablePhase = ({ // skipcq: JS-R1005
 
       {step >= tableSteps.length && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Maximum Value = ${KNAPSACK_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Maximum Value = ${KNAPSACK_ANSWER}
+          </span>
           <span className="text-gray-400 ml-2">(Items {KNAPSACK_ITEMS})</span>
         </div>
       )}
@@ -573,7 +580,9 @@ const OptimizedPhase = ({
 
       {step >= optimizedSteps.length && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg">
-          <span className="text-green-400 font-bold">Answer: Maximum Value = ${KNAPSACK_ANSWER}</span>
+          <span className="text-green-400 font-bold">
+            Answer: Maximum Value = ${KNAPSACK_ANSWER}
+          </span>
           <span className="text-gray-400 ml-2">(Items {KNAPSACK_ITEMS})</span>
         </div>
       )}

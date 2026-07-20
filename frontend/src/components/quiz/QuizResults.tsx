@@ -12,7 +12,8 @@ interface QuizResultsProps {
   onClose: () => void;
 }
 
-export default function QuizResults({ // skipcq: JS-0067
+export default function QuizResults({
+  // skipcq: JS-0067
   totalQuestions,
   correctCount,
   scorePercentage,

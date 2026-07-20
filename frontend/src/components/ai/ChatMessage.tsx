@@ -1,27 +1,167 @@
 "use client";
 
-import { memo } from "react";
-import type { AIMessage } from "@/types/ai";
+import { memo, useMemo, useDeferredValue } from "react";
+import Image from "next/image";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import type { AIMessage, Intent } from "@/types/ai";
+import { MermaidBlock } from "./MermaidBlock";
+import CodeBlock from "@/components/ui/CodeBlock";
 
 interface ChatMessageProps {
   message: AIMessage;
+  showIntentBadge?: boolean;
 }
 
-function ChatMessageComponent({ message }: ChatMessageProps) { // skipcq: JS-0067
+// Intent badge colors
+const intentColors: Record<Intent, string> = {
+  byop: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
+  syntax: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+  complexity: "bg-amber-500/20 text-amber-300 border-amber-500/30",
+  diagram: "bg-violet-500/20 text-violet-300 border-violet-500/30",
+  intersection: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+  concept: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  out_of_scope: "bg-rose-500/20 text-rose-300 border-rose-500/30",
+};
+
+// Create markdown component overrides
+// Defined before ChatMessageComponent to avoid "used before defined" warning
+const createMarkdownComponents = (
+  isStreaming: boolean
+): React.ComponentPropsWithoutRef<typeof ReactMarkdown>["components"] => ({
+  p: ({ children }) => (
+    <p className="my-2 leading-relaxed text-gray-300">{children}</p>
+  ),
+  strong: ({ children }) => (
+    <strong className="font-semibold text-white">{children}</strong>
+  ),
+  em: ({ children }) => <em className="italic text-gray-200">{children}</em>,
+  h1: ({ children }) => (
+    <h3 className="mb-2 mt-4 text-lg font-bold text-white">{children}</h3>
+  ),
+  h2: ({ children }) => (
+    <h4 className="mb-1.5 mt-3 text-base font-semibold text-white">
+      {children}
+    </h4>
+  ),
+  h3: ({ children }) => (
+    <h5 className="mb-1 mt-2 text-sm font-semibold text-gray-100">
+      {children}
+    </h5>
+  ),
+  ul: ({ children }) => (
+    <ul className="my-2 list-inside list-disc space-y-0.5 text-gray-300">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="my-2 list-inside list-decimal space-y-0.5 text-gray-300">
+      {children}
+    </ol>
+  ),
+  li: ({ children }) => <li className="text-gray-300">{children}</li>,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      className="text-indigo-400 underline hover:text-indigo-300"
+      target={href?.startsWith("http") ? "_blank" : undefined}
+      rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+    >
+      {children}
+    </a>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="my-2 border-l-2 border-gray-600 pl-3 italic text-gray-400">
+      {children}
+    </blockquote>
+  ),
+  table: ({ children }) => (
+    <div className="my-3 overflow-x-auto">
+      <table className="min-w-full border border-gray-700 text-sm text-gray-300">
+        {children}
+      </table>
+    </div>
+  ),
+  th: ({ children }) => (
+    <th className="border-b border-gray-700 px-3 py-1.5 text-left font-semibold text-gray-100">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="border-b border-gray-800 px-3 py-1.5">{children}</td>
+  ),
+  hr: () => <hr className="my-3 border-gray-700" />,
+  // Code block override with Mermaid support
+  code: ({ className, children }) => {
+    const match = /language-(\w+)/.exec(className || "");
+    const lang = match ? match[1] : "";
+    const codeString = String(children).replace(/\n$/, "");
+
+    // Check if this is an inline code (no language class and short content)
+    const isInline = !className && !codeString.includes("\n");
+
+    if (isInline) {
+      return (
+        <code className="rounded bg-gray-900 px-1.5 py-0.5 text-xs text-indigo-300 font-mono">
+          {children}
+        </code>
+      );
+    }
+
+    // Mermaid diagrams
+    if (lang === "mermaid") {
+      return <MermaidBlock chart={codeString} isStreaming={isStreaming} />;
+    }
+
+    // Regular code blocks
+    return <CodeBlock language={lang || "text"} code={codeString} />;
+  },
+  // skipcq: JS-0424 - Fragment required by ReactMarkdown's pre component interface
+  pre: ({ children }) => <>{children}</>,
+});
+
+// skipcq: JS-0067
+function ChatMessageComponent({
+  message,
+  showIntentBadge = false,
+}: ChatMessageProps) {
   const isUser = message.role === "user";
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}>
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
+      {/* Thor AI avatar for assistant messages */}
+      {!isUser && (
+        <div className="flex-shrink-0 mr-3">
+          <Image
+            src="/thor_ai_icon.png"
+            alt="Thor AI"
+            width={32}
+            height={32}
+            className="rounded-full"
+          />
+        </div>
+      )}
       <div
-        className={`max-w-[90%] rounded-md px-3 py-2 text-sm ${
+        className={`max-w-[90%] rounded-lg px-4 py-3 text-sm ${
           isUser
-            ? "bg-indigo-600 text-white"
-            : "bg-gray-800 text-gray-200 border border-gray-700"
+            ? "bg-indigo-600 text-white max-w-[85%]"
+            : "bg-gray-800/50 text-gray-200 border border-gray-700/50"
         }`}
       >
+        {/* Intent badge for assistant messages */}
+        {!isUser && showIntentBadge && message.intent && (
+          <div className="mb-2">
+            <span
+              className={`inline-block px-1.5 py-0.5 text-[10px] font-medium rounded border ${intentColors[message.intent]}`}
+            >
+              {message.intent}
+            </span>
+          </div>
+        )}
         <MessageContent
           content={message.content}
           isStreaming={message.isStreaming}
+          isUser={isUser}
         />
         {message.isStreaming && (
           <span className="inline-block w-1.5 h-3.5 ml-0.5 bg-indigo-400 animate-pulse" />
@@ -31,274 +171,72 @@ function ChatMessageComponent({ message }: ChatMessageProps) { // skipcq: JS-006
   );
 }
 
-function MessageContent({ // skipcq: JS-0067
+// skipcq: JS-0067
+function MessageContent({
   content,
   isStreaming,
+  isUser,
 }: {
   content: string;
   isStreaming?: boolean;
+  isUser?: boolean;
 }) {
+  // Create markdown components with isStreaming in closure.
+  // Must be before early return to satisfy rules of hooks.
+  const components = useMemo(
+    () => createMarkdownComponents(isStreaming ?? false),
+    [isStreaming]
+  );
+
+  // Defer content updates during streaming so ReactMarkdown does not
+  // re-tokenize on every token. React batches the deferred value and
+  // commits it at most once per paint, eliminating the per-chunk
+  // re-render cascade that caused visible flicker.
+  const deferredContent = useDeferredValue(content);
+  const renderContent = isStreaming ? deferredContent : content;
+
+  // Thinking indicator while waiting for response
   if (!content && isStreaming) {
     return (
-      <div className="flex items-center gap-1 py-1">
-        <span
-          className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
-          style={{ animationDelay: "0ms" }}
-        />
-        <span
-          className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
-          style={{ animationDelay: "150ms" }}
-        />
-        <span
-          className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
-          style={{ animationDelay: "300ms" }}
-        />
+      <div className="flex items-center gap-2 py-1">
+        <span className="text-gray-400 text-sm">Thinking</span>
+        <div className="flex items-center gap-1">
+          <span
+            className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+            style={{ animationDelay: "0ms" }}
+          />
+          <span
+            className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+            style={{ animationDelay: "150ms" }}
+          />
+          <span
+            className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+            style={{ animationDelay: "300ms" }}
+          />
+        </div>
       </div>
     );
   }
 
-  // Split by code blocks first
-  const parts = content.split(/(```[\s\S]*?```)/g);
+  // User messages are rendered as plain text with preserved whitespace.
+  // This avoids markdown misinterpreting code pastes (e.g. `*` as emphasis,
+  // backticks as inline code, blank lines as paragraph breaks) which
+  // previously caused only fragments of pasted code to highlight.
+  if (isUser) {
+    return (
+      <div className="whitespace-pre-wrap break-words leading-relaxed">
+        {content}
+      </div>
+    );
+  }
 
   return (
-    <div className="leading-relaxed space-y-2">
-      {parts.map((part, index) => {
-        if (part.startsWith("```")) {
-          const match = part.match(/```(\w+)?\n?([\s\S]*?)```/);
-          if (match) {
-            const [, lang, code] = match;
-            return (
-              <pre
-                key={`code-${index}`} // skipcq: JS-0437
-                className="bg-gray-900 rounded-md p-2 my-2 overflow-x-auto text-xs font-mono"
-              >
-                {lang && (
-                  <div className="text-[10px] text-gray-500 mb-1 uppercase">
-                    {lang}
-                  </div>
-                )}
-                <code className="text-gray-300">{code.trim()}</code>
-              </pre>
-            );
-          }
-        }
-        return <FormattedText key={`text-${index}`} text={part} />; // skipcq: JS-0437
-      })}
+    <div className="max-w-none leading-relaxed overflow-x-auto">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {renderContent}
+      </ReactMarkdown>
     </div>
   );
-}
-
-/**
- * Returns true when a line should be rendered in a monospace preformatted
- * block to preserve character alignment (ASCII art, trees, tables, etc.).
- */
-// skipcq: JS-0067, JS-R1005
-const isPreformattedLine = (line: string): boolean => {
-  // Box-drawing unicode characters (U+2500–U+256C range and related)
-  if (/[─━│┃┌┐└┘├┤┬┴┼═║╔╗╚╝╠╣╦╩╬┄┅┆┇┈┉┊┋┍┎┏┑┒┓┕┖┗┙┚┛]/u.test(line)) {
-    return true;
-  }
-  // Pipe-delimited table rows — starts with | and has ≥2 pipe characters
-  if (/^\s*\|/u.test(line) && (line.match(/\|/gu) ?? []).length >= 2) {
-    return true;
-  }
-  // ASCII table separators like +---+---+ or +===+===+
-  if (/^\s*\+[-=]+/u.test(line)) {
-    return true;
-  }
-  // Tree branch lines: the entire line consists only of spaces, /, \, and |
-  // characters — and has at least one / or \
-  return /^[\s/\\|]+$/u.test(line) && /[/\\]/u.test(line.trim());
-};
-
-// skipcq: JS-0067
-function FormattedText({ text }: { text: string }) {
-  // Process line by line for headers and lists
-  const lines = text.split("\n");
-  const elements: React.ReactNode[] = [];
-  let currentParagraph: string[] = [];
-
-  const flushParagraph = () => {
-    if (currentParagraph.length > 0) {
-      const paragraphText = currentParagraph.join("\n");
-      // If any line looks like ASCII art / preformatted content, render the
-      // whole block in a monospace <pre> so characters stay aligned.
-      const hasPreformatted = currentParagraph.some(isPreformattedLine);
-
-      if (hasPreformatted) {
-        elements.push(
-          <pre
-            key={elements.length}
-            className="bg-gray-900 rounded-md p-2 my-1 overflow-x-auto text-xs font-mono text-gray-300 leading-relaxed"
-          >
-            {paragraphText}
-          </pre>
-        );
-      } else {
-        elements.push(
-          <p key={elements.length} className="whitespace-pre-wrap">
-            {formatInlineText(paragraphText)}
-          </p>
-        );
-      }
-      currentParagraph = [];
-    }
-  };
-
-  lines.forEach((line, i) => {
-    const trimmed = line.trim();
-
-    // Headers
-    if (trimmed.startsWith("### ")) {
-      flushParagraph();
-      elements.push(
-        // skipcq: JS-0437
-        <h4 key={`h4-${i}`} className="font-semibold text-white mt-3 mb-1">
-          {formatInlineText(trimmed.slice(4))}
-        </h4>
-      );
-    } else if (trimmed.startsWith("## ")) {
-      flushParagraph();
-      elements.push(
-        // skipcq: JS-0437
-        <h3
-          // skipcq: JS-0437
-          key={`h3-${i}`}
-          className="font-semibold text-white mt-3 mb-1 text-base"
-        >
-          {formatInlineText(trimmed.slice(3))}
-        </h3>
-      );
-    } else if (trimmed.startsWith("# ")) {
-      flushParagraph();
-      elements.push(
-        // skipcq: JS-0437
-        <h2
-          // skipcq: JS-0437
-          key={`h2-${i}`}
-          className="font-bold text-white mt-3 mb-2 text-base"
-        >
-          {formatInlineText(trimmed.slice(2))}
-        </h2>
-      );
-    }
-    // Bullet lists
-    else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-      flushParagraph();
-      elements.push(
-        // skipcq: JS-0437
-        <div key={`li-${i}`} className="flex gap-2 ml-2">
-          <span className="text-gray-500">•</span>
-          <span>{formatInlineText(trimmed.slice(2))}</span>
-        </div>
-      );
-    }
-    // Numbered lists
-    else if (/^\d+\.\s/.test(trimmed)) {
-      flushParagraph();
-      const match = trimmed.match(/^(\d+)\.\s(.*)$/);
-      if (match) {
-        elements.push(
-          // skipcq: JS-0437
-          <div key={`ol-${i}`} className="flex gap-2 ml-2">
-            <span className="text-gray-500 min-w-[1.2em]">{match[1]}.</span>
-            <span>{formatInlineText(match[2])}</span>
-          </div>
-        );
-      }
-    }
-    // Horizontal rule
-    else if (trimmed === "---" || trimmed === "***" || trimmed === "___") {
-      flushParagraph();
-      elements.push(
-        // skipcq: JS-0437
-        <hr key={`hr-${i}`} className="border-gray-700 my-2" />
-      );
-    }
-    // Empty line
-    else if (trimmed === "") {
-      flushParagraph();
-    }
-    // Regular text
-    else {
-      currentParagraph.push(line);
-    }
-  });
-
-  flushParagraph();
-
-  return elements;
-// skipcq: JS-R1005
-}
-
-function formatInlineText(text: string): React.ReactNode { // skipcq: JS-0067
-  // skipcq: JS-R1005
-  // Handle bold, italic, inline code
-  const parts: React.ReactNode[] = [];
-  let remaining = text;
-  let keyIndex = 0;
-
-  while (remaining.length > 0) {
-    // Bold **text**
-    const boldMatch = remaining.match(/^([\s\S]*?)\*\*([^*]+)\*\*([\s\S]*)/);
-    if (boldMatch) {
-      if (boldMatch[1]) {
-        parts.push(...processInlineCode(boldMatch[1], keyIndex++));
-      }
-      parts.push(
-        <strong key={`bold-${keyIndex++}`} className="font-semibold text-white">
-          {boldMatch[2]}
-        </strong>
-      );
-      remaining = boldMatch[3];
-      continue;
-    }
-
-    // Italic *text* or _text_
-    const italicMatch = remaining.match(
-      /^([\s\S]*?)(?:\*([^*]+)\*|_([^_]+)_)([\s\S]*)/
-    );
-    if (italicMatch) {
-      if (italicMatch[1]) {
-        parts.push(...processInlineCode(italicMatch[1], keyIndex++));
-      }
-      parts.push(
-        <em key={`italic-${keyIndex++}`} className="italic">
-          {italicMatch[2] || italicMatch[3]}
-        </em>
-      );
-      remaining = italicMatch[4];
-      continue;
-    }
-
-    // No more formatting, process remaining for inline code
-    parts.push(...processInlineCode(remaining, keyIndex));
-    break;
-  }
-
-  return parts.length === 1 ? parts[0] : parts;
-}
-
-function processInlineCode(text: string, startKey: number): React.ReactNode[] {
-  const parts: React.ReactNode[] = [];
-  const segments = text.split(/(`[^`]+`)/g);
-
-  segments.forEach((segment, i) => {
-    if (segment.startsWith("`") && segment.endsWith("`")) {
-      parts.push(
-        <code
-          key={`code-${startKey}-${i}`} // skipcq: JS-0437
-          className="bg-gray-900 px-1 py-0.5 rounded-md text-xs font-mono text-indigo-300"
-        >
-          {segment.slice(1, -1)}
-        </code>
-      );
-    } else if (segment) {
-      parts.push(segment);
-    }
-  });
-
-  return parts;
 }
 
 export const ChatMessage = memo(ChatMessageComponent);

@@ -46,7 +46,7 @@ const buildHeaders = (extra?: HeadersInit): Record<string, string> => {
 };
 
 // skipcq: JS-R1005
-const fetchApi = async <T,>(
+const fetchApi = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {

@@ -77,7 +77,9 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 
         {/* Mode Toggle */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <span className={`text-xs ${mode === "keyword" ? "text-white" : "text-gray-500"}`}>
+          <span
+            className={`text-xs ${mode === "keyword" ? "text-white" : "text-gray-500"}`}
+          >
             Search
           </span>
           <button
@@ -95,7 +97,9 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
               }`}
             />
           </button>
-          <span className={`text-xs ${mode === "ai" ? "text-violet-400 font-medium" : "text-gray-500"}`}>
+          <span
+            className={`text-xs ${mode === "ai" ? "text-violet-400 font-medium" : "text-gray-500"}`}
+          >
             AI
           </span>
         </div>

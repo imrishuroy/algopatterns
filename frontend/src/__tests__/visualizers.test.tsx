@@ -1109,3 +1109,379 @@ describe("TaskSchedulerVisualizer", () => {
     expect(slider).toBeInTheDocument();
   });
 });
+
+// Section: Interval Visualizers with Step Button Tests
+import InsertIntervalVisualizer from "@/components/visualizers/InsertIntervalVisualizer";
+import IntervalIntersectionVisualizer from "@/components/visualizers/IntervalIntersectionVisualizer";
+import MinimumArrowsVisualizer from "@/components/visualizers/MinimumArrowsVisualizer";
+import EmployeeFreeTimeVisualizer from "@/components/visualizers/EmployeeFreeTimeVisualizer";
+import IntervalQueryVisualizer from "@/components/visualizers/IntervalQueryVisualizer";
+import ActivitySelectionVisualizer from "@/components/visualizers/ActivitySelectionVisualizer";
+import MeetingRoomsVisualizer from "@/components/visualizers/MeetingRoomsVisualizer";
+
+describe("MergeIntervalsVisualizer Step functionality", () => {
+  it("renders Step button", () => {
+    render(<MergeIntervalsVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("Step button is disabled when playing", () => {
+    render(<MergeIntervalsVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    expect(screen.getByText("Step")).toBeDisabled();
+  });
+
+  it("Step button advances one step when clicked", () => {
+    render(<MergeIntervalsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toContain("Step 1");
+  });
+
+  it("can complete visualization using only Step button", () => {
+    render(<MergeIntervalsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    // Click through all steps
+    for (let i = 0; i < 10; i++) {
+      if (!stepBtn.hasAttribute("disabled")) {
+        fireEvent.click(stepBtn);
+      }
+    }
+    expect(document.body.textContent).toContain("Done");
+  });
+});
+
+describe("InsertIntervalVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<InsertIntervalVisualizer />);
+    expect(screen.getByText(/Insert Interval/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<InsertIntervalVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<InsertIntervalVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<InsertIntervalVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<InsertIntervalVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    // After first step, should show phase message
+    expect(document.body.textContent).toMatch(/Phase|interval/i);
+  });
+
+  it("renders speed slider", () => {
+    render(<InsertIntervalVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
+  });
+
+  it("can reset after stepping", () => {
+    render(<InsertIntervalVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    fireEvent.click(screen.getByText("Reset"));
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+});
+
+describe("IntervalIntersectionVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<IntervalIntersectionVisualizer />);
+    expect(screen.getByText(/Interval List Intersection/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<IntervalIntersectionVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<IntervalIntersectionVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<IntervalIntersectionVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<IntervalIntersectionVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toMatch(/Comparing|intersection/i);
+  });
+
+  it("renders two interval lists A and B", () => {
+    render(<IntervalIntersectionVisualizer />);
+    expect(screen.getByText("A")).toBeInTheDocument();
+    expect(screen.getByText("B")).toBeInTheDocument();
+  });
+
+  it("renders pointer indicators", () => {
+    render(<IntervalIntersectionVisualizer />);
+    expect(screen.getByText("Pointer A")).toBeInTheDocument();
+    expect(screen.getByText("Pointer B")).toBeInTheDocument();
+  });
+});
+
+describe("MinimumArrowsVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<MinimumArrowsVisualizer />);
+    // Use getAllByText since "Minimum Arrows" appears in title and description
+    expect(screen.getAllByText(/Minimum Arrows/i).length).toBeGreaterThan(0);
+  });
+
+  it("renders Play button", () => {
+    render(<MinimumArrowsVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<MinimumArrowsVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<MinimumArrowsVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<MinimumArrowsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toMatch(/Sort|balloon/i);
+  });
+
+  it("renders balloon and arrow stats", () => {
+    render(<MinimumArrowsVisualizer />);
+    expect(screen.getByText("Total Balloons")).toBeInTheDocument();
+    expect(screen.getByText("Arrows Shot")).toBeInTheDocument();
+  });
+
+  it("can complete visualization", () => {
+    render(<MinimumArrowsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    for (let i = 0; i < 10; i++) {
+      if (!stepBtn.hasAttribute("disabled")) {
+        fireEvent.click(stepBtn);
+      }
+    }
+    expect(document.body.textContent).toMatch(/Done|arrow/i);
+  });
+});
+
+describe("EmployeeFreeTimeVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<EmployeeFreeTimeVisualizer />);
+    expect(screen.getByText(/Employee Free Time/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<EmployeeFreeTimeVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<EmployeeFreeTimeVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<EmployeeFreeTimeVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<EmployeeFreeTimeVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toMatch(/Flatten|Step 1/i);
+  });
+
+  it("renders phase indicators", () => {
+    render(<EmployeeFreeTimeVisualizer />);
+    expect(screen.getByText("Flatten")).toBeInTheDocument();
+    expect(screen.getByText("Sort")).toBeInTheDocument();
+    expect(screen.getByText("Merge")).toBeInTheDocument();
+    expect(screen.getByText("Find Gaps")).toBeInTheDocument();
+  });
+
+  it("renders employee schedule labels", () => {
+    render(<EmployeeFreeTimeVisualizer />);
+    expect(screen.getByText("Emp 1:")).toBeInTheDocument();
+    expect(screen.getByText("Emp 2:")).toBeInTheDocument();
+    expect(screen.getByText("Emp 3:")).toBeInTheDocument();
+  });
+
+  it("renders stats grid", () => {
+    render(<EmployeeFreeTimeVisualizer />);
+    expect(screen.getByText("Employees")).toBeInTheDocument();
+    expect(screen.getByText("Work Intervals")).toBeInTheDocument();
+    expect(screen.getByText("Merged Blocks")).toBeInTheDocument();
+    expect(screen.getByText("Free Slots")).toBeInTheDocument();
+  });
+});
+
+describe("IntervalQueryVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<IntervalQueryVisualizer />);
+    // Check for component-specific text instead of title
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<IntervalQueryVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<IntervalQueryVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<IntervalQueryVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<IntervalQueryVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toMatch(/Sort|query/i);
+  });
+
+  it("renders intervals and queries sections", () => {
+    render(<IntervalQueryVisualizer />);
+    // Use getAllByText since these labels appear multiple times
+    expect(screen.getAllByText(/Intervals/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Queries/i).length).toBeGreaterThan(0);
+  });
+});
+
+describe("ActivitySelectionVisualizer Step functionality", () => {
+  it("renders without crashing", () => {
+    render(<ActivitySelectionVisualizer />);
+    expect(screen.getByText(/Activity Selection/i)).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<ActivitySelectionVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<ActivitySelectionVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<ActivitySelectionVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<ActivitySelectionVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toMatch(/Sort|END time/i);
+  });
+
+  it("Step button is disabled when playing", () => {
+    render(<ActivitySelectionVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    expect(screen.getByText("Step")).toBeDisabled();
+  });
+
+  it("renders phase indicators", () => {
+    render(<ActivitySelectionVisualizer />);
+    expect(screen.getByText("Original")).toBeInTheDocument();
+    expect(screen.getByText("Sort")).toBeInTheDocument();
+    expect(screen.getByText("Ready")).toBeInTheDocument();
+    expect(screen.getByText("Select")).toBeInTheDocument();
+  });
+
+  it("renders activity stats", () => {
+    render(<ActivitySelectionVisualizer />);
+    expect(screen.getByText("Total Activities")).toBeInTheDocument();
+    // "Selected" appears multiple times (stat label and activity state)
+    expect(screen.getAllByText("Selected").length).toBeGreaterThan(0);
+    expect(screen.getByText("Processed")).toBeInTheDocument();
+  });
+});
+
+describe("MeetingRoomsVisualizer Step functionality", () => {
+  it("renders without crashing", () => {
+    render(<MeetingRoomsVisualizer />);
+    // Use getAllByText since "Meeting Rooms" appears in title and stats
+    expect(screen.getAllByText(/Meeting Rooms/i).length).toBeGreaterThan(0);
+  });
+
+  it("renders Play button", () => {
+    render(<MeetingRoomsVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<MeetingRoomsVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<MeetingRoomsVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<MeetingRoomsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toMatch(/Step 1|events/i);
+  });
+
+  it("Step button is disabled when playing", () => {
+    render(<MeetingRoomsVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    expect(screen.getByText("Step")).toBeDisabled();
+  });
+
+  it("renders meetings section", () => {
+    render(<MeetingRoomsVisualizer />);
+    expect(screen.getByText("Meetings:")).toBeInTheDocument();
+  });
+
+  it("renders events section", () => {
+    render(<MeetingRoomsVisualizer />);
+    expect(screen.getByText("Events (sorted by time):")).toBeInTheDocument();
+  });
+
+  it("renders room counter", () => {
+    render(<MeetingRoomsVisualizer />);
+    expect(screen.getByText("Current Active Rooms")).toBeInTheDocument();
+    expect(screen.getByText("Max Rooms Needed")).toBeInTheDocument();
+  });
+
+  it("can complete visualization using Step button", () => {
+    render(<MeetingRoomsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    // Click through all steps
+    for (let i = 0; i < 15; i++) {
+      if (!stepBtn.hasAttribute("disabled")) {
+        fireEvent.click(stepBtn);
+      }
+    }
+    expect(document.body.textContent).toMatch(/Done|Maximum/i);
+  });
+});

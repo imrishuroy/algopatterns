@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Activity {
@@ -11,9 +11,9 @@ interface Activity {
   color: string;
 }
 
+// skipcq: JS-0067
 export default function ActivitySelectionVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [, setStep] = useState(0);
   const [speed, setSpeed] = useState(800);
   const [selectedActivities, setSelectedActivities] = useState<Set<number>>(
     new Set()
@@ -46,67 +46,58 @@ export default function ActivitySelectionVisualizer() {
 
   const timelineMax = 12;
 
-  useEffect(() => {
-    if (!isPlaying) return;
+  const isDone =
+    phase === "selecting" && (currentActivity ?? 0) >= sortedActivities.length;
 
-    const timer = setTimeout(() => {
-      if (phase === "unsorted") {
-        setPhase("sorting");
-        setMessage("Sorting by END time (the greedy insight!)");
-        setStep((s) => s + 1);
-      } else if (phase === "sorting") {
-        setActivities(sortedActivities);
-        setPhase("sorted");
-        setMessage("Sorted! Now selecting activities greedily...");
-        setStep((s) => s + 1);
-      } else if (phase === "sorted") {
-        setPhase("selecting");
-        setCurrentActivity(0);
-        setStep((s) => s + 1);
-      } else if (phase === "selecting") {
-        const sortedActs = sortedActivities;
-        const currentIdx = currentActivity ?? 0;
+  const performStep = useCallback(() => {
+    if (phase === "unsorted") {
+      setPhase("sorting");
+      setMessage("Sorting by END time (the greedy insight!)");
+    } else if (phase === "sorting") {
+      setActivities(sortedActivities);
+      setPhase("sorted");
+      setMessage("Sorted! Now selecting activities greedily...");
+    } else if (phase === "sorted") {
+      setPhase("selecting");
+      setCurrentActivity(0);
+    } else if (phase === "selecting") {
+      const sortedActs = sortedActivities;
+      const currentIdx = currentActivity ?? 0;
 
-        if (currentIdx >= sortedActs.length) {
-          setIsPlaying(false);
-          setMessage(
-            `Done! Selected ${selectedActivities.size} non-overlapping activities.`
-          );
-          return;
-        }
-
-        const act = sortedActs[currentIdx];
-
-        if (act.start >= lastEnd) {
-          setSelectedActivities((prev) => new Set([...prev, act.id]));
-          setLastEnd(act.end);
-          setMessage(
-            `Selected ${act.name} (ends at ${act.end}). Last end = ${act.end}`
-          );
-        } else {
-          setMessage(
-            `Skipped ${act.name} (starts at ${act.start} < lastEnd ${lastEnd})`
-          );
-        }
-
-        setCurrentActivity(currentIdx + 1);
-        setStep((s) => s + 1);
+      if (currentIdx >= sortedActs.length) {
+        setIsPlaying(false);
+        setMessage(
+          `Done! Selected ${selectedActivities.size} non-overlapping activities.`
+        );
+        return;
       }
-    }, speed);
 
+      const act = sortedActs[currentIdx];
+
+      if (act.start >= lastEnd) {
+        setSelectedActivities((prev) => new Set([...prev, act.id]));
+        setLastEnd(act.end);
+        setMessage(
+          `Selected ${act.name} (ends at ${act.end}). Last end = ${act.end}`
+        );
+      } else {
+        setMessage(
+          `Skipped ${act.name} (starts at ${act.start} < lastEnd ${lastEnd})`
+        );
+      }
+
+      setCurrentActivity(currentIdx + 1);
+    }
+  }, [phase, currentActivity, lastEnd, selectedActivities.size, sortedActivities]);
+
+  useEffect(() => {
+    if (!isPlaying || isDone) return;
+
+    const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
-  }, [
-    isPlaying,
-    phase,
-    currentActivity,
-    lastEnd,
-    selectedActivities.size,
-    speed,
-    sortedActivities,
-  ]);
+  }, [isPlaying, isDone, speed, performStep]);
 
   const reset = () => {
-    setStep(0);
     setIsPlaying(false);
     setPhase("unsorted");
     setActivities(originalActivities);
@@ -150,15 +141,23 @@ export default function ActivitySelectionVisualizer() {
         <div className="flex items-center gap-2 mb-4">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            disabled={
-              phase === "selecting" &&
-              (currentActivity ?? 0) >= sortedActivities.length
-            }
+            disabled={isDone}
             className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
             {isPlaying ? "Pause" : "Play"}
+          </button>
+          <button
+            onClick={() => {
+              if (!isPlaying && !isDone) {
+                performStep();
+              }
+            }}
+            disabled={isPlaying || isDone}
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 disabled:opacity-50"
+          >
+            Step
           </button>
           <button
             onClick={reset}

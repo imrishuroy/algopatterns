@@ -80,77 +80,78 @@ export default function MergeIntervalsVisualizer() {
     });
   }, [reset]);
 
-  useEffect(() => {
-    if (!isPlaying) return;
+  const performStep = useCallback(() => {
+    if (phase === "init") {
+      setPhase("sorting");
+      setMessage("Step 1: Sort intervals by start time");
+    } else if (phase === "sorting") {
+      const sorted = [...intervals].sort((a, b) => a.start - b.start);
+      sorted.forEach((int, i) => (int.id = i));
+      const updated = sorted.map((int) => ({
+        ...int,
+        state: "sorted" as const,
+      }));
+      setIntervals(updated);
 
-    const timer = setTimeout(() => {
-      if (phase === "init") {
-        setPhase("sorting");
-        setMessage("Step 1: Sort intervals by start time");
-      } else if (phase === "sorting") {
-        const sorted = [...intervals].sort((a, b) => a.start - b.start);
-        sorted.forEach((int, i) => (int.id = i));
-        const updated = sorted.map((int) => ({
-          ...int,
-          state: "sorted" as const,
-        }));
-        setIntervals(updated);
-
-        // Initialize result with first interval
-        const first = { ...updated[0], state: "added" as const };
-        setResult([first]);
-        setCurrentIdx(1);
-        setPhase("merging");
+      // Initialize result with first interval
+      const first = { ...updated[0], state: "added" as const };
+      setResult([first]);
+      setCurrentIdx(1);
+      setPhase("merging");
+      setMessage(
+        `Sorted! Starting with first interval [${first.start}, ${first.end}]`
+      );
+    } else if (phase === "merging") {
+      if (currentIdx >= intervals.length) {
+        setPhase("done");
         setMessage(
-          `Sorted! Starting with first interval [${first.start}, ${first.end}]`
+          `Done! Merged ${initialIntervals.length} intervals into ${result.length}`
         );
-      } else if (phase === "merging") {
-        if (currentIdx >= intervals.length) {
-          setPhase("done");
-          setMessage(
-            `Done! Merged ${initialIntervals.length} intervals into ${result.length}`
-          );
-          dispatch({ type: "STOP" });
-          return;
-        }
-
-        const curr = intervals[currentIdx];
-        const last = result[result.length - 1];
-
-        // Mark current as being processed
-        const updatedIntervals = intervals.map((int, i) =>
-          i === currentIdx ? { ...int, state: "current" as const } : int
-        );
-        setIntervals(updatedIntervals);
-
-        if (curr.start <= last.end) {
-          // Overlap - merge
-          const newEnd = Math.max(last.end, curr.end);
-          const newResult = [...result];
-          newResult[newResult.length - 1] = {
-            ...last,
-            end: newEnd,
-            state: "merged" as const,
-          };
-          setResult(newResult);
-          setMessage(
-            `[${curr.start}, ${curr.end}] overlaps with [${last.start}, ${last.end}] (${curr.start} <= ${last.end}). Merge to [${last.start}, ${newEnd}]`
-          );
-        } else {
-          // No overlap - add as new
-          const newInterval = { ...curr, state: "added" as const };
-          setResult([...result, newInterval]);
-          setMessage(
-            `[${curr.start}, ${curr.end}] doesn't overlap (${curr.start} > ${last.end}). Add as new interval.`
-          );
-        }
-
-        setCurrentIdx(currentIdx + 1);
+        dispatch({ type: "STOP" });
+        return;
       }
-    }, speed);
 
+      const curr = intervals[currentIdx];
+      const last = result[result.length - 1];
+
+      // Mark current as being processed
+      const updatedIntervals = intervals.map((int, i) =>
+        i === currentIdx ? { ...int, state: "current" as const } : int
+      );
+      setIntervals(updatedIntervals);
+
+      if (curr.start <= last.end) {
+        // Overlap - merge
+        const newEnd = Math.max(last.end, curr.end);
+        const newResult = [...result];
+        newResult[newResult.length - 1] = {
+          ...last,
+          end: newEnd,
+          state: "merged" as const,
+        };
+        setResult(newResult);
+        setMessage(
+          `[${curr.start}, ${curr.end}] overlaps with [${last.start}, ${last.end}] (${curr.start} <= ${last.end}). Merge to [${last.start}, ${newEnd}]`
+        );
+      } else {
+        // No overlap - add as new
+        const newInterval = { ...curr, state: "added" as const };
+        setResult([...result, newInterval]);
+        setMessage(
+          `[${curr.start}, ${curr.end}] doesn't overlap (${curr.start} > ${last.end}). Add as new interval.`
+        );
+      }
+
+      setCurrentIdx(currentIdx + 1);
+    }
+  }, [phase, currentIdx, intervals, result]);
+
+  useEffect(() => {
+    if (!isPlaying || phase === "done") return;
+
+    const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
-  }, [isPlaying, phase, currentIdx, intervals, result, speed]);
+  }, [isPlaying, phase, speed, performStep]);
 
   const maxEnd = Math.max(...initialIntervals.map((i) => i.end));
 
@@ -189,6 +190,17 @@ export default function MergeIntervalsVisualizer() {
             } disabled:opacity-50`}
           >
             {isPlaying ? "Pause" : "Play"}
+          </button>
+          <button
+            onClick={() => {
+              if (!isPlaying && phase !== "done") {
+                performStep();
+              }
+            }}
+            disabled={isPlaying || phase === "done"}
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 disabled:opacity-50"
+          >
+            Step
           </button>
           <button
             onClick={reset}

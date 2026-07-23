@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import {
   Pattern,
   SupportedLanguage,
@@ -292,6 +293,22 @@ const GridDPVisualizer = dynamic(
 );
 const IntervalDPVisualizer = dynamic(
   () => import("@/components/visualizers/IntervalDPVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const InsertIntervalVisualizer = dynamic(
+  () => import("@/components/visualizers/InsertIntervalVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const MinimumArrowsVisualizer = dynamic(
+  () => import("@/components/visualizers/MinimumArrowsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const EmployeeFreeTimeVisualizer = dynamic(
+  () => import("@/components/visualizers/EmployeeFreeTimeVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const IntervalQueryVisualizer = dynamic(
+  () => import("@/components/visualizers/IntervalQueryVisualizer"),
   { loading: VisualizerLoading, ssr: false }
 );
 const PalindromeDPVisualizer = dynamic(
@@ -706,6 +723,18 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
           </div>
         )}
 
+      {cat === "Intervals" &&
+        (title.includes("Non-overlapping") || title.includes("Greedy")) &&
+        !title.includes("Arrows") && (
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-green-400">▶</span> Interactive Activity
+              Selection
+            </h4>
+            <ActivitySelectionVisualizer />
+          </div>
+        )}
+
       {cat === "Intervals" && title.includes("Intersection") && (
         <div className="mt-8">
           <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -715,6 +744,50 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
           <IntervalIntersectionVisualizer />
         </div>
       )}
+
+      {cat === "Intervals" && title.includes("Insert Interval") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-amber-400">▶</span> Interactive Insert
+            Interval
+          </h4>
+          <InsertIntervalVisualizer />
+        </div>
+      )}
+
+      {cat === "Intervals" &&
+        (title.includes("Minimum Arrows") || title.includes("Balloons")) && (
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-red-400">▶</span> Interactive Minimum Arrows
+            </h4>
+            <MinimumArrowsVisualizer />
+          </div>
+        )}
+
+      {cat === "Intervals" &&
+        (title.includes("Employee Free Time") ||
+          title.includes("Employee Free")) && (
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-cyan-400">▶</span> Interactive Employee Free
+              Time
+            </h4>
+            <EmployeeFreeTimeVisualizer />
+          </div>
+        )}
+
+      {cat === "Intervals" &&
+        (title.includes("Interval Queries") ||
+          title.includes("Minimum Interval to Include")) && (
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-purple-400">▶</span> Interactive Interval
+              Query
+            </h4>
+            <IntervalQueryVisualizer />
+          </div>
+        )}
 
       {/* Linked List Visualizers */}
       {cat === "Linked List" &&
@@ -1079,6 +1152,7 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
         <div className="tutorial-content">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
             components={{
               p: ({ children }) => (
                 <p className="text-gray-300 leading-relaxed mb-5">{children}</p>
@@ -1278,6 +1352,17 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
                 <blockquote className="my-6 pl-4 border-l-4 border-indigo-500 bg-indigo-500/10 py-3 pr-4 rounded-r-md">
                   {children}
                 </blockquote>
+              ),
+              details: ({ children }) => (
+                <details className="my-4 rounded-md border border-gray-700 bg-gray-800/50 overflow-hidden group [&>*:not(summary)]:px-4 [&>*:not(summary)]:pb-4 [&>*:not(summary)]:pt-2">
+                  {children}
+                </details>
+              ),
+              summary: ({ children }) => (
+                <summary className="px-4 py-3 cursor-pointer text-indigo-400 font-medium hover:bg-gray-700/50 transition-colors select-none list-none flex items-center gap-2 [&::-webkit-details-marker]:hidden">
+                  <span className="text-gray-500 group-open:rotate-90 transition-transform">▶</span>
+                  {children}
+                </summary>
               ),
             }}
           >

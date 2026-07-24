@@ -49,6 +49,8 @@ const listB: Interval[] = [
 ];
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: The component owns the two-pointer playback state for a compact demo.
 export default function IntervalIntersectionVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -81,57 +83,58 @@ export default function IntervalIntersectionVisualizer() {
     });
   }, [reset]);
 
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    const timer = setTimeout(() => {
-      if (phase === "init") {
-        setPhase("checking");
-        setMessage("Comparing intervals from both lists...");
-      } else if (phase === "checking") {
-        if (ptrA >= listA.length || ptrB >= listB.length) {
-          setPhase("done");
-          setCurrentIntersection(null);
-          setMessage(`Done! Found ${result.length} intersections`);
-          dispatch({ type: "STOP" });
-          return;
-        }
-
-        const a = listA[ptrA];
-        const b = listB[ptrB];
-
-        // Calculate intersection
-        const start = Math.max(a.start, b.start);
-        const end = Math.min(a.end, b.end);
-
-        if (start <= end) {
-          // Valid intersection
-          const intersection = { start, end };
-          setCurrentIntersection(intersection);
-          setResult([...result, intersection]);
-          setMessage(
-            `A[${ptrA}]=[${a.start},${a.end}] ∩ B[${ptrB}]=[${b.start},${b.end}] = [max(${a.start},${b.start}), min(${a.end},${b.end})] = [${start},${end}] ✓`
-          );
-        } else {
-          setCurrentIntersection(null);
-          setMessage(
-            `A[${ptrA}]=[${a.start},${a.end}] ∩ B[${ptrB}]=[${b.start},${b.end}]: No intersection (${start} > ${end})`
-          );
-        }
-
-        // Advance pointer with smaller end
-        setTimeout(() => {
-          if (a.end < b.end) {
-            setPtrA(ptrA + 1);
-          } else {
-            setPtrB(ptrB + 1);
-          }
-        }, speed / 2);
+  // skipcq: JS-R1005
+  // Reason: Branches correspond to initialization, comparison, and completion phases.
+  const performStep = useCallback(() => {
+    if (phase === "init") {
+      setPhase("checking");
+      setMessage("Comparing intervals from both lists...");
+    } else if (phase === "checking") {
+      if (ptrA >= listA.length || ptrB >= listB.length) {
+        setPhase("done");
+        setCurrentIntersection(null);
+        setMessage(`Done! Found ${result.length} intersections`);
+        dispatch({ type: "STOP" });
+        return;
       }
-    }, speed);
 
+      const intervalA = listA[ptrA];
+      const intervalB = listB[ptrB];
+
+      // Calculate intersection
+      const start = Math.max(intervalA.start, intervalB.start);
+      const end = Math.min(intervalA.end, intervalB.end);
+
+      if (start <= end) {
+        // Valid intersection
+        const intersection = { start, end };
+        setCurrentIntersection(intersection);
+        setResult([...result, intersection]);
+        setMessage(
+          `A[${ptrA}]=[${intervalA.start},${intervalA.end}] ∩ B[${ptrB}]=[${intervalB.start},${intervalB.end}] = [max(${intervalA.start},${intervalB.start}), min(${intervalA.end},${intervalB.end})] = [${start},${end}] ✓`
+        );
+      } else {
+        setCurrentIntersection(null);
+        setMessage(
+          `A[${ptrA}]=[${intervalA.start},${intervalA.end}] ∩ B[${ptrB}]=[${intervalB.start},${intervalB.end}]: No intersection (${start} > ${end})`
+        );
+      }
+
+      // Advance pointer with smaller end
+      if (intervalA.end < intervalB.end) {
+        setPtrA(ptrA + 1);
+      } else {
+        setPtrB(ptrB + 1);
+      }
+    }
+  }, [phase, ptrA, ptrB, result]);
+
+  useEffect(() => {
+    if (!isPlaying || phase === "done") return undefined;
+
+    const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
-  }, [isPlaying, phase, ptrA, ptrB, result, speed]);
+  }, [isPlaying, phase, speed, performStep]);
 
   const maxEnd = Math.max(
     ...listA.map((i) => i.end),
@@ -162,6 +165,17 @@ export default function IntervalIntersectionVisualizer() {
             {isPlaying ? "Pause" : "Play"}
           </button>
           <button
+            onClick={() => {
+              if (!isPlaying && phase !== "done") {
+                performStep();
+              }
+            }}
+            disabled={isPlaying || phase === "done"}
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 disabled:opacity-50"
+          >
+            Step
+          </button>
+          <button
             onClick={reset}
             className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600"
           >
@@ -181,81 +195,119 @@ export default function IntervalIntersectionVisualizer() {
           </div>
         </div>
 
-        {/* List A */}
-        <div className="mb-4">
+        {/* Timeline visualization */}
+        <div className="mb-4 bg-gray-800/30 rounded-lg p-4">
+          {/* Timeline scale */}
+          <div className="relative h-5 mb-2 ml-8">
+            {Array.from({ length: Math.ceil(maxEnd / 5) + 1 }).map((_, i) => {
+              const value = i * 5;
+              if (value > maxEnd) return null;
+              return (
+                <span
+                  key={`scale-${value}`}
+                  className="absolute text-xs text-gray-400 -translate-x-1/2"
+                  style={{ left: `${(value / maxEnd) * 100}%` }}
+                >
+                  {value}
+                </span>
+              );
+            })}
+          </div>
+
+          {/* List A row */}
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-6 h-6 rounded-md bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
+            <span className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               A
             </span>
-            <span className="text-sm text-gray-400">
-              List A (sorted, non-overlapping)
-            </span>
+            <div className="relative flex-1 h-10">
+              {/* Grid lines */}
+              {Array.from({ length: Math.ceil(maxEnd / 5) + 1 }).map((_, i) => {
+                const value = i * 5;
+                if (value > maxEnd) return null;
+                return (
+                  <div
+                    key={`grid-a-${value}`}
+                    className="absolute top-0 bottom-0 w-px bg-gray-700/50"
+                    style={{ left: `${(value / maxEnd) * 100}%` }}
+                  />
+                );
+              })}
+              {/* Intervals */}
+              {listA.map((int, position) => {
+                const leftPct = (int.start / maxEnd) * 100;
+                const widthPct = ((int.end - int.start) / maxEnd) * 100;
+                return (
+                  <motion.div
+                    key={`a-${int.start}-${int.end}`}
+                    animate={{
+                      y: position === ptrA ? -3 : 0,
+                      scale: position === ptrA ? 1.02 : 1,
+                    }}
+                    className={`absolute h-8 rounded flex items-center justify-center text-white text-xs font-bold ${
+                      position === ptrA
+                        ? "bg-blue-500 ring-2 ring-blue-300 z-10"
+                        : "bg-blue-500/70"
+                    }`}
+                    style={{
+                      left: `${leftPct}%`,
+                      width: `${widthPct}%`,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                    }}
+                  >
+                    <span className="truncate px-1">[{int.start},{int.end}]</span>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
-          <div className="relative bg-gray-800/50 rounded-md p-4 h-16 overflow-hidden">
-            {/* Timeline */}
-            <div className="absolute bottom-2 left-4 right-4 h-0.5 bg-gray-600" />
 
-            {listA.map((int, position) => (
-              <motion.div
-                key={`a-${int.start}-${int.end}`}
-                animate={{
-                  y: position === ptrA ? -3 : 0,
-                  scale: position === ptrA ? 1.05 : 1,
-                }}
-                className={`absolute h-8 rounded-md flex items-center justify-center text-white text-xs font-bold shadow-lg ${
-                  position === ptrA
-                    ? "bg-blue-500 ring-2 ring-blue-300"
-                    : "bg-blue-500/50"
-                }`}
-                style={{
-                  left: `${(int.start / maxEnd) * 100}%`,
-                  width: `${((int.end - int.start) / maxEnd) * 100}%`,
-                  top: "8px",
-                  minWidth: "50px",
-                }}
-              >
-                [{int.start},{int.end}]
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* List B */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-6 h-6 rounded-md bg-green-500 flex items-center justify-center text-white text-xs font-bold">
+          {/* List B row */}
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               B
             </span>
-            <span className="text-sm text-gray-400">
-              List B (sorted, non-overlapping)
-            </span>
-          </div>
-          <div className="relative bg-gray-800/50 rounded-md p-4 h-16 overflow-hidden">
-            {/* Timeline */}
-            <div className="absolute bottom-2 left-4 right-4 h-0.5 bg-gray-600" />
-
-            {listB.map((int, position) => (
-              <motion.div
-                key={`b-${int.start}-${int.end}`}
-                animate={{
-                  y: position === ptrB ? -3 : 0,
-                  scale: position === ptrB ? 1.05 : 1,
-                }}
-                className={`absolute h-8 rounded-md flex items-center justify-center text-white text-xs font-bold shadow-lg ${
-                  position === ptrB
-                    ? "bg-green-500 ring-2 ring-green-300"
-                    : "bg-green-500/50"
-                }`}
-                style={{
-                  left: `${(int.start / maxEnd) * 100}%`,
-                  width: `${((int.end - int.start) / maxEnd) * 100}%`,
-                  top: "8px",
-                  minWidth: "50px",
-                }}
-              >
-                [{int.start},{int.end}]
-              </motion.div>
-            ))}
+            <div className="relative flex-1 h-10">
+              {/* Grid lines */}
+              {Array.from({ length: Math.ceil(maxEnd / 5) + 1 }).map((_, i) => {
+                const value = i * 5;
+                if (value > maxEnd) return null;
+                return (
+                  <div
+                    key={`grid-b-${value}`}
+                    className="absolute top-0 bottom-0 w-px bg-gray-700/50"
+                    style={{ left: `${(value / maxEnd) * 100}%` }}
+                  />
+                );
+              })}
+              {/* Intervals */}
+              {listB.map((int, position) => {
+                const leftPct = (int.start / maxEnd) * 100;
+                const widthPct = ((int.end - int.start) / maxEnd) * 100;
+                return (
+                  <motion.div
+                    key={`b-${int.start}-${int.end}`}
+                    animate={{
+                      y: position === ptrB ? -3 : 0,
+                      scale: position === ptrB ? 1.02 : 1,
+                    }}
+                    className={`absolute h-8 rounded flex items-center justify-center text-white text-xs font-bold ${
+                      position === ptrB
+                        ? "bg-green-500 ring-2 ring-green-300 z-10"
+                        : "bg-green-500/70"
+                    }`}
+                    style={{
+                      left: `${leftPct}%`,
+                      width: `${widthPct}%`,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                    }}
+                  >
+                    <span className="truncate px-1">[{int.start},{int.end}]</span>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </div>
 

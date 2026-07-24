@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Activity {
@@ -11,9 +11,11 @@ interface Activity {
   color: string;
 }
 
+// skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: This visualizer coordinates playback, selection state, and timeline rendering.
 export default function ActivitySelectionVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [, setStep] = useState(0);
   const [speed, setSpeed] = useState(800);
   const [selectedActivities, setSelectedActivities] = useState<Set<number>>(
     new Set()
@@ -45,68 +47,65 @@ export default function ActivitySelectionVisualizer() {
   );
 
   const timelineMax = 12;
+  const timelineTicks = Array.from(
+    { length: timelineMax + 1 },
+    (_, tick) => tick
+  );
+
+  const isDone =
+    phase === "selecting" && (currentActivity ?? 0) >= sortedActivities.length;
+
+  // skipcq: JS-R1005
+  // Reason: Each branch maps directly to one visible visualizer phase.
+  const performStep = useCallback(() => {
+    if (phase === "unsorted") {
+      setPhase("sorting");
+      setMessage("Sorting by END time (the greedy insight!)");
+    } else if (phase === "sorting") {
+      setActivities(sortedActivities);
+      setPhase("sorted");
+      setMessage("Sorted! Now selecting activities greedily...");
+    } else if (phase === "sorted") {
+      setPhase("selecting");
+      setCurrentActivity(0);
+    } else if (phase === "selecting") {
+      const sortedActs = sortedActivities;
+      const currentIdx = currentActivity ?? 0;
+
+      if (currentIdx >= sortedActs.length) {
+        setIsPlaying(false);
+        setMessage(
+          `Done! Selected ${selectedActivities.size} non-overlapping activities.`
+        );
+        return;
+      }
+
+      const act = sortedActs[currentIdx];
+
+      if (act.start >= lastEnd) {
+        setSelectedActivities((prev) => new Set([...prev, act.id]));
+        setLastEnd(act.end);
+        setMessage(
+          `Selected ${act.name} (ends at ${act.end}). Last end = ${act.end}`
+        );
+      } else {
+        setMessage(
+          `Skipped ${act.name} (starts at ${act.start} < lastEnd ${lastEnd})`
+        );
+      }
+
+      setCurrentActivity(currentIdx + 1);
+    }
+  }, [phase, currentActivity, lastEnd, selectedActivities.size, sortedActivities]);
 
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying || isDone) return undefined;
 
-    const timer = setTimeout(() => {
-      if (phase === "unsorted") {
-        setPhase("sorting");
-        setMessage("Sorting by END time (the greedy insight!)");
-        setStep((s) => s + 1);
-      } else if (phase === "sorting") {
-        setActivities(sortedActivities);
-        setPhase("sorted");
-        setMessage("Sorted! Now selecting activities greedily...");
-        setStep((s) => s + 1);
-      } else if (phase === "sorted") {
-        setPhase("selecting");
-        setCurrentActivity(0);
-        setStep((s) => s + 1);
-      } else if (phase === "selecting") {
-        const sortedActs = sortedActivities;
-        const currentIdx = currentActivity ?? 0;
-
-        if (currentIdx >= sortedActs.length) {
-          setIsPlaying(false);
-          setMessage(
-            `Done! Selected ${selectedActivities.size} non-overlapping activities.`
-          );
-          return;
-        }
-
-        const act = sortedActs[currentIdx];
-
-        if (act.start >= lastEnd) {
-          setSelectedActivities((prev) => new Set([...prev, act.id]));
-          setLastEnd(act.end);
-          setMessage(
-            `Selected ${act.name} (ends at ${act.end}). Last end = ${act.end}`
-          );
-        } else {
-          setMessage(
-            `Skipped ${act.name} (starts at ${act.start} < lastEnd ${lastEnd})`
-          );
-        }
-
-        setCurrentActivity(currentIdx + 1);
-        setStep((s) => s + 1);
-      }
-    }, speed);
-
+    const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
-  }, [
-    isPlaying,
-    phase,
-    currentActivity,
-    lastEnd,
-    selectedActivities.size,
-    speed,
-    sortedActivities,
-  ]);
+  }, [isPlaying, isDone, speed, performStep]);
 
   const reset = () => {
-    setStep(0);
     setIsPlaying(false);
     setPhase("unsorted");
     setActivities(originalActivities);
@@ -150,15 +149,23 @@ export default function ActivitySelectionVisualizer() {
         <div className="flex items-center gap-2 mb-4">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            disabled={
-              phase === "selecting" &&
-              (currentActivity ?? 0) >= sortedActivities.length
-            }
+            disabled={isDone}
             className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
             {isPlaying ? "Pause" : "Play"}
+          </button>
+          <button
+            onClick={() => {
+              if (!isPlaying && !isDone) {
+                performStep();
+              }
+            }}
+            disabled={isPlaying || isDone}
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 disabled:opacity-50"
+          >
+            Step
           </button>
           <button
             onClick={reset}
@@ -217,17 +224,17 @@ export default function ActivitySelectionVisualizer() {
         {/* Timeline */}
         <div className="mb-6">
           <div className="flex justify-between text-xs text-gray-500 mb-2 px-2">
-            {Array.from({ length: timelineMax + 1 }).map((_, i) => (
-              <span key={`timeline-label-${i}`}>{i}</span>
+            {timelineTicks.map((tick) => (
+              <span key={`timeline-label-${tick}`}>{tick}</span>
             ))}
           </div>
           <div className="relative h-64 bg-gray-800/50 rounded-md overflow-hidden">
             {/* Time grid lines */}
-            {Array.from({ length: timelineMax + 1 }).map((_, i) => (
+            {timelineTicks.map((tick) => (
               <div
-                key={`grid-line-${i}`}
+                key={`grid-line-${tick}`}
                 className="absolute top-0 bottom-0 border-l border-gray-700/50"
-                style={{ left: `${(i / timelineMax) * 100}%` }}
+                style={{ left: `${(tick / timelineMax) * 100}%` }}
               />
             ))}
 

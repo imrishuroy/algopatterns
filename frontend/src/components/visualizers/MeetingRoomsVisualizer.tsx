@@ -59,6 +59,8 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: The component intentionally owns all state for a small playback demo.
 export default function MeetingRoomsVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -98,82 +100,76 @@ export default function MeetingRoomsVisualizer() {
     });
   }, [reset]);
 
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    const timer = setTimeout(() => {
-      if (phase === "init") {
-        setPhase("creating-events");
-        setMessage("Step 1: Create events - starts (+1) and ends (-1)");
-      } else if (phase === "creating-events") {
-        // Create and sort events
-        const evts: Event[] = [];
-        for (const meeting of initialMeetings) {
-          evts.push({
-            time: meeting.start,
-            type: "start",
-            meetingId: meeting.id,
-          });
-          evts.push({ time: meeting.end, type: "end", meetingId: meeting.id });
-        }
-        // Sort by time; if same time, ends before starts
-        evts.sort((a, b) => {
-          if (a.time !== b.time) return a.time - b.time;
-          return a.type === "end" ? -1 : 1;
+  // skipcq: JS-R1005
+  // Reason: Branches map to line-sweep setup and sweep playback phases.
+  const performStep = useCallback(() => {
+    if (phase === "init") {
+      setPhase("creating-events");
+      setMessage("Step 1: Create events - starts (+1) and ends (-1)");
+    } else if (phase === "creating-events") {
+      // Create and sort events
+      const evts: Event[] = [];
+      for (const meeting of initialMeetings) {
+        evts.push({
+          time: meeting.start,
+          type: "start",
+          meetingId: meeting.id,
         });
-        setEvents(evts);
-        setPhase("sweeping");
-        setMessage(`Created ${evts.length} events. Now sweep through time...`);
-      } else if (phase === "sweeping") {
-        if (currentEventIdx >= events.length) {
-          setPhase("done");
-          setMessage(
-            `Done! Maximum concurrent meetings: ${maxRooms} rooms needed`
-          );
-          dispatch({ type: "STOP" });
-          return;
-        }
-
-        const event = events[currentEventIdx];
-        let newRooms = activeRooms;
-
-        if (event.type === "start") {
-          newRooms = activeRooms + 1;
-          setMessage(
-            `Time ${event.time}: Meeting ${event.meetingId + 1} STARTS → rooms: ${activeRooms} + 1 = ${newRooms}`
-          );
-        } else {
-          newRooms = activeRooms - 1;
-          setMessage(
-            `Time ${event.time}: Meeting ${event.meetingId + 1} ENDS → rooms: ${activeRooms} - 1 = ${newRooms}`
-          );
-        }
-
-        setActiveRooms(newRooms);
-        setRoomsTimeline([
-          ...roomsTimeline,
-          { time: event.time, rooms: newRooms },
-        ]);
-
-        if (newRooms > maxRooms) {
-          setMaxRooms(newRooms);
-        }
-
-        setCurrentEventIdx(currentEventIdx + 1);
+        evts.push({ time: meeting.end, type: "end", meetingId: meeting.id });
       }
-    }, speed);
+      // Sort by time; if same time, ends before starts
+      evts.sort((a, b) => {
+        if (a.time !== b.time) return a.time - b.time;
+        return a.type === "end" ? -1 : 1;
+      });
+      setEvents(evts);
+      setPhase("sweeping");
+      setMessage(`Created ${evts.length} events. Now sweep through time...`);
+    } else if (phase === "sweeping") {
+      if (currentEventIdx >= events.length) {
+        setPhase("done");
+        setMessage(
+          `Done! Maximum concurrent meetings: ${maxRooms} rooms needed`
+        );
+        dispatch({ type: "STOP" });
+        return;
+      }
 
+      const event = events[currentEventIdx];
+      let newRooms = activeRooms;
+
+      if (event.type === "start") {
+        newRooms = activeRooms + 1;
+        setMessage(
+          `Time ${event.time}: Meeting ${event.meetingId + 1} STARTS → rooms: ${activeRooms} + 1 = ${newRooms}`
+        );
+      } else {
+        newRooms = activeRooms - 1;
+        setMessage(
+          `Time ${event.time}: Meeting ${event.meetingId + 1} ENDS → rooms: ${activeRooms} - 1 = ${newRooms}`
+        );
+      }
+
+      setActiveRooms(newRooms);
+      setRoomsTimeline([
+        ...roomsTimeline,
+        { time: event.time, rooms: newRooms },
+      ]);
+
+      if (newRooms > maxRooms) {
+        setMaxRooms(newRooms);
+      }
+
+      setCurrentEventIdx(currentEventIdx + 1);
+    }
+  }, [phase, currentEventIdx, events, activeRooms, maxRooms, roomsTimeline]);
+
+  useEffect(() => {
+    if (!isPlaying || phase === "done") return undefined;
+
+    const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
-  }, [
-    isPlaying,
-    phase,
-    currentEventIdx,
-    events,
-    activeRooms,
-    maxRooms,
-    roomsTimeline,
-    speed,
-  ]);
+  }, [isPlaying, phase, speed, performStep]);
 
   const maxTime = Math.max(...initialMeetings.map((m) => m.end));
 
@@ -197,6 +193,17 @@ export default function MeetingRoomsVisualizer() {
             } disabled:opacity-50`}
           >
             {isPlaying ? "Pause" : "Play"}
+          </button>
+          <button
+            onClick={() => {
+              if (!isPlaying && phase !== "done") {
+                performStep();
+              }
+            }}
+            disabled={isPlaying || phase === "done"}
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 disabled:opacity-50"
+          >
+            Step
           </button>
           <button
             onClick={reset}

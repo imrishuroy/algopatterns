@@ -12,6 +12,8 @@ interface Activity {
 }
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: This visualizer coordinates playback, selection state, and timeline rendering.
 export default function ActivitySelectionVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
@@ -45,10 +47,16 @@ export default function ActivitySelectionVisualizer() {
   );
 
   const timelineMax = 12;
+  const timelineTicks = Array.from(
+    { length: timelineMax + 1 },
+    (_, tick) => tick
+  );
 
   const isDone =
     phase === "selecting" && (currentActivity ?? 0) >= sortedActivities.length;
 
+  // skipcq: JS-R1005
+  // Reason: Each branch maps directly to one visible visualizer phase.
   const performStep = useCallback(() => {
     if (phase === "unsorted") {
       setPhase("sorting");
@@ -91,7 +99,7 @@ export default function ActivitySelectionVisualizer() {
   }, [phase, currentActivity, lastEnd, selectedActivities.size, sortedActivities]);
 
   useEffect(() => {
-    if (!isPlaying || isDone) return;
+    if (!isPlaying || isDone) return undefined;
 
     const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
@@ -216,17 +224,17 @@ export default function ActivitySelectionVisualizer() {
         {/* Timeline */}
         <div className="mb-6">
           <div className="flex justify-between text-xs text-gray-500 mb-2 px-2">
-            {Array.from({ length: timelineMax + 1 }).map((_, i) => (
-              <span key={`timeline-label-${i}`}>{i}</span>
+            {timelineTicks.map((tick) => (
+              <span key={`timeline-label-${tick}`}>{tick}</span>
             ))}
           </div>
           <div className="relative h-64 bg-gray-800/50 rounded-md overflow-hidden">
             {/* Time grid lines */}
-            {Array.from({ length: timelineMax + 1 }).map((_, i) => (
+            {timelineTicks.map((tick) => (
               <div
-                key={`grid-line-${i}`}
+                key={`grid-line-${tick}`}
                 className="absolute top-0 bottom-0 border-l border-gray-700/50"
-                style={{ left: `${(i / timelineMax) * 100}%` }}
+                style={{ left: `${(tick / timelineMax) * 100}%` }}
               />
             ))}
 

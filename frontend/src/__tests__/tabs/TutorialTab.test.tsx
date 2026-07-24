@@ -535,7 +535,7 @@ describe("TutorialTab", () => {
   });
 
   describe("sidebar wheel scroll handling", () => {
-    it("stops propagation when scrolling down and not at bottom", async () => {
+    it("stops propagation when scrolling down and not at bottom", () => {
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       // Find the sidebar container (desktop version)
@@ -564,7 +564,7 @@ describe("TutorialTab", () => {
       }
     });
 
-    it("stops propagation when scrolling up and not at top", async () => {
+    it("stops propagation when scrolling up and not at top", () => {
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       const sidebarContainers = document.querySelectorAll(
@@ -591,7 +591,7 @@ describe("TutorialTab", () => {
       }
     });
 
-    it("allows parent scroll when at top and scrolling up", async () => {
+    it("allows parent scroll when at top and scrolling up", () => {
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       const sidebarContainers = document.querySelectorAll(
@@ -620,7 +620,7 @@ describe("TutorialTab", () => {
       }
     });
 
-    it("allows parent scroll when at bottom and scrolling down", async () => {
+    it("allows parent scroll when at bottom and scrolling down", () => {
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       const sidebarContainers = document.querySelectorAll(
@@ -649,7 +649,7 @@ describe("TutorialTab", () => {
       }
     });
 
-    it("handles wheel event with zero deltaY", async () => {
+    it("handles wheel event with zero deltaY", () => {
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       const sidebarContainers = document.querySelectorAll(

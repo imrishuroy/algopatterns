@@ -33,7 +33,18 @@ const playReducer = (state: PlayState, action: PlayAction): PlayState => {
       return { ...state, step: state.step + 1 };
     case "RESET":
       return { step: 0, isPlaying: false };
+    default:
+      return state;
   }
+};
+
+const intervalColorByState: Record<Interval["state"], string> = {
+  new: "bg-yellow-500",
+  merged: "bg-green-500",
+  overlap: "bg-orange-500",
+  before: "bg-blue-400",
+  after: "bg-purple-400",
+  result: "bg-emerald-500",
 };
 
 const initialIntervals = [
@@ -47,6 +58,8 @@ const initialIntervals = [
 const newInterval = { start: 4, end: 8 };
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: This visualizer keeps playback state, interval state, and result state together.
 export default function InsertIntervalVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -89,6 +102,8 @@ export default function InsertIntervalVisualizer() {
     });
   }, [reset]);
 
+  // skipcq: JS-R1005
+  // Reason: Insert interval is easiest to follow as the same three phases shown in the UI.
   const performStep = useCallback(() => {
     if (!insertInterval) return;
 
@@ -166,16 +181,14 @@ export default function InsertIntervalVisualizer() {
         setCurrentIdx(currentIdx + 1);
       } else {
         setPhase("done");
-        setMessage(
-          `Done! Result has ${result.length} intervals.`
-        );
+        setMessage(`Done! Result has ${result.length} intervals.`);
         dispatch({ type: "STOP" });
       }
     }
   }, [phase, currentIdx, intervals, insertInterval, result]);
 
   useEffect(() => {
-    if (!isPlaying || phase === "done") return;
+    if (!isPlaying || phase === "done") return undefined;
 
     const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
@@ -187,25 +200,8 @@ export default function InsertIntervalVisualizer() {
   );
   const timelineMax = maxEnd + 2;
 
-  const getIntervalColor = (state: string) => {
-    switch (state) {
-      case "new":
-        return "bg-yellow-500";
-      case "merged":
-        return "bg-green-500";
-      case "overlap":
-        return "bg-orange-500";
-      case "before":
-        return "bg-blue-400";
-      case "after":
-        return "bg-purple-400";
-      case "result":
-        return "bg-emerald-500";
-      default:
-        return "bg-gray-600";
-    }
-  };
-
+  // skipcq: JS-0415
+  // Reason: The nested timeline markup keeps the three interval rows aligned.
   return (
     <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-gray-800">
@@ -260,6 +256,7 @@ export default function InsertIntervalVisualizer() {
 
         {/* Phase indicator */}
         <div className="flex gap-2 mb-4">
+          {/* skipcq: JS-R1005 */}
           {["before", "merging", "after"].map((p, i) => (
             <div
               key={`phase-${p}`}
@@ -291,14 +288,14 @@ export default function InsertIntervalVisualizer() {
           <div className="relative bg-gray-800/50 rounded-md p-4 h-48 overflow-hidden">
             {/* Timeline axis */}
             <div className="absolute bottom-4 left-4 right-4 h-0.5 bg-gray-600">
-              {Array.from({ length: timelineMax + 1 }, (_, i) => (
+              {Array.from({ length: timelineMax + 1 }, (_, tick) => (
                 <div
-                  key={`timeline-${i}`}
+                  key={`timeline-${tick}`}
                   className="absolute bottom-0 w-0.5 h-2 bg-gray-600"
-                  style={{ left: `${(i / timelineMax) * 100}%` }}
+                  style={{ left: `${(tick / timelineMax) * 100}%` }}
                 >
                   <span className="absolute top-3 -translate-x-1/2 text-xs text-gray-500">
-                    {i}
+                    {tick}
                   </span>
                 </div>
               ))}
@@ -314,7 +311,7 @@ export default function InsertIntervalVisualizer() {
                     opacity: int.state === "overlap" ? 0.5 : 1,
                     y: idx === currentIdx ? -5 : 0,
                   }}
-                  className={`absolute h-8 rounded-md ${getIntervalColor(int.state)} flex items-center justify-center text-white text-xs font-bold shadow-lg`}
+                  className={`absolute h-8 rounded-md ${intervalColorByState[int.state]} flex items-center justify-center text-white text-xs font-bold shadow-lg`}
                   style={{
                     left: `${(int.start / timelineMax) * 100}%`,
                     width: `${((int.end - int.start) / timelineMax) * 100}%`,
@@ -340,7 +337,7 @@ export default function InsertIntervalVisualizer() {
                 key={`insert-${insertInterval.start}-${insertInterval.end}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`absolute h-10 rounded-md ${getIntervalColor(insertInterval.state)} flex items-center justify-center text-white text-sm font-bold shadow-lg ring-2 ring-white/30`}
+                className={`absolute h-10 rounded-md ${intervalColorByState[insertInterval.state]} flex items-center justify-center text-white text-sm font-bold shadow-lg ring-2 ring-white/30`}
                 style={{
                   left: `${(insertInterval.start / timelineMax) * 100}%`,
                   width: `${((insertInterval.end - insertInterval.start) / timelineMax) * 100}%`,
@@ -360,9 +357,9 @@ export default function InsertIntervalVisualizer() {
           <div className="relative bg-gray-800/50 rounded-md p-4 h-16 overflow-hidden">
             <div className="absolute bottom-4 left-4 right-4 h-0.5 bg-gray-600" />
             <AnimatePresence>
-              {result.map((int, idx) => (
+              {result.map((int) => (
                 <motion.div
-                  key={`result-${int.id}-${idx}`}
+                  key={`result-${int.id}`}
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="absolute h-10 rounded-md bg-emerald-500 flex items-center justify-center text-white text-sm font-bold shadow-lg"

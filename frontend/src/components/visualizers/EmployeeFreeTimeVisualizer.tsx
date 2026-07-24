@@ -28,6 +28,9 @@ type PlayAction =
   | { type: "ADVANCE" }
   | { type: "RESET" };
 
+const timelineTicks = (max: number) =>
+  Array.from({ length: max + 1 }, (_, tick) => tick);
+
 const playReducer = (state: PlayState, action: PlayAction): PlayState => {
   switch (action.type) {
     case "TOGGLE":
@@ -38,29 +41,41 @@ const playReducer = (state: PlayState, action: PlayAction): PlayState => {
       return { ...state, step: state.step + 1 };
     case "RESET":
       return { step: 0, isPlaying: false };
+    default:
+      return state;
   }
 };
 
 const employeeSchedules = [
-  [
-    { start: 1, end: 3 },
-    { start: 6, end: 7 },
-  ], // Employee 1
-  [{ start: 2, end: 4 }], // Employee 2
-  [
-    { start: 2, end: 5 },
-    { start: 9, end: 12 },
-  ], // Employee 3
-];
-
-const employeeColors = [
-  "bg-blue-500",
-  "bg-green-500",
-  "bg-purple-500",
-  "bg-orange-500",
+  {
+    id: "emp-1",
+    label: "Emp 1",
+    color: "bg-blue-500",
+    intervals: [
+      { start: 1, end: 3 },
+      { start: 6, end: 7 },
+    ],
+  },
+  {
+    id: "emp-2",
+    label: "Emp 2",
+    color: "bg-green-500",
+    intervals: [{ start: 2, end: 4 }],
+  },
+  {
+    id: "emp-3",
+    label: "Emp 3",
+    color: "bg-purple-500",
+    intervals: [
+      { start: 2, end: 5 },
+      { start: 9, end: 12 },
+    ],
+  },
 ];
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: The visualizer keeps several playback and derived timeline states together.
 export default function EmployeeFreeTimeVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -96,6 +111,8 @@ export default function EmployeeFreeTimeVisualizer() {
     });
   }, [reset]);
 
+  // skipcq: JS-R1005
+  // Reason: The explicit phase branches mirror the tutorial walkthrough steps.
   const performStep = useCallback(() => {
     if (phase === "init") {
       setPhase("flatten");
@@ -103,11 +120,11 @@ export default function EmployeeFreeTimeVisualizer() {
     } else if (phase === "flatten") {
       // Flatten all schedules
       const flattened: WorkInterval[] = [];
-      employeeSchedules.forEach((schedule, empId) => {
-        schedule.forEach((interval) => {
+      employeeSchedules.forEach((employee, employeeIndex) => {
+        employee.intervals.forEach((interval) => {
           flattened.push({
             ...interval,
-            employeeId: empId,
+            employeeId: employeeIndex,
             state: "original",
           });
         });
@@ -190,15 +207,22 @@ export default function EmployeeFreeTimeVisualizer() {
   }, [phase, currentIdx, flattenedIntervals, mergedIntervals, freeTime]);
 
   useEffect(() => {
-    if (!isPlaying || phase === "done") return;
+    if (!isPlaying || phase === "done") return undefined;
 
     const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
   }, [isPlaying, phase, speed, performStep]);
 
   const maxEnd =
-    Math.max(...employeeSchedules.flatMap((s) => s.map((i) => i.end)), 12) + 1;
+    Math.max(
+      ...employeeSchedules.flatMap((employee) =>
+        employee.intervals.map((interval) => interval.end)
+      ),
+      12
+    ) + 1;
 
+  // skipcq: JS-0415
+  // Reason: Timeline rows are nested to keep labels, grids, and bars aligned.
   return (
     <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b border-gray-800">
@@ -286,8 +310,8 @@ export default function EmployeeFreeTimeVisualizer() {
 
         {/* Timeline header */}
         <div className="flex justify-between text-xs text-gray-500 mb-2 px-2">
-          {Array.from({ length: maxEnd + 1 }).map((_, i) => (
-            <span key={`time-${i}`}>{i}</span>
+          {timelineTicks(maxEnd).map((tick) => (
+            <span key={`time-${tick}`}>{tick}</span>
           ))}
         </div>
 
@@ -295,25 +319,25 @@ export default function EmployeeFreeTimeVisualizer() {
         <div className="mb-4">
           <div className="text-sm text-gray-400 mb-2">Employee Schedules:</div>
           <div className="relative bg-gray-800/50 rounded-md p-4 overflow-hidden">
-            {employeeSchedules.map((schedule, empId) => (
-              <div key={`emp-${empId}`} className="relative h-10 mb-2">
+            {employeeSchedules.map((employee) => (
+              <div key={employee.id} className="relative h-10 mb-2">
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 text-xs text-gray-400 w-16">
-                  Emp {empId + 1}:
+                  {employee.label}:
                 </div>
                 <div className="ml-16 relative h-full">
                   {/* Grid lines */}
-                  {Array.from({ length: maxEnd + 1 }).map((_, i) => (
+                  {timelineTicks(maxEnd).map((tick) => (
                     <div
-                      key={`grid-emp-${empId}-${i}`}
+                      key={`grid-${employee.id}-${tick}`}
                       className="absolute top-0 bottom-0 border-l border-gray-700/30"
-                      style={{ left: `${(i / maxEnd) * 100}%` }}
+                      style={{ left: `${(tick / maxEnd) * 100}%` }}
                     />
                   ))}
                   {/* Intervals */}
-                  {schedule.map((interval, idx) => (
+                  {employee.intervals.map((interval) => (
                     <div
-                      key={`emp-${empId}-int-${idx}`}
-                      className={`absolute h-8 top-1 rounded-md ${employeeColors[empId]} flex items-center justify-center text-white text-xs font-bold shadow-md`}
+                      key={`${employee.id}-${interval.start}-${interval.end}`}
+                      className={`absolute h-8 top-1 rounded-md ${employee.color} flex items-center justify-center text-white text-xs font-bold shadow-md`}
                       style={{
                         left: `${(interval.start / maxEnd) * 100}%`,
                         width: `${((interval.end - interval.start) / maxEnd) * 100}%`,
@@ -335,17 +359,17 @@ export default function EmployeeFreeTimeVisualizer() {
           </div>
           <div className="relative bg-gray-800/50 rounded-md p-4 h-16 overflow-hidden">
             {/* Grid lines */}
-            {Array.from({ length: maxEnd + 1 }).map((_, i) => (
+            {timelineTicks(maxEnd).map((tick) => (
               <div
-                key={`grid-merged-${i}`}
+                key={`grid-merged-${tick}`}
                 className="absolute top-0 bottom-0 border-l border-gray-700/30"
-                style={{ left: `${(i / maxEnd) * 100}%` }}
+                style={{ left: `${(tick / maxEnd) * 100}%` }}
               />
             ))}
             <AnimatePresence>
-              {mergedIntervals.map((interval, idx) => (
+              {mergedIntervals.map((interval) => (
                 <motion.div
-                  key={`merged-${idx}`}
+                  key={`merged-${interval.employeeId}-${interval.start}-${interval.end}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="absolute h-10 top-2 rounded-md bg-red-500 flex items-center justify-center text-white text-xs font-bold shadow-lg"
@@ -373,17 +397,17 @@ export default function EmployeeFreeTimeVisualizer() {
           </div>
           <div className="relative bg-gray-800/50 rounded-md p-4 h-16 overflow-hidden">
             {/* Grid lines */}
-            {Array.from({ length: maxEnd + 1 }).map((_, i) => (
+            {timelineTicks(maxEnd).map((tick) => (
               <div
-                key={`grid-free-${i}`}
+                key={`grid-free-${tick}`}
                 className="absolute top-0 bottom-0 border-l border-gray-700/30"
-                style={{ left: `${(i / maxEnd) * 100}%` }}
+                style={{ left: `${(tick / maxEnd) * 100}%` }}
               />
             ))}
             <AnimatePresence>
-              {freeTime.map((interval, idx) => (
+              {freeTime.map((interval) => (
                 <motion.div
-                  key={`free-${idx}`}
+                  key={`free-${interval.start}-${interval.end}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="absolute h-10 top-2 rounded-md bg-emerald-500 flex items-center justify-center text-white text-sm font-bold shadow-lg ring-2 ring-emerald-400/50"
@@ -414,7 +438,10 @@ export default function EmployeeFreeTimeVisualizer() {
           </div>
           <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-blue-400">
-              {employeeSchedules.reduce((sum, s) => sum + s.length, 0)}
+              {employeeSchedules.reduce(
+                (sum, employee) => sum + employee.intervals.length,
+                0
+              )}
             </div>
             <div className="text-xs text-gray-500">Work Intervals</div>
           </div>
@@ -450,10 +477,10 @@ export default function EmployeeFreeTimeVisualizer() {
 
         {/* Legend */}
         <div className="flex flex-wrap gap-3 text-sm mb-4">
-          {employeeSchedules.map((_, idx) => (
-            <div key={`legend-emp-${idx}`} className="flex items-center gap-2">
-              <div className={`w-4 h-4 rounded-md ${employeeColors[idx]}`} />
-              <span className="text-gray-400">Emp {idx + 1}</span>
+          {employeeSchedules.map((employee) => (
+            <div key={`legend-${employee.id}`} className="flex items-center gap-2">
+              <div className={`w-4 h-4 rounded-md ${employee.color}`} />
+              <span className="text-gray-400">{employee.label}</span>
             </div>
           ))}
           <div className="flex items-center gap-2">

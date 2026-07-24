@@ -49,6 +49,8 @@ const listB: Interval[] = [
 ];
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: The component owns the two-pointer playback state for a compact demo.
 export default function IntervalIntersectionVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -81,6 +83,8 @@ export default function IntervalIntersectionVisualizer() {
     });
   }, [reset]);
 
+  // skipcq: JS-R1005
+  // Reason: Branches correspond to initialization, comparison, and completion phases.
   const performStep = useCallback(() => {
     if (phase === "init") {
       setPhase("checking");
@@ -94,12 +98,12 @@ export default function IntervalIntersectionVisualizer() {
         return;
       }
 
-      const a = listA[ptrA];
-      const b = listB[ptrB];
+      const intervalA = listA[ptrA];
+      const intervalB = listB[ptrB];
 
       // Calculate intersection
-      const start = Math.max(a.start, b.start);
-      const end = Math.min(a.end, b.end);
+      const start = Math.max(intervalA.start, intervalB.start);
+      const end = Math.min(intervalA.end, intervalB.end);
 
       if (start <= end) {
         // Valid intersection
@@ -107,17 +111,17 @@ export default function IntervalIntersectionVisualizer() {
         setCurrentIntersection(intersection);
         setResult([...result, intersection]);
         setMessage(
-          `A[${ptrA}]=[${a.start},${a.end}] ∩ B[${ptrB}]=[${b.start},${b.end}] = [max(${a.start},${b.start}), min(${a.end},${b.end})] = [${start},${end}] ✓`
+          `A[${ptrA}]=[${intervalA.start},${intervalA.end}] ∩ B[${ptrB}]=[${intervalB.start},${intervalB.end}] = [max(${intervalA.start},${intervalB.start}), min(${intervalA.end},${intervalB.end})] = [${start},${end}] ✓`
         );
       } else {
         setCurrentIntersection(null);
         setMessage(
-          `A[${ptrA}]=[${a.start},${a.end}] ∩ B[${ptrB}]=[${b.start},${b.end}]: No intersection (${start} > ${end})`
+          `A[${ptrA}]=[${intervalA.start},${intervalA.end}] ∩ B[${ptrB}]=[${intervalB.start},${intervalB.end}]: No intersection (${start} > ${end})`
         );
       }
 
       // Advance pointer with smaller end
-      if (a.end < b.end) {
+      if (intervalA.end < intervalB.end) {
         setPtrA(ptrA + 1);
       } else {
         setPtrB(ptrB + 1);
@@ -126,7 +130,7 @@ export default function IntervalIntersectionVisualizer() {
   }, [phase, ptrA, ptrB, result]);
 
   useEffect(() => {
-    if (!isPlaying || phase === "done") return;
+    if (!isPlaying || phase === "done") return undefined;
 
     const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);

@@ -43,7 +43,7 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
   // Handle sidebar scroll independently
   useEffect(() => {
     const sidebar = sidebarRef.current;
-    if (!sidebar) return;
+    if (!sidebar) return undefined;
 
     const handleWheel = (e: WheelEvent) => {
       const { scrollTop, scrollHeight, clientHeight } = sidebar;
@@ -61,9 +61,7 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
     };
 
     sidebar.addEventListener("wheel", handleWheel, { passive: false });
-    // skipcq: JS-0045
     return () => {
-      // skipcq: JS-0045
       sidebar.removeEventListener("wheel", handleWheel);
     };
   }, []);
@@ -73,8 +71,10 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
   // skipcq: JS-R1005
   useEffect(() => {
     // Skip hash navigation if there are no sections
-    if (sections.length === 0) return;
+    if (sections.length === 0) return undefined;
 
+    // skipcq: JS-R1005
+    // Reason: Hash routing supports legacy numeric anchors, slugs, and quiz anchors.
     const handleHashNavigation = () => {
       const currentSections = sectionsRef.current;
       const hash = window.location.hash;

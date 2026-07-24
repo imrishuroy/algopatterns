@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface Interval {
   start: number;
   end: number;
-  id: number;
+  id: string;
   state: "unsorted" | "sorted" | "current" | "comparing" | "merged" | "added";
 }
 
@@ -33,17 +33,21 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
       return { ...state, step: state.step + 1 };
     case "RESET":
       return { step: 0, isPlaying: false };
+    default:
+      return state;
   }
 }
 
 const initialIntervals = [
-  { start: 1, end: 3 },
-  { start: 2, end: 6 },
-  { start: 8, end: 10 },
-  { start: 15, end: 18 },
+  { id: "interval-1-3", start: 1, end: 3 },
+  { id: "interval-2-6", start: 2, end: 6 },
+  { id: "interval-8-10", start: 8, end: 10 },
+  { id: "interval-15-18", start: 15, end: 18 },
 ];
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: The component keeps interval, result, and playback state in one demo.
 export default function MergeIntervalsVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -61,9 +65,8 @@ export default function MergeIntervalsVisualizer() {
   );
 
   const reset = useCallback(() => {
-    const ints = initialIntervals.map((int, i) => ({
+    const ints = initialIntervals.map((int) => ({
       ...int,
-      id: i,
       state: "unsorted" as const,
     }));
     setIntervals(ints);
@@ -80,13 +83,14 @@ export default function MergeIntervalsVisualizer() {
     });
   }, [reset]);
 
+  // skipcq: JS-R1005
+  // Reason: Branches mirror sorting, merging, and done states shown to users.
   const performStep = useCallback(() => {
     if (phase === "init") {
       setPhase("sorting");
       setMessage("Step 1: Sort intervals by start time");
     } else if (phase === "sorting") {
       const sorted = [...intervals].sort((a, b) => a.start - b.start);
-      sorted.forEach((int, i) => (int.id = i));
       const updated = sorted.map((int) => ({
         ...int,
         state: "sorted" as const,
@@ -147,7 +151,7 @@ export default function MergeIntervalsVisualizer() {
   }, [phase, currentIdx, intervals, result]);
 
   useEffect(() => {
-    if (!isPlaying || phase === "done") return;
+    if (!isPlaying || phase === "done") return undefined;
 
     const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
@@ -230,14 +234,14 @@ export default function MergeIntervalsVisualizer() {
           <div className="relative bg-gray-800/50 rounded-md p-4 h-40 overflow-hidden">
             {/* Timeline axis */}
             <div className="absolute bottom-4 left-4 right-4 h-0.5 bg-gray-600">
-              {Array.from({ length: maxEnd + 2 }, (_, i) => (
+              {Array.from({ length: maxEnd + 2 }, (_, tick) => (
                 <div
-                  key={`timeline-${i}`}
+                  key={`timeline-${tick}`}
                   className="absolute bottom-0 w-0.5 h-2 bg-gray-600"
-                  style={{ left: `${(i / (maxEnd + 1)) * 100}%` }}
+                  style={{ left: `${(tick / (maxEnd + 1)) * 100}%` }}
                 >
                   <span className="absolute top-3 -translate-x-1/2 text-xs text-gray-500">
-                    {i}
+                    {tick}
                   </span>
                 </div>
               ))}
@@ -273,9 +277,9 @@ export default function MergeIntervalsVisualizer() {
             <div className="absolute bottom-4 left-4 right-4 h-0.5 bg-gray-600" />
 
             <AnimatePresence>
-              {result.map((int, idx) => (
+              {result.map((int) => (
                 <motion.div
-                  key={`result-${int.start}-${int.end}-${idx}`}
+                  key={`result-${int.id}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className={`absolute h-10 rounded-md ${getIntervalColor(int.state)} flex items-center justify-center text-white text-sm font-bold shadow-lg ring-2 ring-white/30`}

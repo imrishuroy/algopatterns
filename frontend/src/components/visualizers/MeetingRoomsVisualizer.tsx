@@ -59,6 +59,8 @@ function playReducer(state: PlayState, action: PlayAction): PlayState {
 }
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: The component intentionally owns all state for a small playback demo.
 export default function MeetingRoomsVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -98,6 +100,8 @@ export default function MeetingRoomsVisualizer() {
     });
   }, [reset]);
 
+  // skipcq: JS-R1005
+  // Reason: Branches map to line-sweep setup and sweep playback phases.
   const performStep = useCallback(() => {
     if (phase === "init") {
       setPhase("creating-events");
@@ -161,7 +165,7 @@ export default function MeetingRoomsVisualizer() {
   }, [phase, currentEventIdx, events, activeRooms, maxRooms, roomsTimeline]);
 
   useEffect(() => {
-    if (!isPlaying || phase === "done") return;
+    if (!isPlaying || phase === "done") return undefined;
 
     const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);

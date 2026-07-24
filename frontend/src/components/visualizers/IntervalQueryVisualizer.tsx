@@ -13,11 +13,12 @@ interface Interval {
   start: number;
   end: number;
   length: number;
-  id: number;
+  id: string;
   state: "waiting" | "added" | "expired" | "best";
 }
 
 interface QueryResult {
+  queryId: string;
   query: number;
   answer: number;
   bestInterval: Interval | null;
@@ -40,20 +41,33 @@ const playReducer = (state: PlayState, action: PlayAction): PlayState => {
       return { ...state, step: state.step + 1 };
     case "RESET":
       return { step: 0, isPlaying: false };
+    default:
+      return state;
   }
 };
 
 // Example data
 const initialIntervals = [
-  { start: 1, end: 3 },
-  { start: 2, end: 3 },
-  { start: 3, end: 7 },
-  { start: 6, end: 6 },
+  { id: "interval-1-3", start: 1, end: 3 },
+  { id: "interval-2-3", start: 2, end: 3 },
+  { id: "interval-3-7", start: 3, end: 7 },
+  { id: "interval-6-6", start: 6, end: 6 },
 ];
 
-const queries = [2, 3, 1, 7, 6, 8];
+const queryItems = [
+  { id: "query-2", query: 2 },
+  { id: "query-3", query: 3 },
+  { id: "query-1", query: 1 },
+  { id: "query-7", query: 7 },
+  { id: "query-6", query: 6 },
+  { id: "query-8", query: 8 },
+];
+
+const queries = queryItems.map((item) => item.query);
 
 // skipcq: JS-0067
+// skipcq: JS-R1005
+// Reason: This visualizer owns offline query, heap, playback, and result state.
 export default function IntervalQueryVisualizer() {
   const [{ isPlaying }, dispatch] = useReducer(playReducer, {
     step: 0,
@@ -62,7 +76,7 @@ export default function IntervalQueryVisualizer() {
   const [speed, setSpeed] = useState(1200);
   const [intervals, setIntervals] = useState<Interval[]>([]);
   const [sortedQueries, setSortedQueries] = useState<
-    { query: number; originalIdx: number }[]
+    { query: number; queryId: string }[]
   >([]);
   const [currentQueryIdx, setCurrentQueryIdx] = useState(0);
   const [heap, setHeap] = useState<Interval[]>([]);
@@ -76,10 +90,9 @@ export default function IntervalQueryVisualizer() {
   const [intervalIdx, setIntervalIdx] = useState(0);
 
   const reset = useCallback(() => {
-    const ints = initialIntervals.map((int, i) => ({
+    const ints = initialIntervals.map((int) => ({
       ...int,
       length: int.end - int.start + 1,
-      id: i,
       state: "waiting" as const,
     }));
     setIntervals(ints);
@@ -99,6 +112,8 @@ export default function IntervalQueryVisualizer() {
     });
   }, [reset]);
 
+  // skipcq: JS-R1005
+  // Reason: The algorithm is shown as explicit sorting and processing phases.
   const performStep = useCallback(() => {
     if (phase === "init") {
       setPhase("sorting");
@@ -109,7 +124,10 @@ export default function IntervalQueryVisualizer() {
       setIntervals(sortedInts);
 
       // Sort queries but keep original indices
-      const sq = queries.map((q, i) => ({ query: q, originalIdx: i }));
+      const sq = queryItems.map((item) => ({
+        query: item.query,
+        queryId: item.id,
+      }));
       sq.sort((a, b) => a.query - b.query);
       setSortedQueries(sq);
 
@@ -154,9 +172,14 @@ export default function IntervalQueryVisualizer() {
           validHeap.push(int);
         } else {
           // Mark as expired
-          const idx = newIntervals.findIndex((i) => i.id === int.id);
-          if (idx !== -1) {
-            newIntervals[idx] = { ...newIntervals[idx], state: "expired" };
+          const intervalIndex = newIntervals.findIndex(
+            (interval) => interval.id === int.id
+          );
+          if (intervalIndex !== -1) {
+            newIntervals[intervalIndex] = {
+              ...newIntervals[intervalIndex],
+              state: "expired",
+            };
           }
         }
       }
@@ -168,9 +191,15 @@ export default function IntervalQueryVisualizer() {
         bestInterval = validHeap[0];
         answer = bestInterval.length;
         // Mark best
-        const idx = newIntervals.findIndex((i) => i.id === bestInterval!.id);
-        if (idx !== -1) {
-          newIntervals[idx] = { ...newIntervals[idx], state: "best" };
+        const bestIntervalId = bestInterval.id;
+        const intervalIndex = newIntervals.findIndex(
+          (interval) => interval.id === bestIntervalId
+        );
+        if (intervalIndex !== -1) {
+          newIntervals[intervalIndex] = {
+            ...newIntervals[intervalIndex],
+            state: "best",
+          };
         }
       }
 
@@ -180,6 +209,7 @@ export default function IntervalQueryVisualizer() {
 
       // Store result
       const newResult: QueryResult = {
+        queryId: sortedQueries[currentQueryIdx].queryId,
         query: currentQuery,
         answer,
         bestInterval,
@@ -191,8 +221,11 @@ export default function IntervalQueryVisualizer() {
           `Query ${currentQuery}: No interval contains it. Answer = -1`
         );
       } else {
+        const interval = bestInterval;
         setMessage(
-          `Query ${currentQuery}: Smallest interval is [${bestInterval!.start},${bestInterval!.end}] with length ${answer}`
+          interval
+            ? `Query ${currentQuery}: Smallest interval is [${interval.start},${interval.end}] with length ${answer}`
+            : `Query ${currentQuery}: No interval contains it. Answer = -1`
         );
       }
 
@@ -220,13 +253,14 @@ export default function IntervalQueryVisualizer() {
   ]);
 
   useEffect(() => {
-    if (!isPlaying || phase === "done") return;
+    if (!isPlaying || phase === "done") return undefined;
 
     const timer = setTimeout(performStep, speed);
     return () => clearTimeout(timer);
   }, [isPlaying, phase, speed, performStep]);
 
   const maxEnd = Math.max(...initialIntervals.map((i) => i.end), ...queries) + 1;
+  const scaleTicks = Array.from({ length: maxEnd + 1 }, (_, tick) => tick);
 
   const getIntervalColor = (state: string) => {
     switch (state) {
@@ -241,6 +275,8 @@ export default function IntervalQueryVisualizer() {
     }
   };
 
+  // skipcq: JS-0415
+  // Reason: Nested markup is needed to align query labels, heap entries, and timeline bars.
   return (
     <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
       <div className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-b border-gray-800">
@@ -300,9 +336,9 @@ export default function IntervalQueryVisualizer() {
           <div className="bg-gray-800/50 rounded-md p-3">
             <div className="text-sm text-gray-400 mb-2">Intervals:</div>
             <div className="flex flex-wrap gap-2">
-              {initialIntervals.map((int, i) => (
+              {initialIntervals.map((int) => (
                 <span
-                  key={`init-int-${i}`}
+                  key={int.id}
                   className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-sm font-mono"
                 >
                   [{int.start},{int.end}]
@@ -313,15 +349,15 @@ export default function IntervalQueryVisualizer() {
           <div className="bg-gray-800/50 rounded-md p-3">
             <div className="text-sm text-gray-400 mb-2">Queries:</div>
             <div className="flex flex-wrap gap-2">
-              {queries.map((q, i) => {
-                const result = results.find((r) => r.query === q);
+              {queryItems.map((item) => {
+                const result = results.find((r) => r.queryId === item.id);
                 const isProcessed = result !== undefined;
                 const isCurrent =
-                  sortedQueries[currentQueryIdx]?.query === q &&
+                  sortedQueries[currentQueryIdx]?.queryId === item.id &&
                   phase === "processing";
                 return (
                   <span
-                    key={`query-${i}`}
+                    key={item.id}
                     className={`px-2 py-1 rounded text-sm font-mono ${
                       isCurrent
                         ? "bg-yellow-500 text-black"
@@ -330,7 +366,7 @@ export default function IntervalQueryVisualizer() {
                           : "bg-gray-700 text-gray-300"
                     }`}
                   >
-                    {q}
+                    {item.query}
                   </span>
                 );
               })}
@@ -342,13 +378,13 @@ export default function IntervalQueryVisualizer() {
         <div className="mb-4 bg-gray-800/30 rounded-lg p-4">
           {/* Timeline scale */}
           <div className="relative h-5 mb-2">
-            {Array.from({ length: maxEnd + 1 }).map((_, i) => (
+            {scaleTicks.map((tick) => (
               <span
-                key={`scale-${i}`}
+                key={`scale-${tick}`}
                 className="absolute text-xs text-gray-500 -translate-x-1/2"
-                style={{ left: `${(i / maxEnd) * 100}%` }}
+                style={{ left: `${(tick / maxEnd) * 100}%` }}
               >
-                {i}
+                {tick}
               </span>
             ))}
           </div>
@@ -442,17 +478,12 @@ export default function IntervalQueryVisualizer() {
                 No results yet
               </span>
             ) : (
-              queries.map((q, i) => {
-                // Find the sorted query entry for this original index
-                const sqEntry = sortedQueries.find((sq) => sq.originalIdx === i);
-                // Find the result for this query value
-                const result = sqEntry
-                  ? results.find((r) => r.query === sqEntry.query)
-                  : null;
+              queryItems.map((item) => {
+                const result = results.find((entry) => entry.queryId === item.id);
                 const answer = result?.answer ?? null;
                 return (
                   <span
-                    key={`result-${i}`}
+                    key={`result-${item.id}`}
                     className={`px-2 py-1 rounded text-sm font-mono ${
                       answer !== null
                         ? answer === -1
@@ -470,10 +501,9 @@ export default function IntervalQueryVisualizer() {
           {results.length > 0 && results.length === queries.length && (
             <div className="mt-2 text-xs text-gray-500">
               Output array: [
-              {queries.map((_, i) => {
-                const sq = sortedQueries.find((s) => s.originalIdx === i);
-                const r = sq ? results.find((res) => res.query === sq.query) : null;
-                return r?.answer ?? "?";
+              {queryItems.map((item) => {
+                const result = results.find((entry) => entry.queryId === item.id);
+                return result?.answer ?? "?";
               }).join(", ")}
               ]
             </div>

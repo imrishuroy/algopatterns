@@ -119,6 +119,7 @@ const getHeightColor = (height: number, maxHeight: number): string => {
   return "bg-blue-500 border-blue-400";
 };
 
+// skipcq: JS-0067 — React component with hooks requires function declaration
 export default function QueueReconstructionVisualizer() {
   const [selectedExample, setSelectedExample] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -174,7 +175,7 @@ export default function QueueReconstructionVisualizer() {
   // Render a person card
   const renderPerson = (
     person: Person,
-    isCurrentlyInserting: boolean = false
+    isCurrentlyInserting = false
   ) => {
     const heightPercent = (person[0] / maxHeight) * 100;
 
@@ -357,7 +358,7 @@ export default function QueueReconstructionVisualizer() {
 
                     return (
                       <div key={`queue-${idx}`}>
-                        {renderPerson(person, !!isJustInserted)}
+                            {renderPerson(person, Boolean(isJustInserted))}
                       </div>
                     );
                   })}

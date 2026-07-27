@@ -138,6 +138,7 @@ const computeSteps = (): StepInfo[] => {
 const STEPS = computeSteps();
 const UNIQUE_CARDS = [...new Set(HAND)].sort((a, b) => a - b);
 
+// skipcq: JS-0067 — React component with hooks requires function declaration
 export default function HandOfStraightsVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1000);
@@ -151,7 +152,8 @@ export default function HandOfStraightsVisualizer() {
     if (currentStep < STEPS.length) {
       const step = STEPS[currentStep];
       if (step.type === "group-complete" && step.groupCards) {
-        setCompletedGroups((prev) => [...prev, step.groupCards!]);
+            const cards = step.groupCards;
+            setCompletedGroups((prev) => [...prev, cards]);
       }
       setCurrentStep((s) => s + 1);
     } else {

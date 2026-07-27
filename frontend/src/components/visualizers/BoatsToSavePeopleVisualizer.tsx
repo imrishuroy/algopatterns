@@ -157,6 +157,7 @@ const computeSteps = (people: number[], limit: number): StepInfo[] => {
   return steps;
 };
 
+// skipcq: JS-0067 — React component with hooks requires function declaration
 export default function BoatsToSavePeopleVisualizer() {
   const [selectedExample, setSelectedExample] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

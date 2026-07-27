@@ -124,6 +124,7 @@ const computeSteps = (s: string): StepInfo[] => {
   return steps;
 };
 
+// skipcq: JS-0067 — React component with hooks requires function declaration
 export default function ValidParenthesisVisualizer() {
   const [selectedExample, setSelectedExample] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

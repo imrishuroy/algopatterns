@@ -57,6 +57,7 @@ const computeSteps = (): { steps: StepInfo[]; answer: number } => {
 
 const PRECOMPUTED = computeSteps();
 
+// skipcq: JS-0067 — React component with hooks requires function declaration
 export default function GasStationVisualizer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1000);

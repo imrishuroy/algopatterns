@@ -327,6 +327,38 @@ const MultiStateDPVisualizer = dynamic(
   () => import("@/components/visualizers/MultiStateDPVisualizer"),
   { loading: VisualizerLoading, ssr: false }
 );
+const GasStationVisualizer = dynamic(
+  () => import("@/components/visualizers/GasStationVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const HandOfStraightsVisualizer = dynamic(
+  () => import("@/components/visualizers/HandOfStraightsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const MergeTripletsVisualizer = dynamic(
+  () => import("@/components/visualizers/MergeTripletsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const PartitionLabelsVisualizer = dynamic(
+  () => import("@/components/visualizers/PartitionLabelsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const ValidParenthesisVisualizer = dynamic(
+  () => import("@/components/visualizers/ValidParenthesisVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const BuyAndSellStockVisualizer = dynamic(
+  () => import("@/components/visualizers/BuyAndSellStockVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const BoatsToSavePeopleVisualizer = dynamic(
+  () => import("@/components/visualizers/BoatsToSavePeopleVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const QueueReconstructionVisualizer = dynamic(
+  () => import("@/components/visualizers/QueueReconstructionVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
 
 interface TutorialSectionProps {
   pattern: Pattern;
@@ -512,29 +544,127 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
 
       {/* Greedy Visualizers */}
       {cat === "Greedy" &&
-        (title.includes("Activity") ||
-          title.includes("Interval") ||
-          title.includes("Scheduling")) && (
+        (title.includes("Activity") || title.includes("Scheduling")) && (
           <div className="mt-8">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <span className="text-green-400">▶</span> Interactive Activity
               Selection
             </h4>
-            <ActivitySelectionVisualizer />
+            <ActivitySelectionVisualizer mode="activity" />
           </div>
         )}
 
+      {cat === "Greedy" && title.includes("Non-Overlapping") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-orange-400">▶</span> Interactive Interval
+            Visualizer
+          </h4>
+          <ActivitySelectionVisualizer mode="intervals" />
+        </div>
+      )}
+
+      {cat === "Greedy" && title.includes("Buy and Sell Stock") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Stock Trading
+          </h4>
+          <BuyAndSellStockVisualizer />
+        </div>
+      )}
+
+      {cat === "Greedy" && title.includes("Boats to Save People") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-cyan-400">▶</span> Interactive Boat Pairing
+          </h4>
+          <BoatsToSavePeopleVisualizer />
+        </div>
+      )}
+
+      {cat === "Greedy" && title.includes("Queue Reconstruction") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-purple-400">▶</span> Interactive Queue Builder
+          </h4>
+          <QueueReconstructionVisualizer />
+        </div>
+      )}
+
+      {cat === "Greedy" && title === "Jump Game" && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Jump Game
+          </h4>
+          <JumpGameVisualizer showModeSelector={false} initialMode="can-jump" />
+        </div>
+      )}
+
+      {cat === "Greedy" && title.includes("Jump Game II") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-blue-400">▶</span> Interactive Jump Game II
+          </h4>
+          <JumpGameVisualizer showModeSelector={false} initialMode="min-jumps" />
+        </div>
+      )}
+
       {cat === "Greedy" &&
-        (title.includes("Jump") ||
-          title.includes("Reachability") ||
-          title.includes("Array Traversal")) && (
+        (title.includes("Maximum Subarray") ||
+          title.includes("Kadane")) && (
           <div className="mt-8">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <span className="text-blue-400">▶</span> Interactive Jump Game
+              <span className="text-purple-400">▶</span> Interactive Maximum
+              Subarray
             </h4>
-            <JumpGameVisualizer />
+            <KadaneVisualizer />
           </div>
         )}
+
+      {cat === "Greedy" && title.includes("Gas Station") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-orange-400">▶</span> Interactive Gas Station
+          </h4>
+          <GasStationVisualizer />
+        </div>
+      )}
+
+      {cat === "Greedy" && title.includes("Hand of Straights") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-purple-400">▶</span> Interactive Hand of Straights
+          </h4>
+          <HandOfStraightsVisualizer />
+        </div>
+      )}
+
+      {cat === "Greedy" && title.includes("Merge Triplets") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-purple-400">▶</span> Interactive Merge Triplets
+          </h4>
+          <MergeTripletsVisualizer />
+        </div>
+      )}
+
+      {cat === "Greedy" && title.includes("Partition Labels") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-teal-400">▶</span> Interactive Partition Labels
+          </h4>
+          <PartitionLabelsVisualizer />
+        </div>
+      )}
+
+      {cat === "Greedy" && title.includes("Valid Parenthesis String") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-violet-400">▶</span> Interactive Range Tracker
+          </h4>
+          <ValidParenthesisVisualizer />
+        </div>
+      )}
 
       {/* Graph Visualizers */}
       {cat === "Graphs" &&

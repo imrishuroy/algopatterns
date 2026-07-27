@@ -1,12 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 
 type Mode = "can-jump" | "min-jumps";
 
-export default function JumpGameVisualizer() {
-  const [mode, setMode] = useState<Mode>("can-jump");
+interface JumpGameVisualizerProps {
+  showModeSelector?: boolean;
+  initialMode?: Mode;
+}
+
+export default function JumpGameVisualizer({
+  showModeSelector = true,
+  initialMode = "can-jump",
+}: JumpGameVisualizerProps) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(600);
 
@@ -25,73 +33,69 @@ export default function JumpGameVisualizer() {
   const [showFailCase, setShowFailCase] = useState(false);
   const activeNums = showFailCase ? cannotJumpNums : nums;
 
+  const isDone = result !== null;
+
+  const performStep = useCallback(() => {
+    if (currentIndex >= activeNums.length) {
+      setIsPlaying(false);
+      if (mode === "can-jump") {
+        setResult(
+          maxReach >= activeNums.length - 1
+            ? "Can reach the end!"
+            : "Cannot reach the end"
+        );
+      } else {
+        setResult(`Minimum jumps: ${jumps}`);
+      }
+      return;
+    }
+
+    if (mode === "can-jump") {
+      if (currentIndex > maxReach) {
+        setIsPlaying(false);
+        setResult("Stuck! Cannot reach the end.");
+        return;
+      }
+
+      const newMaxReach = Math.max(
+        maxReach,
+        currentIndex + activeNums[currentIndex]
+      );
+      setMaxReach(newMaxReach);
+
+      if (newMaxReach >= activeNums.length - 1) {
+        setIsPlaying(false);
+        setResult("Can reach the end!");
+        return;
+      }
+    } else {
+      const newFarthest = Math.max(
+        farthest,
+        currentIndex + activeNums[currentIndex]
+      );
+      setFarthest(newFarthest);
+
+      if (
+        currentIndex === currentEnd &&
+        currentIndex < activeNums.length - 1
+      ) {
+        setJumps((j) => j + 1);
+        setCurrentEnd(newFarthest);
+      }
+    }
+
+    setCurrentIndex((i) => i + 1);
+  }, [currentIndex, activeNums, mode, maxReach, jumps, farthest, currentEnd]);
+
   useEffect(() => {
     if (!isPlaying) return;
 
     const timer = setTimeout(() => {
-      if (currentIndex >= activeNums.length) {
-        setIsPlaying(false);
-        if (mode === "can-jump") {
-          setResult(
-            maxReach >= activeNums.length - 1
-              ? "Can reach the end!"
-              : "Cannot reach the end"
-          );
-        } else {
-          setResult(`Minimum jumps: ${jumps}`);
-        }
-        return;
-      }
-
-      if (mode === "can-jump") {
-        if (currentIndex > maxReach) {
-          setIsPlaying(false);
-          setResult("Stuck! Cannot reach the end.");
-          return;
-        }
-
-        const newMaxReach = Math.max(
-          maxReach,
-          currentIndex + activeNums[currentIndex]
-        );
-        setMaxReach(newMaxReach);
-
-        if (newMaxReach >= activeNums.length - 1) {
-          setIsPlaying(false);
-          setResult("Can reach the end!");
-          return;
-        }
-      } else {
-        const newFarthest = Math.max(
-          farthest,
-          currentIndex + activeNums[currentIndex]
-        );
-        setFarthest(newFarthest);
-
-        if (
-          currentIndex === currentEnd &&
-          currentIndex < activeNums.length - 1
-        ) {
-          setJumps((j) => j + 1);
-          setCurrentEnd(newFarthest);
-        }
-      }
-
-      setCurrentIndex((i) => i + 1);
+      performStep();
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [
-    isPlaying,
-    currentIndex,
-    maxReach,
-    mode,
-    activeNums,
-    currentEnd,
-    farthest,
-    jumps,
-    speed,
-  ]);
+  }, [isPlaying, performStep, speed]);
 
   const reset = () => {
     setIsPlaying(false);
@@ -135,40 +139,54 @@ export default function JumpGameVisualizer() {
 
   return (
     <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border-b border-gray-800">
+      <div
+        className={`p-4 border-b border-gray-800 ${
+          mode === "can-jump"
+            ? "bg-gradient-to-r from-green-500/10 to-emerald-500/10"
+            : "bg-gradient-to-r from-blue-500/10 to-indigo-500/10"
+        }`}
+      >
         <h3 className="text-lg font-semibold text-white">
-          Jump Game Visualizer
+          {mode === "can-jump" ? "Jump Game" : "Jump Game II"}
         </h3>
         <p className="text-gray-400 text-sm mt-1">
-          Greedy: Track the maximum reachable position
+          {mode === "can-jump"
+            ? "Can you reach the last index? Track the furthest position you can reach."
+            : "Find the minimum number of jumps to reach the end."}
         </p>
       </div>
 
       <div className="p-4">
-        {/* Mode Selector */}
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => switchMode("can-jump")}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
-              mode === "can-jump"
-                ? "bg-green-500 text-white"
-                : "bg-gray-800 text-gray-400"
-            }`}
-          >
-            Can Jump? (I)
-          </button>
-          <button
-            onClick={() => switchMode("min-jumps")}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
-              mode === "min-jumps"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-800 text-gray-400"
-            }`}
-          >
-            Min Jumps (II)
-          </button>
-          {mode === "can-jump" && (
-            <label className="flex items-center gap-2 ml-4 cursor-pointer">
+        {/* Mode Selector - only show if showModeSelector is true */}
+        {showModeSelector && (
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => switchMode("can-jump")}
+              className={`px-4 py-2 rounded-lg font-medium transition ${
+                mode === "can-jump"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-800 text-gray-400"
+              }`}
+            >
+              Can Jump? (I)
+            </button>
+            <button
+              onClick={() => switchMode("min-jumps")}
+              className={`px-4 py-2 rounded-lg font-medium transition ${
+                mode === "min-jumps"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-800 text-gray-400"
+              }`}
+            >
+              Min Jumps (II)
+            </button>
+          </div>
+        )}
+
+        {/* Show fail case toggle - only for can-jump mode */}
+        {mode === "can-jump" && (
+          <div className="flex gap-2 mb-4">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={showFailCase}
@@ -180,19 +198,30 @@ export default function JumpGameVisualizer() {
               />
               <span className="text-gray-400 text-sm">Show fail case</span>
             </label>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Controls */}
         <div className="flex items-center gap-2 mb-4">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            disabled={result !== null}
+            disabled={isDone}
             className={`px-4 py-2 rounded-lg font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
             {isPlaying ? "Pause" : "Play"}
+          </button>
+          <button
+            onClick={() => {
+              if (!isPlaying && !isDone) {
+                performStep();
+              }
+            }}
+            disabled={isPlaying || isDone}
+            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 disabled:opacity-50"
+          >
+            Step
           </button>
           <button
             onClick={reset}
@@ -362,17 +391,17 @@ export default function JumpGameVisualizer() {
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           {mode === "can-jump" ? (
             <p>
-              <strong className="text-green-400">Greedy Insight:</strong> At
-              each position, update the maximum reachable index. If current
-              index exceeds maxReach, we&apos;re stuck. If maxReach {">="} last
-              index, we can reach the end.
+              <strong className="text-green-400">How it works:</strong> At each
+              step, we update how far we can reach. If we&apos;re at an index we
+              can&apos;t reach, we&apos;re stuck. If we can reach the last
+              index, we&apos;re done!
             </p>
           ) : (
             <p>
-              <strong className="text-blue-400">BFS-like Greedy:</strong> Think
-              of it as levels. currentEnd marks the boundary of current
-              &ldquo;level&rdquo;. When we reach it, we must jump (increment
-              jumps) and set new boundary to farthest.
+              <strong className="text-blue-400">How it works:</strong> Count
+              jumps in &ldquo;levels&rdquo;. When we reach the end of current
+              level (currentEnd), we must jump. The new level ends at the
+              farthest point we found.
             </p>
           )}
         </div>

@@ -11,10 +11,18 @@ interface Activity {
   color: string;
 }
 
+interface ActivitySelectionVisualizerProps {
+  // "activity" = Activity Selection framing (maximize selections)
+  // "intervals" = Non-Overlapping Intervals framing (minimize removals)
+  mode?: "activity" | "intervals";
+}
+
 // skipcq: JS-0067
 // skipcq: JS-R1005
 // Reason: This visualizer coordinates playback, selection state, and timeline rendering.
-export default function ActivitySelectionVisualizer() {
+export default function ActivitySelectionVisualizer({
+  mode = "activity",
+}: ActivitySelectionVisualizerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(800);
   const [selectedActivities, setSelectedActivities] = useState<Set<number>>(
@@ -42,9 +50,11 @@ export default function ActivitySelectionVisualizer() {
   );
 
   const [activities, setActivities] = useState(originalActivities);
-  const [message, setMessage] = useState(
-    "Activities shown in original order. Click Play to start!"
-  );
+  const initialMessage =
+    mode === "intervals"
+      ? "Intervals shown in original order. Click Play to find minimum removals!"
+      : "Activities shown in original order. Click Play to start!";
+  const [message, setMessage] = useState(initialMessage);
 
   const timelineMax = 12;
   const timelineTicks = Array.from(
@@ -58,13 +68,17 @@ export default function ActivitySelectionVisualizer() {
   // skipcq: JS-R1005
   // Reason: Each branch maps directly to one visible visualizer phase.
   const performStep = useCallback(() => {
+    const itemLabel = mode === "intervals" ? "intervals" : "activities";
+    const keepLabel = mode === "intervals" ? "Kept" : "Selected";
+    const skipLabel = mode === "intervals" ? "Removed" : "Skipped";
+
     if (phase === "unsorted") {
       setPhase("sorting");
       setMessage("Sorting by END time (the greedy insight!)");
     } else if (phase === "sorting") {
       setActivities(sortedActivities);
       setPhase("sorted");
-      setMessage("Sorted! Now selecting activities greedily...");
+      setMessage(`Sorted! Now selecting ${itemLabel} greedily...`);
     } else if (phase === "sorted") {
       setPhase("selecting");
       setCurrentActivity(0);
@@ -74,9 +88,16 @@ export default function ActivitySelectionVisualizer() {
 
       if (currentIdx >= sortedActs.length) {
         setIsPlaying(false);
-        setMessage(
-          `Done! Selected ${selectedActivities.size} non-overlapping activities.`
-        );
+        const total = sortedActs.length;
+        const kept = selectedActivities.size;
+        const removed = total - kept;
+        if (mode === "intervals") {
+          setMessage(
+            `Done! Kept ${kept} non-overlapping intervals. Remove ${removed} interval${removed !== 1 ? "s" : ""}.`
+          );
+        } else {
+          setMessage(`Done! Selected ${kept} non-overlapping activities.`);
+        }
         return;
       }
 
@@ -86,17 +107,17 @@ export default function ActivitySelectionVisualizer() {
         setSelectedActivities((prev) => new Set([...prev, act.id]));
         setLastEnd(act.end);
         setMessage(
-          `Selected ${act.name} (ends at ${act.end}). Last end = ${act.end}`
+          `${keepLabel} ${act.name} (ends at ${act.end}). Last end = ${act.end}`
         );
       } else {
         setMessage(
-          `Skipped ${act.name} (starts at ${act.start} < lastEnd ${lastEnd})`
+          `${skipLabel} ${act.name} (starts at ${act.start} < lastEnd ${lastEnd})`
         );
       }
 
       setCurrentActivity(currentIdx + 1);
     }
-  }, [phase, currentActivity, lastEnd, selectedActivities.size, sortedActivities]);
+  }, [phase, currentActivity, lastEnd, selectedActivities.size, sortedActivities, mode]);
 
   useEffect(() => {
     if (!isPlaying || isDone) return undefined;
@@ -112,7 +133,7 @@ export default function ActivitySelectionVisualizer() {
     setSelectedActivities(new Set());
     setCurrentActivity(null);
     setLastEnd(0);
-    setMessage("Activities shown in original order. Click Play to start!");
+    setMessage(initialMessage);
   };
 
   const getActivityStyle = (act: Activity) => {
@@ -133,15 +154,29 @@ export default function ActivitySelectionVisualizer() {
     return "";
   };
 
+  // Mode-specific labels
+  const title =
+    mode === "intervals"
+      ? "Non-Overlapping Intervals Visualizer"
+      : "Activity Selection Visualizer";
+
+  const description =
+    mode === "intervals"
+      ? "Find minimum intervals to remove by keeping maximum non-overlapping ones"
+      : "Watch how we pick the most activities by always choosing the one that ends first";
+
+  const gradientFrom =
+    mode === "intervals" ? "from-orange-500/10" : "from-green-500/10";
+  const gradientTo =
+    mode === "intervals" ? "to-amber-500/10" : "to-emerald-500/10";
+
   return (
     <div className="bg-gray-900 rounded-md border border-gray-800 overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-b border-gray-800">
-        <h3 className="text-lg font-semibold text-white">
-          Activity Selection Visualizer
-        </h3>
-        <p className="text-gray-400 text-sm mt-1">
-          Greedy: Sort by end time, always pick earliest ending activity
-        </p>
+      <div
+        className={`p-4 bg-gradient-to-r ${gradientFrom} ${gradientTo} border-b border-gray-800`}
+      >
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
+        <p className="text-gray-400 text-sm mt-1">{description}</p>
       </div>
 
       <div className="p-4">
@@ -304,19 +339,33 @@ export default function ActivitySelectionVisualizer() {
         </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
+        <div
+          className={`grid ${mode === "intervals" ? "grid-cols-4" : "grid-cols-3"} gap-3`}
+        >
           <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-white">
               {activities.length}
             </div>
-            <div className="text-xs text-gray-500">Total Activities</div>
+            <div className="text-xs text-gray-500">
+              {mode === "intervals" ? "Total Intervals" : "Total Activities"}
+            </div>
           </div>
           <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-green-400">
               {selectedActivities.size}
             </div>
-            <div className="text-xs text-gray-500">Selected</div>
+            <div className="text-xs text-gray-500">
+              {mode === "intervals" ? "Kept" : "Selected"}
+            </div>
           </div>
+          {mode === "intervals" && (
+            <div className="bg-gray-800/50 rounded-md p-3 text-center">
+              <div className="text-2xl font-bold text-orange-400">
+                {activities.length - selectedActivities.size}
+              </div>
+              <div className="text-xs text-gray-500">To Remove</div>
+            </div>
+          )}
           <div className="bg-gray-800/50 rounded-md p-3 text-center">
             <div className="text-2xl font-bold text-gray-400">
               {phase === "selecting" ? (currentActivity ?? 0) : 0}/
@@ -334,11 +383,15 @@ export default function ActivitySelectionVisualizer() {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-md bg-green-500/50 ring-2 ring-green-400" />
-            <span className="text-gray-400">Selected</span>
+            <span className="text-gray-400">
+              {mode === "intervals" ? "Kept" : "Selected"}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-md bg-gray-600 opacity-40" />
-            <span className="text-gray-400">Skipped</span>
+            <span className="text-gray-400">
+              {mode === "intervals" ? "Removed" : "Skipped"}
+            </span>
           </div>
         </div>
       </div>

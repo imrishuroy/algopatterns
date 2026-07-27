@@ -1,5 +1,10 @@
 # AlgoPatterns
 
+## Agent Rules
+
+- **NEVER commit or push code.** Only make changes to files. The user will review and commit manually.
+- Do not run `git commit`, `git push`, or create PRs unless explicitly requested by the user.
+
 ## Top-level Layout
 
 ```

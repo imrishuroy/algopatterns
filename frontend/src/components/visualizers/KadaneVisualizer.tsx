@@ -117,6 +117,43 @@ export default function KadaneVisualizer() {
     dispatch({ type: "STOP" });
   }, [generateSteps]);
 
+  const performStep = useCallback(() => {
+    if (phase === "init") {
+      setPhase("running");
+      setCurrentStep(0);
+      const step = steps[0];
+      setMessage(
+        `i=0: Start with nums[0]=${step.num}. currentSum=${step.currentSum}, maxSum=${step.maxSum}`
+      );
+      return;
+    }
+
+    const nextStepIdx = currentStep + 1;
+    if (nextStepIdx >= steps.length) {
+      setPhase("done");
+      const finalStep = steps[steps.length - 1];
+      setMessage(
+        `Done! Maximum subarray sum = ${finalStep.maxSum} (indices ${finalStep.subarrayStart} to ${finalStep.subarrayEnd})`
+      );
+      dispatch({ type: "STOP" });
+      return;
+    }
+
+    setCurrentStep(nextStepIdx);
+    const step = steps[nextStepIdx];
+    const prevSum = steps[nextStepIdx - 1].currentSum;
+
+    if (step.decision === "start") {
+      setMessage(
+        `i=${step.index}: ${step.num} > ${prevSum} + ${step.num} = ${prevSum + step.num}. Start new subarray! currentSum=${step.currentSum}`
+      );
+    } else {
+      setMessage(
+        `i=${step.index}: ${prevSum} + ${step.num} = ${step.currentSum} >= ${step.num}. Extend subarray. currentSum=${step.currentSum}`
+      );
+    }
+  }, [phase, currentStep, steps]);
+
   useEffect(() => {
     startTransition(() => {
       setSteps(generateSteps());
@@ -127,44 +164,13 @@ export default function KadaneVisualizer() {
     if (!isPlaying) return;
 
     const timer = setTimeout(() => {
-      if (phase === "init") {
-        setPhase("running");
-        setCurrentStep(0);
-        const step = steps[0];
-        setMessage(
-          `i=0: Start with nums[0]=${step.num}. currentSum=${step.currentSum}, maxSum=${step.maxSum}`
-        );
-        return;
-      }
-
-      const nextStep = currentStep + 1;
-      if (nextStep >= steps.length) {
-        setPhase("done");
-        const finalStep = steps[steps.length - 1];
-        setMessage(
-          `Done! Maximum subarray sum = ${finalStep.maxSum} (indices ${finalStep.subarrayStart} to ${finalStep.subarrayEnd})`
-        );
-        dispatch({ type: "STOP" });
-        return;
-      }
-
-      setCurrentStep(nextStep);
-      const step = steps[nextStep];
-      const prevSum = steps[nextStep - 1].currentSum;
-
-      if (step.decision === "start") {
-        setMessage(
-          `i=${step.index}: ${step.num} > ${prevSum} + ${step.num} = ${prevSum + step.num}. Start new subarray! currentSum=${step.currentSum}`
-        );
-      } else {
-        setMessage(
-          `i=${step.index}: ${prevSum} + ${step.num} = ${step.currentSum} >= ${step.num}. Extend subarray. currentSum=${step.currentSum}`
-        );
-      }
+      performStep();
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [isPlaying, phase, currentStep, steps, speed]);
+  }, [isPlaying, performStep, speed]);
+
+  const isDone = phase === "done";
 
   const current =
     currentStep >= 0 && currentStep < steps.length ? steps[currentStep] : null;
@@ -185,12 +191,23 @@ export default function KadaneVisualizer() {
         <div className="flex items-center gap-2 mb-4">
           <button
             onClick={() => dispatch({ type: "TOGGLE" })}
-            disabled={phase === "done"}
+            disabled={isDone}
             className={`px-4 py-2 rounded-md font-medium transition ${
               isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
             } disabled:opacity-50`}
           >
             {isPlaying ? "Pause" : "Play"}
+          </button>
+          <button
+            onClick={() => {
+              if (!isPlaying && !isDone) {
+                performStep();
+              }
+            }}
+            disabled={isPlaying || isDone}
+            className="px-4 py-2 bg-gray-700 text-white rounded-md font-medium hover:bg-gray-600 disabled:opacity-50"
+          >
+            Step
           </button>
           <button
             onClick={reset}

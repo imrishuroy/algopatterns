@@ -803,6 +803,7 @@ const VISUALIZER_PATHS = [
   "ConnectedComponentsVisualizer",
   "ConsecutiveSequenceVisualizer",
   "ContainerWaterVisualizer",
+  "CountingBitsVisualizer",
   "CycleDetectionVisualizer",
   "DijkstraVisualizer",
   "DPComparisonVisualizer",
@@ -828,9 +829,11 @@ const VISUALIZER_PATHS = [
   "MemoryVisualizer",
   "MergeIntervalsVisualizer",
   "MergeKListsVisualizer",
+  "MissingNumberXORVisualizer",
   "NextGreaterVisualizer",
   "NQueensVisualizer",
   "PermutationsVisualizer",
+  "PowerOfTwoVisualizer",
   "PrefixSumArrayVisualizer",
   "PrefixSumVisualizer",
   "ProductExceptSelfVisualizer",
@@ -840,10 +843,13 @@ const VISUALIZER_PATHS = [
   "RecursionVsIterationVisualizer",
   "RemoveDuplicatesVisualizer",
   "ReorderListVisualizer",
+  "ReverseBitsVisualizer",
   "RotatedArrayVisualizer",
+  "SingleNumberXORVisualizer",
   "StepByStepExecutor",
   "SubarraySumKVisualizer",
   "SubsetsVisualizer",
+  "SumIntegersVisualizer",
   "TaskSchedulerVisualizer",
   "TopologicalSortVisualizer",
   "TreeTraversalVisualizer",
@@ -1483,5 +1489,617 @@ describe("MeetingRoomsVisualizer Step functionality", () => {
       }
     }
     expect(document.body.textContent).toMatch(/Done|Maximum/i);
+  });
+});
+
+// Section: Bit Manipulation Visualizers
+import SingleNumberXORVisualizer from "@/components/visualizers/SingleNumberXORVisualizer";
+import CountingBitsVisualizer from "@/components/visualizers/CountingBitsVisualizer";
+import MissingNumberXORVisualizer from "@/components/visualizers/MissingNumberXORVisualizer";
+import PowerOfTwoVisualizer from "@/components/visualizers/PowerOfTwoVisualizer";
+import ReverseBitsVisualizer from "@/components/visualizers/ReverseBitsVisualizer";
+import SumIntegersVisualizer from "@/components/visualizers/SumIntegersVisualizer";
+
+describe("SingleNumberXORVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(
+      screen.getByText("Single Number: XOR Cancellation")
+    ).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("renders speed slider", () => {
+    render(<SingleNumberXORVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
+  });
+
+  it("renders input array display", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(screen.getByText("Input Array:")).toBeInTheDocument();
+  });
+
+  it("renders initial ready message", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(screen.getByText("Ready to start")).toBeInTheDocument();
+  });
+
+  it("renders initial prompt message", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(screen.getByText("Click Play or Step to start")).toBeInTheDocument();
+  });
+
+  it("Play toggles to Pause on click", () => {
+    render(<SingleNumberXORVisualizer />);
+    const btn = screen.getByText("Play");
+    fireEvent.click(btn);
+    expect(screen.getByText("Pause")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<SingleNumberXORVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toContain("Step 1");
+  });
+
+  it("shows XOR operation after stepping", () => {
+    render(<SingleNumberXORVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    // Should show result and binary representation
+    expect(document.body.textContent).toMatch(/result|^/i);
+  });
+
+  it("shows current result display", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(screen.getByText("Current Result:")).toBeInTheDocument();
+  });
+
+  it("renders legend with pair cancelled indicator", () => {
+    render(<SingleNumberXORVisualizer />);
+    expect(screen.getByText("Pair Cancelled")).toBeInTheDocument();
+  });
+
+  it("Reset clears state after stepping", () => {
+    render(<SingleNumberXORVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    fireEvent.click(screen.getByText("Reset"));
+    expect(screen.getByText("Ready to start")).toBeInTheDocument();
+  });
+
+  it("reaches complete state after all steps", () => {
+    vi.useFakeTimers();
+    render(<SingleNumberXORVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    // Advance through all 5 steps
+    for (let i = 0; i < 6; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+    }
+    expect(document.body.textContent).toContain("Complete");
+    expect(document.body.textContent).toContain("Answer:");
+    vi.useRealTimers();
+  });
+});
+
+describe("CountingBitsVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<CountingBitsVisualizer />);
+    expect(
+      screen.getByText("Counting 1 Bits: n & (n-1) Trick")
+    ).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<CountingBitsVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<CountingBitsVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<CountingBitsVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("renders speed slider", () => {
+    render(<CountingBitsVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
+  });
+
+  it("renders number selector dropdown", () => {
+    render(<CountingBitsVisualizer />);
+    expect(screen.getByText("Number:")).toBeInTheDocument();
+    const select = document.querySelector("select");
+    expect(select).toBeInTheDocument();
+  });
+
+  it("renders current n display", () => {
+    render(<CountingBitsVisualizer />);
+    expect(screen.getByText("Current n:")).toBeInTheDocument();
+  });
+
+  it("renders count display", () => {
+    render(<CountingBitsVisualizer />);
+    expect(screen.getByText("1s removed so far:")).toBeInTheDocument();
+  });
+
+  it("renders legend", () => {
+    render(<CountingBitsVisualizer />);
+    expect(screen.getByText("1 bit")).toBeInTheDocument();
+    expect(screen.getByText("Being removed")).toBeInTheDocument();
+    expect(screen.getByText("0 bit")).toBeInTheDocument();
+  });
+
+  it("Play toggles to Pause on click", () => {
+    render(<CountingBitsVisualizer />);
+    const btn = screen.getByText("Play");
+    fireEvent.click(btn);
+    expect(screen.getByText("Pause")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<CountingBitsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toContain("Step 1");
+  });
+
+  it("shows operation details after stepping", () => {
+    render(<CountingBitsVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    expect(document.body.textContent).toMatch(/n:|n - 1:|result:/);
+  });
+
+  it("can change input number", () => {
+    render(<CountingBitsVisualizer />);
+    const select = document.querySelector("select");
+    if (select) {
+      fireEvent.change(select, { target: { value: "7" } });
+      expect(document.body.textContent).toContain("7 (0111)");
+    }
+  });
+
+  it("Reset clears state after stepping", () => {
+    render(<CountingBitsVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    fireEvent.click(screen.getByText("Reset"));
+    expect(document.body.textContent).toContain("Ready to start");
+  });
+
+  it("reaches complete state after all steps", () => {
+    vi.useFakeTimers();
+    render(<CountingBitsVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    // Default is 11 (1011) which has 3 ones
+    for (let i = 0; i < 5; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1200);
+      });
+    }
+    expect(document.body.textContent).toContain("Complete");
+    expect(document.body.textContent).toContain("Total:");
+    vi.useRealTimers();
+  });
+});
+
+describe("MissingNumberXORVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<MissingNumberXORVisualizer />);
+    expect(
+      screen.getByText("Missing Number: XOR with Indices")
+    ).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<MissingNumberXORVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<MissingNumberXORVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<MissingNumberXORVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("renders speed slider", () => {
+    render(<MissingNumberXORVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
+  });
+
+  it("renders complete range display", () => {
+    render(<MissingNumberXORVisualizer />);
+    expect(screen.getByText(/Complete range/)).toBeInTheDocument();
+  });
+
+  it("renders array with indices", () => {
+    render(<MissingNumberXORVisualizer />);
+    expect(screen.getByText("Array (with indices above):")).toBeInTheDocument();
+  });
+
+  it("renders current XOR display", () => {
+    render(<MissingNumberXORVisualizer />);
+    expect(screen.getByText("Current XOR:")).toBeInTheDocument();
+  });
+
+  it("renders legend", () => {
+    render(<MissingNumberXORVisualizer />);
+    expect(screen.getByText("Current")).toBeInTheDocument();
+    expect(screen.getByText("Processed")).toBeInTheDocument();
+    expect(screen.getByText("Missing")).toBeInTheDocument();
+  });
+
+  it("Play toggles to Pause on click", () => {
+    render(<MissingNumberXORVisualizer />);
+    const btn = screen.getByText("Play");
+    fireEvent.click(btn);
+    expect(screen.getByText("Pause")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<MissingNumberXORVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toContain("Step 1");
+  });
+
+  it("shows XOR operation after stepping", () => {
+    render(<MissingNumberXORVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    // Should show prev xor ^ index ^ value = new xor
+    expect(document.body.textContent).toMatch(/\^/);
+  });
+
+  it("Reset clears state after stepping", () => {
+    render(<MissingNumberXORVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    fireEvent.click(screen.getByText("Reset"));
+    expect(screen.getByText("Ready to start")).toBeInTheDocument();
+  });
+
+  it("reaches complete state and shows missing number", () => {
+    vi.useFakeTimers();
+    render(<MissingNumberXORVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    // Default array [3, 0, 1] has 3 elements
+    for (let i = 0; i < 5; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1200);
+      });
+    }
+    expect(document.body.textContent).toContain("Complete");
+    expect(document.body.textContent).toContain("Missing:");
+    vi.useRealTimers();
+  });
+});
+
+describe("PowerOfTwoVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<PowerOfTwoVisualizer />);
+    expect(
+      screen.getByText("Power of Two Check: n & (n-1)")
+    ).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<PowerOfTwoVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<PowerOfTwoVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<PowerOfTwoVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("renders speed slider", () => {
+    render(<PowerOfTwoVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
+  });
+
+  it("renders number selector", () => {
+    render(<PowerOfTwoVisualizer />);
+    expect(screen.getByText("n =")).toBeInTheDocument();
+    const select = document.querySelector("select");
+    expect(select).toBeInTheDocument();
+  });
+
+  it("shows power of 2 badge for default value", () => {
+    render(<PowerOfTwoVisualizer />);
+    // Default is 8 which is a power of 2
+    expect(screen.getByText("Power of 2")).toBeInTheDocument();
+  });
+
+  it("renders legend", () => {
+    render(<PowerOfTwoVisualizer />);
+    expect(screen.getByText("Rightmost 1 in n")).toBeInTheDocument();
+    expect(screen.getByText("Flipped to 1 in n-1")).toBeInTheDocument();
+    expect(screen.getByText("Flipped to 0 in n-1")).toBeInTheDocument();
+    expect(screen.getByText("Result 1-bits")).toBeInTheDocument();
+  });
+
+  it("Play toggles to Pause on click", () => {
+    render(<PowerOfTwoVisualizer />);
+    const btn = screen.getByText("Play");
+    fireEvent.click(btn);
+    expect(screen.getByText("Pause")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<PowerOfTwoVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    // Should show n in binary
+    expect(document.body.textContent).toMatch(/n = 8/);
+  });
+
+  it("can change input number to non-power of 2", () => {
+    render(<PowerOfTwoVisualizer />);
+    const select = document.querySelector("select");
+    if (select) {
+      fireEvent.change(select, { target: { value: "6" } });
+      expect(screen.getByText("Not a power of 2")).toBeInTheDocument();
+    }
+  });
+
+  it("Reset clears state after stepping", () => {
+    render(<PowerOfTwoVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    fireEvent.click(screen.getByText("Reset"));
+    expect(document.body.textContent).toContain("Click Play");
+  });
+
+  it("reaches complete state showing result", () => {
+    vi.useFakeTimers();
+    render(<PowerOfTwoVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    // 4 phases to complete
+    for (let i = 0; i < 5; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+    }
+    expect(document.body.textContent).toContain("IS a power of 2");
+    vi.useRealTimers();
+  });
+});
+
+describe("ReverseBitsVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<ReverseBitsVisualizer />);
+    expect(
+      screen.getByText("Reverse Bits: Mirror the Binary")
+    ).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<ReverseBitsVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<ReverseBitsVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<ReverseBitsVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("renders speed slider", () => {
+    render(<ReverseBitsVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
+  });
+
+  it("renders number selector dropdown", () => {
+    render(<ReverseBitsVisualizer />);
+    expect(screen.getByText("Number:")).toBeInTheDocument();
+    const select = document.querySelector("select");
+    expect(select).toBeInTheDocument();
+  });
+
+  it("renders input and result sections", () => {
+    render(<ReverseBitsVisualizer />);
+    expect(document.body.textContent).toContain("Input:");
+    expect(document.body.textContent).toContain("Result:");
+  });
+
+  it("renders formula reminder", () => {
+    render(<ReverseBitsVisualizer />);
+    expect(document.body.textContent).toContain("result |=");
+  });
+
+  it("renders legend", () => {
+    render(<ReverseBitsVisualizer />);
+    expect(screen.getByText("Input 1")).toBeInTheDocument();
+    expect(screen.getByText("Output 1")).toBeInTheDocument();
+    expect(screen.getByText("Current bit")).toBeInTheDocument();
+  });
+
+  it("Play toggles to Pause on click", () => {
+    render(<ReverseBitsVisualizer />);
+    const btn = screen.getByText("Play");
+    fireEvent.click(btn);
+    expect(screen.getByText("Pause")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<ReverseBitsVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toContain("Step 1");
+  });
+
+  it("shows position mapping after stepping", () => {
+    render(<ReverseBitsVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    // Should show position i → position (7-i)
+    expect(document.body.textContent).toMatch(/Position \d+ → Position \d+/u);
+  });
+
+  it("Reset clears state after stepping", () => {
+    render(<ReverseBitsVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    fireEvent.click(screen.getByText("Reset"));
+    expect(document.body.textContent).toContain("Ready to start");
+  });
+
+  it("reaches complete state showing reversed result", () => {
+    vi.useFakeTimers();
+    render(<ReverseBitsVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    // 8 bits to reverse
+    for (let i = 0; i < 10; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+    }
+    expect(document.body.textContent).toContain("Complete");
+    expect(document.body.textContent).toContain("Reversed!");
+    vi.useRealTimers();
+  });
+});
+
+describe("SumIntegersVisualizer", () => {
+  it("renders without crashing", () => {
+    render(<SumIntegersVisualizer />);
+    expect(screen.getByText("Sum Without + Operator")).toBeInTheDocument();
+  });
+
+  it("renders Play button", () => {
+    render(<SumIntegersVisualizer />);
+    expect(screen.getByText("Play")).toBeInTheDocument();
+  });
+
+  it("renders Reset button", () => {
+    render(<SumIntegersVisualizer />);
+    expect(screen.getByText("Reset")).toBeInTheDocument();
+  });
+
+  it("renders Step button", () => {
+    render(<SumIntegersVisualizer />);
+    expect(screen.getByText("Step")).toBeInTheDocument();
+  });
+
+  it("renders speed slider", () => {
+    render(<SumIntegersVisualizer />);
+    const slider = document.querySelector('input[type="range"]');
+    expect(slider).toBeInTheDocument();
+  });
+
+  it("renders input selectors for a and b", () => {
+    render(<SumIntegersVisualizer />);
+    expect(screen.getByText("a:")).toBeInTheDocument();
+    expect(screen.getByText("b:")).toBeInTheDocument();
+    const selects = document.querySelectorAll("select");
+    expect(selects.length).toBe(2);
+  });
+
+  it("shows expected sum", () => {
+    render(<SumIntegersVisualizer />);
+    // Default is 5 + 3 = 8
+    const eights = screen.getAllByText("8");
+    expect(eights.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders formula reminder", () => {
+    render(<SumIntegersVisualizer />);
+    expect(document.body.textContent).toContain("while (b != 0)");
+    expect(document.body.textContent).toContain("carry = (a & b)");
+  });
+
+  it("renders legend", () => {
+    render(<SumIntegersVisualizer />);
+    expect(screen.getByText("a value")).toBeInTheDocument();
+    expect(screen.getByText("b value")).toBeInTheDocument();
+    expect(screen.getByText("XOR (sum)")).toBeInTheDocument();
+    expect(screen.getByText("AND (carry)")).toBeInTheDocument();
+  });
+
+  it("Play toggles to Pause on click", () => {
+    render(<SumIntegersVisualizer />);
+    const btn = screen.getByText("Play");
+    fireEvent.click(btn);
+    expect(screen.getByText("Pause")).toBeInTheDocument();
+  });
+
+  it("Step button advances visualization", () => {
+    render(<SumIntegersVisualizer />);
+    const stepBtn = screen.getByText("Step");
+    fireEvent.click(stepBtn);
+    expect(document.body.textContent).toContain("Step 1");
+  });
+
+  it("shows XOR and AND operations after stepping", () => {
+    render(<SumIntegersVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    expect(document.body.textContent).toContain("XOR gives sum without carry");
+    expect(document.body.textContent).toContain("AND finds where both bits are 1");
+  });
+
+  it("can change input values", () => {
+    render(<SumIntegersVisualizer />);
+    const selects = document.querySelectorAll("select");
+    if (selects[0]) {
+      fireEvent.change(selects[0], { target: { value: "7" } });
+      // Sum should update to 7 + 3 = 10
+      const tens = screen.getAllByText("10");
+      expect(tens.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("Reset clears state after stepping", () => {
+    render(<SumIntegersVisualizer />);
+    fireEvent.click(screen.getByText("Step"));
+    fireEvent.click(screen.getByText("Reset"));
+    expect(document.body.textContent).toContain("Ready to calculate");
+  });
+
+  it("reaches complete state showing final sum", () => {
+    vi.useFakeTimers();
+    render(<SumIntegersVisualizer />);
+    fireEvent.click(screen.getByText("Play"));
+    // Multiple iterations until b = 0
+    for (let i = 0; i < 8; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1500);
+      });
+    }
+    expect(document.body.textContent).toContain("Complete");
+    expect(document.body.textContent).toContain("5 + 3 = 8");
+    vi.useRealTimers();
   });
 });

@@ -16,7 +16,7 @@ const findRightmostOneBit = (n: number): number => {
   return Math.log2(rightmost);
 };
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-R1005, JS-0415 - visualizer component with inherent complexity
 export default function PowerOfTwoVisualizer() {
   const [inputNum, setInputNum] = useState<number>(8);
   const [animationPhase, setAnimationPhase] = useState<number>(-1);
@@ -50,7 +50,7 @@ export default function PowerOfTwoVisualizer() {
     setIsPlaying(true);
   }, [isComplete]);
 
-  // Animation timer
+  // skipcq: JS-0045 - cleanup function is standard React pattern
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -299,10 +299,10 @@ export default function PowerOfTwoVisualizer() {
               >
                 <span className="text-gray-500 font-mono w-20 text-right">AND</span>
                 <div className="flex gap-0.5">
-                  {/* skipcq: JS-0437 - static divider elements */}
                   {Array(BITS)
                     .fill(0)
                     .map((_, i) => (
+                      // skipcq: JS-0437 - static divider elements
                       <span
                         key={`div-${i}`}
                         className="w-7 h-1 bg-gray-600 rounded"

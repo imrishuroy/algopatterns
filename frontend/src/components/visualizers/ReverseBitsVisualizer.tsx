@@ -45,7 +45,7 @@ const generateSteps = (num: number): Step[] => {
   return steps;
 };
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-R1005, JS-0415 - visualizer component with inherent complexity
 export default function ReverseBitsVisualizer() {
   const [inputNum, setInputNum] = useState<number>(43);
   const [currentStep, setCurrentStep] = useState<number>(-1);
@@ -67,6 +67,7 @@ export default function ReverseBitsVisualizer() {
     setIsPlaying(true);
   }, [isComplete]);
 
+  // skipcq: JS-0045 - cleanup function is standard React pattern
   useEffect(() => {
     if (!isPlaying) return;
 

@@ -51,7 +51,7 @@ const generateSteps = (nums: number[]): Step[] => {
   return steps;
 };
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-R1005, JS-0415 - visualizer component with inherent complexity
 export default function SingleNumberXORVisualizer() {
   const [nums] = useState<number[]>(DEFAULT_INPUT);
   const [currentStep, setCurrentStep] = useState<number>(-1);
@@ -74,6 +74,7 @@ export default function SingleNumberXORVisualizer() {
     setIsPlaying(true);
   }, [isComplete]);
 
+  // skipcq: JS-0045 - cleanup function is standard React pattern
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -195,11 +196,11 @@ export default function SingleNumberXORVisualizer() {
         <div className="mb-4">
           <div className="text-sm text-gray-400 mb-2">Input Array:</div>
           <div className="flex gap-2 flex-wrap">
-            {/* skipcq: JS-0437 - array indices represent processing order */}
             {nums.map((num, i) => {
               const isCurrent = i === currentStep;
 
               return (
+                // skipcq: JS-0437 - index needed for duplicate values in array
                 <motion.div
                   key={`num-${num}-${i}`}
                   className={`

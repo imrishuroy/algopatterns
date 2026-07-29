@@ -72,7 +72,7 @@ const generateSteps = (a: number, b: number): Step[] => {
   return steps;
 };
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-R1005, JS-0415 - visualizer component with inherent complexity
 export default function SumIntegersVisualizer() {
   const [inputA, setInputA] = useState<number>(5);
   const [inputB, setInputB] = useState<number>(3);
@@ -96,6 +96,7 @@ export default function SumIntegersVisualizer() {
     setIsPlaying(true);
   }, [isComplete]);
 
+  // skipcq: JS-0045 - cleanup function is standard React pattern
   useEffect(() => {
     if (!isPlaying) return;
 

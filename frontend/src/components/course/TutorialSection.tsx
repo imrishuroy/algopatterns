@@ -359,6 +359,30 @@ const QueueReconstructionVisualizer = dynamic(
   () => import("@/components/visualizers/QueueReconstructionVisualizer"),
   { loading: VisualizerLoading, ssr: false }
 );
+const SingleNumberXORVisualizer = dynamic(
+  () => import("@/components/visualizers/SingleNumberXORVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const MissingNumberXORVisualizer = dynamic(
+  () => import("@/components/visualizers/MissingNumberXORVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const CountingBitsVisualizer = dynamic(
+  () => import("@/components/visualizers/CountingBitsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const ReverseBitsVisualizer = dynamic(
+  () => import("@/components/visualizers/ReverseBitsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const SumIntegersVisualizer = dynamic(
+  () => import("@/components/visualizers/SumIntegersVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const PowerOfTwoVisualizer = dynamic(
+  () => import("@/components/visualizers/PowerOfTwoVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
 
 interface TutorialSectionProps {
   pattern: Pattern;
@@ -1207,6 +1231,66 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
             <KokoEatingVisualizer />
           </div>
         )}
+
+      {/* Bit Manipulation Visualizers */}
+      {cat === "Bit Manipulation" &&
+        title.includes("XOR") &&
+        !title.includes("Missing") && (
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-cyan-400">▶</span> Interactive XOR
+              Visualization
+            </h4>
+            <SingleNumberXORVisualizer />
+          </div>
+        )}
+
+      {cat === "Bit Manipulation" && title.includes("Missing Number") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-purple-400">▶</span> Interactive Missing
+            Number
+          </h4>
+          <MissingNumberXORVisualizer />
+        </div>
+      )}
+
+      {cat === "Bit Manipulation" && title === "Counting Set Bits" && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-orange-400">▶</span> Interactive Bit Counter
+          </h4>
+          <CountingBitsVisualizer />
+        </div>
+      )}
+
+      {cat === "Bit Manipulation" && title === "Power of Two Check" && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-purple-400">▶</span> Interactive Power of Two
+              Checker
+          </h4>
+          <PowerOfTwoVisualizer />
+        </div>
+      )}
+
+      {cat === "Bit Manipulation" && title === "Reverse Bits" && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-purple-400">▶</span> Interactive Bit Reverser
+          </h4>
+          <ReverseBitsVisualizer />
+        </div>
+      )}
+
+      {cat === "Bit Manipulation" && title === "Sum of Two Integers" && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Sum Calculator
+          </h4>
+          <SumIntegersVisualizer />
+        </div>
+      )}
     </>
   );
 };

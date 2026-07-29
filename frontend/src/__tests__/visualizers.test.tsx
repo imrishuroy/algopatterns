@@ -1967,7 +1967,7 @@ describe("ReverseBitsVisualizer", () => {
     render(<ReverseBitsVisualizer />);
     fireEvent.click(screen.getByText("Step"));
     // Should show position i → position (7-i)
-    expect(document.body.textContent).toMatch(/Position \d+ → Position \d+/);
+    expect(document.body.textContent).toMatch(/Position \d+ → Position \d+/u);
   });
 
   it("Reset clears state after stepping", () => {

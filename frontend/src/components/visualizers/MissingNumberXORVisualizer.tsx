@@ -197,12 +197,13 @@ export default function MissingNumberXORVisualizer() {
             Array (with indices above):
           </div>
           <div className="flex gap-2 flex-wrap">
+            {/* skipcq: JS-0437 - index represents array position being processed */}
             {nums.map((num, i) => {
               const isCurrent = i === currentStep;
               const isProcessed = i <= currentStep;
 
               return (
-                <div key={`arr-${i}`} className="flex flex-col items-center">
+                <div key={`arr-${num}-${i}`} className="flex flex-col items-center">
                   <div className="text-xs text-blue-400 mb-1">i={i}</div>
                   <motion.div
                     className={`

@@ -70,8 +70,8 @@ export default function PowerOfTwoVisualizer() {
     bit: string,
     position: number,
     type: "n" | "nMinus1" | "result",
-    highlight: boolean = false,
-    animate: boolean = false
+    highlight = false,
+    animate = false
   ) => {
     const isOne = bit === "1";
     let bgClass = "bg-gray-700 text-gray-400";
@@ -111,8 +111,8 @@ export default function PowerOfTwoVisualizer() {
   const renderBinaryWithLabels = (
     binary: string,
     type: "n" | "nMinus1" | "result",
-    highlight: boolean = false,
-    showAnimation: boolean = false
+    highlight = false,
+    showAnimation = false
   ) => {
     return (
       <div className="flex flex-col items-center gap-1">
@@ -123,11 +123,12 @@ export default function PowerOfTwoVisualizer() {
           })}
         </div>
         <div className="flex gap-0.5">
+          {/* skipcq: JS-0437 - position labels are static indices */}
           {binary.split("").map((_, i) => {
             const position = BITS - 1 - i;
             return (
               <span
-                key={i}
+                key={`pos-${position}`}
                 className="w-7 text-center text-xs text-gray-500 font-mono"
               >
                 {position}
@@ -146,7 +147,7 @@ export default function PowerOfTwoVisualizer() {
       case 1:
         return `n - 1 = ${nMinus1}. Subtracting 1 flips the rightmost 1 to 0, and all 0s to its right become 1s.`;
       case 2:
-        return `AND operation: Each position is 1 only if BOTH bits are 1.`;
+        return "AND operation: Each position is 1 only if BOTH bits are 1.";
       case 3:
         return andResult === 0
           ? `Result is 0! The only 1-bit was removed, confirming ${inputNum} IS a power of 2.`
@@ -230,7 +231,7 @@ export default function PowerOfTwoVisualizer() {
             >
               {inputOptions.map((n) => (
                 <option key={n} value={n}>
-                  {n} {(n & (n - 1)) === 0 && n > 0 ? "(2^" + Math.log2(n) + ")" : ""}
+                  {n} {(n & (n - 1)) === 0 && n > 0 ? `(2^${Math.log2(n)})` : ""}
                 </option>
               ))}
             </select>
@@ -298,11 +299,12 @@ export default function PowerOfTwoVisualizer() {
               >
                 <span className="text-gray-500 font-mono w-20 text-right">AND</span>
                 <div className="flex gap-0.5">
+                  {/* skipcq: JS-0437 - static divider elements */}
                   {Array(BITS)
                     .fill(0)
                     .map((_, i) => (
                       <span
-                        key={i}
+                        key={`div-${i}`}
                         className="w-7 h-1 bg-gray-600 rounded"
                       ></span>
                     ))}

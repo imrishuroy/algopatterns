@@ -128,11 +128,12 @@ export default function SumIntegersVisualizer() {
 
     return (
       <div className="flex gap-0.5">
+        {/* skipcq: JS-0437 - bit positions are stable */}
         {binary.split("").map((bit, i) => {
           const isHighlighted = highlightBits && highlightBits[i] === "1";
           return (
             <motion.span
-              key={i}
+              key={`bit-${BITS - 1 - i}`}
               className={`w-6 h-7 flex items-center justify-center text-sm font-mono font-bold rounded ${
                 isHighlighted || bit === "1"
                   ? colorClasses[color]

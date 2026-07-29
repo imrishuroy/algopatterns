@@ -195,12 +195,13 @@ export default function SingleNumberXORVisualizer() {
         <div className="mb-4">
           <div className="text-sm text-gray-400 mb-2">Input Array:</div>
           <div className="flex gap-2 flex-wrap">
+            {/* skipcq: JS-0437 - array indices represent processing order */}
             {nums.map((num, i) => {
               const isCurrent = i === currentStep;
 
               return (
                 <motion.div
-                  key={`num-${i}`}
+                  key={`num-${num}-${i}`}
                   className={`
                     w-12 h-12 rounded-lg flex items-center justify-center text-lg font-bold
                     border-2 transition-all duration-300

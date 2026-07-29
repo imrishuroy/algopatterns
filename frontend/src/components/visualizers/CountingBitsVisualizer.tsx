@@ -99,6 +99,7 @@ export default function CountingBitsVisualizer() {
   ) => {
     return (
       <div className="flex gap-0.5">
+        {/* skipcq: JS-0437 - bit positions are stable identifiers */}
         {binary.split("").map((bit, i) => {
           const pos = binary.length - 1 - i;
           const isHighlighted = highlightPos !== undefined && pos === highlightPos;
@@ -106,7 +107,7 @@ export default function CountingBitsVisualizer() {
 
           return (
             <motion.span
-              key={i}
+              key={`bit-${pos}`}
               className={`
                 w-6 h-8 flex items-center justify-center text-lg font-mono font-bold rounded
                 ${

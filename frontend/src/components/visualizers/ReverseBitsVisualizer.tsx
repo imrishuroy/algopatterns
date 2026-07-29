@@ -111,7 +111,7 @@ export default function ReverseBitsVisualizer() {
     return (
       <motion.div
         key={position}
-        className={`relative flex flex-col items-center`}
+        className="relative flex flex-col items-center"
         animate={isActive ? { scale: [1, 1.15, 1] } : {}}
         transition={{ duration: 0.3 }}
       >

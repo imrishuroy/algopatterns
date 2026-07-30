@@ -327,10 +327,10 @@ describe("AIChatPanel", () => {
   it("shows empty state when authenticated with no messages", () => {
     render(<AIChatPanel {...defaultPanelProps} />);
     expect(
-      screen.getByText("Ask about the problem or use quick actions above")
+      screen.getByText("Ask a question or try a quick action above")
     ).toBeInTheDocument();
     expect(
-      screen.getByText("I guide with questions, not answers")
+      screen.getByText("I help you learn through guided exploration")
     ).toBeInTheDocument();
   });
 

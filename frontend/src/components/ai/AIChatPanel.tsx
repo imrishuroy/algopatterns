@@ -349,12 +349,12 @@ export function AIChatPanel({
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">
             <p className="text-sm text-gray-400 mb-2">
-              {contextType === "pattern"
-                ? "Ask about the pattern or use quick actions above"
-                : "Ask about the problem or use quick actions above"}
+              {contextType === "language_guide"
+                ? "Ask about Go syntax, data structures, or algorithms"
+                : "Ask a question or try a quick action above"}
             </p>
             <p className="text-xs text-gray-500">
-              I guide with questions, not answers
+              I help you learn through guided exploration
             </p>
           </div>
         ) : (
@@ -380,12 +380,14 @@ export function AIChatPanel({
 
       {/* Input */}
       {isAuthenticated && !isViewingArchived && (
-        <ChatInput
-          onSend={sendMessage}
-          onStop={stopStreaming}
-          isLoading={isLoading}
-          disabled={!isAuthenticated}
-        />
+        <div className="p-3 border-t border-gray-800">
+          <ChatInput
+            onSend={sendMessage}
+            onStop={stopStreaming}
+            isLoading={isLoading}
+            disabled={!isAuthenticated}
+          />
+        </div>
       )}
     </div>
   );

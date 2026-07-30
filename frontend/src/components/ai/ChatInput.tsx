@@ -88,7 +88,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
     };
 
     return (
-      <div className="flex items-stretch gap-2">
+      <div className="flex items-end gap-2">
         <textarea
           ref={textareaRef}
           value={input}
@@ -97,27 +97,16 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="flex-1 px-3 py-2 text-sm resize-none disabled:opacity-50 focus:outline-none transition-colors"
+          className="flex-1 px-4 py-2.5 text-sm resize-none disabled:opacity-50 focus:outline-none transition-colors bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:border-gray-600 overflow-y-hidden"
           style={{
-            minHeight: "40px",
-            maxHeight: "100px",
-            background: "var(--bg-elevated)",
-            border: "1px solid var(--border-1)",
-            borderRadius: "var(--radius-md)",
-            color: "var(--text-1)",
+            minHeight: "44px",
+            maxHeight: "120px",
           }}
-          onFocus={(e) =>
-            (e.currentTarget.style.borderColor = "var(--border-2)")
-          }
-          onBlur={(e) =>
-            (e.currentTarget.style.borderColor = "var(--border-1)")
-          }
         />
         {isLoading ? (
           <button
             onClick={onStop}
-            className="px-4 bg-red-600 hover:bg-red-700 text-white transition-colors flex items-center"
-            style={{ borderRadius: "var(--radius-md)" }}
+            className="flex-shrink-0 w-10 h-10 bg-red-600 hover:bg-red-700 text-white transition-colors flex items-center justify-center rounded-lg"
             title="Stop"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -128,14 +117,11 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(
           <button
             onClick={handleSend}
             disabled={!input.trim() || disabled}
-            className="px-4 text-white transition-all flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              background:
-                !input.trim() || disabled
-                  ? "var(--bg-elevated)"
-                  : "var(--accent-gradient)",
-              borderRadius: "var(--radius-md)",
-            }}
+            className={`flex-shrink-0 w-10 h-10 transition-all flex items-center justify-center rounded-lg ${
+              !input.trim() || disabled
+                ? "bg-gray-800 text-gray-500 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-500 text-white"
+            }`}
             title="Send"
           >
             <svg

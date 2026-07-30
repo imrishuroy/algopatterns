@@ -15,7 +15,7 @@ export interface AISession {
   createdAt: Date;
 }
 
-export type ContextType = "problem" | "pattern" | "general";
+export type ContextType = "problem" | "pattern" | "general" | "language_guide";
 
 export type Intent =
   | "byop"

@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
 };
 
-// skipcq: JS-0067, JS-0415 — Next.js page component, nesting from existing UI structure
+// skipcq: JS-0067 — Next.js page component
 export default function LanguagesPage() {
   const languages = getLanguageMetas();
 
@@ -56,6 +56,7 @@ export default function LanguagesPage() {
     position: index + 1,
   }));
 
+  // skipcq: JS-0415 — nesting depth from existing UI structure with SEO components
   return (
     <>
       <BreadcrumbJsonLd items={breadcrumbs} />

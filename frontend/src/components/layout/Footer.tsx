@@ -21,7 +21,7 @@ const footerLinks = {
   ],
 };
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-0415 - React component, footer layout needs nesting
 export default function Footer() {
   return (
     <footer className="mt-auto border-t border-gray-800/50 bg-gray-950/50">

@@ -108,7 +108,7 @@ const ContactCard = ({
   );
 };
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-0415 - Next.js page, content page needs nesting
 export default function ContactPage() {
   return (
     <>

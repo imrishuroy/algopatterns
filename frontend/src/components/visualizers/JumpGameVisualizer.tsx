@@ -10,6 +10,7 @@ interface JumpGameVisualizerProps {
   initialMode?: Mode;
 }
 
+// skipcq: JS-0067 - React component with hooks
 export default function JumpGameVisualizer({
   showModeSelector = true,
   initialMode = "can-jump",

@@ -1370,7 +1370,7 @@ describe("LanguageGuideClient", () => {
   });
 
   describe("Resize Handler", () => {
-    it("handles resize mouse events", async () => {
+    it("handles resize mouse events", () => {
       render(<LanguageGuideClient guide={mockGuide} />);
 
       // Find the resize handle

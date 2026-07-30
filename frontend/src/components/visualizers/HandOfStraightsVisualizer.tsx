@@ -353,9 +353,10 @@ export default function HandOfStraightsVisualizer() {
                 Forming Group {(currentStepData.groupIndex || 0) + 1}
               </div>
               <div className="flex justify-center gap-2">
+                {/* skipcq: JS-0437 - cards are unique values, index used for animation ordering */}
                 {currentStepData.groupCards.map((card, idx) => (
                   <motion.div
-                    key={idx}
+                    key={`card-${card}-${idx}`}
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg"
@@ -363,7 +364,7 @@ export default function HandOfStraightsVisualizer() {
                     {card}
                   </motion.div>
                 ))}
-                {/* Placeholder for remaining cards */}
+                {/* Placeholder for remaining cards - skipcq: JS-0437 - placeholders have no unique id */}
                 {Array.from({
                   length: GROUP_SIZE - currentStepData.groupCards.length,
                 }).map((_, idx) => (

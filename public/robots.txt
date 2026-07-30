@@ -1,0 +1,37 @@
+# robots.txt for AlgoPatterns
+# https://algopatterns.in
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://algopatterns.in/sitemap.xml
+
+# Allow all major search engine crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Allow AI search crawlers for better AI visibility
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+# Crawl delay to be polite
+Crawl-delay: 1

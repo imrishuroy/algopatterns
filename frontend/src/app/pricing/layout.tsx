@@ -99,6 +99,7 @@ const pricingPlans = [
   },
 ];
 
+// skipcq: JS-0067 — Next.js layout component
 export default function PricingLayout({
   children,
 }: {

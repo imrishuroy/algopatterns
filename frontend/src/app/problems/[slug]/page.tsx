@@ -8,6 +8,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// skipcq: JS-0067 — Next.js metadata generation function
 export async function generateMetadata({
   params,
 }: {

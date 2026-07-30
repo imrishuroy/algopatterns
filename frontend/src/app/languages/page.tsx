@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
 };
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-0415 — Next.js page component, nesting from existing UI structure
 export default function LanguagesPage() {
   const languages = getLanguageMetas();
 

@@ -142,10 +142,10 @@ function ChatMessageComponent({
         </div>
       )}
       <div
-        className={`max-w-[90%] rounded-lg px-4 py-3 text-sm ${
+        className={`rounded-lg px-4 py-3 text-sm ${
           isUser
             ? "bg-indigo-600 text-white max-w-[85%]"
-            : "bg-gray-800/50 text-gray-200 border border-gray-700/50"
+            : "bg-gray-800/50 text-gray-200 border border-gray-700/50 max-w-[90%]"
         }`}
       >
         {/* Intent badge for assistant messages */}

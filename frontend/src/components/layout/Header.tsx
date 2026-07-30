@@ -291,6 +291,7 @@ const Header = () => {
 
   const navLinks = [
     { href: "/dsa-fundamentals", label: "Fundamentals", free: true },
+    { href: "/languages", label: "Languages", free: true },
     { href: "/pattern-recognition", label: "Pattern Recognition", free: true },
     {
       href: "/interview-cheatsheet",

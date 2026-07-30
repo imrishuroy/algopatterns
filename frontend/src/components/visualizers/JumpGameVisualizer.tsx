@@ -75,10 +75,7 @@ export default function JumpGameVisualizer({
       );
       setFarthest(newFarthest);
 
-      if (
-        currentIndex === currentEnd &&
-        currentIndex < activeNums.length - 1
-      ) {
+      if (currentIndex === currentEnd && currentIndex < activeNums.length - 1) {
         setJumps((j) => j + 1);
         setCurrentEnd(newFarthest);
       }

@@ -255,7 +255,9 @@ export default function IntervalIntersectionVisualizer() {
                       transform: "translateY(-50%)",
                     }}
                   >
-                    <span className="truncate px-1">[{int.start},{int.end}]</span>
+                    <span className="truncate px-1">
+                      [{int.start},{int.end}]
+                    </span>
                   </motion.div>
                 );
               })}
@@ -303,7 +305,9 @@ export default function IntervalIntersectionVisualizer() {
                       transform: "translateY(-50%)",
                     }}
                   >
-                    <span className="truncate px-1">[{int.start},{int.end}]</span>
+                    <span className="truncate px-1">
+                      [{int.start},{int.end}]
+                    </span>
                   </motion.div>
                 );
               })}

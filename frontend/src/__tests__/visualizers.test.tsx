@@ -2067,7 +2067,9 @@ describe("SumIntegersVisualizer", () => {
     render(<SumIntegersVisualizer />);
     fireEvent.click(screen.getByText("Step"));
     expect(document.body.textContent).toContain("XOR gives sum without carry");
-    expect(document.body.textContent).toContain("AND finds where both bits are 1");
+    expect(document.body.textContent).toContain(
+      "AND finds where both bits are 1"
+    );
   });
 
   it("can change input values", () => {

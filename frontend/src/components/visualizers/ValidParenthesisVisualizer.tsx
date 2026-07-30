@@ -401,9 +401,7 @@ export default function ValidParenthesisVisualizer() {
         {/* Current State */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-            <div className="text-xs text-gray-500 mb-1">
-              low (min possible)
-            </div>
+            <div className="text-xs text-gray-500 mb-1">low (min possible)</div>
             <div
               className={`text-3xl font-mono font-bold ${state.low === 0 ? "text-green-400" : "text-blue-400"}`}
             >
@@ -509,8 +507,8 @@ export default function ValidParenthesisVisualizer() {
           <p>
             <strong className="text-violet-400">Key Rules:</strong> (1) If{" "}
             <code className="text-red-400">high &lt; 0</code>, return false
-            immediately. (2) Keep{" "}
-            <code className="text-blue-400">low ≥ 0</code> (clamp). (3) At end,{" "}
+            immediately. (2) Keep <code className="text-blue-400">low ≥ 0</code>{" "}
+            (clamp). (3) At end,{" "}
             <code className="text-green-400">low == 0</code> means valid.
           </p>
         </div>

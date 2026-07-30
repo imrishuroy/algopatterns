@@ -18,7 +18,7 @@ const siteUrl = siteConfig.url;
 export const metadata: Metadata = {
   title: "DSA Patterns - All Algorithm Patterns | AlgoPatterns",
   description:
-    "Browse all DSA algorithm patterns: Sliding Window, Two Pointers, Binary Search, Dynamic Programming, Graphs, Trees, and more. Interactive visualizations and curated LeetCode problems for FAANG interview prep.",
+    "Master Data Structures & Algorithms with AI Enabled pattern-first learning. 18 patterns including Sliding Window, Two Pointers, Binary Search, DP, Graphs, Trees, and 300+ curated problems.",
   keywords: [
     "DSA patterns",
     "algorithm patterns",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "DSA Patterns - All Algorithm Patterns | AlgoPatterns",
     description:
-      "Browse all DSA algorithm patterns with interactive visualizations and curated practice problems for FAANG interview prep.",
+      "Master DSA with AI Enabled pattern-first learning. Interactive visualizations and 300+ curated problems.",
     type: "website",
     url: `${siteUrl}/patterns`,
     images: [
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "DSA Patterns - All Algorithm Patterns | AlgoPatterns",
     description:
-      "Browse all DSA algorithm patterns with interactive visualizations for FAANG interview prep.",
+      "Master DSA with AI Enabled pattern-first learning and interactive visualizations.",
     images: ["/opengraph-image"],
   },
   alternates: {

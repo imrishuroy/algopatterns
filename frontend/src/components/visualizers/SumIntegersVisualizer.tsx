@@ -204,7 +204,9 @@ export default function SumIntegersVisualizer() {
             </select>
           </div>
           <span className="text-gray-400 text-lg">=</span>
-          <span className="text-green-400 font-bold text-lg">{expectedSum}</span>
+          <span className="text-green-400 font-bold text-lg">
+            {expectedSum}
+          </span>
         </div>
 
         {/* Controls */}
@@ -255,13 +257,17 @@ export default function SumIntegersVisualizer() {
         {/* Step indicator */}
         <div className="text-sm text-gray-400 mb-4">
           {currentStep === -1 ? (
-            <>Ready to calculate {inputA} + {inputB}</>
+            <>
+              Ready to calculate {inputA} + {inputB}
+            </>
           ) : isComplete ? (
             <span className="text-green-400 font-medium">
               Complete! No more carry. Answer: {currentStepData?.a}
             </span>
           ) : (
-            <>Step {currentStep + 1} of {steps.length}</>
+            <>
+              Step {currentStep + 1} of {steps.length}
+            </>
           )}
         </div>
 
@@ -278,9 +284,10 @@ export default function SumIntegersVisualizer() {
               {/* Current values */}
               <div className="bg-gray-800 rounded-lg p-4">
                 <div className="text-sm text-gray-400 mb-3">
-                  Step {currentStepData.stepNumber}: a = {currentStepData.a}, b = {currentStepData.b}
+                  Step {currentStepData.stepNumber}: a = {currentStepData.a}, b
+                  = {currentStepData.b}
                 </div>
-                
+
                 {/* XOR operation */}
                 <div className="mb-4">
                   <div className="text-xs text-blue-400 mb-2 font-medium">
@@ -289,18 +296,38 @@ export default function SumIntegersVisualizer() {
                   <div className="flex flex-col items-center gap-1 font-mono text-sm">
                     <div className="flex items-center gap-2">
                       <span className="w-16 text-right text-gray-400">a:</span>
-                      {renderBinary(currentStepData.aBinary, currentStepData.aBinary, "blue")}
-                      <span className="text-gray-500">({currentStepData.a})</span>
+                      {renderBinary(
+                        currentStepData.aBinary,
+                        currentStepData.aBinary,
+                        "blue"
+                      )}
+                      <span className="text-gray-500">
+                        ({currentStepData.a})
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="w-16 text-right text-gray-400">b:</span>
-                      {renderBinary(currentStepData.bBinary, currentStepData.bBinary, "purple")}
-                      <span className="text-gray-500">({currentStepData.b})</span>
+                      {renderBinary(
+                        currentStepData.bBinary,
+                        currentStepData.bBinary,
+                        "purple"
+                      )}
+                      <span className="text-gray-500">
+                        ({currentStepData.b})
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-16 text-right text-orange-400">XOR:</span>
-                      {renderBinary(currentStepData.xorBinary, currentStepData.xorBinary, "orange")}
-                      <span className="text-orange-400">({currentStepData.xorResult})</span>
+                      <span className="w-16 text-right text-orange-400">
+                        XOR:
+                      </span>
+                      {renderBinary(
+                        currentStepData.xorBinary,
+                        currentStepData.xorBinary,
+                        "orange"
+                      )}
+                      <span className="text-orange-400">
+                        ({currentStepData.xorResult})
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -313,16 +340,32 @@ export default function SumIntegersVisualizer() {
                   <div className="flex flex-col items-center gap-1 font-mono text-sm">
                     <div className="flex items-center gap-2">
                       <span className="w-16 text-right text-gray-400">a:</span>
-                      {renderBinary(currentStepData.aBinary, currentStepData.andBinary, "blue")}
+                      {renderBinary(
+                        currentStepData.aBinary,
+                        currentStepData.andBinary,
+                        "blue"
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="w-16 text-right text-gray-400">b:</span>
-                      {renderBinary(currentStepData.bBinary, currentStepData.andBinary, "purple")}
+                      {renderBinary(
+                        currentStepData.bBinary,
+                        currentStepData.andBinary,
+                        "purple"
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-16 text-right text-green-400">AND:</span>
-                      {renderBinary(currentStepData.andBinary, currentStepData.andBinary, "green")}
-                      <span className="text-green-400">({currentStepData.andResult})</span>
+                      <span className="w-16 text-right text-green-400">
+                        AND:
+                      </span>
+                      {renderBinary(
+                        currentStepData.andBinary,
+                        currentStepData.andBinary,
+                        "green"
+                      )}
+                      <span className="text-green-400">
+                        ({currentStepData.andResult})
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -334,14 +377,30 @@ export default function SumIntegersVisualizer() {
                   </div>
                   <div className="flex flex-col items-center gap-1 font-mono text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="w-16 text-right text-gray-400">AND:</span>
-                      {renderBinary(currentStepData.andBinary, currentStepData.andBinary, "green")}
-                      <span className="text-gray-500">({currentStepData.andResult})</span>
+                      <span className="w-16 text-right text-gray-400">
+                        AND:
+                      </span>
+                      {renderBinary(
+                        currentStepData.andBinary,
+                        currentStepData.andBinary,
+                        "green"
+                      )}
+                      <span className="text-gray-500">
+                        ({currentStepData.andResult})
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-16 text-right text-purple-400">{"<< 1:"}</span>
-                      {renderBinary(currentStepData.carryBinary, currentStepData.carryBinary, "purple")}
-                      <span className="text-purple-400">({currentStepData.carryResult})</span>
+                      <span className="w-16 text-right text-purple-400">
+                        {"<< 1:"}
+                      </span>
+                      {renderBinary(
+                        currentStepData.carryBinary,
+                        currentStepData.carryBinary,
+                        "purple"
+                      )}
+                      <span className="text-purple-400">
+                        ({currentStepData.carryResult})
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -350,7 +409,8 @@ export default function SumIntegersVisualizer() {
               {/* Next iteration preview */}
               <div className="bg-gray-800/50 rounded-lg p-3 text-center">
                 <span className="text-gray-400 text-sm">
-                  Next: a = {currentStepData.xorResult}, b = {currentStepData.carryResult}
+                  Next: a = {currentStepData.xorResult}, b ={" "}
+                  {currentStepData.carryResult}
                   {currentStepData.carryResult === 0 && (
                     <span className="text-green-400 ml-2">(b = 0, done!)</span>
                   )}
@@ -371,14 +431,19 @@ export default function SumIntegersVisualizer() {
               </div>
               <div className="mt-3 font-mono text-sm">
                 <span className="text-gray-400">Result: </span>
-                {renderBinary(currentStepData.aBinary, currentStepData.aBinary, "green")}
+                {renderBinary(
+                  currentStepData.aBinary,
+                  currentStepData.aBinary,
+                  "green"
+                )}
               </div>
             </motion.div>
           ) : (
             <div className="bg-gray-800 rounded-lg p-6 text-center text-gray-500">
               <div className="mb-2">Click Play or Step to start</div>
               <div className="text-sm">
-                We&apos;ll add {inputA} ({toBinary(inputA)}) and {inputB} ({toBinary(inputB)})
+                We&apos;ll add {inputA} ({toBinary(inputA)}) and {inputB} (
+                {toBinary(inputB)})
               </div>
             </div>
           )}
@@ -388,7 +453,8 @@ export default function SumIntegersVisualizer() {
         <div className="mt-4 bg-gray-800/50 rounded-lg p-3">
           <div className="text-xs text-gray-400 mb-1">Formula:</div>
           <code className="text-green-300 text-sm">
-            while (b != 0) {"{"} carry = (a & b) {"<<"} 1; a = a ^ b; b = carry; {"}"}
+            while (b != 0) {"{"} carry = (a & b) {"<<"} 1; a = a ^ b; b = carry;{" "}
+            {"}"}
           </code>
         </div>
 

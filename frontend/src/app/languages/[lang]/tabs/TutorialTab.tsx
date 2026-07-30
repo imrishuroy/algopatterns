@@ -196,7 +196,9 @@ const SectionNavigation = ({
       className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
     >
       <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-      <span className="text-sm truncate max-w-[200px]">{prevSection?.title}</span>
+      <span className="text-sm truncate max-w-[200px]">
+        {prevSection?.title}
+      </span>
     </button>
   );
 
@@ -205,7 +207,9 @@ const SectionNavigation = ({
       onClick={() => onNavigate(currentSectionIndex + 1)}
       className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors group"
     >
-      <span className="text-sm truncate max-w-[200px]">{nextSection?.title}</span>
+      <span className="text-sm truncate max-w-[200px]">
+        {nextSection?.title}
+      </span>
       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
     </button>
   );
@@ -219,16 +223,10 @@ const SectionNavigation = ({
         </div>
 
         {/* Center - only show if prev exists */}
-        {hasPrev && (
-          <div className="flex-shrink-0">
-            {markCompleteButton}
-          </div>
-        )}
+        {hasPrev && <div className="flex-shrink-0">{markCompleteButton}</div>}
 
         {/* Right side */}
-        <div className="flex-1 min-w-0 flex justify-end">
-          {nextButton}
-        </div>
+        <div className="flex-1 min-w-0 flex justify-end">{nextButton}</div>
       </div>
     </div>
   );

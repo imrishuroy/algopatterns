@@ -109,9 +109,7 @@ export default function InsertIntervalVisualizer() {
 
     if (phase === "init") {
       setPhase("before");
-      setMessage(
-        "Phase 1: Find intervals that end BEFORE new interval starts"
-      );
+      setMessage("Phase 1: Find intervals that end BEFORE new interval starts");
     } else if (phase === "before") {
       // Find intervals completely before newInterval
       if (

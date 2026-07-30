@@ -6,7 +6,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 export const metadata: Metadata = {
   title: "Pricing - AlgoPatterns Pro Plans",
   description:
-    "Choose your AlgoPatterns plan. Get access to all 17 DSA patterns, interactive visualizers, and curated problem sets for FAANG interview preparation. Free tier available.",
+    "Choose your AlgoPatterns plan. Master DSA with AI Enabled pattern-first learning, interactive visualizations, and 300+ curated problems. Free tier available.",
   keywords: [
     "algopatterns pricing",
     "dsa course price",

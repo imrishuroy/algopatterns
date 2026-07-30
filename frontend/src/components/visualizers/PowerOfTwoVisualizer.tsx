@@ -119,7 +119,13 @@ export default function PowerOfTwoVisualizer() {
         <div className="flex gap-0.5">
           {binary.split("").map((bit, i) => {
             const position = BITS - 1 - i;
-            return renderBit(bit, position, type, highlight, showAnimation && highlight);
+            return renderBit(
+              bit,
+              position,
+              type,
+              highlight,
+              showAnimation && highlight
+            );
           })}
         </div>
         <div className="flex gap-0.5">
@@ -231,7 +237,8 @@ export default function PowerOfTwoVisualizer() {
             >
               {inputOptions.map((n) => (
                 <option key={n} value={n}>
-                  {n} {(n & (n - 1)) === 0 && n > 0 ? `(2^${Math.log2(n)})` : ""}
+                  {n}{" "}
+                  {(n & (n - 1)) === 0 && n > 0 ? `(2^${Math.log2(n)})` : ""}
                 </option>
               ))}
             </select>
@@ -297,7 +304,9 @@ export default function PowerOfTwoVisualizer() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <span className="text-gray-500 font-mono w-20 text-right">AND</span>
+                <span className="text-gray-500 font-mono w-20 text-right">
+                  AND
+                </span>
                 <div className="flex gap-0.5">
                   {Array(BITS)
                     .fill(0)

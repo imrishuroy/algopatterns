@@ -71,7 +71,8 @@ class MockResizeObserver {
   unobserve = vi.fn();
   disconnect = vi.fn();
 }
-globalThis.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+globalThis.ResizeObserver =
+  MockResizeObserver as unknown as typeof ResizeObserver;
 
 // Types tests
 describe("Language Types", () => {
@@ -620,9 +621,13 @@ describe("CheatsheetTab", () => {
   });
 
   it("renders numbered gotcha items", () => {
-    const { container } = render(<CheatsheetTab cheatsheet={mockCheatsheet} language="Go" />);
+    const { container } = render(
+      <CheatsheetTab cheatsheet={mockCheatsheet} language="Go" />
+    );
     // Check for numbered gotcha items (in amber-colored spans)
-    const gotchaNumbers = container.querySelectorAll('.text-amber-400.font-bold');
+    const gotchaNumbers = container.querySelectorAll(
+      ".text-amber-400.font-bold"
+    );
     expect(gotchaNumbers.length).toBe(3);
     expect(gotchaNumbers[0].textContent).toBe("1");
     expect(gotchaNumbers[1].textContent).toBe("2");
@@ -886,12 +891,16 @@ describe("TutorialTab", () => {
       // Find button in sidebar with current section title
       const buttons = screen.getAllByText("Why Go for Data Structures");
       const sidebarButton = buttons.find((el) => el.closest("button"));
-      expect(sidebarButton?.closest("button")?.className).toContain("bg-indigo");
+      expect(sidebarButton?.closest("button")?.className).toContain(
+        "bg-indigo"
+      );
     });
 
     it("calls onSectionChange when section button is clicked", () => {
       const onSectionChange = vi.fn();
-      render(<TutorialTab {...defaultProps} onSectionChange={onSectionChange} />);
+      render(
+        <TutorialTab {...defaultProps} onSectionChange={onSectionChange} />
+      );
 
       // Find and click on Essential Go Concepts in the sidebar
       const essentialButtons = screen.getAllByText("Essential Go Concepts");
@@ -1152,7 +1161,9 @@ describe("LanguageGuideClient", () => {
     it("renders guide display name", () => {
       render(<LanguageGuideClient guide={mockGuide} />);
       // Title appears multiple times (main header and sidebar)
-      const titles = screen.getAllByText("Data Structures and Algorithms in Go");
+      const titles = screen.getAllByText(
+        "Data Structures and Algorithms in Go"
+      );
       expect(titles.length).toBeGreaterThan(0);
     });
 
@@ -1363,7 +1374,9 @@ describe("LanguageGuideClient", () => {
       render(<LanguageGuideClient guide={mockGuide} />);
 
       // Find the resize handle
-      const resizeHandle = document.querySelector('[class*="cursor-col-resize"]');
+      const resizeHandle = document.querySelector(
+        '[class*="cursor-col-resize"]'
+      );
       if (resizeHandle) {
         // Simulate mouse down on resize handle
         fireEvent.mouseDown(resizeHandle, { clientX: 100 });

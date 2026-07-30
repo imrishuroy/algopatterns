@@ -194,9 +194,12 @@ export default function ArticlesPage() {
               We are working on comprehensive guides for Dynamic Programming,
               Graph Algorithms, System Design, and more.
             </p>
-            <button className="px-6 py-3 bg-indigo-500 text-white rounded-md font-medium hover:bg-indigo-400 transition">
-              Get Notified
-            </button>
+            <Link
+              href="/contact"
+              className="inline-block px-6 py-3 bg-indigo-500 text-white rounded-md font-medium hover:bg-indigo-400 transition"
+            >
+              Get in Touch
+            </Link>
           </div>
         </div>
       </div>

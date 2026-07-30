@@ -62,6 +62,31 @@ const sitemap = (): MetadataRoute.Sitemap => {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // Legal pages
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/refund`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
     // login/register/account/auth excluded — no SEO value and wastes crawl budget
   ];
 

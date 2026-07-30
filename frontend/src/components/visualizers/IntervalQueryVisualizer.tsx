@@ -259,7 +259,8 @@ export default function IntervalQueryVisualizer() {
     return () => clearTimeout(timer);
   }, [isPlaying, phase, speed, performStep]);
 
-  const maxEnd = Math.max(...initialIntervals.map((i) => i.end), ...queries) + 1;
+  const maxEnd =
+    Math.max(...initialIntervals.map((i) => i.end), ...queries) + 1;
   const scaleTicks = Array.from({ length: maxEnd + 1 }, (_, tick) => tick);
 
   const getIntervalColor = (state: string) => {
@@ -479,7 +480,9 @@ export default function IntervalQueryVisualizer() {
               </span>
             ) : (
               queryItems.map((item) => {
-                const result = results.find((entry) => entry.queryId === item.id);
+                const result = results.find(
+                  (entry) => entry.queryId === item.id
+                );
                 const answer = result?.answer ?? null;
                 return (
                   <span
@@ -501,10 +504,14 @@ export default function IntervalQueryVisualizer() {
           {results.length > 0 && results.length === queries.length && (
             <div className="mt-2 text-xs text-gray-500">
               Output array: [
-              {queryItems.map((item) => {
-                const result = results.find((entry) => entry.queryId === item.id);
-                return result?.answer ?? "?";
-              }).join(", ")}
+              {queryItems
+                .map((item) => {
+                  const result = results.find(
+                    (entry) => entry.queryId === item.id
+                  );
+                  return result?.answer ?? "?";
+                })
+                .join(", ")}
               ]
             </div>
           )}

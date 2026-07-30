@@ -16,7 +16,9 @@ interface LanguageGuideClientProps {
 }
 
 // skipcq: JS-0067, JS-R1005, JS-0415
-export default function LanguageGuideClient({ guide }: LanguageGuideClientProps) {
+export default function LanguageGuideClient({
+  guide,
+}: LanguageGuideClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>("tutorial");
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [isAIChatOpen, setIsAIChatOpen] = useState(true);
@@ -34,19 +36,22 @@ export default function LanguageGuideClient({ guide }: LanguageGuideClientProps)
   const progress = Math.round((completedSections.size / totalSections) * 100);
 
   // Hash navigation: find section index from hash (supports section id)
-  const findSectionFromHash = useCallback((hash: string): number => {
-    if (!hash) return -1;
-    // Try to find by section id (e.g., #printing-output, #arrays-slices)
-    const index = guide.sections.findIndex((s) => s.id === hash);
-    return index;
-  }, [guide.sections]);
+  const findSectionFromHash = useCallback(
+    (hash: string): number => {
+      if (!hash) return -1;
+      // Try to find by section id (e.g., #printing-output, #arrays-slices)
+      const index = guide.sections.findIndex((s) => s.id === hash);
+      return index;
+    },
+    [guide.sections]
+  );
 
   // Set initial section from hash on mount and listen for hash changes
   useEffect(() => {
     const handleHashNavigation = () => {
       const hash = window.location.hash.slice(1);
       if (!hash) return;
-      
+
       const index = findSectionFromHash(hash);
       if (index !== -1) {
         setCurrentSectionIndex(index);
@@ -126,7 +131,12 @@ export default function LanguageGuideClient({ guide }: LanguageGuideClientProps)
       setAiMessageKey((k) => k + 1);
       setIsAIChatOpen(true);
     },
-    [guide.displayName, guide.sections, currentSectionIndex, derivedActiveSection]
+    [
+      guide.displayName,
+      guide.sections,
+      currentSectionIndex,
+      derivedActiveSection,
+    ]
   );
 
   const handleCloseAI = useCallback(() => {
@@ -213,7 +223,9 @@ export default function LanguageGuideClient({ guide }: LanguageGuideClientProps)
                   <div className="text-2xl font-bold text-white">
                     {completedSections.size}/{totalSections}
                   </div>
-                  <div className="text-sm text-gray-500">sections completed</div>
+                  <div className="text-sm text-gray-500">
+                    sections completed
+                  </div>
                 </div>
                 <div className="w-16 h-16 relative">
                   <svg
@@ -308,7 +320,10 @@ export default function LanguageGuideClient({ guide }: LanguageGuideClientProps)
                   contentId={guide.id}
                   onAskAI={handleAskAI}
                 >
-                  <CheatsheetTab cheatsheet={guide.cheatsheet} language={guide.name} />
+                  <CheatsheetTab
+                    cheatsheet={guide.cheatsheet}
+                    language={guide.name}
+                  />
                 </Highlightable>
               </div>
             </div>

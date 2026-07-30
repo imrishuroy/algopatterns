@@ -9,19 +9,42 @@ type Person = [number, number];
 // Example inputs
 const EXAMPLES: { people: Person[]; description: string }[] = [
   {
-    people: [[7, 0], [4, 4], [7, 1], [5, 0], [6, 1], [5, 2]],
+    people: [
+      [7, 0],
+      [4, 4],
+      [7, 1],
+      [5, 0],
+      [6, 1],
+      [5, 2],
+    ],
     description: "Classic example",
   },
   {
-    people: [[6, 0], [5, 0], [4, 0], [3, 2], [2, 2], [1, 4]],
+    people: [
+      [6, 0],
+      [5, 0],
+      [4, 0],
+      [3, 2],
+      [2, 2],
+      [1, 4],
+    ],
     description: "Various heights",
   },
   {
-    people: [[2, 0], [3, 0], [4, 0], [5, 0]],
+    people: [
+      [2, 0],
+      [3, 0],
+      [4, 0],
+      [5, 0],
+    ],
     description: "All k=0",
   },
   {
-    people: [[3, 0], [3, 1], [3, 2]],
+    people: [
+      [3, 0],
+      [3, 1],
+      [3, 2],
+    ],
     description: "Same height",
   },
 ];
@@ -173,10 +196,7 @@ export default function QueueReconstructionVisualizer() {
   };
 
   // Render a person card
-  const renderPerson = (
-    person: Person,
-    isCurrentlyInserting = false
-  ) => {
+  const renderPerson = (person: Person, isCurrentlyInserting = false) => {
     const heightPercent = (person[0] / maxHeight) * 100;
 
     return (
@@ -313,7 +333,7 @@ export default function QueueReconstructionVisualizer() {
               {displayState.queue.length} / {people.length} placed
             </span>
           </div>
-          
+
           {displayState.queue.length === 0 ? (
             <div className="min-h-[120px] flex items-center">
               <span className="text-gray-500 text-sm">Queue is empty</span>
@@ -344,7 +364,7 @@ export default function QueueReconstructionVisualizer() {
                   })}
                 </AnimatePresence>
               </div>
-              
+
               {/* People row - aligned to bottom */}
               <div className="flex gap-2 items-end min-h-[100px]">
                 <AnimatePresence>
@@ -358,7 +378,7 @@ export default function QueueReconstructionVisualizer() {
 
                     return (
                       <div key={`queue-${idx}`}>
-                            {renderPerson(person, Boolean(isJustInserted))}
+                        {renderPerson(person, Boolean(isJustInserted))}
                       </div>
                     );
                   })}
@@ -374,7 +394,8 @@ export default function QueueReconstructionVisualizer() {
             <div className="flex items-center gap-4">
               <div className="text-sm">
                 <span className="text-purple-400 font-bold">
-                  Inserting [{displayState.currentPerson[0]},{displayState.currentPerson[1]}]
+                  Inserting [{displayState.currentPerson[0]},
+                  {displayState.currentPerson[1]}]
                 </span>
                 <span className="text-gray-400"> at index </span>
                 <span className="text-green-400 font-bold">
@@ -383,8 +404,9 @@ export default function QueueReconstructionVisualizer() {
               </div>
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              k = {displayState.currentPerson[1]} means {displayState.currentPerson[1]} people
-              with height ≥ {displayState.currentPerson[0]} should be in front
+              k = {displayState.currentPerson[1]} means{" "}
+              {displayState.currentPerson[1]} people with height ≥{" "}
+              {displayState.currentPerson[0]} should be in front
             </div>
           </div>
         )}
@@ -443,7 +465,9 @@ export default function QueueReconstructionVisualizer() {
                     <span className="text-gray-500">
                       sees {tallerOrEqualCount} people ≥ {person[0]}
                     </span>
-                    <span className={isCorrect ? "text-green-400" : "text-red-400"}>
+                    <span
+                      className={isCorrect ? "text-green-400" : "text-red-400"}
+                    >
                       {isCorrect ? "✓" : "✗"}
                     </span>
                   </div>
@@ -482,10 +506,10 @@ export default function QueueReconstructionVisualizer() {
         {/* Algorithm Summary */}
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
-            <strong className="text-purple-400">Key Insight:</strong> Tall people
-            don&apos;t &quot;see&quot; shorter people. Process tallest first, then
-            insert at index k. Shorter people inserted later don&apos;t affect
-            taller people&apos;s k values.
+            <strong className="text-purple-400">Key Insight:</strong> Tall
+            people don&apos;t &quot;see&quot; shorter people. Process tallest
+            first, then insert at index k. Shorter people inserted later
+            don&apos;t affect taller people&apos;s k values.
           </p>
         </div>
       </div>

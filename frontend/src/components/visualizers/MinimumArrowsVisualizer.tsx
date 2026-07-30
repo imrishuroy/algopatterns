@@ -326,9 +326,7 @@ export default function MinimumArrowsVisualizer() {
             </AnimatePresence>
 
             {/* Balloons */}
-            <AnimatePresence>
-              {balloons.map(renderBalloon)}
-            </AnimatePresence>
+            <AnimatePresence>{balloons.map(renderBalloon)}</AnimatePresence>
           </div>
         </div>
 

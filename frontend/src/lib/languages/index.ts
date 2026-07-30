@@ -81,7 +81,9 @@ export const getLanguageMetas = (): LanguageMeta[] => {
 };
 
 // Check if a language is supported and available
-export const isLanguageAvailable = (lang: string): lang is SupportedGuideLanguage => {
+export const isLanguageAvailable = (
+  lang: string
+): lang is SupportedGuideLanguage => {
   return lang in guides && guides[lang as SupportedGuideLanguage] !== null;
 };
 

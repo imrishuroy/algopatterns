@@ -29,6 +29,39 @@ const breadcrumbs = [
   { name: "Privacy Policy", url: `${siteUrl}/privacy` },
 ];
 
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <section>
+    <h2
+      className="text-xl font-semibold mb-3"
+      style={{ color: "var(--text-1)" }}
+    >
+      {title}
+    </h2>
+    {children}
+  </section>
+);
+
+const Subsection = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <div className="mb-4">
+    <h3 className="text-lg font-medium mb-2" style={{ color: "var(--text-1)" }}>
+      {title}
+    </h3>
+    {children}
+  </div>
+);
+
 // skipcq: JS-0067
 export default function PrivacyPolicyPage() {
   return (
@@ -255,36 +288,3 @@ export default function PrivacyPolicyPage() {
     </>
   );
 }
-
-const Section = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => (
-  <section>
-    <h2
-      className="text-xl font-semibold mb-3"
-      style={{ color: "var(--text-1)" }}
-    >
-      {title}
-    </h2>
-    {children}
-  </section>
-);
-
-const Subsection = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => (
-  <div className="mb-4">
-    <h3 className="text-lg font-medium mb-2" style={{ color: "var(--text-1)" }}>
-      {title}
-    </h3>
-    {children}
-  </div>
-);

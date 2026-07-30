@@ -51,6 +51,63 @@ const contactMethods = [
   },
 ];
 
+const ContactCard = ({
+  title,
+  description,
+  email,
+  subject,
+  responseTime,
+  note,
+}: {
+  title: string;
+  description: string;
+  email: string;
+  subject?: string;
+  responseTime?: string;
+  note?: string;
+}) => {
+  const mailtoLink = subject
+    ? `mailto:${email}?subject=${encodeURIComponent(subject)}`
+    : `mailto:${email}`;
+
+  return (
+    <div
+      className="p-5 rounded-lg border"
+      style={{
+        backgroundColor: "var(--bg-2)",
+        borderColor: "var(--border-1)",
+      }}
+    >
+      <h3
+        className="text-lg font-semibold mb-2"
+        style={{ color: "var(--text-1)" }}
+      >
+        {title}
+      </h3>
+      <p className="text-sm mb-3" style={{ color: "var(--text-3)" }}>
+        {description}
+      </p>
+      <a
+        href={mailtoLink}
+        className="inline-block text-sm font-medium underline"
+        style={{ color: "var(--accent)" }}
+      >
+        {email}
+      </a>
+      {responseTime && (
+        <p className="text-xs mt-2" style={{ color: "var(--text-3)" }}>
+          Response: {responseTime}
+        </p>
+      )}
+      {note && (
+        <p className="text-xs mt-2" style={{ color: "var(--text-3)" }}>
+          {note}
+        </p>
+      )}
+    </div>
+  );
+};
+
 // skipcq: JS-0067
 export default function ContactPage() {
   return (
@@ -169,60 +226,3 @@ export default function ContactPage() {
     </>
   );
 }
-
-const ContactCard = ({
-  title,
-  description,
-  email,
-  subject,
-  responseTime,
-  note,
-}: {
-  title: string;
-  description: string;
-  email: string;
-  subject?: string;
-  responseTime?: string;
-  note?: string;
-}) => {
-  const mailtoLink = subject
-    ? `mailto:${email}?subject=${encodeURIComponent(subject)}`
-    : `mailto:${email}`;
-
-  return (
-    <div
-      className="p-5 rounded-lg border"
-      style={{
-        backgroundColor: "var(--bg-2)",
-        borderColor: "var(--border-1)",
-      }}
-    >
-      <h3
-        className="text-lg font-semibold mb-2"
-        style={{ color: "var(--text-1)" }}
-      >
-        {title}
-      </h3>
-      <p className="text-sm mb-3" style={{ color: "var(--text-3)" }}>
-        {description}
-      </p>
-      <a
-        href={mailtoLink}
-        className="inline-block text-sm font-medium underline"
-        style={{ color: "var(--accent)" }}
-      >
-        {email}
-      </a>
-      {responseTime && (
-        <p className="text-xs mt-2" style={{ color: "var(--text-3)" }}>
-          Response: {responseTime}
-        </p>
-      )}
-      {note && (
-        <p className="text-xs mt-2" style={{ color: "var(--text-3)" }}>
-          {note}
-        </p>
-      )}
-    </div>
-  );
-};

@@ -78,9 +78,9 @@ export default function ProblemsTab({ problems }: ProblemsTabProps) {
             No problems found matching your filters.
           </div>
         ) : (
-          filteredProblems.map((problem, index) => (
+          filteredProblems.map((problem) => (
             <div
-              key={index}
+              key={problem.name}
               className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50 border border-gray-800 hover:border-gray-700 transition-colors"
             >
               <div className="flex-1 min-w-0">
@@ -95,9 +95,9 @@ export default function ProblemsTab({ problems }: ProblemsTabProps) {
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {problem.topics.map((topic, i) => (
+                  {problem.topics.map((topic) => (
                     <span
-                      key={i}
+                      key={topic}
                       className="px-2 py-0.5 text-xs rounded bg-gray-700 text-gray-300"
                     >
                       {topic}

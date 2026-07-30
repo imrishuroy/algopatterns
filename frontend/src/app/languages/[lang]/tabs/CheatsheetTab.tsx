@@ -26,9 +26,9 @@ export default function CheatsheetTab({
           <h2 className="text-xl font-semibold text-white">Quick Reference</h2>
         </div>
         <div className="grid gap-4">
-          {cheatsheet.quickReference.map((item, index) => (
+          {cheatsheet.quickReference.map((item) => (
             <div
-              key={index}
+              key={item.title}
               className="p-4 rounded-lg bg-gray-800/50 border border-gray-800"
             >
               <h3 className="font-medium text-white mb-3">{item.title}</h3>
@@ -60,9 +60,9 @@ export default function CheatsheetTab({
           <h2 className="text-xl font-semibold text-white">Common Patterns</h2>
         </div>
         <div className="grid gap-4">
-          {cheatsheet.commonPatterns.map((item, index) => (
+          {cheatsheet.commonPatterns.map((item) => (
             <div
-              key={index}
+              key={item.title}
               className="p-4 rounded-lg bg-gray-800/50 border border-gray-800"
             >
               <h3 className="font-medium text-white mb-3">{item.title}</h3>
@@ -96,14 +96,14 @@ export default function CheatsheetTab({
           </h2>
         </div>
         <div className="space-y-3">
-          {cheatsheet.gotchas.map((gotcha, index) => (
+          {cheatsheet.gotchas.map((gotcha, idx) => (
             <div
-              key={index}
+              key={gotcha}
               className="flex gap-3 p-4 rounded-lg bg-amber-500/5 border border-amber-500/20"
             >
               <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-xs font-bold text-amber-400">
-                  {index + 1}
+                  {idx + 1}
                 </span>
               </div>
               <p className="text-gray-300">{gotcha}</p>

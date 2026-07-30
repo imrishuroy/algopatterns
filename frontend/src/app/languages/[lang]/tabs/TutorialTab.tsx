@@ -242,15 +242,25 @@ const ContentRenderer = ({
   content: SectionContent[];
   language: string;
 }) => {
+  // Generate a stable key for each content block
+  const getBlockKey = (block: SectionContent, index: number): string => {
+    if (block.text) return `${block.type}-${block.text.slice(0, 30)}`;
+    if (block.code) return `code-${block.code.slice(0, 30)}`;
+    if (block.title) return `${block.type}-${block.title}`;
+    if (block.message) return `${block.type}-${block.message.slice(0, 30)}`;
+    return `${block.type}-${index}`;
+  };
+
   return (
     <div className="space-y-6">
       {content.map((block, index) => {
+        const key = getBlockKey(block, index);
         switch (block.type) {
           case "heading":
             const HeadingTag = `h${block.level || 3}` as "h2" | "h3" | "h4";
             return (
               <HeadingTag
-                key={index}
+                key={key}
                 className={`font-semibold text-white ${
                   block.level === 2
                     ? "text-xl mt-8"
@@ -265,7 +275,7 @@ const ContentRenderer = ({
 
           case "text":
             return (
-              <p key={index} className="text-gray-300 leading-relaxed">
+              <p key={key} className="text-gray-300 leading-relaxed">
                 {block.text}
               </p>
             );
@@ -273,7 +283,7 @@ const ContentRenderer = ({
           case "code":
             return (
               <div
-                key={index}
+                key={key}
                 className="relative group rounded-md overflow-hidden border border-gray-800 bg-[#011627]"
               >
                 {/* Header bar */}
@@ -349,7 +359,7 @@ const ContentRenderer = ({
           case "tip":
             return (
               <div
-                key={index}
+                key={key}
                 className="flex gap-3 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20"
               >
                 <Lightbulb className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
@@ -367,7 +377,7 @@ const ContentRenderer = ({
           case "warning":
             return (
               <div
-                key={index}
+                key={key}
                 className="flex gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20"
               >
                 <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
@@ -384,10 +394,10 @@ const ContentRenderer = ({
 
           case "comparison":
             return (
-              <div key={index} className="grid gap-3">
-                {block.items?.map((item, i) => (
+              <div key={key} className="grid gap-3">
+                {block.items?.map((item) => (
                   <div
-                    key={i}
+                    key={item.label}
                     className="flex gap-4 p-3 rounded-lg bg-gray-800/50"
                   >
                     <div className="font-medium text-indigo-400 min-w-[140px]">
@@ -402,7 +412,7 @@ const ContentRenderer = ({
           case "complexity":
             return (
               <div
-                key={index}
+                key={key}
                 className="p-4 rounded-lg bg-gray-800/50 border border-gray-700"
               >
                 <h4 className="font-medium text-white mb-3">Complexity</h4>
@@ -431,16 +441,16 @@ const ContentRenderer = ({
           case "table":
             return (
               <div
-                key={index}
+                key={key}
                 className="overflow-x-auto rounded-lg border border-gray-700"
               >
                 <table className="w-full text-sm">
                   {block.headers && (
                     <thead className="bg-gray-800/80">
                       <tr>
-                        {block.headers.map((header, i) => (
+                        {block.headers.map((header) => (
                           <th
-                            key={i}
+                            key={header}
                             className="px-4 py-3 text-left font-medium text-indigo-400 border-b border-gray-700"
                           >
                             {header}
@@ -450,14 +460,14 @@ const ContentRenderer = ({
                     </thead>
                   )}
                   <tbody className="divide-y divide-gray-700/50">
-                    {block.rows?.map((row, rowIndex) => (
+                    {block.rows?.map((row) => (
                       <tr
-                        key={rowIndex}
+                        key={row[0]}
                         className="bg-gray-800/30 hover:bg-gray-800/50 transition-colors"
                       >
                         {row.map((cell, cellIndex) => (
                           <td
-                            key={cellIndex}
+                            key={cell}
                             className={`px-4 py-3 ${cellIndex === 0 ? "font-mono text-emerald-400" : "text-gray-300"}`}
                           >
                             {cell}

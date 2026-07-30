@@ -4,6 +4,70 @@ import LanguageCard from "@/components/languages/LanguageCard";
 import { ItemListJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/lib/seo";
 
+type FeatureCardProps = {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  bgColor: string;
+};
+
+const FeatureCard = ({ icon, title, description, bgColor }: FeatureCardProps) => (
+  <div
+    className="p-6 rounded-xl"
+    style={{
+      background: "var(--bg-surface)",
+      border: "1px solid var(--border-1)",
+    }}
+  >
+    <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center mb-4`}>
+      {icon}
+    </div>
+    <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+    <p className="text-gray-400 text-sm">{description}</p>
+  </div>
+);
+
+const CodeIcon = () => (
+  <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+  </svg>
+);
+
+const LibraryIcon = () => (
+  <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+  </svg>
+);
+
+const CheckBadgeIcon = () => (
+  <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+  </svg>
+);
+
+const FeaturesGrid = () => (
+  <div className="grid md:grid-cols-3 gap-6 mb-16">
+    <FeatureCard
+      icon={<CodeIcon />}
+      title="Idiomatic Code"
+      description="Learn language-specific patterns and best practices that interviewers expect to see."
+      bgColor="bg-indigo-500/20"
+    />
+    <FeatureCard
+      icon={<LibraryIcon />}
+      title="Standard Library"
+      description="Master built-in data structures, sorting, and utilities for efficient solutions."
+      bgColor="bg-purple-500/20"
+    />
+    <FeatureCard
+      icon={<CheckBadgeIcon />}
+      title="Interview Ready"
+      description="Practice problems, cheatsheets, and common patterns used in FAANG interviews."
+      bgColor="bg-emerald-500/20"
+    />
+  </div>
+);
+
 export const metadata: Metadata = {
   title: "Language-Specific Data Structures and Algorithms Guides | AlgoPatterns",
   description:
@@ -56,7 +120,6 @@ export default function LanguagesPage() {
     position: index + 1,
   }));
 
-  // skipcq: JS-0415 — nesting depth from existing UI structure with SEO components
   return (
     <>
       <BreadcrumbJsonLd items={breadcrumbs} />
@@ -96,100 +159,7 @@ export default function LanguagesPage() {
           </div>
 
           {/* Features */}
-          <div className="grid md:grid-cols-3 gap-6 mb-16">
-            <div
-              className="p-6 rounded-xl"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border-1)",
-              }}
-            >
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center mb-4">
-                <svg
-                  className="w-5 h-5 text-indigo-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Idiomatic Code
-              </h3>
-              <p className="text-gray-400 text-sm">
-                Learn language-specific patterns and best practices that
-                interviewers expect to see.
-              </p>
-            </div>
-
-            <div
-              className="p-6 rounded-xl"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border-1)",
-              }}
-            >
-              <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4">
-                <svg
-                  className="w-5 h-5 text-purple-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Standard Library
-              </h3>
-              <p className="text-gray-400 text-sm">
-                Master built-in data structures, sorting, and utilities for
-                efficient solutions.
-              </p>
-            </div>
-
-            <div
-              className="p-6 rounded-xl"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border-1)",
-              }}
-            >
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-4">
-                <svg
-                  className="w-5 h-5 text-emerald-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Interview Ready
-              </h3>
-              <p className="text-gray-400 text-sm">
-                Practice problems, cheatsheets, and common patterns used in
-                FAANG interviews.
-              </p>
-            </div>
-          </div>
+          <FeaturesGrid />
 
           {/* Language Cards */}
           <h2 className="text-xl font-semibold text-white mb-6">

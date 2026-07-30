@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { getLanguageMetas } from "@/lib/languages";
 import LanguageCard from "@/components/languages/LanguageCard";
+import { ItemListJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { siteConfig } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Language-Specific Data Structures and Algorithms Guides | AlgoPatterns",
@@ -17,11 +19,24 @@ export const metadata: Metadata = {
     "python dsa",
   ],
   openGraph: {
-    title: "Language-Specific Data Structures and Algorithms Guides | AlgoPatterns",
+    title:
+      "Language-Specific Data Structures and Algorithms Guides | AlgoPatterns",
     description:
       "Learn Data Structures and Algorithms in your favorite language with comprehensive guides and practical examples.",
     type: "website",
-    url: "/languages",
+    url: `${siteConfig.url}/languages`,
+    siteName: siteConfig.name,
+    images: ["/opengraph-image"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Language-Specific DSA Guides | AlgoPatterns",
+    description:
+      "Master DSA in Go, Rust, Java, and Python with comprehensive guides.",
+    images: ["/opengraph-image"],
+  },
+  alternates: {
+    canonical: `${siteConfig.url}/languages`,
   },
 };
 
@@ -29,8 +44,27 @@ export const metadata: Metadata = {
 export default function LanguagesPage() {
   const languages = getLanguageMetas();
 
+  const breadcrumbs = [
+    { name: "Home", url: siteConfig.url },
+    { name: "Languages", url: `${siteConfig.url}/languages` },
+  ];
+
+  const languageItems = languages.map((lang, index) => ({
+    name: `${lang.name} DSA Guide`,
+    url: `${siteConfig.url}/languages/${lang.id}`,
+    description: lang.description,
+    position: index + 1,
+  }));
+
   return (
-    <main className="min-h-screen">
+    <>
+      <BreadcrumbJsonLd items={breadcrumbs} />
+      <ItemListJsonLd
+        name="Programming Language DSA Guides"
+        description="Comprehensive Data Structures and Algorithms guides for popular programming languages including Go, Rust, Java, and Python."
+        items={languageItems}
+      />
+      <main className="min-h-screen">
       {/* Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         {/* Background gradient */}
@@ -168,5 +202,6 @@ export default function LanguagesPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }

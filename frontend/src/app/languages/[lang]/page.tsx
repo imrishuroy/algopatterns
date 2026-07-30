@@ -6,6 +6,8 @@ import {
   isLanguageAvailable,
 } from "@/lib/languages";
 import LanguageGuideClient from "./LanguageGuideClient";
+import { LanguageGuideJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { siteConfig } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{ lang: string }>;
@@ -29,22 +31,37 @@ export const generateMetadata = async ({
     };
   }
 
+  const langLower = guide.name.toLowerCase();
+
   return {
     title: `${guide.displayName} - Complete Guide | AlgoPatterns`,
     description: guide.description,
     keywords: [
-      `dsa in ${guide.name.toLowerCase()}`,
-      `${guide.name.toLowerCase()} data structures`,
-      `${guide.name.toLowerCase()} algorithms`,
-      `${guide.name.toLowerCase()} leetcode`,
-      `${guide.name.toLowerCase()} coding interview`,
-      `${guide.name.toLowerCase()} interview preparation`,
+      `dsa in ${langLower}`,
+      `${langLower} data structures`,
+      `${langLower} algorithms`,
+      `${langLower} leetcode`,
+      `${langLower} coding interview`,
+      `${langLower} interview preparation`,
+      `${langLower} standard library`,
+      `learn ${langLower} for interviews`,
     ],
     openGraph: {
       title: `${guide.displayName} - Complete Guide for Coding Interviews`,
       description: guide.description,
       type: "article",
-      url: `/languages/${lang}`,
+      url: `${siteConfig.url}/languages/${lang}`,
+      siteName: siteConfig.name,
+      images: ["/opengraph-image"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${guide.displayName} DSA Guide | AlgoPatterns`,
+      description: guide.description,
+      images: ["/opengraph-image"],
+    },
+    alternates: {
+      canonical: `${siteConfig.url}/languages/${lang}`,
     },
   };
 };
@@ -58,5 +75,24 @@ export default async function LanguageGuidePage({ params }: PageProps) {
     notFound();
   }
 
-  return <LanguageGuideClient guide={guide} />;
+  const breadcrumbs = [
+    { name: "Home", url: siteConfig.url },
+    { name: "Languages", url: `${siteConfig.url}/languages` },
+    { name: guide.displayName, url: `${siteConfig.url}/languages/${lang}` },
+  ];
+
+  return (
+    <>
+      <BreadcrumbJsonLd items={breadcrumbs} />
+      <LanguageGuideJsonLd
+        guide={{
+          name: guide.name,
+          displayName: guide.displayName,
+          description: guide.description,
+          slug: lang,
+        }}
+      />
+      <LanguageGuideClient guide={guide} />
+    </>
+  );
 }

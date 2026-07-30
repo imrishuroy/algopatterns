@@ -48,6 +48,7 @@ export const defaultMetadata: Metadata = {
     title: "AlgoPatterns - Master DSA Patterns for FAANG Interviews",
     description: siteConfig.description,
     images: ["/opengraph-image"],
+    site: "@algopatterns",
     creator: "@algopatterns",
   },
   robots: {

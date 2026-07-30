@@ -206,3 +206,121 @@ export const ArticleJsonLd = ({
 
   return <JsonLdScript data={jsonLd} />;
 };
+
+type ItemListItem = {
+  name: string;
+  url: string;
+  description?: string;
+  position?: number;
+};
+
+export const ItemListJsonLd = ({
+  name,
+  description,
+  items,
+}: {
+  name: string;
+  description: string;
+  items: ItemListItem[];
+}) => {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    description,
+    numberOfItems: items.length,
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: item.position ?? index + 1,
+      name: item.name,
+      url: item.url,
+      ...(item.description && { description: item.description }),
+    })),
+  };
+
+  return <JsonLdScript data={jsonLd} />;
+};
+
+type LanguageGuideData = {
+  name: string;
+  displayName: string;
+  description: string;
+  slug: string;
+};
+
+export const LanguageGuideJsonLd = ({
+  guide,
+}: {
+  guide: LanguageGuideData;
+}) => {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: `${guide.displayName} - Data Structures & Algorithms Guide`,
+    description: guide.description,
+    url: `${siteConfig.url}/languages/${guide.slug}`,
+    provider: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      sameAs: siteConfig.url,
+    },
+    hasCourseInstance: {
+      "@type": "CourseInstance",
+      courseMode: "online",
+      courseWorkload: "PT4H",
+    },
+    teaches: [
+      `Data Structures in ${guide.name}`,
+      `Algorithms in ${guide.name}`,
+      `${guide.name} Standard Library`,
+      "Coding Interview Preparation",
+    ],
+    educationalLevel: "Beginner to Advanced",
+    isAccessibleForFree: true,
+    inLanguage: "en",
+    programmingLanguage: {
+      "@type": "ComputerLanguage",
+      name: guide.name,
+    },
+  };
+
+  return <JsonLdScript data={jsonLd} />;
+};
+
+type PricingPlan = {
+  name: string;
+  description: string;
+  price: string;
+  currency: string;
+  features: string[];
+};
+
+export const PricingJsonLd = ({ plans }: { plans: PricingPlan[] }) => {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "AlgoPatterns Pricing",
+    description:
+      "Choose the right plan for your DSA learning journey. Free tier available.",
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: plans.map((plan, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "Product",
+          name: plan.name,
+          description: plan.description,
+          offers: {
+            "@type": "Offer",
+            price: plan.price,
+            priceCurrency: plan.currency,
+            availability: "https://schema.org/InStock",
+          },
+        },
+      })),
+    },
+  };
+
+  return <JsonLdScript data={jsonLd} />;
+};

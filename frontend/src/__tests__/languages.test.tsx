@@ -11,7 +11,6 @@ import type {
   LanguageMeta,
   LanguageSection,
   CheatsheetContent,
-  SectionContent,
 } from "@/types/languages";
 import { difficultyColors, languageAccents } from "@/types/languages";
 

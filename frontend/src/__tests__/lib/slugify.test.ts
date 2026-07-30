@@ -30,7 +30,9 @@ describe("slugify", () => {
     });
 
     it("removes parentheses", () => {
-      expect(slugify("Binary Search (Advanced)")).toBe("binary-search-advanced");
+      expect(slugify("Binary Search (Advanced)")).toBe(
+        "binary-search-advanced"
+      );
     });
 
     it("removes brackets", () => {
@@ -181,9 +183,9 @@ describe("findSectionIndexBySlug", () => {
     });
 
     it("finds middle section", () => {
-      expect(
-        findSectionIndexBySlug(sections, "meeting-rooms-line-sweep")
-      ).toBe(3);
+      expect(findSectionIndexBySlug(sections, "meeting-rooms-line-sweep")).toBe(
+        3
+      );
     });
 
     it("finds last section", () => {
@@ -207,15 +209,11 @@ describe("findSectionIndexBySlug", () => {
     });
 
     it("handles mixed case slug", () => {
-      expect(
-        findSectionIndexBySlug(sections, "Insert-INTERVAL")
-      ).toBe(2);
+      expect(findSectionIndexBySlug(sections, "Insert-INTERVAL")).toBe(2);
     });
 
     it("handles lowercase slug", () => {
-      expect(
-        findSectionIndexBySlug(sections, "insert-interval")
-      ).toBe(2);
+      expect(findSectionIndexBySlug(sections, "insert-interval")).toBe(2);
     });
   });
 
@@ -234,7 +232,10 @@ describe("findSectionIndexBySlug", () => {
 
     it("returns -1 for slug with extra words", () => {
       expect(
-        findSectionIndexBySlug(sections, "introduction-to-interval-problems-extra")
+        findSectionIndexBySlug(
+          sections,
+          "introduction-to-interval-problems-extra"
+        )
       ).toBe(-1);
     });
   });
@@ -257,8 +258,12 @@ describe("findSectionIndexBySlug", () => {
         { title: "Binary Search Variations" },
       ];
       expect(findSectionIndexBySlug(similarSections, "binary-search")).toBe(0);
-      expect(findSectionIndexBySlug(similarSections, "binary-search-tree")).toBe(1);
-      expect(findSectionIndexBySlug(similarSections, "binary-search-variations")).toBe(2);
+      expect(
+        findSectionIndexBySlug(similarSections, "binary-search-tree")
+      ).toBe(1);
+      expect(
+        findSectionIndexBySlug(similarSections, "binary-search-variations")
+      ).toBe(2);
     });
   });
 });

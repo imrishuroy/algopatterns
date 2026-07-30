@@ -11,7 +11,12 @@ type FeatureCardProps = {
   bgColor: string;
 };
 
-const FeatureCard = ({ icon, title, description, bgColor }: FeatureCardProps) => (
+const FeatureCard = ({
+  icon,
+  title,
+  description,
+  bgColor,
+}: FeatureCardProps) => (
   <div
     className="p-6 rounded-xl"
     style={{
@@ -19,7 +24,9 @@ const FeatureCard = ({ icon, title, description, bgColor }: FeatureCardProps) =>
       border: "1px solid var(--border-1)",
     }}
   >
-    <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center mb-4`}>
+    <div
+      className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center mb-4`}
+    >
       {icon}
     </div>
     <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
@@ -28,20 +35,50 @@ const FeatureCard = ({ icon, title, description, bgColor }: FeatureCardProps) =>
 );
 
 const CodeIcon = () => (
-  <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+  <svg
+    className="w-5 h-5 text-indigo-400"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+    />
   </svg>
 );
 
 const LibraryIcon = () => (
-  <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+  <svg
+    className="w-5 h-5 text-purple-400"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+    />
   </svg>
 );
 
 const CheckBadgeIcon = () => (
-  <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+  <svg
+    className="w-5 h-5 text-emerald-400"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+    />
   </svg>
 );
 
@@ -69,7 +106,8 @@ const FeaturesGrid = () => (
 );
 
 export const metadata: Metadata = {
-  title: "Language-Specific Data Structures and Algorithms Guides | AlgoPatterns",
+  title:
+    "Language-Specific Data Structures and Algorithms Guides | AlgoPatterns",
   description:
     "Master data structures and algorithms in your favorite programming language. Comprehensive guides for Go, Rust, Java, and Python with practical examples for coding interviews.",
   keywords: [
@@ -106,7 +144,7 @@ export const metadata: Metadata = {
 
 // skipcq: JS-0067 — Next.js page component
 export default function LanguagesPage() {
-  const languages = getLanguageMetas();
+  const languages = getLanguageMetas().filter((lang) => lang.available);
 
   const breadcrumbs = [
     { name: "Home", url: siteConfig.url },
@@ -129,50 +167,50 @@ export default function LanguagesPage() {
         items={languageItems}
       />
       <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
-        {/* Background gradient */}
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            background:
-              "radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%)",
-          }}
-        />
+        {/* Hero Section */}
+        <section className="relative py-16 md:py-24 overflow-hidden">
+          {/* Background gradient */}
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%)",
+            }}
+          />
 
-        <div className="relative max-w-6xl mx-auto px-4 md:px-6">
-          <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
-              Learn Data Structures and Algorithms in Your{" "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{ backgroundImage: "var(--accent-gradient)" }}
-              >
-                Favorite Language
-              </span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
-              Master data structures and algorithms with language-specific
-              guides. Learn idiomatic patterns, built-in libraries, and
-              interview-ready techniques.
-            </p>
+          <div className="relative max-w-6xl mx-auto px-4 md:px-6">
+            <div className="text-center mb-12">
+              <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                Learn Data Structures and Algorithms in Your{" "}
+                <span
+                  className="bg-clip-text text-transparent"
+                  style={{ backgroundImage: "var(--accent-gradient)" }}
+                >
+                  Favorite Language
+                </span>
+              </h1>
+              <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
+                Master data structures and algorithms with language-specific
+                guides. Learn idiomatic patterns, built-in libraries, and
+                interview-ready techniques.
+              </p>
+            </div>
+
+            {/* Features */}
+            <FeaturesGrid />
+
+            {/* Language Cards */}
+            <h2 className="text-xl font-semibold text-white mb-6">
+              Choose Your Language
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {languages.map((language) => (
+                <LanguageCard key={language.id} language={language} />
+              ))}
+            </div>
           </div>
-
-          {/* Features */}
-          <FeaturesGrid />
-
-          {/* Language Cards */}
-          <h2 className="text-xl font-semibold text-white mb-6">
-            Choose Your Language
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {languages.map((language) => (
-              <LanguageCard key={language.id} language={language} />
-            ))}
-          </div>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
     </>
   );
 }

@@ -294,6 +294,8 @@ vi.mock("@/components/seo/JsonLd", () => ({
   FAQJsonLd: () => null,
   ArticleJsonLd: () => null,
   BreadcrumbJsonLd: () => null,
+  PricingJsonLd: () => null,
+  ItemListJsonLd: () => null,
 }));
 
 // ── Data mocks ──
@@ -1669,9 +1671,10 @@ describe("Articles index page", () => {
     const ArticlesPage = (await import("@/app/articles/page")).default;
     render(React.createElement(ArticlesPage));
     expect(screen.getByText(/more articles coming soon/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /get notified/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /get in touch/i })).toHaveAttribute(
+      "href",
+      "/contact"
+    );
   });
 });
 

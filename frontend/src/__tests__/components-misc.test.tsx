@@ -186,21 +186,37 @@ describe("Footer", () => {
   it("renders the branding text", async () => {
     const Footer = (await import("@/components/layout/Footer")).default;
     render(<Footer />);
+    expect(screen.getByText("AlgoPatterns")).toBeInTheDocument();
     expect(
-      screen.getByText("AlgoPatterns - Interactive Algorithm Visualizations")
+      screen.getByText(/Master Data Structures & Algorithms/i)
     ).toBeInTheDocument();
   });
 
   it("renders the version number", async () => {
     const Footer = (await import("@/components/layout/Footer")).default;
     render(<Footer />);
-    expect(screen.getByText("v1.1.0")).toBeInTheDocument();
+    expect(screen.getByText("v2.3.0")).toBeInTheDocument();
   });
 
   it("has a footer element", async () => {
     const Footer = (await import("@/components/layout/Footer")).default;
     const { container } = render(<Footer />);
     expect(container.querySelector("footer")).toBeInTheDocument();
+  });
+
+  it("renders legal links", async () => {
+    const Footer = (await import("@/components/layout/Footer")).default;
+    render(<Footer />);
+    expect(screen.getByText("Privacy Policy")).toBeInTheDocument();
+    expect(screen.getByText("Terms of Service")).toBeInTheDocument();
+    expect(screen.getByText("Refund Policy")).toBeInTheDocument();
+    expect(screen.getByText("Contact")).toBeInTheDocument();
+  });
+
+  it("renders email link", async () => {
+    const Footer = (await import("@/components/layout/Footer")).default;
+    render(<Footer />);
+    expect(screen.getByText("hello@algopatterns.in")).toBeInTheDocument();
   });
 });
 

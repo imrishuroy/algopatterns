@@ -629,13 +629,15 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
           <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <span className="text-blue-400">▶</span> Interactive Jump Game II
           </h4>
-          <JumpGameVisualizer showModeSelector={false} initialMode="min-jumps" />
+          <JumpGameVisualizer
+            showModeSelector={false}
+            initialMode="min-jumps"
+          />
         </div>
       )}
 
       {cat === "Greedy" &&
-        (title.includes("Maximum Subarray") ||
-          title.includes("Kadane")) && (
+        (title.includes("Maximum Subarray") || title.includes("Kadane")) && (
           <div className="mt-8">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <span className="text-purple-400">▶</span> Interactive Maximum
@@ -657,7 +659,8 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
       {cat === "Greedy" && title.includes("Hand of Straights") && (
         <div className="mt-8">
           <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <span className="text-purple-400">▶</span> Interactive Hand of Straights
+            <span className="text-purple-400">▶</span> Interactive Hand of
+            Straights
           </h4>
           <HandOfStraightsVisualizer />
         </div>
@@ -666,7 +669,8 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
       {cat === "Greedy" && title.includes("Merge Triplets") && (
         <div className="mt-8">
           <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <span className="text-purple-400">▶</span> Interactive Merge Triplets
+            <span className="text-purple-400">▶</span> Interactive Merge
+            Triplets
           </h4>
           <MergeTripletsVisualizer />
         </div>
@@ -675,7 +679,8 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
       {cat === "Greedy" && title.includes("Partition Labels") && (
         <div className="mt-8">
           <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <span className="text-teal-400">▶</span> Interactive Partition Labels
+            <span className="text-teal-400">▶</span> Interactive Partition
+            Labels
           </h4>
           <PartitionLabelsVisualizer />
         </div>
@@ -1268,7 +1273,7 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
         <div className="mt-8">
           <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <span className="text-purple-400">▶</span> Interactive Power of Two
-              Checker
+            Checker
           </h4>
           <PowerOfTwoVisualizer />
         </div>
@@ -1574,7 +1579,9 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
               ),
               summary: ({ children }) => (
                 <summary className="px-4 py-3 cursor-pointer text-indigo-400 font-medium hover:bg-gray-700/50 transition-colors select-none list-none flex items-center gap-2 [&::-webkit-details-marker]:hidden">
-                  <span className="text-gray-500 group-open:rotate-90 transition-transform">▶</span>
+                  <span className="text-gray-500 group-open:rotate-90 transition-transform">
+                    ▶
+                  </span>
                   {children}
                 </summary>
               ),

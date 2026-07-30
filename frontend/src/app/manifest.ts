@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "AlgoPatterns - Master DSA Patterns",
     short_name: "AlgoPatterns",
     description:
-      "Master Data Structures & Algorithms with pattern-based learning for FAANG interviews.",
+      "Master Data Structures & Algorithms with AI Enabled pattern-first learning. Interactive visualizations and 300+ curated problems.",
     start_url: "/",
     display: "standalone",
     background_color: "#111827",

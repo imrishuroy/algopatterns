@@ -27,12 +27,21 @@ const GoIcon = () => (
 
 const RustIcon = () => (
   <svg viewBox="0 0 120 120" className="w-12 h-12">
-    <circle cx="60" cy="60" r="40" fill="none" stroke="#DEA584" strokeWidth="4" />
+    <circle
+      cx="60"
+      cy="60"
+      r="40"
+      fill="none"
+      stroke="#DEA584"
+      strokeWidth="4"
+    />
     <path
       fill="#DEA584"
       d="M60 30v10M60 80v10M30 60h10M80 60h10M38 38l7 7M75 75l7 7M38 82l7-7M75 45l7-7"
     />
-    <text x="48" y="68" fill="#DEA584" fontSize="24" fontWeight="bold">R</text>
+    <text x="48" y="68" fill="#DEA584" fontSize="24" fontWeight="bold">
+      R
+    </text>
   </svg>
 );
 

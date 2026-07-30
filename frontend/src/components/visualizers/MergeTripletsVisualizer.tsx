@@ -98,7 +98,10 @@ const computeSteps = (): StepInfo[] => {
     found: [...found],
     reason: allFound
       ? "All target components found! Return true."
-      : `Missing component(s): ${found.map((f, i) => (!f ? i : null)).filter((x) => x !== null).join(", ")}. Return false.`,
+      : `Missing component(s): ${found
+          .map((f, i) => (!f ? i : null))
+          .filter((x) => x !== null)
+          .join(", ")}. Return false.`,
   });
 
   return steps;
@@ -176,11 +179,7 @@ export default function MergeTripletsVisualizer() {
     }
   };
 
-  const getCellStyle = (
-    tripletIdx: number,
-    cellIdx: number,
-    value: number
-  ) => {
+  const getCellStyle = (tripletIdx: number, cellIdx: number, value: number) => {
     const status = getTripletStatus(tripletIdx);
 
     // If currently checking this triplet
@@ -303,7 +302,11 @@ export default function MergeTripletsVisualizer() {
                     : "border-gray-600 bg-gray-800"
                 }`}
               >
-                <div className={`text-xs mb-1 ${found[idx] ? "text-white/80" : "text-gray-400"}`}>pos {idx}</div>
+                <div
+                  className={`text-xs mb-1 ${found[idx] ? "text-white/80" : "text-gray-400"}`}
+                >
+                  pos {idx}
+                </div>
                 <div
                   className={`text-xl font-bold ${found[idx] ? "text-white" : "text-gray-300"}`}
                 >

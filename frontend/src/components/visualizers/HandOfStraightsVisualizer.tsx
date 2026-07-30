@@ -8,7 +8,14 @@ const HAND = [1, 2, 3, 6, 2, 3, 4, 7, 8];
 const GROUP_SIZE = 3;
 
 interface StepInfo {
-  type: "init" | "find-smallest" | "form-group" | "take-card" | "group-complete" | "done" | "fail";
+  type:
+    | "init"
+    | "find-smallest"
+    | "form-group"
+    | "take-card"
+    | "group-complete"
+    | "done"
+    | "fail";
   smallest?: number;
   currentCard?: number;
   groupCards?: number[];
@@ -21,7 +28,7 @@ interface StepInfo {
 // Pre-compute all steps
 const computeSteps = (): StepInfo[] => {
   const steps: StepInfo[] = [];
-  
+
   // Check divisibility
   if (HAND.length % GROUP_SIZE !== 0) {
     steps.push({
@@ -152,8 +159,8 @@ export default function HandOfStraightsVisualizer() {
     if (currentStep < STEPS.length) {
       const step = STEPS[currentStep];
       if (step.type === "group-complete" && step.groupCards) {
-            const cards = step.groupCards;
-            setCompletedGroups((prev) => [...prev, cards]);
+        const cards = step.groupCards;
+        setCompletedGroups((prev) => [...prev, cards]);
       }
       setCurrentStep((s) => s + 1);
     } else {
@@ -194,8 +201,11 @@ export default function HandOfStraightsVisualizer() {
   // Get card status for coloring
   const getCardStatus = (card: number) => {
     if (!currentStepData) return "default";
-    
-    if (currentStepData.type === "fail" && currentStepData.currentCard === card) {
+
+    if (
+      currentStepData.type === "fail" &&
+      currentStepData.currentCard === card
+    ) {
       return "error";
     }
     if (currentStepData.currentCard === card) {
@@ -316,14 +326,13 @@ export default function HandOfStraightsVisualizer() {
                 <motion.div
                   key={card}
                   animate={{
-                    scale: status === "current" || status === "smallest" ? 1.1 : 1,
+                    scale:
+                      status === "current" || status === "smallest" ? 1.1 : 1,
                   }}
                   className={`relative w-16 p-3 rounded-lg border-2 text-center transition-all ${getCardStyle(status)}`}
                 >
                   <div className="text-2xl font-bold">{card}</div>
-                  <div className="text-xs mt-1 opacity-80">
-                    count: {count}
-                  </div>
+                  <div className="text-xs mt-1 opacity-80">count: {count}</div>
                   {status === "smallest" && (
                     <div className="absolute -top-2 -left-2 bg-green-500 text-white text-xs px-1 rounded">
                       min
@@ -336,34 +345,39 @@ export default function HandOfStraightsVisualizer() {
         </div>
 
         {/* Current Group Being Formed */}
-        {currentStepData?.groupCards && currentStepData.groupCards.length > 0 && !isDone && (
-          <div className="mb-6">
-            <div className="text-sm text-gray-400 mb-2 text-center">
-              Forming Group {(currentStepData.groupIndex || 0) + 1}
+        {currentStepData?.groupCards &&
+          currentStepData.groupCards.length > 0 &&
+          !isDone && (
+            <div className="mb-6">
+              <div className="text-sm text-gray-400 mb-2 text-center">
+                Forming Group {(currentStepData.groupIndex || 0) + 1}
+              </div>
+              <div className="flex justify-center gap-2">
+                {/* skipcq: JS-0437 - cards are unique values, index used for animation ordering */}
+                {currentStepData.groupCards.map((card, idx) => (
+                  <motion.div
+                    key={`card-${card}-${idx}`}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg"
+                  >
+                    {card}
+                  </motion.div>
+                ))}
+                {/* Placeholder for remaining cards - skipcq: JS-0437 - placeholders have no unique id */}
+                {Array.from({
+                  length: GROUP_SIZE - currentStepData.groupCards.length,
+                }).map((_, idx) => (
+                  <div
+                    key={`placeholder-${idx}`}
+                    className="w-12 h-12 border-2 border-dashed border-gray-600 rounded-lg flex items-center justify-center text-gray-600"
+                  >
+                    ?
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex justify-center gap-2">
-              {currentStepData.groupCards.map((card, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg"
-                >
-                  {card}
-                </motion.div>
-              ))}
-              {/* Placeholder for remaining cards */}
-              {Array.from({ length: GROUP_SIZE - currentStepData.groupCards.length }).map((_, idx) => (
-                <div
-                  key={`placeholder-${idx}`}
-                  className="w-12 h-12 border-2 border-dashed border-gray-600 rounded-lg flex items-center justify-center text-gray-600"
-                >
-                  ?
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          )}
 
         {/* Completed Groups */}
         {completedGroups.length > 0 && (
@@ -414,7 +428,8 @@ export default function HandOfStraightsVisualizer() {
                 className={
                   currentStepData.type === "fail"
                     ? "text-red-400"
-                    : currentStepData.type === "group-complete" || currentStepData.type === "done"
+                    : currentStepData.type === "group-complete" ||
+                        currentStepData.type === "done"
                       ? "text-green-400"
                       : "text-gray-300"
                 }
@@ -442,7 +457,8 @@ export default function HandOfStraightsVisualizer() {
                   ✓ Success! All groups formed.
                 </div>
                 <div className="text-gray-400 text-sm mt-2">
-                  {completedGroups.length} groups of {GROUP_SIZE} consecutive cards each.
+                  {completedGroups.length} groups of {GROUP_SIZE} consecutive
+                  cards each.
                 </div>
               </>
             ) : (
@@ -478,9 +494,10 @@ export default function HandOfStraightsVisualizer() {
         {/* How it works */}
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
-            <strong className="text-purple-400">How it works:</strong> Count card frequencies, 
-            then always start groups from the smallest available card. 
-            Take consecutive cards until the group is complete. Repeat until all cards are used.
+            <strong className="text-purple-400">How it works:</strong> Count
+            card frequencies, then always start groups from the smallest
+            available card. Take consecutive cards until the group is complete.
+            Repeat until all cards are used.
           </p>
         </div>
       </div>

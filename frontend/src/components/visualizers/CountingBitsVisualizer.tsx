@@ -103,7 +103,8 @@ export default function CountingBitsVisualizer() {
         {/* skipcq: JS-0437 - bit positions are stable identifiers */}
         {binary.split("").map((bit, i) => {
           const pos = binary.length - 1 - i;
-          const isHighlighted = highlightPos !== undefined && pos === highlightPos;
+          const isHighlighted =
+            highlightPos !== undefined && pos === highlightPos;
           const isOne = bit === "1";
 
           return (
@@ -167,8 +168,18 @@ export default function CountingBitsVisualizer() {
                 <option value={23}>23 (10111)</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-4 h-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </div>
             </div>

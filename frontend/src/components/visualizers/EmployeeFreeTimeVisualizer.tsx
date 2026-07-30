@@ -478,7 +478,10 @@ export default function EmployeeFreeTimeVisualizer() {
         {/* Legend */}
         <div className="flex flex-wrap gap-3 text-sm mb-4">
           {employeeSchedules.map((employee) => (
-            <div key={`legend-${employee.id}`} className="flex items-center gap-2">
+            <div
+              key={`legend-${employee.id}`}
+              className="flex items-center gap-2"
+            >
               <div className={`w-4 h-4 rounded-md ${employee.color}`} />
               <span className="text-gray-400">{employee.label}</span>
             </div>

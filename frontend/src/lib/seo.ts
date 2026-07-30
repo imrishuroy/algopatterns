@@ -4,7 +4,7 @@ export const siteConfig = {
   name: "AlgoPatterns",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in",
   description:
-    "Master Data Structures & Algorithms with pattern-based learning. Interactive visualizers, step-by-step animations, and curated problem sets for FAANG interviews.",
+    "Master Data Structures & Algorithms with AI Enabled pattern-first learning. Interactive visualizations and 300+ curated problems.",
   keywords: [
     "DSA",
     "algorithms",

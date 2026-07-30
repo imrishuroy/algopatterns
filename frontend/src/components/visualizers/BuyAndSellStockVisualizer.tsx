@@ -7,7 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 const EXAMPLES = [
   { prices: [7, 1, 5, 3, 6, 4], expected: 5, description: "Classic example" },
   { prices: [7, 6, 4, 3, 1], expected: 0, description: "Decreasing prices" },
-  { prices: [2, 4, 1, 7, 5, 3], expected: 6, description: "Buy at 1, sell at 7" },
+  {
+    prices: [2, 4, 1, 7, 5, 3],
+    expected: 6,
+    description: "Buy at 1, sell at 7",
+  },
   { prices: [3, 3, 3, 3], expected: 0, description: "All same price" },
 ];
 
@@ -252,7 +256,9 @@ export default function BuyAndSellStockVisualizer() {
                 }`}
               >
                 [{ex.prices.join(", ")}]
-                <span className="ml-2 text-xs text-gray-500">→ ${ex.expected}</span>
+                <span className="ml-2 text-xs text-gray-500">
+                  → ${ex.expected}
+                </span>
               </button>
             ))}
           </div>
@@ -345,7 +351,8 @@ export default function BuyAndSellStockVisualizer() {
           {isDone && state.maxProfit > 0 && (
             <div className="mt-4 text-center">
               <span className="text-green-400 font-mono">
-                Buy at ${prices[state.buyDay]} → Sell at ${prices[state.sellDay]} = 
+                Buy at ${prices[state.buyDay]} → Sell at $
+                {prices[state.sellDay]} =
                 <span className="font-bold"> +${state.maxProfit}</span>
               </span>
             </div>
@@ -362,7 +369,9 @@ export default function BuyAndSellStockVisualizer() {
               {state.minPrice === Infinity ? "∞" : `$${state.minPrice}`}
             </div>
             {minPriceDay >= 0 && state.minPrice !== Infinity && (
-              <div className="text-xs text-gray-500 mt-1">Day {minPriceDay}</div>
+              <div className="text-xs text-gray-500 mt-1">
+                Day {minPriceDay}
+              </div>
             )}
           </div>
           <div className="bg-gray-800/50 rounded-lg p-3 text-center">
@@ -381,21 +390,31 @@ export default function BuyAndSellStockVisualizer() {
         </div>
 
         {/* Current Day Info */}
-        {currentStepData && currentStepData.type !== "init" && currentStepData.type !== "done" && (
-          <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">
-                Day {currentStepData.dayIndex}: Price = ${currentStepData.price}
-              </span>
-              <span className="text-gray-400">
-                Profit if sell today = ${currentStepData.price} - ${currentStepData.minPriceAfter} ={" "}
-                <span className={currentStepData.currentProfit > 0 ? "text-green-400" : "text-gray-500"}>
-                  ${currentStepData.currentProfit}
+        {currentStepData &&
+          currentStepData.type !== "init" &&
+          currentStepData.type !== "done" && (
+            <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">
+                  Day {currentStepData.dayIndex}: Price = $
+                  {currentStepData.price}
                 </span>
-              </span>
+                <span className="text-gray-400">
+                  Profit if sell today = ${currentStepData.price} - $
+                  {currentStepData.minPriceAfter} ={" "}
+                  <span
+                    className={
+                      currentStepData.currentProfit > 0
+                        ? "text-green-400"
+                        : "text-gray-500"
+                    }
+                  >
+                    ${currentStepData.currentProfit}
+                  </span>
+                </span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Step Explanation */}
         <AnimatePresence mode="wait">
@@ -463,9 +482,9 @@ export default function BuyAndSellStockVisualizer() {
         {/* Algorithm Summary */}
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
-            <strong className="text-green-400">Key Insight:</strong> At each day,
-            the best profit = today&apos;s price - minimum price seen so far. Track the
-            minimum as you go, no need to look back!
+            <strong className="text-green-400">Key Insight:</strong> At each
+            day, the best profit = today&apos;s price - minimum price seen so
+            far. Track the minimum as you go, no need to look back!
           </p>
         </div>
       </div>

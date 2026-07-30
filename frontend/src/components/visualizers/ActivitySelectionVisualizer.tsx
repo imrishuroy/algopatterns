@@ -117,7 +117,14 @@ export default function ActivitySelectionVisualizer({
 
       setCurrentActivity(currentIdx + 1);
     }
-  }, [phase, currentActivity, lastEnd, selectedActivities.size, sortedActivities, mode]);
+  }, [
+    phase,
+    currentActivity,
+    lastEnd,
+    selectedActivities.size,
+    sortedActivities,
+    mode,
+  ]);
 
   useEffect(() => {
     if (!isPlaying || isDone) return undefined;

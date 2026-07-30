@@ -36,9 +36,10 @@ const generateSteps = (num: number): Step[] => {
       inputBinary,
       resultBinary: toBinary(result),
       resultValue: result,
-      explanation: bit === 1
-        ? `Bit at position ${i} is 1, place it at position ${outputPosition}`
-        : `Bit at position ${i} is 0, position ${outputPosition} stays 0`,
+      explanation:
+        bit === 1
+          ? `Bit at position ${i} is 1, place it at position ${outputPosition}`
+          : `Bit at position ${i} is 0, position ${outputPosition} stays 0`,
     });
   }
 
@@ -266,20 +267,17 @@ export default function ReverseBitsVisualizer() {
               Input: {inputNum} (read from right, position 0)
             </div>
             <div className="flex justify-center gap-1 pt-6">
-              {inputBinary
-                .split("")
-                .map((bit, i) => {
-                  const position = BITS - 1 - i;
-                  const isActive =
-                    currentStepData?.bitIndex === position;
-                  return renderBit(
-                    bit,
-                    position,
-                    isActive,
-                    true,
-                    bit === "1" ? "blue" : "gray"
-                  );
-                })}
+              {inputBinary.split("").map((bit, i) => {
+                const position = BITS - 1 - i;
+                const isActive = currentStepData?.bitIndex === position;
+                return renderBit(
+                  bit,
+                  position,
+                  isActive,
+                  true,
+                  bit === "1" ? "blue" : "gray"
+                );
+              })}
             </div>
             <div className="flex justify-center mt-2">
               <span className="text-xs text-gray-500">
@@ -319,8 +317,7 @@ export default function ReverseBitsVisualizer() {
             <div className="flex justify-center gap-1">
               {currentResult.split("").map((bit, i) => {
                 const position = BITS - 1 - i;
-                const isActive =
-                  currentStepData?.outputPosition === position;
+                const isActive = currentStepData?.outputPosition === position;
                 const hasBeenSet =
                   currentStepData &&
                   position >= currentStepData.outputPosition &&
@@ -356,9 +353,7 @@ export default function ReverseBitsVisualizer() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-4 bg-green-900/30 border border-green-700 rounded-lg p-4 text-center"
           >
-            <div className="text-green-400 font-bold text-lg">
-              Reversed!
-            </div>
+            <div className="text-green-400 font-bold text-lg">Reversed!</div>
             <div className="text-gray-300 mt-1">
               {inputNum} ({inputBinary}) → {finalResult} (
               {toBinary(finalResult)})

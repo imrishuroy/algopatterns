@@ -188,7 +188,7 @@ export default function GasStationVisualizer() {
         <div className="mb-6 p-4 bg-gray-800/50 rounded-lg font-mono text-sm">
           <div className="flex gap-8 justify-center flex-wrap">
             <div>
-              <span className="text-gray-500">gas  = </span>
+              <span className="text-gray-500">gas = </span>
               <span className="text-green-400">[{GAS.join(", ")}]</span>
             </div>
             <div>
@@ -230,7 +230,8 @@ export default function GasStationVisualizer() {
                         net >= 0 ? "text-green-400" : "text-red-400"
                       }`}
                     >
-                      net: {net >= 0 ? "+" : ""}{net}
+                      net: {net >= 0 ? "+" : ""}
+                      {net}
                     </div>
                     {isDone && finalAnswer === idx && (
                       <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded font-bold">
@@ -287,17 +288,31 @@ export default function GasStationVisualizer() {
                 <span className="text-yellow-400 font-bold">
                   Station {currentStepData.station}:
                 </span>{" "}
-                We have <span className="text-blue-400">{currentStepData.tankBefore}</span> gas in tank.
+                We have{" "}
+                <span className="text-blue-400">
+                  {currentStepData.tankBefore}
+                </span>{" "}
+                gas in tank.
               </div>
               <div className="text-gray-300">
-                → Get <span className="text-green-400">+{currentStepData.gasAtStation}</span> gas,
-                need <span className="text-red-400">-{currentStepData.costToNext}</span> to drive to next station.
+                → Get{" "}
+                <span className="text-green-400">
+                  +{currentStepData.gasAtStation}
+                </span>{" "}
+                gas, need{" "}
+                <span className="text-red-400">
+                  -{currentStepData.costToNext}
+                </span>{" "}
+                to drive to next station.
               </div>
               <div className="text-gray-300">
-                → Tank after: {currentStepData.tankBefore} + {currentStepData.gasAtStation} - {currentStepData.costToNext} ={" "}
+                → Tank after: {currentStepData.tankBefore} +{" "}
+                {currentStepData.gasAtStation} - {currentStepData.costToNext} ={" "}
                 <span
                   className={
-                    currentStepData.tankAfter >= 0 ? "text-green-400 font-bold" : "text-red-400 font-bold"
+                    currentStepData.tankAfter >= 0
+                      ? "text-green-400 font-bold"
+                      : "text-red-400 font-bold"
                   }
                 >
                   {currentStepData.tankAfter}
@@ -305,8 +320,9 @@ export default function GasStationVisualizer() {
               </div>
               {!currentStepData.canProceed && (
                 <div className="text-red-400 font-bold mt-2">
-                  ❌ Tank negative! Station {currentStepData.station} can&apos;t be reached from Station {currentStepData.startStation}. 
-                  Reset and try starting from Station {currentStepData.station + 1}.
+                  ❌ Tank negative! Station {currentStepData.station} can&apos;t
+                  be reached from Station {currentStepData.startStation}. Reset
+                  and try starting from Station {currentStepData.station + 1}.
                 </div>
               )}
               {currentStepData.canProceed && (
@@ -339,8 +355,8 @@ export default function GasStationVisualizer() {
                   ✓ Answer: Start from Station {finalAnswer}
                 </div>
                 <div className="text-gray-400 text-sm mt-2">
-                  Total gas ({GAS.reduce((a, b) => a + b, 0)}) ≥ Total cost ({COST.reduce((a, b) => a + b, 0)}), 
-                  so a solution exists!
+                  Total gas ({GAS.reduce((a, b) => a + b, 0)}) ≥ Total cost (
+                  {COST.reduce((a, b) => a + b, 0)}), so a solution exists!
                 </div>
               </>
             )}

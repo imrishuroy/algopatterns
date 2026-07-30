@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  waitFor,
+} from "@testing-library/react";
 import TutorialTab from "@/app/patterns/[slug]/tabs/TutorialTab";
 import type { Pattern } from "@/types";
 
@@ -169,9 +175,7 @@ describe("TutorialTab", () => {
       render(<TutorialTab pattern={mockPatternWithoutTutorial} />);
 
       expect(screen.getByText("Overview")).toBeInTheDocument();
-      expect(
-        screen.getByText("Pattern without tutorial")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Pattern without tutorial")).toBeInTheDocument();
     });
 
     it("renders When to Use section", () => {
@@ -547,9 +551,18 @@ describe("TutorialTab", () => {
         const sidebar = sidebarContainers[0] as HTMLElement;
 
         // Mock scroll properties
-        Object.defineProperty(sidebar, "scrollTop", { value: 50, writable: true });
-        Object.defineProperty(sidebar, "scrollHeight", { value: 500, writable: true });
-        Object.defineProperty(sidebar, "clientHeight", { value: 200, writable: true });
+        Object.defineProperty(sidebar, "scrollTop", {
+          value: 50,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "scrollHeight", {
+          value: 500,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "clientHeight", {
+          value: 200,
+          writable: true,
+        });
 
         const wheelEvent = new WheelEvent("wheel", {
           deltaY: 10,
@@ -574,9 +587,18 @@ describe("TutorialTab", () => {
       if (sidebarContainers.length > 0) {
         const sidebar = sidebarContainers[0] as HTMLElement;
 
-        Object.defineProperty(sidebar, "scrollTop", { value: 50, writable: true });
-        Object.defineProperty(sidebar, "scrollHeight", { value: 500, writable: true });
-        Object.defineProperty(sidebar, "clientHeight", { value: 200, writable: true });
+        Object.defineProperty(sidebar, "scrollTop", {
+          value: 50,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "scrollHeight", {
+          value: 500,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "clientHeight", {
+          value: 200,
+          writable: true,
+        });
 
         const wheelEvent = new WheelEvent("wheel", {
           deltaY: -10,
@@ -602,9 +624,18 @@ describe("TutorialTab", () => {
         const sidebar = sidebarContainers[0] as HTMLElement;
 
         // At top of scroll
-        Object.defineProperty(sidebar, "scrollTop", { value: 0, writable: true });
-        Object.defineProperty(sidebar, "scrollHeight", { value: 500, writable: true });
-        Object.defineProperty(sidebar, "clientHeight", { value: 200, writable: true });
+        Object.defineProperty(sidebar, "scrollTop", {
+          value: 0,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "scrollHeight", {
+          value: 500,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "clientHeight", {
+          value: 200,
+          writable: true,
+        });
 
         const wheelEvent = new WheelEvent("wheel", {
           deltaY: -10,
@@ -631,9 +662,18 @@ describe("TutorialTab", () => {
         const sidebar = sidebarContainers[0] as HTMLElement;
 
         // At bottom of scroll (scrollTop + clientHeight >= scrollHeight - 1)
-        Object.defineProperty(sidebar, "scrollTop", { value: 300, writable: true });
-        Object.defineProperty(sidebar, "scrollHeight", { value: 500, writable: true });
-        Object.defineProperty(sidebar, "clientHeight", { value: 200, writable: true });
+        Object.defineProperty(sidebar, "scrollTop", {
+          value: 300,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "scrollHeight", {
+          value: 500,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "clientHeight", {
+          value: 200,
+          writable: true,
+        });
 
         const wheelEvent = new WheelEvent("wheel", {
           deltaY: 10,
@@ -659,9 +699,18 @@ describe("TutorialTab", () => {
       if (sidebarContainers.length > 0) {
         const sidebar = sidebarContainers[0] as HTMLElement;
 
-        Object.defineProperty(sidebar, "scrollTop", { value: 50, writable: true });
-        Object.defineProperty(sidebar, "scrollHeight", { value: 500, writable: true });
-        Object.defineProperty(sidebar, "clientHeight", { value: 200, writable: true });
+        Object.defineProperty(sidebar, "scrollTop", {
+          value: 50,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "scrollHeight", {
+          value: 500,
+          writable: true,
+        });
+        Object.defineProperty(sidebar, "clientHeight", {
+          value: 200,
+          writable: true,
+        });
 
         const wheelEvent = new WheelEvent("wheel", {
           deltaY: 0,

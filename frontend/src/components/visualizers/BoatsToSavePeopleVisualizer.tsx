@@ -5,10 +5,20 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // Example inputs
 const EXAMPLES = [
-  { people: [3, 2, 2, 1], limit: 3, expected: 3, description: "Classic example" },
+  {
+    people: [3, 2, 2, 1],
+    limit: 3,
+    expected: 3,
+    description: "Classic example",
+  },
   { people: [1, 2, 3, 4], limit: 5, expected: 2, description: "All can pair" },
   { people: [3, 5, 3, 4], limit: 5, expected: 4, description: "No one pairs" },
-  { people: [1, 1, 1, 1], limit: 2, expected: 2, description: "Everyone pairs" },
+  {
+    people: [1, 1, 1, 1],
+    limit: 2,
+    expected: 2,
+    description: "Everyone pairs",
+  },
 ];
 
 interface Boat {
@@ -94,7 +104,7 @@ const computeSteps = (people: number[], limit: number): StepInfo[] => {
       // Single person left
       boats.push({ people: [sorted[left]], total: sorted[left] });
       handled.add(left);
-      
+
       steps.push({
         type: "solo",
         left: left + 1,
@@ -109,10 +119,10 @@ const computeSteps = (people: number[], limit: number): StepInfo[] => {
       boats.push({ people: [lightWeight, heavyWeight], total: sum });
       handled.add(left);
       handled.add(right);
-      
+
       const newLeft = left + 1;
       const newRight = right - 1;
-      
+
       steps.push({
         type: "pair",
         left: newLeft,
@@ -121,16 +131,16 @@ const computeSteps = (people: number[], limit: number): StepInfo[] => {
         boats: [...boats],
         message: `Boat ${boats.length}: Weights ${lightWeight} + ${heavyWeight} = ${sum} <= ${limit}. Both board! Move both pointers.`,
       });
-      
+
       left = newLeft;
       right = newRight;
     } else {
       // Only heaviest goes
       boats.push({ people: [heavyWeight], total: heavyWeight });
       handled.add(right);
-      
+
       const newRight = right - 1;
-      
+
       steps.push({
         type: "solo",
         left,
@@ -139,7 +149,7 @@ const computeSteps = (people: number[], limit: number): StepInfo[] => {
         boats: [...boats],
         message: `Boat ${boats.length}: Weight ${heavyWeight} goes alone (${sum} > ${limit}). Move right pointer only.`,
       });
-      
+
       right = newRight;
     }
   }
@@ -218,10 +228,16 @@ export default function BoatsToSavePeopleVisualizer() {
 
   // Get person style based on state
   const getPersonStyle = (idx: number) => {
-    const isLeft = idx === displayState.left && displayState.type !== "init" && displayState.type !== "done";
-    const isRight = idx === displayState.right && displayState.type !== "init" && displayState.type !== "done";
+    const isLeft =
+      idx === displayState.left &&
+      displayState.type !== "init" &&
+      displayState.type !== "done";
+    const isRight =
+      idx === displayState.right &&
+      displayState.type !== "init" &&
+      displayState.type !== "done";
     const handled = isHandled(idx);
-    
+
     if (handled) {
       return "bg-gray-700 border-gray-600 opacity-50";
     }
@@ -264,7 +280,9 @@ export default function BoatsToSavePeopleVisualizer() {
                 }`}
               >
                 [{ex.people.join(",")}] limit={ex.limit}
-                <span className="ml-2 text-xs text-gray-500">→ {ex.expected} boats</span>
+                <span className="ml-2 text-xs text-gray-500">
+                  → {ex.expected} boats
+                </span>
               </button>
             ))}
           </div>
@@ -326,23 +344,34 @@ export default function BoatsToSavePeopleVisualizer() {
               >
                 <span className="text-lg font-bold text-white">{weight}</span>
                 <span className="text-xs text-gray-400">#{idx}</span>
-                
+
                 {/* Pointer labels */}
-                {idx === displayState.left && displayState.type !== "init" && displayState.type !== "done" && !isHandled(idx) && (
-                  <span className="absolute -bottom-6 text-xs font-bold text-green-400">
-                    L
-                  </span>
-                )}
-                {idx === displayState.right && idx !== displayState.left && displayState.type !== "init" && displayState.type !== "done" && !isHandled(idx) && (
-                  <span className="absolute -bottom-6 text-xs font-bold text-blue-400">
-                    R
-                  </span>
-                )}
-                {idx === displayState.left && idx === displayState.right && displayState.type !== "init" && displayState.type !== "done" && !isHandled(idx) && (
-                  <span className="absolute -bottom-6 text-xs font-bold text-purple-400">
-                    L=R
-                  </span>
-                )}
+                {idx === displayState.left &&
+                  displayState.type !== "init" &&
+                  displayState.type !== "done" &&
+                  !isHandled(idx) && (
+                    <span className="absolute -bottom-6 text-xs font-bold text-green-400">
+                      L
+                    </span>
+                  )}
+                {idx === displayState.right &&
+                  idx !== displayState.left &&
+                  displayState.type !== "init" &&
+                  displayState.type !== "done" &&
+                  !isHandled(idx) && (
+                    <span className="absolute -bottom-6 text-xs font-bold text-blue-400">
+                      R
+                    </span>
+                  )}
+                {idx === displayState.left &&
+                  idx === displayState.right &&
+                  displayState.type !== "init" &&
+                  displayState.type !== "done" &&
+                  !isHandled(idx) && (
+                    <span className="absolute -bottom-6 text-xs font-bold text-purple-400">
+                      L=R
+                    </span>
+                  )}
               </motion.div>
             ))}
           </div>
@@ -351,24 +380,44 @@ export default function BoatsToSavePeopleVisualizer() {
 
         {/* Current Check Info */}
         {currentStepData && currentStepData.type === "check" && (
-          <div className={`mb-4 p-3 rounded-lg ${currentStepData.canPair ? "bg-green-500/10 border border-green-500/30" : "bg-red-500/10 border border-red-500/30"}`}>
+          <div
+            className={`mb-4 p-3 rounded-lg ${currentStepData.canPair ? "bg-green-500/10 border border-green-500/30" : "bg-red-500/10 border border-red-500/30"}`}
+          >
             <div className="text-center font-mono">
               {currentStepData.left !== currentStepData.right ? (
                 <>
-                  <span className="text-green-400">{displayState.sortedPeople[currentStepData.left]}</span>
+                  <span className="text-green-400">
+                    {displayState.sortedPeople[currentStepData.left]}
+                  </span>
                   <span className="text-gray-400"> + </span>
-                  <span className="text-blue-400">{displayState.sortedPeople[currentStepData.right]}</span>
+                  <span className="text-blue-400">
+                    {displayState.sortedPeople[currentStepData.right]}
+                  </span>
                   <span className="text-gray-400"> = </span>
-                  <span className={currentStepData.canPair ? "text-green-400" : "text-red-400"}>
+                  <span
+                    className={
+                      currentStepData.canPair
+                        ? "text-green-400"
+                        : "text-red-400"
+                    }
+                  >
                     {currentStepData.currentSum}
                   </span>
-                  <span className="text-gray-400"> {currentStepData.canPair ? "≤" : ">"} {limit}</span>
-                  <span className={`ml-2 font-bold ${currentStepData.canPair ? "text-green-400" : "text-red-400"}`}>
+                  <span className="text-gray-400">
+                    {" "}
+                    {currentStepData.canPair ? "≤" : ">"} {limit}
+                  </span>
+                  <span
+                    className={`ml-2 font-bold ${currentStepData.canPair ? "text-green-400" : "text-red-400"}`}
+                  >
                     {currentStepData.canPair ? "✓ CAN PAIR" : "✗ TOO HEAVY"}
                   </span>
                 </>
               ) : (
-                <span className="text-purple-400">Single person left: {displayState.sortedPeople[currentStepData.left]}</span>
+                <span className="text-purple-400">
+                  Single person left:{" "}
+                  {displayState.sortedPeople[currentStepData.left]}
+                </span>
               )}
             </div>
           </div>
@@ -463,9 +512,9 @@ export default function BoatsToSavePeopleVisualizer() {
         {/* Algorithm Summary */}
         <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
           <p>
-            <strong className="text-cyan-400">Strategy:</strong> Always try to pair
-            the heaviest with the lightest. If they fit, both go. If not, the
-            heaviest goes alone (no one else could pair with them either).
+            <strong className="text-cyan-400">Strategy:</strong> Always try to
+            pair the heaviest with the lightest. If they fit, both go. If not,
+            the heaviest goes alone (no one else could pair with them either).
           </p>
         </div>
       </div>

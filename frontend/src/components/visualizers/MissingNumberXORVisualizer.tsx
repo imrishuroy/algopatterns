@@ -204,7 +204,10 @@ export default function MissingNumberXORVisualizer() {
 
               return (
                 // skipcq: JS-0437 - index needed for duplicate values in array
-                <div key={`arr-${num}-${i}`} className="flex flex-col items-center">
+                <div
+                  key={`arr-${num}-${i}`}
+                  className="flex flex-col items-center"
+                >
                   <div className="text-xs text-blue-400 mb-1">i={i}</div>
                   <motion.div
                     className={`
@@ -242,11 +245,17 @@ export default function MissingNumberXORVisualizer() {
                 className="font-mono text-center"
               >
                 <div className="text-lg mb-2">
-                  <span className="text-blue-400">{currentStepData.prevXor}</span>
+                  <span className="text-blue-400">
+                    {currentStepData.prevXor}
+                  </span>
                   <span className="text-gray-400"> ^ </span>
-                  <span className="text-purple-400">{currentStepData.index}</span>
+                  <span className="text-purple-400">
+                    {currentStepData.index}
+                  </span>
                   <span className="text-gray-400"> ^ </span>
-                  <span className="text-yellow-400">{currentStepData.value}</span>
+                  <span className="text-yellow-400">
+                    {currentStepData.value}
+                  </span>
                   <span className="text-gray-400"> = </span>
                   <span className="text-green-400 font-bold">
                     {currentStepData.newXor}
@@ -273,9 +282,7 @@ export default function MissingNumberXORVisualizer() {
                 animate={{ opacity: 1 }}
                 className="text-gray-500 text-center py-4"
               >
-                <div>
-                  Starting XOR = {n} (array length)
-                </div>
+                <div>Starting XOR = {n} (array length)</div>
                 <div className="text-sm mt-1">Click Play or Step to start</div>
               </motion.div>
             )}

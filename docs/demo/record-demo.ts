@@ -1,3 +1,12 @@
+/**
+ * Demo recording script for AlgoPatterns.
+ * This is a Node.js CLI script, NOT browser code.
+ *
+ * skipcq: JS-C1003 — namespace imports are idiomatic for Node.js fs/path
+ * skipcq: JS-0067 — function declarations are fine in Node.js scripts
+ * skipcq: JS-0002 — console is the standard output for CLI scripts
+ * skipcq: JS-R1005 — complexity is acceptable for a linear demo script
+ */
 import { chromium, Browser, Page, BrowserContext } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
@@ -77,15 +86,6 @@ async function smoothScrollElement(
       { sel: selector, d: stepDistance }
     );
     await wait(stepDuration);
-  }
-}
-
-// Helper to type text slowly (for demo effect)
-async function typeSlowly(page: Page, selector: string, text: string) {
-  const element = page.locator(selector);
-  await element.click();
-  for (const char of text) {
-    await element.type(char, { delay: 50 });
   }
 }
 
@@ -185,7 +185,7 @@ async function runDemo() {
   // Create main context (with or without recording)
   const contextOptions: Parameters<typeof browser.newContext>[0] = {
     viewport: { width: WINDOW_WIDTH, height: WINDOW_HEIGHT },
-    storageState: storageState,
+    storageState,
   };
 
   if (ENABLE_RECORDING) {

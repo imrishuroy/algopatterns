@@ -396,11 +396,11 @@ export function useAIChat(options: UseAIChatOptions = {}) {
     }
   }, []);
 
-  // Delete a session
+  // Delete a session (removes the entire session, not just messages)
   const deleteSession = useCallback(
     async (targetSessionId: string) => {
       try {
-        await aiApiClient.clearSession(targetSessionId);
+        await aiApiClient.deleteSession(targetSessionId);
         // Remove from sessions list
         setSessions((prev) => prev.filter((s) => s.id !== targetSessionId));
         // If we deleted the current session, clear messages

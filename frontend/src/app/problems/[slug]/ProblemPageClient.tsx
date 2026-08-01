@@ -1717,11 +1717,11 @@ export default function ProblemPageClient({ params }: PageProps) {
         <div className="flex-1 overflow-hidden">
           {mobileView === "problem" && (
             <div className="h-full overflow-y-auto overscroll-y-contain">
-              {/* Problem Tabs */}
-              <div className="flex border-b border-gray-800 bg-gray-900/50 overflow-x-auto">
+              {/* Problem Tabs - scrollable */}
+              <div className="flex border-b border-gray-800 bg-gray-900/50 overflow-x-auto scrollbar-none">
                 <button
                   onClick={() => setActiveTab("description")}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 transition ${
                     activeTab === "description"
                       ? "text-white border-b-2 border-indigo-500"
                       : "text-gray-400"
@@ -1731,7 +1731,7 @@ export default function ProblemPageClient({ params }: PageProps) {
                 </button>
                 <button
                   onClick={() => setActiveTab("submissions")}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 transition ${
                     activeTab === "submissions"
                       ? "text-white border-b-2 border-indigo-500"
                       : "text-gray-400"
@@ -1741,7 +1741,7 @@ export default function ProblemPageClient({ params }: PageProps) {
                 </button>
                 <button
                   onClick={() => setActiveTab("hints")}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 transition ${
                     activeTab === "hints"
                       ? "text-white border-b-2 border-indigo-500"
                       : "text-gray-400"
@@ -1751,7 +1751,7 @@ export default function ProblemPageClient({ params }: PageProps) {
                 </button>
                 <button
                   onClick={() => setActiveTab("solution")}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 transition ${
                     activeTab === "solution"
                       ? "text-white border-b-2 border-indigo-500"
                       : "text-gray-400"
@@ -2329,11 +2329,11 @@ export default function ProblemPageClient({ params }: PageProps) {
           className="flex flex-col h-full overflow-hidden"
           style={{ width: `${leftPanelWidth}%` }}
         >
-          {/* Tabs */}
-          <div className="flex items-center border-b border-gray-800">
+          {/* Tabs - scrollable */}
+          <div className="flex items-center border-b border-gray-800 overflow-x-auto scrollbar-none">
             <button
               onClick={handleBack}
-              className="px-3 py-3 text-gray-500 hover:text-white transition"
+              className="px-3 py-3 text-gray-500 hover:text-white transition flex-shrink-0"
               title="Back to problems"
             >
               <svg
@@ -2352,7 +2352,7 @@ export default function ProblemPageClient({ params }: PageProps) {
             </button>
             <button
               onClick={() => setActiveTab("description")}
-              className={`px-6 py-3 font-medium transition ${
+              className={`px-4 py-3 font-medium transition whitespace-nowrap flex-shrink-0 ${
                 activeTab === "description"
                   ? "text-white border-b-2 border-indigo-500"
                   : "text-gray-400 hover:text-white"
@@ -2362,7 +2362,7 @@ export default function ProblemPageClient({ params }: PageProps) {
             </button>
             <button
               onClick={() => setActiveTab("submissions")}
-              className={`px-6 py-3 font-medium transition ${
+              className={`px-4 py-3 font-medium transition whitespace-nowrap flex-shrink-0 ${
                 activeTab === "submissions"
                   ? "text-white border-b-2 border-indigo-500"
                   : "text-gray-400 hover:text-white"
@@ -2372,7 +2372,7 @@ export default function ProblemPageClient({ params }: PageProps) {
             </button>
             <button
               onClick={() => setActiveTab("hints")}
-              className={`px-6 py-3 font-medium transition ${
+              className={`px-4 py-3 font-medium transition whitespace-nowrap flex-shrink-0 ${
                 activeTab === "hints"
                   ? "text-white border-b-2 border-indigo-500"
                   : "text-gray-400 hover:text-white"
@@ -2382,7 +2382,7 @@ export default function ProblemPageClient({ params }: PageProps) {
             </button>
             <button
               onClick={() => setActiveTab("solution")}
-              className={`px-6 py-3 font-medium transition ${
+              className={`px-4 py-3 font-medium transition whitespace-nowrap flex-shrink-0 ${
                 activeTab === "solution"
                   ? "text-white border-b-2 border-indigo-500"
                   : "text-gray-400 hover:text-white"
@@ -2690,27 +2690,24 @@ export default function ProblemPageClient({ params }: PageProps) {
         className="flex flex-col h-full overflow-hidden"
         style={{ width: `${middlePanelWidth}%` }}
       >
-        {/* Toolbar */}
-        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800">
-          <div className="flex items-center gap-3">
+        {/* Toolbar - Clean single row like LeetCode */}
+        <div className="flex items-center justify-between px-3 py-2 border-b border-gray-800 gap-3">
+          {/* Left section - can shrink */}
+          <div className="flex items-center gap-2 min-w-0 flex-shrink overflow-hidden">
+            {/* Language dropdown */}
             <div className="relative" ref={langDropdownRef}>
               <button
                 onClick={() => setShowLangDropdown(!showLangDropdown)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-md text-white text-sm font-medium hover:bg-gray-700 hover:border-gray-600 transition-colors h-8"
+                className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-md text-white text-sm font-medium hover:bg-gray-700 transition-colors h-8"
               >
-                <span>{selectedLanguage?.name || "Select Language"}</span>
+                <span>{selectedLanguage?.name || "Language"}</span>
                 <svg
                   className={`w-4 h-4 text-gray-400 transition-transform ${showLangDropdown ? "rotate-180" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               {showLangDropdown && (
@@ -2730,18 +2727,8 @@ export default function ProblemPageClient({ params }: PageProps) {
                     >
                       <span>{t.languageName}</span>
                       {selectedLanguageId === t.languageId && (
-                        <svg
-                          className="w-4 h-4 ml-auto text-indigo-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
+                        <svg className="w-4 h-4 ml-auto text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
                     </button>
@@ -2751,297 +2738,89 @@ export default function ProblemPageClient({ params }: PageProps) {
             </div>
 
             {/* Font size controls */}
-            <div className="flex items-center gap-1 bg-gray-800 rounded-md px-3 border border-gray-700 h-8">
+            <div className="flex items-center bg-gray-800 rounded-md border border-gray-700 h-8">
               <button
                 onClick={() => setFontSize(Math.max(10, fontSize - 2))}
-                className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
-                data-tooltip="Decrease font size"
+                className="px-2 text-gray-400 hover:text-white transition"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20 12H4"
-                  />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                 </svg>
               </button>
-              <span className="text-gray-400 text-sm w-6 text-center font-mono">
-                {fontSize}
-              </span>
+              <span className="text-gray-300 text-sm w-6 text-center font-mono">{fontSize}</span>
               <button
                 onClick={() => setFontSize(Math.min(24, fontSize + 2))}
-                className="p-1.5 text-gray-400 hover:text-white tooltip-wrap"
-                data-tooltip="Increase font size"
+                className="px-2 text-gray-400 hover:text-white transition"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </button>
             </div>
 
-            {/* Full screen button */}
-            <button
-              onClick={() => setIsFullScreen(true)}
-              className="p-1.5 text-gray-400 hover:text-white transition tooltip-wrap"
-              data-tooltip="Full screen (Esc to exit)"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                />
-              </svg>
-            </button>
-
-            {/* Reset button */}
-            <button
-              onClick={handleReset}
-              className="p-1.5 text-gray-400 hover:text-white transition tooltip-wrap"
-              data-tooltip="Reset to template"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-            </button>
-
-            {/* Format button */}
-            <button
-              onClick={formatCode}
-              className="p-1.5 text-gray-400 hover:text-white transition tooltip-wrap"
-              data-tooltip="Format code"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              </svg>
-            </button>
-
-            {/* Word wrap */}
-            <button
-              onClick={() => setWordWrap(!wordWrap)}
-              className={`p-1.5 transition tooltip-wrap ${wordWrap ? "text-indigo-400" : "text-gray-400 hover:text-white"}`}
-              data-tooltip="Toggle word wrap"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h10"
-                />
-              </svg>
-            </button>
-
-            {/* Toggle description */}
-            <button
-              onClick={() => setShowDescription(!showDescription)}
-              className={`p-1.5 transition tooltip-wrap ${showDescription ? "text-gray-400 hover:text-white" : "text-indigo-400"}`}
-              data-tooltip={
-                showDescription ? "Hide description" : "Show description"
-              }
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </button>
-
-            {/* Save indicator */}
-            <span
-              className={`text-xs ${saveStatus === "saved" ? "text-emerald-400" : "text-amber-400"}`}
-            >
-              {saveStatus === "saved" ? (
-                <span className="flex items-center gap-1">
-                  <svg
-                    className="w-3 h-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Saved
-                </span>
-              ) : (
-                "Unsaved"
-              )}
-            </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Right section - Tab size, Timer, Run, Submit (always visible) */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             {/* Tab size */}
-            <span className="tooltip-wrap" data-tooltip="Tab size">
-              <span className="flex rounded-md border border-gray-700 overflow-hidden">
-                <button
-                  onClick={() => setTabSize(2)}
-                  className={`px-2.5 py-1 text-xs font-mono transition cursor-pointer h-8 ${
-                    tabSize === 2
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                  }`}
-                >
-                  2
-                </button>
-                <button
-                  onClick={() => setTabSize(4)}
-                  className={`px-2.5 py-1 text-xs font-mono transition cursor-pointer ${
-                    tabSize === 4
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                  }`}
-                >
-                  4
-                </button>
-              </span>
-            </span>
+            <div className="flex rounded-md border border-gray-700 overflow-hidden h-8">
+              <button
+                onClick={() => setTabSize(2)}
+                className={`px-2 text-sm font-mono transition ${
+                  tabSize === 2 ? "bg-indigo-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                }`}
+              >
+                2
+              </button>
+              <button
+                onClick={() => setTabSize(4)}
+                className={`px-2 text-sm font-mono transition ${
+                  tabSize === 4 ? "bg-indigo-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                }`}
+              >
+                4
+              </button>
+            </div>
 
             {/* Timer */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 rounded-md border border-gray-700 h-8">
-              <svg
-                className="w-4 h-4 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+            <div className="flex items-center gap-1 px-2 bg-gray-800 rounded-md border border-gray-700 h-8">
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span
-                className={`text-sm font-mono ${problemSolved ? "text-emerald-400" : "text-white"}`}
-              >
+              <span className={`text-sm font-mono ${problemSolved ? "text-emerald-400" : "text-white"}`}>
                 {formatTime(timerSeconds)}
               </span>
               <button
                 onClick={() => setTimerRunning(!timerRunning)}
-                className="text-gray-400 hover:text-white tooltip-wrap"
-                data-tooltip={timerRunning ? "Pause timer" : "Start timer"}
+                className="text-gray-400 hover:text-white transition"
+                title={timerRunning ? "Pause timer" : "Start timer"}
               >
                 {timerRunning ? (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 9v6m4-6v6"
-                    />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
                   </svg>
                 ) : (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                    />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                   </svg>
                 )}
               </button>
             </div>
+            {/* Run button */}
             <button
               onClick={handleRun}
               disabled={isRunning}
-              className={`px-4 py-1.5 rounded-md font-medium text-sm transition tooltip-wrap h-8 ${
+              className={`px-4 py-1.5 rounded-md font-medium text-sm transition h-8 ${
                 isRunning
                   ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                   : "bg-gray-700 hover:bg-gray-600 text-white"
               }`}
-              data-tooltip="Run (Ctrl/Cmd+Shift+Enter)"
             >
               {isRunning ? (
                 <span className="flex items-center gap-1.5">
-                  <svg
-                    className="animate-spin w-3.5 h-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
+                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                   Run
                 </span>
@@ -3049,36 +2828,22 @@ export default function ProblemPageClient({ params }: PageProps) {
                 "Run"
               )}
             </button>
+
+            {/* Submit button */}
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className={`px-6 py-1.5 rounded-md font-medium text-sm transition tooltip-wrap h-8 ${
+              className={`px-5 py-1.5 rounded-md font-medium text-sm transition h-8 ${
                 isSubmitting
                   ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                   : "bg-emerald-600 hover:bg-emerald-500 text-white"
               }`}
-              data-tooltip="Submit (Ctrl/Cmd+Enter)"
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-1.5">
-                  <svg
-                    className="animate-spin w-3.5 h-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    />
+                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                   Submit
                 </span>

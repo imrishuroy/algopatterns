@@ -1,4 +1,5 @@
 import { useAIChat } from "@/hooks/useAIChat";
+import { useGlobalSearch } from "@/hooks/useGlobalSearch";
 import { useInlineAI } from "@/hooks/useInlineAI";
 import {
   useIsDesktop,
@@ -21,6 +22,7 @@ vi.mock("@/lib/ai-api", () => {
     getArchivedSessions: vi.fn(),
     getSessionMessages: vi.fn(),
     clearSession: vi.fn(),
+    deleteSession: vi.fn(),
     archiveSession: vi.fn(),
   };
   return { aiApiClient: mockMethods };
@@ -1238,9 +1240,9 @@ describe("useAIChat", () => {
         ],
       },
     });
-    vi.mocked(aiApiClient.clearSession).mockResolvedValue({
+    vi.mocked(aiApiClient.deleteSession).mockResolvedValue({
       success: true,
-      data: { cleared: true },
+      data: { deleted: true },
     });
 
     const { result } = renderHook(() =>
@@ -1255,7 +1257,7 @@ describe("useAIChat", () => {
       await result.current.deleteSession("sess-1");
     });
 
-    expect(aiApiClient.clearSession).toHaveBeenCalledWith("sess-1");
+    expect(aiApiClient.deleteSession).toHaveBeenCalledWith("sess-1");
     expect(result.current.sessions).toHaveLength(0);
   });
 
@@ -1296,9 +1298,9 @@ describe("useAIChat", () => {
         ],
       },
     });
-    vi.mocked(aiApiClient.clearSession).mockResolvedValue({
+    vi.mocked(aiApiClient.deleteSession).mockResolvedValue({
       success: true,
-      data: { cleared: true },
+      data: { deleted: true },
     });
 
     const { result } = renderHook(() =>
@@ -1534,7 +1536,7 @@ describe("useInlineAI", () => {
   });
 });
 
-// ─── useEditorPreferences ────────────────────────────────────────────────────
+// useEditorPreferences
 
 describe("useEditorPreferences", () => {
   beforeEach(() => {
@@ -1546,7 +1548,7 @@ describe("useEditorPreferences", () => {
     vi.useRealTimers();
   });
 
-  // ── Defaults ───────────────────────────────────────────────────────────────
+  // Defaults
 
   it("returns defaults when localStorage is empty", () => {
     const { result } = renderHook(() => useEditorPreferences());
@@ -1568,7 +1570,7 @@ describe("useEditorPreferences", () => {
     expect(result.current.tabSize).toBe(4);
   });
 
-  // ── Reads existing localStorage values on mount ───────────────────────────
+  // Reads existing localStorage values on mount
 
   it("initialises fontSize from localStorage", () => {
     localStorage.setItem("editor_fontSize", "18");
@@ -1598,7 +1600,7 @@ describe("useEditorPreferences", () => {
     expect(result.current.editorHeight).toBe(70);
   });
 
-  // ── Immediate writes for discrete settings ────────────────────────────────
+  // Immediate writes for discrete settings
 
   it("setFontSize updates state and writes to localStorage immediately", () => {
     const { result } = renderHook(() => useEditorPreferences());
@@ -1637,7 +1639,7 @@ describe("useEditorPreferences", () => {
     expect(localStorage.getItem("editor_tabSize")).toBe("2");
   });
 
-  // ── Debounced writes for panel widths ─────────────────────────────────────
+  // Debounced writes for panel widths
 
   it("setLeftPanelWidth updates state immediately but writes to localStorage after 500ms", () => {
     const { result } = renderHook(() => useEditorPreferences());
@@ -1726,7 +1728,7 @@ describe("useEditorPreferences", () => {
     expect(localStorage.getItem("editor_leftPanelWidth")).toBe("42");
   });
 
-  // ── Round-trip: value survives a remount ──────────────────────────────────
+  // Round-trip: value survives a remount
 
   it("persisted fontSize survives unmount + remount", () => {
     const { result, unmount } = renderHook(() => useEditorPreferences());
@@ -1748,5 +1750,126 @@ describe("useEditorPreferences", () => {
 
     const { result: result2 } = renderHook(() => useEditorPreferences());
     expect(result2.current.tabSize).toBe(2);
+  });
+});
+
+// useGlobalSearch
+
+// Mock SearchContext
+const mockOpenSearch = vi.fn();
+const mockCloseSearch = vi.fn();
+let mockIsOpen = false;
+
+vi.mock("@/contexts/SearchContext", () => ({
+  useSearch: () => ({
+    openSearch: mockOpenSearch,
+    closeSearch: mockCloseSearch,
+    isOpen: mockIsOpen,
+  }),
+}));
+
+describe("useGlobalSearch", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockIsOpen = false;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function fireKeydown(key: string, modifiers: { metaKey?: boolean; ctrlKey?: boolean } = {}) {
+    const event = new KeyboardEvent("keydown", {
+      key,
+      metaKey: modifiers.metaKey ?? false,
+      ctrlKey: modifiers.ctrlKey ?? false,
+      bubbles: true,
+    });
+    document.dispatchEvent(event);
+  }
+
+  it("should add keydown listener on mount", () => {
+    const addEventSpy = vi.spyOn(document, "addEventListener");
+    const { unmount } = renderHook(() => useGlobalSearch());
+
+    expect(addEventSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+    unmount();
+  });
+
+  it("should remove keydown listener on unmount", () => {
+    const removeEventSpy = vi.spyOn(document, "removeEventListener");
+    const { unmount } = renderHook(() => useGlobalSearch());
+
+    unmount();
+    expect(removeEventSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+  });
+
+  it("should open search on Cmd+K (Mac)", () => {
+    renderHook(() => useGlobalSearch());
+
+    act(() => {
+      fireKeydown("k", { metaKey: true });
+    });
+
+    expect(mockOpenSearch).toHaveBeenCalledTimes(1);
+  });
+
+  it("should open search on Ctrl+K (Windows/Linux)", () => {
+    renderHook(() => useGlobalSearch());
+
+    act(() => {
+      fireKeydown("k", { ctrlKey: true });
+    });
+
+    expect(mockOpenSearch).toHaveBeenCalledTimes(1);
+  });
+
+  it("should not open search when already open", () => {
+    mockIsOpen = true;
+    renderHook(() => useGlobalSearch());
+
+    act(() => {
+      fireKeydown("k", { metaKey: true });
+    });
+
+    expect(mockOpenSearch).not.toHaveBeenCalled();
+  });
+
+  it("should not open search without modifier key", () => {
+    renderHook(() => useGlobalSearch());
+
+    act(() => {
+      fireKeydown("k", {});
+    });
+
+    expect(mockOpenSearch).not.toHaveBeenCalled();
+  });
+
+  it("should not open search for other keys with modifier", () => {
+    renderHook(() => useGlobalSearch());
+
+    act(() => {
+      fireKeydown("j", { metaKey: true });
+    });
+
+    expect(mockOpenSearch).not.toHaveBeenCalled();
+  });
+
+  it("should prevent default when Cmd+K/Ctrl+K is pressed", () => {
+    renderHook(() => useGlobalSearch());
+
+    const event = new KeyboardEvent("keydown", {
+      key: "k",
+      metaKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    const preventDefaultSpy = vi.spyOn(event, "preventDefault");
+
+    act(() => {
+      document.dispatchEvent(event);
+    });
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
   });
 });

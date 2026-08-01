@@ -380,7 +380,7 @@ export function AIChatPanel({
 
       {/* Input */}
       {isAuthenticated && !isViewingArchived && (
-        <div className="p-3 border-t border-gray-800">
+        <div className="p-3 pb-4 border-t border-gray-800">
           <ChatInput
             onSend={sendMessage}
             onStop={stopStreaming}

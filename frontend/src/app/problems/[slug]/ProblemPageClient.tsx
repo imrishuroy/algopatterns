@@ -633,7 +633,6 @@ export default function ProblemPageClient({ params }: PageProps) {
     fontSize,
     setFontSize,
     wordWrap,
-    setWordWrap,
     tabSize: prefTabSize,
     setTabSize: setPrefTabSize,
     leftPanelWidth,
@@ -648,7 +647,8 @@ export default function ProblemPageClient({ params }: PageProps) {
   const [customInput, setCustomInput] = useState("");
   const [useCustomInput, setUseCustomInput] = useState(false);
   const [expandedTestCase, setExpandedTestCase] = useState<number | null>(null);
-  const [showDescription, setShowDescription] = useState(true);
+  // Setter unused for now but keeping state for future toggle feature
+  const [showDescription] = useState(true);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loadingSubmissions, setLoadingSubmissions] = useState(false);
@@ -729,8 +729,9 @@ export default function ProblemPageClient({ params }: PageProps) {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Format code using indentation-aware formatting
-  const formatCode = useCallback(() => {
+  // Format code using indentation-aware formatting (available for future toolbar button)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _formatCode = useCallback(() => {
     if (!editorInstance) return;
 
     const MONACO_FORMATTED_LANGS = new Set([
@@ -857,7 +858,9 @@ export default function ProblemPageClient({ params }: PageProps) {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Derive save status from whether current code matches last saved code
-  const saveStatus = lastSavedCode === code ? "saved" : "unsaved";
+  // Available for future save indicator in UI
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _saveStatus = lastSavedCode === code ? "saved" : "unsaved";
 
   useEffect(() => {
     if (selectedLanguageId && code) {

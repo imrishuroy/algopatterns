@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { questions } from "@/lib/questions";
 import Dashboard from "@/components/patterns/Dashboard";
+import Footer from "@/components/layout/Footer";
 import { siteConfig } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -38,8 +39,11 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-4 md:py-8">
-      <Dashboard questions={questions} />
-    </div>
+    <>
+      <div className="max-w-6xl mx-auto px-4 py-4 md:py-8">
+        <Dashboard questions={questions} />
+      </div>
+      <Footer />
+    </>
   );
 }

@@ -22,6 +22,18 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Prettier: semicolons, double quotes, trailing commas, printWidth 80.
 - `.npmrc` has `legacy-peer-deps=true`.
 
+## Design System
+
+Read `docs/design-system.md` before making UI changes. Key rules:
+
+- Use CSS custom properties from `src/app/globals.css`, never hardcode colors
+- Primary accent: `--accent-1` (indigo), secondary: `--accent-2` (purple)
+- Text hierarchy: `--text-1` (primary), `--text-2` (secondary), `--text-3` (muted)
+- Backgrounds: `--bg-base`, `--bg-surface`, `--bg-elevated`
+- Border radius: `--radius-sm` to `--radius-xl`
+- Code blocks stay dark regardless of theme (use `.theme-dark` wrapper)
+- Test both dark and light themes
+
 ## Components
 
 - 7 React contexts: Auth, Filter, Highlight, Language, Progress, Subscription, Theme.

@@ -46,13 +46,15 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "Success! Video saved to: $OUTPUT_VIDEO"
     echo ""
-    echo "File size: $(ls -lh "$OUTPUT_VIDEO" | awk '{print $5}')"
+    echo "File size: $(stat -f%z "$OUTPUT_VIDEO" 2>/dev/null || stat -c%s "$OUTPUT_VIDEO" 2>/dev/null) bytes"
     
-    # Open the video
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "Opening video..."
-        open "$OUTPUT_VIDEO"
-    fi
+    # Open the video (macOS only)
+    case "$OSTYPE" in
+        darwin*)
+            echo "Opening video..."
+            open "$OUTPUT_VIDEO"
+            ;;
+    esac
 else
     echo "Error: Failed to add captions"
     exit 1

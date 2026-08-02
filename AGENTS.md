@@ -115,6 +115,7 @@ Read `node_modules/next/dist/docs/` before writing any code. APIs and convention
 
 | Doc | When to read |
 |---|---|
+| `docs/design-system.md` | Before making UI changes, styling, or adding components |
 | `docs/authentication-design.md` | Before touching auth or OAuth code |
 | `docs/database.md` | Schema design decisions |
 | `docs/payment-feature.md` | Razorpay integration |

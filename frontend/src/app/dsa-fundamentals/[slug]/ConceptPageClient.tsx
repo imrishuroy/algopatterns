@@ -37,6 +37,7 @@ const languageLabels: Record<SupportedLanguage, string> = {
   python: "Python",
   cpp: "C++",
   javascript: "JavaScript",
+  go: "Go",
 };
 
 // skipcq: JS-0067

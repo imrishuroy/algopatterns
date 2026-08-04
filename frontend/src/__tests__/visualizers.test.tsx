@@ -800,6 +800,10 @@ const VISUALIZER_PATHS = [
   "BinarySearchVisualizer",
   "BSTValidationVisualizer",
   "CallStackVisualizer",
+  "CombinationsVisualizer",
+  "CombinationSumVisualizer",
+  "CombinationSum2Visualizer",
+  "CombinationSum3Visualizer",
   "ConnectedComponentsVisualizer",
   "ConsecutiveSequenceVisualizer",
   "ContainerWaterVisualizer",
@@ -812,6 +816,7 @@ const VISUALIZER_PATHS = [
   "DPTreeVisualizer",
   "FindAnagramsVisualizer",
   "FixedWindowVisualizer",
+  "GenerateParenthesesVisualizer",
   "GridBFSVisualizer",
   "IntervalIntersectionVisualizer",
   "JumpGameVisualizer",
@@ -832,7 +837,10 @@ const VISUALIZER_PATHS = [
   "MissingNumberXORVisualizer",
   "NextGreaterVisualizer",
   "NQueensVisualizer",
+  "PalindromePartitionVisualizer",
   "PermutationsVisualizer",
+  "PermutationsIIVisualizer",
+  "PhoneLetterVisualizer",
   "PowerOfTwoVisualizer",
   "PrefixSumArrayVisualizer",
   "PrefixSumVisualizer",
@@ -843,12 +851,14 @@ const VISUALIZER_PATHS = [
   "RecursionVsIterationVisualizer",
   "RemoveDuplicatesVisualizer",
   "ReorderListVisualizer",
+  "RestoreIPVisualizer",
   "ReverseBitsVisualizer",
   "RotatedArrayVisualizer",
   "SingleNumberXORVisualizer",
   "StepByStepExecutor",
   "SubarraySumKVisualizer",
   "SubsetsVisualizer",
+  "SubsetsIIVisualizer",
   "SumIntegersVisualizer",
   "TaskSchedulerVisualizer",
   "TopologicalSortVisualizer",
@@ -860,6 +870,7 @@ const VISUALIZER_PATHS = [
   "TwoSumVisualizer",
   "UnionFindVisualizer",
   "ValidParenthesesVisualizer",
+  "WordSearchVisualizer",
 ];
 
 describe.each(VISUALIZER_PATHS)("Smoke test: %s", (name) => {
@@ -875,6 +886,7 @@ describe.each(VISUALIZER_PATHS)("Smoke test: %s", (name) => {
 
     // Some visualizers (like RecursionTypesVisualizer) only have tab buttons,
     // most have Play/Reset, and StepByStepExecutor has Prev/Next/Reset.
+    // Some visualizers use icon buttons with title attributes instead of text.
     const hasControl = Array.from(buttons).some(
       // skipcq: JS-R1005
       (b) =>
@@ -889,7 +901,11 @@ describe.each(VISUALIZER_PATHS)("Smoke test: %s", (name) => {
         b.textContent === "Fibonacci" ||
         b.textContent === "Reverse String" ||
         b.textContent === "Direct Recursion" ||
-        b.textContent === "Indirect Recursion"
+        b.textContent === "Indirect Recursion" ||
+        b.title === "Play" ||
+        b.title === "Reset" ||
+        b.title === "Step Forward" ||
+        b.title === "Step Back"
     );
     expect(hasControl).toBe(true);
   });

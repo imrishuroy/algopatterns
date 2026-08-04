@@ -10,7 +10,7 @@ interface LanguageToggleProps {
 export default function LanguageToggle({
   currentLang,
   onChange,
-  languages = ["javascript", "java"],
+  languages = ["java", "javascript"],
   size = "md",
 }: LanguageToggleProps) {
   const labelMap: Record<string, string> = {
@@ -21,16 +21,19 @@ export default function LanguageToggle({
     go: "Go",
   };
 
+  const sizeClasses = size === "sm" ? "px-3 py-1 text-xs" : "px-4 py-1.5 text-sm";
+
   return (
-    <div className="flex bg-gray-800 rounded-md p-1">
+    <div className="inline-flex bg-gray-800/80 rounded-full p-1 gap-1">
       {languages.map((lang) => (
         <button
           key={lang}
+          type="button"
           onClick={() => onChange(lang)}
-          className={`px-3 py-1 text-sm rounded-md transition ${
+          className={`${sizeClasses} rounded-full font-medium transition-all duration-200 ${
             currentLang === lang
-              ? "bg-indigo-500 text-white"
-              : "text-gray-400 hover:text-white"
+              ? "bg-indigo-500 text-white shadow-md"
+              : "text-gray-400 hover:text-white hover:bg-gray-700/50"
           }`}
         >
           {labelMap[lang] || lang}

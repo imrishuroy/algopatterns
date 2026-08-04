@@ -6,20 +6,23 @@ import { motion, AnimatePresence } from "framer-motion";
 interface TreeNode {
   id: string;
   path: number[];
+  usedIndices: number[];
   children: TreeNode[];
   depth: number;
-  usedIndices: number[];
+  skipped: boolean;
+  skipReason?: string;
 }
 
-const NUMS = [1, 2, 3];
+const NUMS = [1, 1, 2]; // Already sorted
 
-const buildPermutationTree = (): TreeNode => {
+const buildPermutationsIITree = (): TreeNode => {
   const root: TreeNode = {
     id: "root",
     path: [],
+    usedIndices: [],
     children: [],
     depth: 0,
-    usedIndices: [],
+    skipped: false,
   };
 
   const build = (node: TreeNode, used: boolean[]) => {
@@ -28,29 +31,45 @@ const buildPermutationTree = (): TreeNode => {
     for (let i = 0; i < NUMS.length; i++) {
       if (used[i]) continue;
 
+      // Skip if: same as previous AND previous is NOT used
+      const shouldSkip = i > 0 && NUMS[i] === NUMS[i - 1] && !used[i - 1];
+
       const newUsed = [...used];
       newUsed[i] = true;
 
       const child: TreeNode = {
-        id: `${node.id}-${NUMS[i]}`,
+        id: `${node.id}-${i}`,
         path: [...node.path, NUMS[i]],
+        usedIndices: [...node.usedIndices, i],
         children: [],
         depth: node.depth + 1,
-        usedIndices: node.usedIndices.concat(i),
+        skipped: shouldSkip,
+        skipReason: shouldSkip
+          ? `nums[${i}]==${NUMS[i]} == nums[${i - 1}] && !used[${i - 1}]`
+          : undefined,
       };
       node.children.push(child);
-      build(child, newUsed);
+
+      if (!shouldSkip) {
+        build(child, newUsed);
+      }
     }
   };
 
-  build(root, [false, false, false]);
+  build(root, new Array(NUMS.length).fill(false));
   return root;
 };
 
-const flattenTree = (node: TreeNode, order: TreeNode[] = []): TreeNode[] => {
+const flattenTree = (
+  node: TreeNode,
+  order: TreeNode[] = [],
+  includeSkipped = true
+): TreeNode[] => {
   order.push(node);
   for (const child of node.children) {
-    flattenTree(child, order);
+    if (includeSkipped || !child.skipped) {
+      flattenTree(child, order, includeSkipped);
+    }
   }
   return order;
 };
@@ -187,7 +206,7 @@ const Controls = ({
               onClick={() => onSpeedChange(opt.value)}
               className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                 speed === opt.value
-                  ? "bg-blue-600 text-white"
+                  ? "bg-indigo-600 text-white"
                   : "text-gray-400 hover:text-white hover:bg-gray-700"
               }`}
             >
@@ -210,14 +229,14 @@ const Controls = ({
 );
 
 // skipcq: JS-0067
-export default function PermutationsVisualizer() {
+export default function PermutationsIIVisualizer() {
   const [step, setStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const tree = useMemo(() => buildPermutationTree(), []);
-  const nodeOrder = useMemo(() => flattenTree(tree), [tree]);
+  const tree = useMemo(() => buildPermutationsIITree(), []);
+  const nodeOrder = useMemo(() => flattenTree(tree, [], true), [tree]);
   const totalNodes = nodeOrder.length;
   const maxSteps = totalNodes - 1;
 
@@ -227,36 +246,25 @@ export default function PermutationsVisualizer() {
 
   const currentNode = nodeOrder[step];
 
-  // Only count complete permutations (leaf nodes with full path)
-  const completePermutations = useMemo(() => {
+  // Count saved permutations (complete, non-skipped nodes)
+  const savedPermutations = useMemo(() => {
     return nodeOrder
       .slice(0, step + 1)
-      .filter((n) => n.path.length === NUMS.length)
+      .filter((n) => !n.skipped && n.path.length === NUMS.length)
       .map((n) => n.path);
   }, [nodeOrder, step]);
-
-  // Get current used[] state
-  const currentUsed = useMemo(() => {
-    const used = [false, false, false];
-    if (currentNode) {
-      for (const idx of currentNode.usedIndices) {
-        used[idx] = true;
-      }
-    }
-    return used;
-  }, [currentNode]);
 
   // Tree positions
   const positions = useMemo(() => {
     const pos: Record<string, { x: number; y: number }> = {};
     const levelHeight = 70;
-    const svgWidth = 700;
+    const svgWidth = 600;
 
     const getSubtreeWidth = (node: TreeNode): number => {
-      if (node.children.length === 0) return 55;
+      if (node.children.length === 0) return 60;
       return (
         node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
-        (node.children.length - 1) * 8
+        (node.children.length - 1) * 10
       );
     };
 
@@ -266,21 +274,21 @@ export default function PermutationsVisualizer() {
       rightBound: number
     ) => {
       const x = (leftBound + rightBound) / 2;
-      const y = node.depth * levelHeight + 40;
+      const y = node.depth * levelHeight + 35;
       pos[node.id] = { x, y };
 
       if (node.children.length === 0) return;
 
       const totalWidth =
         node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
-        (node.children.length - 1) * 8;
+        (node.children.length - 1) * 10;
 
       let currentLeft = x - totalWidth / 2;
 
       for (const child of node.children) {
         const childWidth = getSubtreeWidth(child);
         assignPositions(child, currentLeft, currentLeft + childWidth);
-        currentLeft += childWidth + 8;
+        currentLeft += childWidth + 10;
       }
     };
 
@@ -319,14 +327,16 @@ export default function PermutationsVisualizer() {
 
     if (!pos) return null;
 
-    const radius = 20;
-    const nodeColor = isCurrent
-      ? "#3b82f6"
-      : isComplete && isVisible
-        ? "#10B981"
-        : isVisible
-          ? "#6366f1"
-          : "#374151";
+    const radius = 22;
+    const nodeColor = node.skipped
+      ? "#ef4444"
+      : isCurrent
+        ? "#6366f1"
+        : isComplete && isVisible
+          ? "#10B981"
+          : isVisible
+            ? "#8b5cf6"
+            : "#374151";
 
     return (
       <g key={node.id}>
@@ -336,9 +346,10 @@ export default function PermutationsVisualizer() {
             y1={parentPos.y + radius}
             x2={pos.x}
             y2={pos.y - radius}
-            stroke={isCurrent ? "#3b82f6" : "#6B7280"}
+            stroke={node.skipped ? "#ef4444" : isCurrent ? "#6366f1" : "#6B7280"}
             strokeWidth={isCurrent ? 2.5 : 1.5}
-            opacity={isVisible ? 0.6 : 0.2}
+            opacity={isVisible ? (node.skipped ? 0.4 : 0.6) : 0.2}
+            strokeDasharray={node.skipped ? "4,4" : "none"}
           />
         )}
         {isVisible && (
@@ -348,14 +359,34 @@ export default function PermutationsVisualizer() {
               cy={pos.y}
               r={radius}
               fill={nodeColor}
-              stroke={isCurrent ? "#60a5fa" : isComplete ? "#34d399" : "#6B7280"}
+              stroke={
+                node.skipped
+                  ? "#f87171"
+                  : isCurrent
+                    ? "#818cf8"
+                    : isComplete
+                      ? "#34d399"
+                      : "#a78bfa"
+              }
               strokeWidth={isCurrent ? 3 : 1.5}
+              opacity={node.skipped ? 0.5 : 1}
             />
+            {node.skipped && (
+              <line
+                x1={pos.x - 10}
+                y1={pos.y - 10}
+                x2={pos.x + 10}
+                y2={pos.y + 10}
+                stroke="#fff"
+                strokeWidth={2}
+              />
+            )}
             <text
               x={pos.x}
               y={pos.y + 4}
               textAnchor="middle"
-              className="text-[10px] fill-white font-mono font-medium"
+              className="text-xs fill-white font-mono font-medium"
+              opacity={node.skipped ? 0.7 : 1}
             >
               {node.path.length === 0 ? "[]" : `[${node.path.join(",")}]`}
             </text>
@@ -369,73 +400,78 @@ export default function PermutationsVisualizer() {
   };
 
   const getMessage = () => {
-    if (step === 0) return "Start with empty path [], all elements available";
+    if (step === 0)
+      return `Start with sorted array [${NUMS.join(", ")}]. Build all permutations.`;
 
     const curr = currentNode;
-    const prev = nodeOrder[step - 1];
-    const isComplete = curr.path.length === NUMS.length;
 
-    // Check if complete permutation first
-    if (isComplete) {
-      return `Complete permutation! Save [${curr.path.join(", ")}]`;
+    if (curr.skipped) {
+      return `SKIP: nums[i]==nums[i-1] && !used[i-1] → duplicate permutation`;
     }
 
-    // Check if done (after all nodes visited)
+    if (curr.path.length === NUMS.length) {
+      return `Complete! Save [${curr.path.join(", ")}]`;
+    }
+
     if (step >= maxSteps) {
-      return `Done! Generated all ${completePermutations.length} permutations (${NUMS.length}! = 6)`;
+      return `Done! Found ${savedPermutations.length} unique permutations`;
     }
 
-    if (curr.depth > prev.depth) {
-      const added = curr.path[curr.path.length - 1];
-      return `CHOOSE ${added} (mark as used) → path = [${curr.path.join(", ")}]`;
-    } else {
-      // Backtracking: find what elements were removed
-      // We go from prev.path to curr.path
-      // Example: [1,2,3] -> [1,3] means we removed 3, then 2, then added 3
-      const commonLength = curr.path.length - 1; // Elements that stay the same
-      const removed = prev.path.slice(commonLength).reverse(); // Reverse to show removal order
-      const added = curr.path[curr.path.length - 1];
-      return `BACKTRACK (remove ${removed.join(", ")}) → CHOOSE ${added} → path = [${curr.path.join(", ")}]`;
-    }
+    const lastIdx = curr.usedIndices[curr.usedIndices.length - 1];
+    return `Choose index ${lastIdx} (value ${NUMS[lastIdx]}) → path = [${curr.path.join(", ")}]`;
   };
+
+  // Get current used state for display
+  const currentUsed = useMemo(() => {
+    const used = new Array(NUMS.length).fill(false);
+    if (currentNode) {
+      for (const idx of currentNode.usedIndices) {
+        used[idx] = true;
+      }
+    }
+    return used;
+  }, [currentNode]);
 
   return (
     <div className="p-6 bg-gray-900 rounded-xl w-full max-w-4xl mx-auto">
       <div className="text-center mb-4">
         <div className="text-lg font-medium text-white">
-          Permutations Generator
+          Permutations II: Handling Duplicates
         </div>
         <div className="text-sm text-gray-400">
-          Generate all n! = {NUMS.length}! = 6 permutations of [
-          {NUMS.join(", ")}]
+          Input: [{NUMS.join(", ")}] (sorted) — Skip duplicate permutations
         </div>
       </div>
 
-      {/* Input array with used[] markers */}
-      <div className="flex justify-center gap-4 mb-6">
+      {/* Input array with used state */}
+      <div className="flex justify-center gap-3 mb-6">
         {NUMS.map((num, idx) => {
           const isUsed = currentUsed[idx];
+          const isDuplicate = idx > 0 && NUMS[idx] === NUMS[idx - 1];
           return (
             <motion.div
               key={idx}
               animate={{
-                scale: isUsed ? 0.95 : 1,
-                backgroundColor: isUsed ? "#ef4444" : "#22c55e",
-                opacity: isUsed ? 0.6 : 1,
+                scale: isUsed ? 1.1 : 1,
+                backgroundColor: isUsed ? "#6366f1" : "#374151",
+                opacity: isUsed ? 1 : 0.6,
               }}
-              className="w-16 h-16 rounded-lg flex flex-col items-center justify-center shadow-lg"
+              className="w-16 h-16 rounded-lg flex flex-col items-center justify-center shadow-lg relative"
               style={{
                 boxShadow: isUsed
-                  ? "none"
-                  : "0 0 20px rgba(34, 197, 94, 0.3)",
+                  ? "0 0 20px rgba(99, 102, 241, 0.4)"
+                  : "none",
               }}
             >
-              <span className="text-xl font-bold text-white">{num}</span>
-              <span
-                className={`text-xs ${isUsed ? "text-red-300" : "text-green-300"}`}
-              >
-                {isUsed ? "used" : "free"}
+              <span className="text-lg font-bold text-white">{num}</span>
+              <span className="text-xs text-gray-400">
+                idx {idx} {isUsed ? "✓" : ""}
               </span>
+              {isDuplicate && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full text-[10px] flex items-center justify-center text-black font-bold">
+                  =
+                </span>
+              )}
             </motion.div>
           );
         })}
@@ -469,8 +505,8 @@ export default function PermutationsVisualizer() {
         >
           <svg
             width="100%"
-            height="340"
-            viewBox="0 0 700 340"
+            height="300"
+            viewBox="0 0 600 300"
             preserveAspectRatio="xMidYMid meet"
             className="bg-gray-800/30 rounded-lg"
           >
@@ -488,33 +524,44 @@ export default function PermutationsVisualizer() {
       {/* Legend */}
       <div className="flex justify-center gap-6 mt-4 text-sm text-gray-400">
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-blue-500 rounded-full" /> current
+          <span className="w-3 h-3 bg-indigo-500 rounded-full" /> current
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-indigo-500 rounded-full" /> exploring
+          <span className="w-3 h-3 bg-violet-500 rounded-full" /> exploring
         </span>
         <span className="flex items-center gap-2">
           <span className="w-3 h-3 bg-green-500 rounded-full" /> complete
         </span>
+        <span className="flex items-center gap-2">
+          <span className="w-3 h-3 bg-red-500 rounded-full opacity-50" /> skipped
+        </span>
       </div>
 
       {/* Message */}
-      <div className="text-center text-sm text-gray-400 bg-gray-800/50 px-4 py-3 rounded-lg font-mono mt-4">
+      <div
+        className={`text-center text-sm px-4 py-3 rounded-lg font-mono mt-4 ${
+          currentNode?.skipped
+            ? "bg-red-500/20 text-red-400"
+            : currentNode?.path.length === NUMS.length
+              ? "bg-green-500/20 text-green-400"
+              : "bg-gray-800/50 text-gray-400"
+        }`}
+      >
         {getMessage()}
       </div>
 
-      {/* Complete permutations */}
+      {/* Saved permutations */}
       <div className="mt-4 p-4 bg-gray-800/30 rounded-lg">
         <div className="text-sm text-gray-500 mb-2">
-          Complete Permutations ({completePermutations.length} / 6):
+          Unique Permutations ({savedPermutations.length} / 3):
         </div>
         <div className="flex flex-wrap gap-2 min-h-[32px]">
-          {completePermutations.map((perm, idx) => (
+          {savedPermutations.map((perm, idx) => (
             <motion.span
               key={idx}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="px-2 py-1 bg-green-600/20 border border-green-500/40 rounded text-green-400 text-sm font-mono"
+              className="px-3 py-1 bg-green-600/20 border border-green-500/40 rounded text-green-400 text-sm font-mono"
             >
               [{perm.join(", ")}]
             </motion.span>
@@ -526,16 +573,17 @@ export default function PermutationsVisualizer() {
       {step >= maxSteps && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
           <span className="text-green-400 font-bold">
-            Complete! Generated all 6 permutations (3! = 6)
+            Complete! Found 3 unique permutations (skipped duplicates)
           </span>
         </div>
       )}
 
       {/* Key insight */}
       <div className="mt-4 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        <span className="text-blue-400">Key:</span> Use{" "}
-        <code className="text-cyan-400">used[]</code> array instead of start
-        index. Loop from 0, skip used elements.
+        <span className="text-indigo-400">Key:</span> Sort first, then skip when{" "}
+        <code className="text-indigo-400">
+          nums[i] == nums[i-1] && !used[i-1]
+        </code>
       </div>
     </div>
   );

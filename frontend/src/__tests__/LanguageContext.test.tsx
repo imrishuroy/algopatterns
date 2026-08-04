@@ -11,6 +11,7 @@ const TestComponent = () => {
       <button onClick={() => setLanguage("cpp")}>Set C++</button>
       <button onClick={() => setLanguage("javascript")}>Set JavaScript</button>
       <button onClick={() => setLanguage("java")}>Set Java</button>
+      <button onClick={() => setLanguage("go")}>Set Go</button>
     </div>
   );
 };
@@ -131,5 +132,35 @@ describe("LanguageContext", () => {
       fireEvent.click(screen.getByText("Set Java"));
     });
     expect(screen.getByTestId("current-language")).toHaveTextContent("java");
+  });
+
+  it("supports Go language", () => {
+    render(
+      <LanguageProvider>
+        <TestComponent />
+      </LanguageProvider>
+    );
+
+    act(() => {
+      fireEvent.click(screen.getByText("Set Go"));
+    });
+    expect(screen.getByTestId("current-language")).toHaveTextContent("go");
+    expect(localStorage.getItem("preferredLanguage")).toBe("go");
+  });
+
+  it("loads Go language from localStorage on mount", async () => {
+    localStorage.setItem("preferredLanguage", "go");
+
+    render(
+      <LanguageProvider>
+        <TestComponent />
+      </LanguageProvider>
+    );
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(screen.getByTestId("current-language")).toHaveTextContent("go");
   });
 });

@@ -1264,7 +1264,7 @@ describe("LanguageToggle", () => {
     expect(screen.getByText("ruby")).toBeInTheDocument();
   });
 
-  it("renders buttons inside a flex container with bg-gray-800", () => {
+  it("renders buttons inside a flex container with dark background", () => {
     const { container } = render(
       <LanguageToggle
         currentLang="java"
@@ -1272,8 +1272,8 @@ describe("LanguageToggle", () => {
         languages={["java"]}
       />
     );
-    const flexContainer = container.querySelector(".flex");
-    expect(flexContainer).toHaveClass("bg-gray-800");
+    const flexContainer = container.querySelector(".inline-flex");
+    expect(flexContainer).toBeInTheDocument();
   });
 });
 

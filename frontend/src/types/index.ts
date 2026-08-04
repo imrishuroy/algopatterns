@@ -7,7 +7,7 @@ export interface CodeTemplates {
 }
 
 // Language types for global language preference
-export type SupportedLanguage = "java" | "python" | "cpp" | "javascript";
+export type SupportedLanguage = "java" | "python" | "cpp" | "javascript" | "go";
 
 // DSA Fundamentals types
 export type ConceptCategory =
@@ -25,6 +25,7 @@ export interface ConceptCodeSnippets {
   python: string;
   cpp: string;
   javascript: string;
+  go?: string;
 }
 
 export interface Concept {
@@ -72,6 +73,7 @@ export type DPApproach =
 export interface ApproachCode {
   java?: string;
   javascript?: string;
+  go?: string;
 }
 
 export interface TutorialSection {
@@ -83,6 +85,9 @@ export interface TutorialSection {
   code?: {
     java?: string;
     javascript?: string;
+    python?: string;
+    cpp?: string;
+    go?: string;
   };
   // Multiple approaches for actual code examples
   approaches?: {

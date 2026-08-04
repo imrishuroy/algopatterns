@@ -8,49 +8,57 @@ interface TreeNode {
   path: number[];
   children: TreeNode[];
   depth: number;
-  usedIndices: number[];
+  pruned: boolean;
 }
 
-const NUMS = [1, 2, 3];
+const N = 4;
+const K = 2;
 
-const buildPermutationTree = (): TreeNode => {
+const buildCombinationTree = (): TreeNode => {
   const root: TreeNode = {
     id: "root",
     path: [],
     children: [],
     depth: 0,
-    usedIndices: [],
+    pruned: false,
   };
 
-  const build = (node: TreeNode, used: boolean[]) => {
-    if (node.path.length === NUMS.length) return;
+  const build = (node: TreeNode, start: number) => {
+    // If we have k elements, this is a valid combination (leaf)
+    if (node.path.length === K) return;
 
-    for (let i = 0; i < NUMS.length; i++) {
-      if (used[i]) continue;
+    const remaining = K - node.path.length;
 
-      const newUsed = [...used];
-      newUsed[i] = true;
+    for (let i = start; i <= N; i++) {
+      // Check if this branch would be pruned
+      const wouldBePruned = i > N - remaining + 1;
 
       const child: TreeNode = {
-        id: `${node.id}-${NUMS[i]}`,
-        path: [...node.path, NUMS[i]],
+        id: `${node.id}-${i}`,
+        path: [...node.path, i],
         children: [],
         depth: node.depth + 1,
-        usedIndices: node.usedIndices.concat(i),
+        pruned: wouldBePruned,
       };
       node.children.push(child);
-      build(child, newUsed);
+
+      // Only continue building if not pruned
+      if (!wouldBePruned) {
+        build(child, i + 1);
+      }
     }
   };
 
-  build(root, [false, false, false]);
+  build(root, 1);
   return root;
 };
 
 const flattenTree = (node: TreeNode, order: TreeNode[] = []): TreeNode[] => {
   order.push(node);
   for (const child of node.children) {
-    flattenTree(child, order);
+    if (!child.pruned) {
+      flattenTree(child, order);
+    }
   }
   return order;
 };
@@ -187,7 +195,7 @@ const Controls = ({
               onClick={() => onSpeedChange(opt.value)}
               className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                 speed === opt.value
-                  ? "bg-blue-600 text-white"
+                  ? "bg-cyan-600 text-white"
                   : "text-gray-400 hover:text-white hover:bg-gray-700"
               }`}
             >
@@ -210,13 +218,13 @@ const Controls = ({
 );
 
 // skipcq: JS-0067
-export default function PermutationsVisualizer() {
+export default function CombinationsVisualizer() {
   const [step, setStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const tree = useMemo(() => buildPermutationTree(), []);
+  const tree = useMemo(() => buildCombinationTree(), []);
   const nodeOrder = useMemo(() => flattenTree(tree), [tree]);
   const totalNodes = nodeOrder.length;
   const maxSteps = totalNodes - 1;
@@ -227,36 +235,32 @@ export default function PermutationsVisualizer() {
 
   const currentNode = nodeOrder[step];
 
-  // Only count complete permutations (leaf nodes with full path)
-  const completePermutations = useMemo(() => {
+  // Only count complete combinations (path.length === K)
+  const completeCombinations = useMemo(() => {
     return nodeOrder
       .slice(0, step + 1)
-      .filter((n) => n.path.length === NUMS.length)
+      .filter((n) => n.path.length === K)
       .map((n) => n.path);
   }, [nodeOrder, step]);
 
-  // Get current used[] state
-  const currentUsed = useMemo(() => {
-    const used = [false, false, false];
-    if (currentNode) {
-      for (const idx of currentNode.usedIndices) {
-        used[idx] = true;
-      }
-    }
-    return used;
-  }, [currentNode]);
+  // Calculate C(n,k)
+  const totalCombinations = useMemo(() => {
+    const factorial = (x: number): number => (x <= 1 ? 1 : x * factorial(x - 1));
+    return factorial(N) / (factorial(K) * factorial(N - K));
+  }, []);
 
   // Tree positions
   const positions = useMemo(() => {
     const pos: Record<string, { x: number; y: number }> = {};
-    const levelHeight = 70;
-    const svgWidth = 700;
+    const levelHeight = 80;
+    const svgWidth = 600;
 
     const getSubtreeWidth = (node: TreeNode): number => {
-      if (node.children.length === 0) return 55;
+      const validChildren = node.children.filter((c) => !c.pruned);
+      if (validChildren.length === 0) return 70;
       return (
-        node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
-        (node.children.length - 1) * 8
+        validChildren.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
+        (validChildren.length - 1) * 15
       );
     };
 
@@ -269,18 +273,19 @@ export default function PermutationsVisualizer() {
       const y = node.depth * levelHeight + 40;
       pos[node.id] = { x, y };
 
-      if (node.children.length === 0) return;
+      const validChildren = node.children.filter((c) => !c.pruned);
+      if (validChildren.length === 0) return;
 
       const totalWidth =
-        node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
-        (node.children.length - 1) * 8;
+        validChildren.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
+        (validChildren.length - 1) * 15;
 
       let currentLeft = x - totalWidth / 2;
 
-      for (const child of node.children) {
+      for (const child of validChildren) {
         const childWidth = getSubtreeWidth(child);
         assignPositions(child, currentLeft, currentLeft + childWidth);
-        currentLeft += childWidth + 8;
+        currentLeft += childWidth + 15;
       }
     };
 
@@ -311,21 +316,23 @@ export default function PermutationsVisualizer() {
     currentId: string | undefined,
     posMap: Record<string, { x: number; y: number }>
   ): React.ReactNode => {
+    if (node.pruned) return null;
+
     const isVisible = visibleSet.has(node.id);
     const isCurrent = currentId === node.id;
-    const isComplete = node.path.length === NUMS.length;
+    const isComplete = node.path.length === K;
     const pos = posMap[node.id];
     const parentPos = parentId ? posMap[parentId] : undefined;
 
     if (!pos) return null;
 
-    const radius = 20;
+    const radius = 22;
     const nodeColor = isCurrent
-      ? "#3b82f6"
+      ? "#06b6d4"
       : isComplete && isVisible
         ? "#10B981"
         : isVisible
-          ? "#6366f1"
+          ? "#8b5cf6"
           : "#374151";
 
     return (
@@ -336,7 +343,7 @@ export default function PermutationsVisualizer() {
             y1={parentPos.y + radius}
             x2={pos.x}
             y2={pos.y - radius}
-            stroke={isCurrent ? "#3b82f6" : "#6B7280"}
+            stroke={isCurrent ? "#06b6d4" : "#6B7280"}
             strokeWidth={isCurrent ? 2.5 : 1.5}
             opacity={isVisible ? 0.6 : 0.2}
           />
@@ -348,54 +355,52 @@ export default function PermutationsVisualizer() {
               cy={pos.y}
               r={radius}
               fill={nodeColor}
-              stroke={isCurrent ? "#60a5fa" : isComplete ? "#34d399" : "#6B7280"}
+              stroke={isCurrent ? "#22d3ee" : isComplete ? "#34d399" : "#6B7280"}
               strokeWidth={isCurrent ? 3 : 1.5}
             />
             <text
               x={pos.x}
               y={pos.y + 4}
               textAnchor="middle"
-              className="text-[10px] fill-white font-mono font-medium"
+              className="text-xs fill-white font-mono font-medium"
             >
               {node.path.length === 0 ? "[]" : `[${node.path.join(",")}]`}
             </text>
           </>
         )}
-        {node.children.map((child) =>
-          renderTreeNode(child, node.id, visibleSet, currentId, posMap)
-        )}
+        {node.children
+          .filter((c) => !c.pruned)
+          .map((child) =>
+            renderTreeNode(child, node.id, visibleSet, currentId, posMap)
+          )}
       </g>
     );
   };
 
   const getMessage = () => {
-    if (step === 0) return "Start with empty path [], all elements available";
+    if (step === 0)
+      return `Start: Choose ${K} elements from [1, 2, 3, 4]`;
 
     const curr = currentNode;
     const prev = nodeOrder[step - 1];
-    const isComplete = curr.path.length === NUMS.length;
+    const isComplete = curr.path.length === K;
 
-    // Check if complete permutation first
     if (isComplete) {
-      return `Complete permutation! Save [${curr.path.join(", ")}]`;
+      return `Size = ${K}, Save [${curr.path.join(", ")}]!`;
     }
 
-    // Check if done (after all nodes visited)
     if (step >= maxSteps) {
-      return `Done! Generated all ${completePermutations.length} permutations (${NUMS.length}! = 6)`;
+      return `Done! Found all ${completeCombinations.length} combinations C(${N},${K})`;
     }
 
     if (curr.depth > prev.depth) {
       const added = curr.path[curr.path.length - 1];
-      return `CHOOSE ${added} (mark as used) → path = [${curr.path.join(", ")}]`;
+      const remaining = K - curr.path.length;
+      return `CHOOSE ${added} → path = [${curr.path.join(", ")}] (need ${remaining} more)`;
     } else {
-      // Backtracking: find what elements were removed
-      // We go from prev.path to curr.path
-      // Example: [1,2,3] -> [1,3] means we removed 3, then 2, then added 3
-      const commonLength = curr.path.length - 1; // Elements that stay the same
-      const removed = prev.path.slice(commonLength).reverse(); // Reverse to show removal order
+      const removed = prev.path.slice(curr.path.length - 1).reverse();
       const added = curr.path[curr.path.length - 1];
-      return `BACKTRACK (remove ${removed.join(", ")}) → CHOOSE ${added} → path = [${curr.path.join(", ")}]`;
+      return `BACKTRACK (remove ${removed.join(", ")}) → CHOOSE ${added}`;
     }
   };
 
@@ -403,39 +408,33 @@ export default function PermutationsVisualizer() {
     <div className="p-6 bg-gray-900 rounded-xl w-full max-w-4xl mx-auto">
       <div className="text-center mb-4">
         <div className="text-lg font-medium text-white">
-          Permutations Generator
+          Combinations Generator
         </div>
         <div className="text-sm text-gray-400">
-          Generate all n! = {NUMS.length}! = 6 permutations of [
-          {NUMS.join(", ")}]
+          Choose k={K} elements from n={N}: C({N},{K}) = {totalCombinations}{" "}
+          combinations
         </div>
       </div>
 
-      {/* Input array with used[] markers */}
-      <div className="flex justify-center gap-4 mb-6">
-        {NUMS.map((num, idx) => {
-          const isUsed = currentUsed[idx];
+      {/* Input array display */}
+      <div className="flex justify-center gap-3 mb-6">
+        {[1, 2, 3, 4].map((num) => {
+          const isInPath = currentNode?.path.includes(num);
           return (
             <motion.div
-              key={idx}
+              key={num}
               animate={{
-                scale: isUsed ? 0.95 : 1,
-                backgroundColor: isUsed ? "#ef4444" : "#22c55e",
-                opacity: isUsed ? 0.6 : 1,
+                scale: isInPath ? 1.1 : 1,
+                backgroundColor: isInPath ? "#06b6d4" : "#374151",
               }}
-              className="w-16 h-16 rounded-lg flex flex-col items-center justify-center shadow-lg"
+              className="w-12 h-12 rounded-lg flex flex-col items-center justify-center shadow-lg"
               style={{
-                boxShadow: isUsed
-                  ? "none"
-                  : "0 0 20px rgba(34, 197, 94, 0.3)",
+                boxShadow: isInPath
+                  ? "0 0 20px rgba(6, 182, 212, 0.4)"
+                  : "none",
               }}
             >
-              <span className="text-xl font-bold text-white">{num}</span>
-              <span
-                className={`text-xs ${isUsed ? "text-red-300" : "text-green-300"}`}
-              >
-                {isUsed ? "used" : "free"}
-              </span>
+              <span className="text-lg font-bold text-white">{num}</span>
             </motion.div>
           );
         })}
@@ -469,8 +468,8 @@ export default function PermutationsVisualizer() {
         >
           <svg
             width="100%"
-            height="340"
-            viewBox="0 0 700 340"
+            height="280"
+            viewBox="0 0 600 280"
             preserveAspectRatio="xMidYMid meet"
             className="bg-gray-800/30 rounded-lg"
           >
@@ -488,13 +487,13 @@ export default function PermutationsVisualizer() {
       {/* Legend */}
       <div className="flex justify-center gap-6 mt-4 text-sm text-gray-400">
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-blue-500 rounded-full" /> current
+          <span className="w-3 h-3 bg-cyan-500 rounded-full" /> current
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-indigo-500 rounded-full" /> exploring
+          <span className="w-3 h-3 bg-violet-500 rounded-full" /> exploring
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-green-500 rounded-full" /> complete
+          <span className="w-3 h-3 bg-green-500 rounded-full" /> complete (k={K})
         </span>
       </div>
 
@@ -503,20 +502,21 @@ export default function PermutationsVisualizer() {
         {getMessage()}
       </div>
 
-      {/* Complete permutations */}
+      {/* Complete combinations */}
       <div className="mt-4 p-4 bg-gray-800/30 rounded-lg">
         <div className="text-sm text-gray-500 mb-2">
-          Complete Permutations ({completePermutations.length} / 6):
+          Complete Combinations ({completeCombinations.length} /{" "}
+          {totalCombinations}):
         </div>
         <div className="flex flex-wrap gap-2 min-h-[32px]">
-          {completePermutations.map((perm, idx) => (
+          {completeCombinations.map((combo, idx) => (
             <motion.span
               key={idx}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               className="px-2 py-1 bg-green-600/20 border border-green-500/40 rounded text-green-400 text-sm font-mono"
             >
-              [{perm.join(", ")}]
+              [{combo.join(", ")}]
             </motion.span>
           ))}
         </div>
@@ -526,16 +526,15 @@ export default function PermutationsVisualizer() {
       {step >= maxSteps && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
           <span className="text-green-400 font-bold">
-            Complete! Generated all 6 permutations (3! = 6)
+            Complete! Found all C({N},{K}) = {totalCombinations} combinations
           </span>
         </div>
       )}
 
       {/* Key insight */}
       <div className="mt-4 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        <span className="text-blue-400">Key:</span> Use{" "}
-        <code className="text-cyan-400">used[]</code> array instead of start
-        index. Loop from 0, skip used elements.
+        <span className="text-cyan-400">Key:</span> Like Subsets but save only
+        when <code className="text-cyan-400">path.length === k</code>
       </div>
     </div>
   );

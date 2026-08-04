@@ -26,6 +26,7 @@ const VALID_LANGUAGES: SupportedLanguage[] = [
   "python",
   "cpp",
   "javascript",
+  "go",
 ];
 const DEFAULT_LANGUAGE: SupportedLanguage = "java";
 

@@ -10,6 +10,7 @@ import {
   SupportedLanguage,
   TutorialSection as TutorialSectionType,
   DPApproach,
+  ApproachCode,
 } from "@/types";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -249,6 +250,50 @@ const PermutationsVisualizer = dynamic(
 );
 const NQueensVisualizer = dynamic(
   () => import("@/components/visualizers/NQueensVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const CombinationsVisualizer = dynamic(
+  () => import("@/components/visualizers/CombinationsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const PhoneLetterVisualizer = dynamic(
+  () => import("@/components/visualizers/PhoneLetterVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const SubsetsIIVisualizer = dynamic(
+  () => import("@/components/visualizers/SubsetsIIVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const PermutationsIIVisualizer = dynamic(
+  () => import("@/components/visualizers/PermutationsIIVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const CombinationSumVisualizer = dynamic(
+  () => import("@/components/visualizers/CombinationSumVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const CombinationSum2Visualizer = dynamic(
+  () => import("@/components/visualizers/CombinationSum2Visualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const CombinationSum3Visualizer = dynamic(
+  () => import("@/components/visualizers/CombinationSum3Visualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const WordSearchVisualizer = dynamic(
+  () => import("@/components/visualizers/WordSearchVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const GenerateParenthesesVisualizer = dynamic(
+  () => import("@/components/visualizers/GenerateParenthesesVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const PalindromePartitionVisualizer = dynamic(
+  () => import("@/components/visualizers/PalindromePartitionVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const RestoreIPVisualizer = dynamic(
+  () => import("@/components/visualizers/RestoreIPVisualizer"),
   { loading: VisualizerLoading, ssr: false }
 );
 const BinarySearchVisualizer = dynamic(
@@ -1189,28 +1234,143 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
 
       {/* Backtracking Visualizers */}
       {cat === "Backtracking" &&
-        title.includes("Interactive") &&
-        title.includes("Subsets") && (
+        title.includes("Subsets") &&
+        !title.includes("Handling Duplicates") && (
           <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-purple-400">▶</span> Interactive Subsets
+              Generator
+            </h4>
             <SubsetsVisualizer />
           </div>
         )}
 
       {cat === "Backtracking" &&
-        title.includes("Interactive") &&
-        title.includes("Permutations") && (
+        title.includes("Permutations") &&
+        !title.includes("Handling Duplicates") && (
           <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-purple-400">▶</span> Interactive Permutations
+              Generator
+            </h4>
             <PermutationsVisualizer />
           </div>
         )}
 
       {cat === "Backtracking" &&
-        title.includes("Interactive") &&
-        title.includes("N-Queens") && (
+        title.includes("Combinations") &&
+        !title.includes("Letter") && (
           <div className="mt-8">
-            <NQueensVisualizer />
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-purple-400">▶</span> Interactive Combinations
+              Generator
+            </h4>
+            <CombinationsVisualizer />
           </div>
         )}
+
+      {cat === "Backtracking" && title.includes("Letter Combinations") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-purple-400">▶</span> Interactive Phone Letter
+            Generator
+          </h4>
+          <PhoneLetterVisualizer />
+        </div>
+      )}
+
+      {cat === "Backtracking" && title.includes("Handling Duplicates") && (
+        <>
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-rose-400">▶</span> Interactive Subsets II
+            </h4>
+            <SubsetsIIVisualizer />
+          </div>
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-indigo-400">▶</span> Interactive Permutations
+              II
+            </h4>
+            <PermutationsIIVisualizer />
+          </div>
+        </>
+      )}
+
+      {cat === "Backtracking" && title.includes("Combination Sum") && (
+        <>
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-emerald-400">▶</span> Combination Sum I
+              (Reuse Allowed)
+            </h4>
+            <CombinationSumVisualizer />
+          </div>
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-orange-400">▶</span> Combination Sum II (No
+              Reuse + Skip Duplicates)
+            </h4>
+            <CombinationSum2Visualizer />
+          </div>
+          <div className="mt-8">
+            <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <span className="text-violet-400">▶</span> Combination Sum III (K
+              Numbers from 1-9)
+            </h4>
+            <CombinationSum3Visualizer />
+          </div>
+        </>
+      )}
+
+      {cat === "Backtracking" && title.includes("Grid Backtracking") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-sky-400">▶</span> Interactive Word Search
+          </h4>
+          <WordSearchVisualizer />
+        </div>
+      )}
+
+      {cat === "Backtracking" && title.includes("N-Queens") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-purple-400">▶</span> Interactive N-Queens
+            Solver
+          </h4>
+          <NQueensVisualizer />
+        </div>
+      )}
+
+      {cat === "Backtracking" && title.includes("Generate Parentheses") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-pink-400">▶</span> Interactive Parentheses
+            Generator
+          </h4>
+          <GenerateParenthesesVisualizer />
+        </div>
+      )}
+
+      {cat === "Backtracking" && title.includes("Palindrome Partitioning") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-amber-400">▶</span> Interactive Palindrome
+            Partitioner
+          </h4>
+          <PalindromePartitionVisualizer />
+        </div>
+      )}
+
+      {cat === "Backtracking" && title.includes("Restore IP") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-cyan-400">▶</span> Interactive IP Address
+            Builder
+          </h4>
+          <RestoreIPVisualizer />
+        </div>
+      )}
 
       {/* Binary Search Visualizers */}
       {cat === "Binary Search" &&
@@ -1314,7 +1474,8 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
         ? (Object.keys(section.approaches) as DPApproach[]).filter(
             (key) =>
               section.approaches?.[key]?.java ||
-              section.approaches?.[key]?.javascript
+              section.approaches?.[key]?.javascript ||
+              section.approaches?.[key]?.go
           )
         : [],
     [section.approaches]
@@ -1652,7 +1813,7 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
                 ).filter(
                   (k) =>
                     section.approaches?.[effectiveApproach]?.[
-                      k as "java" | "javascript"
+                      k as keyof ApproachCode
                     ]
                 )}
                 size="sm"
@@ -1661,10 +1822,11 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
             <CodeBlock
               code={
                 section.approaches[effectiveApproach]?.[
-                  currentLang as "java" | "javascript"
+                  currentLang as keyof ApproachCode
                 ] ||
                 section.approaches[effectiveApproach]?.java ||
                 section.approaches[effectiveApproach]?.javascript ||
+                section.approaches[effectiveApproach]?.go ||
                 ""
               }
               language={currentLang}
@@ -1684,7 +1846,7 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
               <LanguageToggle
                 currentLang={currentLang}
                 onChange={(lang) => setCurrentLang(lang as SupportedLanguage)}
-                languages={Object.keys(section.code).filter(
+                languages={["java", "javascript", "python", "cpp", "go"].filter(
                   (k) => section.code?.[k as keyof typeof section.code]
                 )}
                 size="sm"
@@ -1692,9 +1854,10 @@ const TutorialSection: React.FC<TutorialSectionProps> = ({
             </div>
             <CodeBlock
               code={
-                section.code[currentLang as keyof typeof section.code] ||
-                section.code.java ||
-                section.code.javascript ||
+                section.code?.[currentLang as keyof typeof section.code] ||
+                section.code?.java ||
+                section.code?.javascript ||
+                section.code?.go ||
                 ""
               }
               language={currentLang}

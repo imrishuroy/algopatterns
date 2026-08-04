@@ -43,13 +43,14 @@ func (r *QuizRepository) GetQuestionsByPattern(ctx context.Context, patternID st
 			ORDER BY display_order ASC`
 		args = []interface{}{patternID, *sectionSlug}
 	} else {
+		// No section specified: return ALL questions for this pattern
 		query = `
 			SELECT id, pattern_id, section_slug, question_type, difficulty,
 				question_text, code_snippet, options, correct_answer,
 				acceptable_answers, explanation, display_order, is_active,
 				created_at, updated_at
 			FROM quiz_questions
-			WHERE pattern_id = $1 AND section_slug IS NULL AND is_active = true
+			WHERE pattern_id = $1 AND is_active = true
 			ORDER BY display_order ASC`
 		args = []interface{}{patternID}
 	}

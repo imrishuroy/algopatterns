@@ -5,45 +5,70 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface TreeNode {
   id: string;
-  path: number[];
+  path: string;
+  openCount: number;
+  closeCount: number;
   children: TreeNode[];
   depth: number;
-  usedIndices: number[];
+  isComplete: boolean;
+  isInvalid: boolean;
 }
 
-const NUMS = [1, 2, 3];
+const N = 2; // Generate for n=2 pairs (keeps visualization manageable)
 
-const buildPermutationTree = (): TreeNode => {
+const buildParenthesesTree = (): TreeNode => {
   const root: TreeNode = {
     id: "root",
-    path: [],
+    path: "",
+    openCount: 0,
+    closeCount: 0,
     children: [],
     depth: 0,
-    usedIndices: [],
+    isComplete: false,
+    isInvalid: false,
   };
 
-  const build = (node: TreeNode, used: boolean[]) => {
-    if (node.path.length === NUMS.length) return;
+  const build = (node: TreeNode) => {
+    // Complete: used all 2n parentheses
+    if (node.path.length === 2 * N) {
+      node.isComplete = true;
+      return;
+    }
 
-    for (let i = 0; i < NUMS.length; i++) {
-      if (used[i]) continue;
-
-      const newUsed = [...used];
-      newUsed[i] = true;
-
-      const child: TreeNode = {
-        id: `${node.id}-${NUMS[i]}`,
-        path: [...node.path, NUMS[i]],
+    // Try adding '(' if we haven't used all n
+    if (node.openCount < N) {
+      const openChild: TreeNode = {
+        id: `${node.id}-(`,
+        path: node.path + "(",
+        openCount: node.openCount + 1,
+        closeCount: node.closeCount,
         children: [],
         depth: node.depth + 1,
-        usedIndices: node.usedIndices.concat(i),
+        isComplete: false,
+        isInvalid: false,
       };
-      node.children.push(child);
-      build(child, newUsed);
+      node.children.push(openChild);
+      build(openChild);
+    }
+
+    // Try adding ')' if close < open
+    if (node.closeCount < node.openCount) {
+      const closeChild: TreeNode = {
+        id: `${node.id}-)`,
+        path: node.path + ")",
+        openCount: node.openCount,
+        closeCount: node.closeCount + 1,
+        children: [],
+        depth: node.depth + 1,
+        isComplete: false,
+        isInvalid: false,
+      };
+      node.children.push(closeChild);
+      build(closeChild);
     }
   };
 
-  build(root, [false, false, false]);
+  build(root);
   return root;
 };
 
@@ -187,7 +212,7 @@ const Controls = ({
               onClick={() => onSpeedChange(opt.value)}
               className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                 speed === opt.value
-                  ? "bg-blue-600 text-white"
+                  ? "bg-pink-600 text-white"
                   : "text-gray-400 hover:text-white hover:bg-gray-700"
               }`}
             >
@@ -210,13 +235,13 @@ const Controls = ({
 );
 
 // skipcq: JS-0067
-export default function PermutationsVisualizer() {
+export default function GenerateParenthesesVisualizer() {
   const [step, setStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const tree = useMemo(() => buildPermutationTree(), []);
+  const tree = useMemo(() => buildParenthesesTree(), []);
   const nodeOrder = useMemo(() => flattenTree(tree), [tree]);
   const totalNodes = nodeOrder.length;
   const maxSteps = totalNodes - 1;
@@ -227,36 +252,28 @@ export default function PermutationsVisualizer() {
 
   const currentNode = nodeOrder[step];
 
-  // Only count complete permutations (leaf nodes with full path)
-  const completePermutations = useMemo(() => {
+  // Count complete results
+  const completeResults = useMemo(() => {
     return nodeOrder
       .slice(0, step + 1)
-      .filter((n) => n.path.length === NUMS.length)
+      .filter((n) => n.isComplete)
       .map((n) => n.path);
   }, [nodeOrder, step]);
 
-  // Get current used[] state
-  const currentUsed = useMemo(() => {
-    const used = [false, false, false];
-    if (currentNode) {
-      for (const idx of currentNode.usedIndices) {
-        used[idx] = true;
-      }
-    }
-    return used;
-  }, [currentNode]);
+  // Total valid combinations for n=2 is Catalan(2) = 2
+  const totalCombinations = 2;
 
   // Tree positions
   const positions = useMemo(() => {
     const pos: Record<string, { x: number; y: number }> = {};
-    const levelHeight = 70;
-    const svgWidth = 700;
+    const levelHeight = 80;
+    const svgWidth = 600;
 
     const getSubtreeWidth = (node: TreeNode): number => {
-      if (node.children.length === 0) return 55;
+      if (node.children.length === 0) return 90;
       return (
         node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
-        (node.children.length - 1) * 8
+        (node.children.length - 1) * 25
       );
     };
 
@@ -273,14 +290,14 @@ export default function PermutationsVisualizer() {
 
       const totalWidth =
         node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
-        (node.children.length - 1) * 8;
+        (node.children.length - 1) * 25;
 
       let currentLeft = x - totalWidth / 2;
 
       for (const child of node.children) {
         const childWidth = getSubtreeWidth(child);
         assignPositions(child, currentLeft, currentLeft + childWidth);
-        currentLeft += childWidth + 8;
+        currentLeft += childWidth + 25;
       }
     };
 
@@ -313,33 +330,48 @@ export default function PermutationsVisualizer() {
   ): React.ReactNode => {
     const isVisible = visibleSet.has(node.id);
     const isCurrent = currentId === node.id;
-    const isComplete = node.path.length === NUMS.length;
     const pos = posMap[node.id];
     const parentPos = parentId ? posMap[parentId] : undefined;
 
     if (!pos) return null;
 
-    const radius = 20;
+    const radius = 30;
     const nodeColor = isCurrent
-      ? "#3b82f6"
-      : isComplete && isVisible
-        ? "#10B981"
+      ? "#ec4899" // pink-500 for current
+      : node.isComplete && isVisible
+        ? "#10B981" // green for complete
         : isVisible
-          ? "#6366f1"
+          ? "#8b5cf6" // purple for exploring
           : "#374151";
+
+    // Get the character that was just added
+    const addedChar = node.path.length > 0 ? node.path[node.path.length - 1] : "";
 
     return (
       <g key={node.id}>
         {parentPos && isVisible && (
-          <line
-            x1={parentPos.x}
-            y1={parentPos.y + radius}
-            x2={pos.x}
-            y2={pos.y - radius}
-            stroke={isCurrent ? "#3b82f6" : "#6B7280"}
-            strokeWidth={isCurrent ? 2.5 : 1.5}
-            opacity={isVisible ? 0.6 : 0.2}
-          />
+          <>
+            <line
+              x1={parentPos.x}
+              y1={parentPos.y + radius}
+              x2={pos.x}
+              y2={pos.y - radius}
+              stroke={isCurrent ? "#ec4899" : "#6B7280"}
+              strokeWidth={isCurrent ? 2.5 : 1.5}
+              opacity={isVisible ? 0.6 : 0.2}
+            />
+            {/* Edge label showing what was added */}
+            {isVisible && (
+              <text
+                x={(parentPos.x + pos.x) / 2 + (addedChar === "(" ? -8 : 8)}
+                y={(parentPos.y + pos.y) / 2 + 4}
+                textAnchor="middle"
+                className="text-sm fill-gray-400 font-mono font-bold"
+              >
+                {addedChar}
+              </text>
+            )}
+          </>
         )}
         {isVisible && (
           <>
@@ -348,16 +380,18 @@ export default function PermutationsVisualizer() {
               cy={pos.y}
               r={radius}
               fill={nodeColor}
-              stroke={isCurrent ? "#60a5fa" : isComplete ? "#34d399" : "#6B7280"}
+              stroke={
+                isCurrent ? "#f472b6" : node.isComplete ? "#34d399" : "#6B7280"
+              }
               strokeWidth={isCurrent ? 3 : 1.5}
             />
             <text
               x={pos.x}
               y={pos.y + 4}
               textAnchor="middle"
-              className="text-[10px] fill-white font-mono font-medium"
+              className="text-xs fill-white font-mono font-medium"
             >
-              {node.path.length === 0 ? "[]" : `[${node.path.join(",")}]`}
+              {node.path.length === 0 ? '""' : `"${node.path}"`}
             </text>
           </>
         )}
@@ -369,33 +403,29 @@ export default function PermutationsVisualizer() {
   };
 
   const getMessage = () => {
-    if (step === 0) return "Start with empty path [], all elements available";
+    if (step === 0) return `Start: Generate valid parentheses for n=${N}`;
 
     const curr = currentNode;
     const prev = nodeOrder[step - 1];
-    const isComplete = curr.path.length === NUMS.length;
 
-    // Check if complete permutation first
-    if (isComplete) {
-      return `Complete permutation! Save [${curr.path.join(", ")}]`;
+    if (curr.isComplete) {
+      return `Length = ${2 * N}, SAVE "${curr.path}"!`;
     }
 
-    // Check if done (after all nodes visited)
     if (step >= maxSteps) {
-      return `Done! Generated all ${completePermutations.length} permutations (${NUMS.length}! = 6)`;
+      return `Done! Found all ${completeResults.length} valid combinations`;
     }
 
+    // Determine what choice was made
     if (curr.depth > prev.depth) {
-      const added = curr.path[curr.path.length - 1];
-      return `CHOOSE ${added} (mark as used) → path = [${curr.path.join(", ")}]`;
+      const addedChar = curr.path[curr.path.length - 1];
+      if (addedChar === "(") {
+        return `open < ${N}? YES (${curr.openCount - 1} < ${N}) -> Add '(' -> "${curr.path}"`;
+      } else {
+        return `close < open? YES (${curr.closeCount - 1} < ${curr.openCount}) -> Add ')' -> "${curr.path}"`;
+      }
     } else {
-      // Backtracking: find what elements were removed
-      // We go from prev.path to curr.path
-      // Example: [1,2,3] -> [1,3] means we removed 3, then 2, then added 3
-      const commonLength = curr.path.length - 1; // Elements that stay the same
-      const removed = prev.path.slice(commonLength).reverse(); // Reverse to show removal order
-      const added = curr.path[curr.path.length - 1];
-      return `BACKTRACK (remove ${removed.join(", ")}) → CHOOSE ${added} → path = [${curr.path.join(", ")}]`;
+      return `Backtrack to "${prev.path}", try next option`;
     }
   };
 
@@ -403,42 +433,37 @@ export default function PermutationsVisualizer() {
     <div className="p-6 bg-gray-900 rounded-xl w-full max-w-4xl mx-auto">
       <div className="text-center mb-4">
         <div className="text-lg font-medium text-white">
-          Permutations Generator
+          Generate Parentheses
         </div>
         <div className="text-sm text-gray-400">
-          Generate all n! = {NUMS.length}! = 6 permutations of [
-          {NUMS.join(", ")}]
+          n = {N} pairs: Catalan({N}) = {totalCombinations} valid combinations
         </div>
       </div>
 
-      {/* Input array with used[] markers */}
-      <div className="flex justify-center gap-4 mb-6">
-        {NUMS.map((num, idx) => {
-          const isUsed = currentUsed[idx];
-          return (
-            <motion.div
-              key={idx}
-              animate={{
-                scale: isUsed ? 0.95 : 1,
-                backgroundColor: isUsed ? "#ef4444" : "#22c55e",
-                opacity: isUsed ? 0.6 : 1,
-              }}
-              className="w-16 h-16 rounded-lg flex flex-col items-center justify-center shadow-lg"
-              style={{
-                boxShadow: isUsed
-                  ? "none"
-                  : "0 0 20px rgba(34, 197, 94, 0.3)",
-              }}
-            >
-              <span className="text-xl font-bold text-white">{num}</span>
-              <span
-                className={`text-xs ${isUsed ? "text-red-300" : "text-green-300"}`}
-              >
-                {isUsed ? "used" : "free"}
-              </span>
-            </motion.div>
-          );
-        })}
+      {/* Current state display */}
+      <div className="flex justify-center gap-6 mb-6">
+        <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-4 py-2">
+          <span className="text-gray-400 text-sm">open:</span>
+          <span className="text-pink-400 font-mono text-lg font-bold">
+            {currentNode?.openCount ?? 0}
+          </span>
+          <span className="text-gray-600">/</span>
+          <span className="text-gray-400 font-mono">{N}</span>
+        </div>
+        <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-4 py-2">
+          <span className="text-gray-400 text-sm">close:</span>
+          <span className="text-pink-400 font-mono text-lg font-bold">
+            {currentNode?.closeCount ?? 0}
+          </span>
+          <span className="text-gray-600">/</span>
+          <span className="text-gray-400 font-mono">{N}</span>
+        </div>
+        <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-4 py-2">
+          <span className="text-gray-400 text-sm">path:</span>
+          <span className="text-white font-mono text-lg">
+            &quot;{currentNode?.path ?? ""}&quot;
+          </span>
+        </div>
       </div>
 
       <div className="mb-6">
@@ -469,8 +494,8 @@ export default function PermutationsVisualizer() {
         >
           <svg
             width="100%"
-            height="340"
-            viewBox="0 0 700 340"
+            height="420"
+            viewBox="0 0 600 420"
             preserveAspectRatio="xMidYMid meet"
             className="bg-gray-800/30 rounded-lg"
           >
@@ -488,13 +513,13 @@ export default function PermutationsVisualizer() {
       {/* Legend */}
       <div className="flex justify-center gap-6 mt-4 text-sm text-gray-400">
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-blue-500 rounded-full" /> current
+          <span className="w-3 h-3 bg-pink-500 rounded-full" /> current
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-indigo-500 rounded-full" /> exploring
+          <span className="w-3 h-3 bg-violet-500 rounded-full" /> exploring
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-green-500 rounded-full" /> complete
+          <span className="w-3 h-3 bg-green-500 rounded-full" /> valid result
         </span>
       </div>
 
@@ -503,20 +528,20 @@ export default function PermutationsVisualizer() {
         {getMessage()}
       </div>
 
-      {/* Complete permutations */}
+      {/* Valid combinations found */}
       <div className="mt-4 p-4 bg-gray-800/30 rounded-lg">
         <div className="text-sm text-gray-500 mb-2">
-          Complete Permutations ({completePermutations.length} / 6):
+          Valid Combinations ({completeResults.length} / {totalCombinations}):
         </div>
         <div className="flex flex-wrap gap-2 min-h-[32px]">
-          {completePermutations.map((perm, idx) => (
+          {completeResults.map((result, idx) => (
             <motion.span
               key={idx}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="px-2 py-1 bg-green-600/20 border border-green-500/40 rounded text-green-400 text-sm font-mono"
+              className="px-3 py-1 bg-green-600/20 border border-green-500/40 rounded text-green-400 text-sm font-mono"
             >
-              [{perm.join(", ")}]
+              &quot;{result}&quot;
             </motion.span>
           ))}
         </div>
@@ -526,16 +551,19 @@ export default function PermutationsVisualizer() {
       {step >= maxSteps && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
           <span className="text-green-400 font-bold">
-            Complete! Generated all 6 permutations (3! = 6)
+            Complete! Found all Catalan({N}) = {totalCombinations} valid
+            combinations
           </span>
         </div>
       )}
 
       {/* Key insight */}
       <div className="mt-4 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        <span className="text-blue-400">Key:</span> Use{" "}
-        <code className="text-cyan-400">used[]</code> array instead of start
-        index. Loop from 0, skip used elements.
+        <span className="text-pink-400">Key:</span> Add{" "}
+        <code className="text-pink-400">&apos;(&apos;</code> if{" "}
+        <code className="text-pink-400">open &lt; n</code>, add{" "}
+        <code className="text-pink-400">&apos;)&apos;</code> if{" "}
+        <code className="text-pink-400">close &lt; open</code>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ interface LanguageToggleProps {
   size?: "sm" | "md";
 }
 
+// skipcq: JS-0067 — React component
 export default function LanguageToggle({
   currentLang,
   onChange,

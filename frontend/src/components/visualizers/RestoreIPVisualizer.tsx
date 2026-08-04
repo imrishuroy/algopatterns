@@ -35,7 +35,7 @@ const isValidSegment = (segment: string): { valid: boolean; reason?: string } =>
 };
 
 const buildIPTree = (): TreeNode => {
-  const s = INPUT_STRING;
+  const inputStr = INPUT_STRING;
   const root: TreeNode = {
     id: "root",
     index: 0,
@@ -50,22 +50,22 @@ const buildIPTree = (): TreeNode => {
   const build = (node: TreeNode) => {
     // Check if complete (4 segments and used all chars)
     if (node.segments.length === 4) {
-      if (node.index === s.length) {
+      if (node.index === inputStr.length) {
         node.isComplete = true;
       }
       return;
     }
 
     // Pruning check
-    const remaining = s.length - node.index;
+    const remaining = inputStr.length - node.index;
     const segmentsNeeded = 4 - node.segments.length;
     if (remaining < segmentsNeeded || remaining > segmentsNeeded * 3) {
       return;
     }
 
     // Try taking 1, 2, or 3 characters
-    for (let len = 1; len <= 3 && node.index + len <= s.length; len++) {
-      const segment = s.slice(node.index, node.index + len);
+    for (let len = 1; len <= 3 && node.index + len <= inputStr.length; len++) {
+      const segment = inputStr.slice(node.index, node.index + len);
       const { valid, reason } = isValidSegment(segment);
 
       const child: TreeNode = {
@@ -76,7 +76,7 @@ const buildIPTree = (): TreeNode => {
         depth: node.depth + 1,
         isComplete: false,
         isPruned: !valid,
-        segment: segment,
+        segment,
         pruneReason: reason,
       };
       node.children.push(child);
@@ -315,7 +315,10 @@ export default function RestoreIPVisualizer() {
       if (!groups.has(node.depth)) {
         groups.set(node.depth, []);
       }
-      groups.get(node.depth)!.push(node);
+      const depthGroup = groups.get(node.depth);
+      if (depthGroup) {
+        depthGroup.push(node);
+      }
     }
     return groups;
   }, [nodeOrder]);

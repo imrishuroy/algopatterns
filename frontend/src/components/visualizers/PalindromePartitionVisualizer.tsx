@@ -26,7 +26,7 @@ const isPalindrome = (s: string, lo: number, hi: number): boolean => {
 };
 
 const buildPartitionTree = (): TreeNode => {
-  const s = INPUT_STRING;
+  const inputStr = INPUT_STRING;
   const root: TreeNode = {
     id: "root",
     start: 0,
@@ -39,14 +39,14 @@ const buildPartitionTree = (): TreeNode => {
   };
 
   const build = (node: TreeNode) => {
-    if (node.start === s.length) {
+    if (node.start === inputStr.length) {
       node.isComplete = true;
       return;
     }
 
-    for (let end = node.start; end < s.length; end++) {
-      const substr = s.slice(node.start, end + 1);
-      const isPalin = isPalindrome(s, node.start, end);
+    for (let end = node.start; end < inputStr.length; end++) {
+      const substr = inputStr.slice(node.start, end + 1);
+      const isPalin = isPalindrome(inputStr, node.start, end);
 
       const child: TreeNode = {
         id: `${node.id}-${node.start}-${end}`,
@@ -292,7 +292,10 @@ export default function PalindromePartitionVisualizer() {
       if (!groups.has(node.depth)) {
         groups.set(node.depth, []);
       }
-      groups.get(node.depth)!.push(node);
+      const depthGroup = groups.get(node.depth);
+      if (depthGroup) {
+        depthGroup.push(node);
+      }
     }
     return groups;
   }, [nodeOrder]);

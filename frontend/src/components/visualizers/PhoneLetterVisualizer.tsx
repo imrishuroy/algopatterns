@@ -43,7 +43,7 @@ const buildPhoneTree = (digits: string): TreeNode => {
         path: node.path + letter,
         children: [],
         depth: node.depth + 1,
-        letter: letter,
+        letter,
       };
       node.children.push(child);
       build(child, index + 1);

@@ -20,33 +20,33 @@ const WORD = "SEE";
 
 const generateSearchSteps = (): SearchStep[] => {
   const steps: SearchStep[] = [];
-  const m = BOARD.length;
-  const n = BOARD[0].length;
-  const visited: boolean[][] = Array(m)
+  const rows = BOARD.length;
+  const cols = BOARD[0].length;
+  const visited: boolean[][] = Array(rows)
     .fill(null)
-    .map(() => Array(n).fill(false));
+    .map(() => Array(cols).fill(false));
 
   const backtrack = (
-    i: number,
-    j: number,
-    k: number,
+    row: number,
+    col: number,
+    charIdx: number,
     path: [number, number][]
   ): boolean => {
     // Try this cell
     steps.push({
-      row: i,
-      col: j,
-      charIndex: k,
+      row,
+      col,
+      charIndex: charIdx,
       action: "try",
       path: [...path],
     });
 
     // Out of bounds
-    if (i < 0 || i >= m || j < 0 || j >= n) {
+    if (row < 0 || row >= rows || col < 0 || col >= cols) {
       steps.push({
-        row: i,
-        col: j,
-        charIndex: k,
+        row,
+        col,
+        charIndex: charIdx,
         action: "mismatch",
         path: [...path],
       });
@@ -54,11 +54,11 @@ const generateSearchSteps = (): SearchStep[] => {
     }
 
     // Already visited
-    if (visited[i][j]) {
+    if (visited[row][col]) {
       steps.push({
-        row: i,
-        col: j,
-        charIndex: k,
+        row,
+        col,
+        charIndex: charIdx,
         action: "visited",
         path: [...path],
       });
@@ -66,11 +66,11 @@ const generateSearchSteps = (): SearchStep[] => {
     }
 
     // Character mismatch
-    if (BOARD[i][j] !== WORD[k]) {
+    if (BOARD[row][col] !== WORD[charIdx]) {
       steps.push({
-        row: i,
-        col: j,
-        charIndex: k,
+        row,
+        col,
+        charIndex: charIdx,
         action: "mismatch",
         path: [...path],
       });
@@ -78,21 +78,21 @@ const generateSearchSteps = (): SearchStep[] => {
     }
 
     // Match!
-    const newPath: [number, number][] = [...path, [i, j]];
+    const newPath: [number, number][] = [...path, [row, col]];
     steps.push({
-      row: i,
-      col: j,
-      charIndex: k,
+      row,
+      col,
+      charIndex: charIdx,
       action: "match",
       path: newPath,
     });
 
     // Found complete word
-    if (k === WORD.length - 1) {
+    if (charIdx === WORD.length - 1) {
       steps.push({
-        row: i,
-        col: j,
-        charIndex: k,
+        row,
+        col,
+        charIndex: charIdx,
         action: "found",
         path: newPath,
       });
@@ -100,7 +100,7 @@ const generateSearchSteps = (): SearchStep[] => {
     }
 
     // Mark visited
-    visited[i][j] = true;
+    visited[row][col] = true;
 
     // Explore 4 directions
     const directions = [
@@ -109,31 +109,32 @@ const generateSearchSteps = (): SearchStep[] => {
       [0, 1],
       [0, -1],
     ];
-    for (const [di, dj] of directions) {
-      if (backtrack(i + di, j + dj, k + 1, newPath)) {
+    for (const [dRow, dCol] of directions) {
+      if (backtrack(row + dRow, col + dCol, charIdx + 1, newPath)) {
         return true;
       }
     }
 
     // Backtrack
-    visited[i][j] = false;
+    visited[row][col] = false;
     steps.push({
-      row: i,
-      col: j,
-      charIndex: k,
+      row,
+      col,
+      charIndex: charIdx,
       action: "backtrack",
-      path: path,
+      path,
     });
 
     return false;
   };
 
   // Try starting from each cell
-  outer: for (let i = 0; i < m; i++) {
-    for (let j = 0; j < n; j++) {
-      if (BOARD[i][j] === WORD[0]) {
-        if (backtrack(i, j, 0, [])) {
-          break outer;
+  let found = false;
+  for (let rowIdx = 0; rowIdx < rows && !found; rowIdx++) {
+    for (let colIdx = 0; colIdx < cols && !found; colIdx++) {
+      if (BOARD[rowIdx][colIdx] === WORD[0]) {
+        if (backtrack(rowIdx, colIdx, 0, [])) {
+          found = true;
         }
       }
     }

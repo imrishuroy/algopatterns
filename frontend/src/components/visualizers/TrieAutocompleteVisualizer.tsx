@@ -72,7 +72,7 @@ const generateAutocompleteSteps = (
   for (let i = 0; i < prefix.length; i++) {
     const char = prefix[i];
 
-    if (node && node.children[char]) {
+    if (node?.children[char]) {
       currentPath.push(char);
       node = node.children[char];
 
@@ -103,7 +103,7 @@ const generateAutocompleteSteps = (
         char,
         currentPath: [...currentPath],
         action: "result",
-        description: `Result: [] (prefix not in trie)`,
+        description: "Result: [] (prefix not in trie)",
         collectedWords: [],
       });
 

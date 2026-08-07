@@ -81,6 +81,7 @@ export default function TrieBasicsVisualizer() {
     const stepDelay = 600;
 
     // Animate character by character
+    // skipcq: JS-S1016 -- i === word.length is the final step to mark isEnd, guarded by if check
     for (let i = 0; i <= word.length; i++) {
       setTimeout(() => {
         if (i < word.length) {
@@ -114,11 +115,14 @@ export default function TrieBasicsVisualizer() {
                 });
                 setMessage(`Creating new node '${c}'`);
               } else {
-                const existingNode = node.children.get(c)!;
-                existingNode.isShared = true;
-                setMessage(`Node '${c}' exists (shared prefix)`);
+                const existingNode = node.children.get(c);
+                if (existingNode) {
+                  existingNode.isShared = true;
+                  setMessage(`Node '${c}' exists (shared prefix)`);
+                }
               }
-              node = node.children.get(c)!;
+              const nextNode = node.children.get(c);
+              if (nextNode) node = nextNode;
             }
 
             calculatePositions(newRoot, 1, 30, 470);
@@ -130,7 +134,8 @@ export default function TrieBasicsVisualizer() {
             const newRoot = cloneRoot(prev);
             let node = newRoot;
             for (const c of path) {
-              node = node.children.get(c)!;
+              const nextNode = node.children.get(c);
+              if (nextNode) node = nextNode;
             }
             node.isEnd = true;
             calculatePositions(newRoot, 1, 30, 470);
@@ -165,7 +170,8 @@ export default function TrieBasicsVisualizer() {
         return;
       }
       path.push(char);
-      node = node.children.get(char)!;
+      const nextNode = node.children.get(char);
+      if (nextNode) node = nextNode;
     }
 
     setHighlightPath(path);

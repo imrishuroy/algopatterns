@@ -140,7 +140,7 @@ const generateSearchSteps = (
           currentPath: [...path],
           triedPaths: [...triedPaths],
           activePath: [...path],
-          description: `Wildcard '.' has no children to try → backtrack`,
+          description: "Wildcard '.' has no children to try → backtrack",
           result: false,
         });
       }

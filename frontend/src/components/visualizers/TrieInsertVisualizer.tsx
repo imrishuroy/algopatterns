@@ -211,6 +211,7 @@ const ArrayIndexVisual = ({
         &apos;a&apos; = {index}
       </div>
       <div className="flex flex-wrap justify-center gap-1">
+        {/* skipcq: JS-0437 -- array slots are position-based, index is the stable identifier */}
         {slots.map((c, i) => (
           <div
             key={i}
@@ -230,6 +231,7 @@ const ArrayIndexVisual = ({
         ))}
       </div>
       <div className="flex justify-center gap-1 mt-1">
+        {/* skipcq: JS-0437 -- index labels, position is the identifier */}
         {slots.map((_, i) => (
           <div
             key={i}
@@ -256,6 +258,7 @@ const WordProgress = ({
   action: string;
 }) => (
   <div className="flex items-center justify-center gap-1 text-2xl font-mono">
+    {/* skipcq: JS-0437 -- character position in word is the stable identifier */}
     {word.split("").map((char, i) => (
       <span
         key={i}

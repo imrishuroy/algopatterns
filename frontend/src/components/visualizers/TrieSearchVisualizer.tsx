@@ -57,7 +57,7 @@ const generateSearchSteps = (
     const char = query[i];
 
     // Check if path exists
-    if (node && node.children[char]) {
+    if (node?.children[char]) {
       currentPath.push(char);
       node = node.children[char];
 
@@ -121,7 +121,7 @@ const generateSearchSteps = (
     description:
       method === "search"
         ? `Check: node.isEnd = ${finalNode.isEnd}`
-        : `Check: node != null (path exists)`,
+        : "Check: node != null (path exists)",
     currentPath: [...currentPath],
   });
 

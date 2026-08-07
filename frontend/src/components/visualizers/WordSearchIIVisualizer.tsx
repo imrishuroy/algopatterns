@@ -138,7 +138,7 @@ const generateSteps = (
       steps.push({
         phase: "backtrack",
         cell: [i, j],
-        path: path,
+        path,
         trieProgress:
           path.map((p) => initialBoard[p[0]][p[1]]).join("→") || "root",
         foundWords: [...foundWords],

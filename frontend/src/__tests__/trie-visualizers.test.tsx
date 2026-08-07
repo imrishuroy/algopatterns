@@ -88,6 +88,7 @@ vi.mock("framer-motion", () => ({
       return <button {...filteredProps}>{children}</button>;
     },
   },
+  // skipcq: JS-0424 -- AnimatePresence wrapper needs fragment for children passthrough
   AnimatePresence: ({ children }: { children: React.ReactNode }) => (
     <>{children}</>
   ),
@@ -230,14 +231,16 @@ describe("Trie Visualizers", () => {
         b.textContent?.includes('"cat"')
       );
       expect(catButton).toBeDefined();
-      fireEvent.click(catButton!);
-      act(() => {
-        vi.advanceTimersByTime(600 * 5);
-      });
+      if (catButton) {
+        fireEvent.click(catButton);
+        act(() => {
+          vi.advanceTimersByTime(600 * 5);
+        });
 
-      // After insertion, the button should be disabled and show checkmark
-      expect(catButton).toBeDisabled();
-      expect(catButton?.textContent).toContain("✓");
+        // After insertion, the button should be disabled and show checkmark
+        expect(catButton).toBeDisabled();
+        expect(catButton.textContent).toContain("✓");
+      }
     });
 
     it("handles reset button click", () => {
@@ -284,7 +287,7 @@ describe("Trie Visualizers", () => {
       const catButton = allButtons.find((b) =>
         b.textContent?.includes('"cat"')
       );
-      fireEvent.click(catButton!);
+      if (catButton) fireEvent.click(catButton);
 
       // Wait for all character insertions (c, a, t = 3) + mark end (1) = 4 intervals
       // Plus the clear highlight timer
@@ -297,7 +300,7 @@ describe("Trie Visualizers", () => {
       fireEvent.change(searchInput, { target: { value: "cat" } });
 
       // Should show complete word indicator
-      expect(screen.getByText(/✓ Complete word/)).toBeInTheDocument();
+      expect(screen.getByText(/✓ Complete word/u)).toBeInTheDocument();
     });
 
     it("handles search input for non-existent prefix", () => {

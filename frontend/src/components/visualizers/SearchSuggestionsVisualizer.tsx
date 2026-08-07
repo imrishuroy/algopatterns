@@ -61,7 +61,7 @@ const generateSteps = (
     });
 
     // Step 2: Navigate to child
-    if (node && node.children[char]) {
+    if (node?.children[char]) {
       currentPath.push(char);
       node = node.children[char];
 

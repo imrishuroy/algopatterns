@@ -467,14 +467,16 @@ export default function CombinationSum2Visualizer() {
 
       <div className="flex justify-center items-center gap-6 mb-6">
         <div className="flex gap-2">
-          {[...CANDIDATES].sort((a, b) => a - b).map((num, idx) => (
-            <motion.div
-              key={`cand-${idx}`}
-              className="w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center shadow-lg"
-            >
-              <span className="text-lg font-bold text-white">{num}</span>
-            </motion.div>
-          ))}
+          {[...CANDIDATES]
+            .sort((a, b) => a - b)
+            .map((num, idx) => (
+              <motion.div
+                key={`cand-${idx}`}
+                className="w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center shadow-lg"
+              >
+                <span className="text-lg font-bold text-white">{num}</span>
+              </motion.div>
+            ))}
         </div>
         <div className="text-gray-400 text-2xl">=</div>
         <motion.div

@@ -37,7 +37,13 @@ function TutorialContent({
                 <LanguageToggle
                   currentLang={currentLang}
                   onChange={setCurrentLang}
-                  languages={["java", "javascript", "python", "cpp", "go"].filter(
+                  languages={[
+                    "java",
+                    "javascript",
+                    "python",
+                    "cpp",
+                    "go",
+                  ].filter(
                     (k) => section.code?.[k as keyof typeof section.code]
                   )}
                   size="sm"

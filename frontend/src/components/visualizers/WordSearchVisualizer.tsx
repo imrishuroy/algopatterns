@@ -360,7 +360,8 @@ export default function WordSearchVisualizer() {
     const { row, col, charIndex, action } = currentStep;
     const rows = BOARD.length;
     const cols = BOARD[0].length;
-    const char = row >= 0 && row < rows && col >= 0 && col < cols ? BOARD[row][col] : "?";
+    const char =
+      row >= 0 && row < rows && col >= 0 && col < cols ? BOARD[row][col] : "?";
     const lookingFor = WORD[charIndex];
 
     switch (action) {
@@ -398,8 +399,7 @@ export default function WordSearchVisualizer() {
       {/* Word display */}
       <div className="flex justify-center gap-2 mb-6">
         {WORD.split("").map((char, idx) => {
-          const matched =
-            currentStep && currentStep.path.length > idx;
+          const matched = currentStep && currentStep.path.length > idx;
           return (
             <motion.div
               key={idx}

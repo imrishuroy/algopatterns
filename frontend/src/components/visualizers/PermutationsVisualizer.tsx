@@ -348,7 +348,9 @@ export default function PermutationsVisualizer() {
               cy={pos.y}
               r={radius}
               fill={nodeColor}
-              stroke={isCurrent ? "#60a5fa" : isComplete ? "#34d399" : "#6B7280"}
+              stroke={
+                isCurrent ? "#60a5fa" : isComplete ? "#34d399" : "#6B7280"
+              }
               strokeWidth={isCurrent ? 3 : 1.5}
             />
             <text
@@ -425,9 +427,7 @@ export default function PermutationsVisualizer() {
               }}
               className="w-16 h-16 rounded-lg flex flex-col items-center justify-center shadow-lg"
               style={{
-                boxShadow: isUsed
-                  ? "none"
-                  : "0 0 20px rgba(34, 197, 94, 0.3)",
+                boxShadow: isUsed ? "none" : "0 0 20px rgba(34, 197, 94, 0.3)",
               }}
             >
               <span className="text-xl font-bold text-white">{num}</span>

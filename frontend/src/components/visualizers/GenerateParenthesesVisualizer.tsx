@@ -345,7 +345,8 @@ export default function GenerateParenthesesVisualizer() {
           : "#374151";
 
     // Get the character that was just added
-    const addedChar = node.path.length > 0 ? node.path[node.path.length - 1] : "";
+    const addedChar =
+      node.path.length > 0 ? node.path[node.path.length - 1] : "";
 
     return (
       <g key={node.id}>

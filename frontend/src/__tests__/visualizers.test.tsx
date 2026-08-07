@@ -161,10 +161,12 @@ describe("Shared visualizer UI pattern", () => {
     expect(document.querySelector('input[type="range"]')).toBeInTheDocument();
   });
 
-  it("TrieInsertVisualizer renders heading and Play button", () => {
+  it("TrieInsertVisualizer renders heading and navigation buttons", () => {
     render(<TrieInsertVisualizer />);
-    expect(screen.getByText("Trie Insert")).toBeInTheDocument();
-    expect(screen.getByText("Play")).toBeInTheDocument();
+    expect(screen.getByText("Trie Insert Visualization")).toBeInTheDocument();
+    expect(screen.getByText("Previous")).toBeInTheDocument();
+    expect(screen.getByText("Next")).toBeInTheDocument();
+    expect(screen.getByText("Reset")).toBeInTheDocument();
   });
 
   it("StepByStepExecutor renders heading and navigation", () => {
@@ -556,83 +558,59 @@ describe("StepByStepExecutor", () => {
 
 // 2f. TrieInsertVisualizer
 describe("TrieInsertVisualizer", () => {
-  it("renders SVG visualization area", () => {
-    const { container } = render(<TrieInsertVisualizer />);
-    expect(container.querySelector("svg")).toBeInTheDocument();
+  it("renders visualization area", () => {
+    render(<TrieInsertVisualizer />);
+    expect(screen.getByText("Trie Insert Visualization")).toBeInTheDocument();
   });
 
   it("renders words to insert", () => {
     render(<TrieInsertVisualizer />);
     expect(screen.getByText("cat")).toBeInTheDocument();
     expect(screen.getByText("car")).toBeInTheDocument();
-    expect(screen.getByText("card")).toBeInTheDocument();
   });
 
   it("renders legend", () => {
     render(<TrieInsertVisualizer />);
-    expect(screen.getByText("Current")).toBeInTheDocument();
-    expect(screen.getByText("Path")).toBeInTheDocument();
-    expect(screen.getByText("isEnd")).toBeInTheDocument();
+    expect(screen.getByText("Node")).toBeInTheDocument();
+    expect(screen.getByText("Current Path")).toBeInTheDocument();
+    expect(screen.getByText("Current Node")).toBeInTheDocument();
+    expect(screen.getByText("isEnd = true")).toBeInTheDocument();
   });
 
-  it("shows insertion progress after playing", () => {
-    vi.useFakeTimers();
+  it("shows current word being inserted", () => {
     render(<TrieInsertVisualizer />);
-    fireEvent.click(screen.getByText("Play"));
-    act(() => {
-      vi.advanceTimersByTime(800);
-    });
-    expect(document.body.textContent).toMatch(/Inserting "cat"/);
-    vi.useRealTimers();
+    expect(screen.getByText(/Current word:/)).toBeInTheDocument();
   });
 
-  it("inserts characters one by one", () => {
-    vi.useFakeTimers();
+  it("navigates to next step", () => {
     render(<TrieInsertVisualizer />);
-    fireEvent.click(screen.getByText("Play"));
-    // First timer: init → inserting, charIndex=0, message="Inserting cat"
-    act(() => {
-      vi.advanceTimersByTime(800);
-    });
-    // Second timer: inserting, charIndex=0 < len, process char 'c', create node
-    act(() => {
-      vi.advanceTimersByTime(800);
-    });
-    expect(document.body.textContent).toContain("Create node 'c'");
-    vi.useRealTimers();
+    const nextButton = screen.getByText("Next");
+    fireEvent.click(nextButton);
+    // After clicking, step counter should advance
+    expect(screen.getByText(/Step 2 of/)).toBeInTheDocument();
   });
 
-  it("inserts subsequent characters", () => {
-    vi.useFakeTimers();
+  it("navigates to previous step", () => {
     render(<TrieInsertVisualizer />);
-    fireEvent.click(screen.getByText("Play"));
-    // Timer 0: init → inserting
-    act(() => {
-      vi.advanceTimersByTime(800);
-    });
-    // Timer 1: process char 'c'
-    act(() => {
-      vi.advanceTimersByTime(800);
-    });
-    // Timer 2: process char 'a'
-    act(() => {
-      vi.advanceTimersByTime(800);
-    });
-    expect(document.body.textContent).toContain("Create node 'a'");
-    vi.useRealTimers();
+    // Go forward first
+    fireEvent.click(screen.getByText("Next"));
+    fireEvent.click(screen.getByText("Next"));
+    expect(screen.getByText(/Step 3 of/)).toBeInTheDocument();
+    // Go back
+    fireEvent.click(screen.getByText("Previous"));
+    expect(screen.getByText(/Step 2 of/)).toBeInTheDocument();
   });
 
-  it("reaches done state after inserting all words", () => {
-    vi.useFakeTimers();
+  it("resets to first step", () => {
     render(<TrieInsertVisualizer />);
-    fireEvent.click(screen.getByText("Play"));
-    for (let i = 0; i < 25; i++) {
-      act(() => {
-        vi.advanceTimersByTime(800);
-      });
-    }
-    expect(document.body.textContent).toContain("Done");
-    vi.useRealTimers();
+    // Advance a few steps
+    fireEvent.click(screen.getByText("Next"));
+    fireEvent.click(screen.getByText("Next"));
+    fireEvent.click(screen.getByText("Next"));
+    expect(screen.getByText(/Step 4 of/)).toBeInTheDocument();
+    // Reset
+    fireEvent.click(screen.getByText("Reset"));
+    expect(screen.getByText(/Step 1 of/)).toBeInTheDocument();
   });
 });
 

@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type CellState = "empty" | "queen" | "attack" | "trying" | "conflict";
@@ -51,8 +57,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Back"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
 
@@ -74,7 +90,11 @@ const Controls = ({
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-green-600/20"
           title="Play"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -86,8 +106,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Forward"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
 
@@ -96,15 +126,27 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-all ml-2"
         title="Reset"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </button>
     </div>
 
     <div className="flex items-center justify-center gap-4">
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Speed</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Speed
+        </span>
         <div className="flex gap-1">
           {[
             { value: 800, label: "0.5x" },
@@ -127,7 +169,9 @@ const Controls = ({
       </div>
 
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Step</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Step
+        </span>
         <span className="text-sm font-mono text-white">
           {step + 1} <span className="text-gray-500">/</span> {total + 1}
         </span>
@@ -208,10 +252,14 @@ const Cell = ({
       )}
       {/* Row/col labels */}
       {col === 0 && (
-        <span className="absolute -left-6 text-xs text-gray-500 font-mono">{row}</span>
+        <span className="absolute -left-6 text-xs text-gray-500 font-mono">
+          {row}
+        </span>
       )}
       {row === n - 1 && (
-        <span className="absolute -bottom-5 text-xs text-gray-500 font-mono">{col}</span>
+        <span className="absolute -bottom-5 text-xs text-gray-500 font-mono">
+          {col}
+        </span>
       )}
     </motion.div>
   );
@@ -230,7 +278,9 @@ export default function NQueensVisualizer() {
     const allSteps: Step[] = [];
 
     const createEmptyBoard = (): BoardSnapshot => ({
-      cells: Array(n).fill(null).map(() => Array(n).fill("empty" as CellState)),
+      cells: Array(n)
+        .fill(null)
+        .map(() => Array(n).fill("empty" as CellState)),
       queens: [],
     });
 
@@ -239,7 +289,11 @@ export default function NQueensVisualizer() {
       queens: [...b.queens],
     });
 
-    const markAttacks = (board: BoardSnapshot, row: number, col: number): BoardSnapshot => {
+    const markAttacks = (
+      board: BoardSnapshot,
+      row: number,
+      col: number
+    ): BoardSnapshot => {
       const newBoard = copyBoard(board);
       // Mark cells under attack by this queen
       for (let c = 0; c < n; c++) {
@@ -254,39 +308,68 @@ export default function NQueensVisualizer() {
       }
       // Diagonals
       for (let i = 1; i < n; i++) {
-        if (row - i >= 0 && col - i >= 0 && newBoard.cells[row - i][col - i] === "empty") {
+        if (
+          row - i >= 0 &&
+          col - i >= 0 &&
+          newBoard.cells[row - i][col - i] === "empty"
+        ) {
           newBoard.cells[row - i][col - i] = "attack";
         }
-        if (row - i >= 0 && col + i < n && newBoard.cells[row - i][col + i] === "empty") {
+        if (
+          row - i >= 0 &&
+          col + i < n &&
+          newBoard.cells[row - i][col + i] === "empty"
+        ) {
           newBoard.cells[row - i][col + i] = "attack";
         }
-        if (row + i < n && col - i >= 0 && newBoard.cells[row + i][col - i] === "empty") {
+        if (
+          row + i < n &&
+          col - i >= 0 &&
+          newBoard.cells[row + i][col - i] === "empty"
+        ) {
           newBoard.cells[row + i][col - i] = "attack";
         }
-        if (row + i < n && col + i < n && newBoard.cells[row + i][col + i] === "empty") {
+        if (
+          row + i < n &&
+          col + i < n &&
+          newBoard.cells[row + i][col + i] === "empty"
+        ) {
           newBoard.cells[row + i][col + i] = "attack";
         }
       }
       return newBoard;
     };
 
-    const isSafe = (board: BoardSnapshot, row: number, col: number): { safe: boolean; reason?: string } => {
+    const isSafe = (
+      board: BoardSnapshot,
+      row: number,
+      col: number
+    ): { safe: boolean; reason?: string } => {
       // Check column
       for (let i = 0; i < row; i++) {
         if (board.cells[i][col] === "queen") {
-          return { safe: false, reason: `Column ${col} blocked by queen at row ${i}` };
+          return {
+            safe: false,
+            reason: `Column ${col} blocked by queen at row ${i}`,
+          };
         }
       }
       // Check upper-left diagonal
       for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
         if (board.cells[i][j] === "queen") {
-          return { safe: false, reason: `Diagonal ↖ blocked by queen at (${i}, ${j})` };
+          return {
+            safe: false,
+            reason: `Diagonal ↖ blocked by queen at (${i}, ${j})`,
+          };
         }
       }
       // Check upper-right diagonal
       for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
         if (board.cells[i][j] === "queen") {
-          return { safe: false, reason: `Diagonal ↗ blocked by queen at (${i}, ${j})` };
+          return {
+            safe: false,
+            reason: `Diagonal ↗ blocked by queen at (${i}, ${j})`,
+          };
         }
       }
       return { safe: true };
@@ -337,7 +420,7 @@ export default function NQueensVisualizer() {
         const placeBoard = copyBoard(board);
         placeBoard.cells[row][col] = "queen";
         placeBoard.queens = [...board.queens, [row, col]];
-        
+
         // Mark attack paths
         const boardWithAttacks = markAttacks(placeBoard, row, col);
 
@@ -384,7 +467,8 @@ export default function NQueensVisualizer() {
 
   // Count solutions found so far
   const solutionsFound = useMemo(() => {
-    return steps.slice(0, step + 1).filter((s) => s.action === "solution").length;
+    return steps.slice(0, step + 1).filter((s) => s.action === "solution")
+      .length;
   }, [steps, step]);
 
   // Total solutions for this n
@@ -419,9 +503,7 @@ export default function NQueensVisualizer() {
   return (
     <div className="p-6 bg-gray-900 rounded-xl w-full max-w-4xl mx-auto">
       <div className="text-center mb-4">
-        <div className="text-lg font-medium text-white">
-          N-Queens Solver
-        </div>
+        <div className="text-lg font-medium text-white">N-Queens Solver</div>
         <div className="text-sm text-gray-400">
           Place {n} queens on a {n}×{n} board with no conflicts
         </div>
@@ -429,7 +511,9 @@ export default function NQueensVisualizer() {
 
       {/* Board size selector */}
       <div className="flex justify-center gap-2 mb-6">
-        <span className="text-gray-400 text-sm self-center mr-2">Board size:</span>
+        <span className="text-gray-400 text-sm self-center mr-2">
+          Board size:
+        </span>
         {[4, 5, 6, 7, 8].map((size) => (
           <button
             key={size}
@@ -508,7 +592,10 @@ export default function NQueensVisualizer() {
                       col={colIdx}
                       state={cell}
                       size={cellSize}
-                      isCurrent={rowIdx === currentStep?.row && colIdx === currentStep?.col}
+                      isCurrent={
+                        rowIdx === currentStep?.row &&
+                        colIdx === currentStep?.col
+                      }
                       n={n}
                     />
                   ))}
@@ -522,15 +609,21 @@ export default function NQueensVisualizer() {
       {/* Legend */}
       <div className="flex justify-center gap-6 mb-4 text-sm text-gray-400 flex-wrap">
         <span className="flex items-center gap-2">
-          <span className="w-5 h-5 bg-green-500 rounded flex items-center justify-center text-xs">♛</span>
+          <span className="w-5 h-5 bg-green-500 rounded flex items-center justify-center text-xs">
+            ♛
+          </span>
           queen
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-5 h-5 bg-yellow-500 rounded flex items-center justify-center text-xs text-yellow-900 font-bold">?</span>
+          <span className="w-5 h-5 bg-yellow-500 rounded flex items-center justify-center text-xs text-yellow-900 font-bold">
+            ?
+          </span>
           trying
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-5 h-5 bg-red-500 rounded flex items-center justify-center text-xs font-bold">✗</span>
+          <span className="w-5 h-5 bg-red-500 rounded flex items-center justify-center text-xs font-bold">
+            ✗
+          </span>
           conflict
         </span>
         <span className="flex items-center gap-2">
@@ -574,13 +667,20 @@ export default function NQueensVisualizer() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="p-2 bg-green-600/20 border border-green-500/40 rounded-lg"
                 >
-                  <div className="grid gap-0.5" style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}>
+                  <div
+                    className="grid gap-0.5"
+                    style={{ gridTemplateColumns: `repeat(${n}, 1fr)` }}
+                  >
                     {sol.board.cells.map((row, r) =>
                       row.map((cell, c) => (
                         <div
                           key={`${r}-${c}`}
                           className={`w-3 h-3 rounded-sm ${
-                            cell === "queen" ? "bg-green-500" : (r + c) % 2 === 0 ? "bg-gray-500" : "bg-gray-600"
+                            cell === "queen"
+                              ? "bg-green-500"
+                              : (r + c) % 2 === 0
+                                ? "bg-gray-500"
+                                : "bg-gray-600"
                           }`}
                         />
                       ))
@@ -607,7 +707,9 @@ export default function NQueensVisualizer() {
 
       {/* Key insight */}
       <div className="mt-4 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        <span className="text-emerald-400">Key insight:</span> Check column (col), main diagonal (row-col), and anti-diagonal (row+col) constraints before placing each queen
+        <span className="text-emerald-400">Key insight:</span> Check column
+        (col), main diagonal (row-col), and anti-diagonal (row+col) constraints
+        before placing each queen
       </div>
     </div>
   );

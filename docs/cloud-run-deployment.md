@@ -9,7 +9,7 @@ This guide documents the setup for deploying the AlgoPatterns backend to Google 
 | Backend Hosting | Google Cloud Run | asia-south1 (Mumbai) |
 | Container Registry | Artifact Registry | asia-south1 |
 | Database | CockroachDB Serverless | ap-south-1 |
-| Secrets | Google Secret Manager | |
+| Secrets | Cloud Run env vars | Encrypted at rest |
 | CI/CD | GitHub Actions | Workload Identity Federation |
 | Custom Domain | Cloudflare Workers | api.algopatterns.in |
 | SSL/DDoS | Cloudflare | Free tier |
@@ -42,7 +42,7 @@ GitHub (push to main) → GitHub Actions → Build Docker Image → Push to Arti
 
 - **Region:** asia-south1 (Mumbai)
 - **Database:** CockroachDB Serverless (ap-south-1)
-- **Secrets:** Google Secret Manager
+- **Secrets:** Cloud Run environment variables (not Secret Manager)
 
 ## Initial GCP Setup
 
@@ -106,22 +106,9 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
   --member="serviceAccount:github-actions@$PROJECT_ID.iam.gserviceaccount.com" \
   --role="roles/iam.serviceAccountUser"
-
-# Secret Manager Accessor
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-  --member="serviceAccount:github-actions@$PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/secretmanager.secretAccessor"
 ```
 
-### 3. Grant Compute Service Account Secret Access
-
-Cloud Run uses the default compute service account at runtime:
-
-```bash
-gcloud projects add-iam-policy-binding algopatterns \
-  --member="serviceAccount:785336313924-compute@developer.gserviceaccount.com" \
-  --role="roles/secretmanager.secretAccessor"
-```
+Note: Secret Manager roles are not needed since we use Cloud Run env vars instead.
 
 ## Workload Identity Federation
 
@@ -158,29 +145,25 @@ gcloud iam service-accounts add-iam-policy-binding \
   --member="principalSet://iam.googleapis.com/projects/785336313924/locations/global/workloadIdentityPools/github-pool/attribute.repository/imrishuroy/algopatterns"
 ```
 
-## Secret Manager Setup
+## Environment Variables
 
-### Create Secrets
+All environment variables (including secrets) are configured directly in the Cloud Run console under **Variables & Secrets** tab. This approach was chosen over GCP Secret Manager to reduce costs (Secret Manager charges per access, which adds up with scale-to-zero cold starts).
 
-```bash
-# Database password
-echo -n "YOUR_DB_PASSWORD" | gcloud secrets create db-password --data-file=-
+**To update environment variables:**
+1. Go to Cloud Run console → algopatterns-api → Edit & Deploy New Revision
+2. Go to Variables & Secrets tab
+3. Add/update variables
+4. Click Deploy
 
-# JWT secret
-echo -n "YOUR_JWT_SECRET" | gcloud secrets create jwt-secret --data-file=-
+**Sensitive variables stored as plain env vars:**
+- `JWT_SECRET` - JWT signing key (rotate = all sessions invalidated)
+- `DB_PASSWORD` - CockroachDB password
+- `SMTP_PASSWORD` - Email account password (from Hostinger)
+- `RAZORPAY_KEY_SECRET` - Payment gateway secret
+- `GOOGLE_CLIENT_SECRET` - OAuth secret
+- API keys (OpenAI, DeepSeek, Judge0, etc.)
 
-# Razorpay secret
-echo -n "YOUR_RAZORPAY_SECRET" | gcloud secrets create razorpay-key-secret --data-file=-
-
-# SMTP password
-echo -n "YOUR_SMTP_PASSWORD" | gcloud secrets create smtp-password --data-file=-
-```
-
-### Update Existing Secrets
-
-```bash
-echo -n "NEW_VALUE" | gcloud secrets versions add SECRET_NAME --data-file=-
-```
+Note: Cloud Run env vars are encrypted at rest and only visible to users with Cloud Run Admin IAM access.
 
 ## GitHub Secrets
 
@@ -406,9 +389,10 @@ gcloud run services describe algopatterns-api --region asia-south1
 |----------|---------------|
 | Cloud Run (low traffic) | ~$0-5/month |
 | Artifact Registry | ~$0.10/GB/month |
-| Secret Manager | ~$0.06/secret/month |
 | Cloudflare | Free |
-| **Total** | **~$5-10/month** |
+| **Total** | **~$2-5/month** |
+
+Note: We don't use GCP Secret Manager (saves ~$3-4/month in access costs with scale-to-zero).
 
 ### Free Tier Limits
 

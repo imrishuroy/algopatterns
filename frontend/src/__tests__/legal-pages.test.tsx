@@ -101,7 +101,9 @@ describe("Terms of Service Page", () => {
     expect(
       screen.getByRole("heading", { name: /acceptance of terms/i })
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /accounts/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /accounts/i })
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: /subscriptions and payments/i })
     ).toBeInTheDocument();
@@ -205,10 +207,9 @@ describe("Contact Page", () => {
   it("renders links to other legal pages", async () => {
     const ContactPage = (await import("@/app/contact/page")).default;
     render(React.createElement(ContactPage));
-    expect(screen.getByRole("link", { name: /refund policy/i })).toHaveAttribute(
-      "href",
-      "/refund"
-    );
+    expect(
+      screen.getByRole("link", { name: /refund policy/i })
+    ).toHaveAttribute("href", "/refund");
     expect(
       screen.getByRole("link", { name: /terms of service/i })
     ).toHaveAttribute("href", "/terms");

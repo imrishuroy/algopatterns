@@ -346,7 +346,9 @@ export default function PermutationsIIVisualizer() {
             y1={parentPos.y + radius}
             x2={pos.x}
             y2={pos.y - radius}
-            stroke={node.skipped ? "#ef4444" : isCurrent ? "#6366f1" : "#6B7280"}
+            stroke={
+              node.skipped ? "#ef4444" : isCurrent ? "#6366f1" : "#6B7280"
+            }
             strokeWidth={isCurrent ? 2.5 : 1.5}
             opacity={isVisible ? (node.skipped ? 0.4 : 0.6) : 0.2}
             strokeDasharray={node.skipped ? "4,4" : "none"}
@@ -458,9 +460,7 @@ export default function PermutationsIIVisualizer() {
               }}
               className="w-16 h-16 rounded-lg flex flex-col items-center justify-center shadow-lg relative"
               style={{
-                boxShadow: isUsed
-                  ? "0 0 20px rgba(99, 102, 241, 0.4)"
-                  : "none",
+                boxShadow: isUsed ? "0 0 20px rgba(99, 102, 241, 0.4)" : "none",
               }}
             >
               <span className="text-lg font-bold text-white">{num}</span>
@@ -533,7 +533,8 @@ export default function PermutationsIIVisualizer() {
           <span className="w-3 h-3 bg-green-500 rounded-full" /> complete
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-red-500 rounded-full opacity-50" /> skipped
+          <span className="w-3 h-3 bg-red-500 rounded-full opacity-50" />{" "}
+          skipped
         </span>
       </div>
 

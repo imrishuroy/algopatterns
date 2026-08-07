@@ -22,7 +22,8 @@ export default function LanguageToggle({
     go: "Go",
   };
 
-  const sizeClasses = size === "sm" ? "px-3 py-1 text-xs" : "px-4 py-1.5 text-sm";
+  const sizeClasses =
+    size === "sm" ? "px-3 py-1 text-xs" : "px-4 py-1.5 text-sm";
 
   return (
     <div className="inline-flex bg-gray-800/80 rounded-full p-1 gap-1">

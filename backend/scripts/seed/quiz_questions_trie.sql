@@ -1,10 +1,10 @@
 -- Quiz Questions for Trie Pattern
--- Run: psql "postgresql://..." -f scripts/seed/quiz_questions_trie.sql
+-- Run: psql "$DATABASE_URL" -f scripts/seed/quiz_questions_trie.sql
 
 -- Clear existing trie questions first
 DELETE FROM quiz_questions WHERE pattern_id = 'trie';
 
--- Section: Trie Fundamentals
+-- Section: Trie Fundamentals (Easy)
 INSERT INTO quiz_questions (pattern_id, section_slug, question_type, difficulty, question_text, code_snippet, options, correct_answer, explanation, display_order) VALUES
 ('trie', NULL, 'multiple-choice', 'easy',
  'What does each node in a Trie represent?',
@@ -19,7 +19,7 @@ INSERT INTO quiz_questions (pattern_id, section_slug, question_type, difficulty,
  NULL,
  '["Less memory usage", "Efficient prefix-based operations", "Faster exact match lookup", "Simpler implementation"]',
  '1',
- 'Tries excel at prefix operations like autocomplete. Finding all words with a prefix is O(p + n) where p is prefix length.',
+ 'Tries excel at prefix operations like autocomplete and startsWith. Finding all words with a prefix is O(p + n) where p is prefix length and n is number of matches.',
  2),
 
 ('trie', NULL, 'true-false', 'easy',
@@ -27,7 +27,7 @@ INSERT INTO quiz_questions (pattern_id, section_slug, question_type, difficulty,
  NULL,
  NULL,
  'false',
- 'Only nodes marked with isEnd=true represent complete words. Other nodes are just prefixes.',
+ 'Only nodes marked with isEnd=true represent complete words. Other nodes are just prefixes on the path to complete words.',
  3),
 
 ('trie', NULL, 'multiple-choice', 'easy',
@@ -35,108 +35,88 @@ INSERT INTO quiz_questions (pattern_id, section_slug, question_type, difficulty,
  NULL,
  '["O(1)", "O(L)", "O(n)", "O(n * L)"]',
  '1',
- 'We traverse/create one node per character, so insertion is O(L) where L is word length.',
+ 'We traverse or create one node per character, so insertion is O(L) where L is the word length.',
  4),
 
 ('trie', NULL, 'code-output', 'easy',
  'After inserting "cat" and "car", how many nodes are in the Trie (excluding root)?',
- '// Insert: "cat", "car"
-//     root
-//      |
-//      c
-//      |
-//      a
-//     / \\
-//    t   r',
+ '// Insert: "cat", "car"\n//     root\n//      |\n//      c\n//      |\n//      a\n//     / \\\n//    t   r',
  '["3", "4", "5", "6"]',
  '1',
- 'Nodes: c, a, t, r = 4 nodes. "c" and "a" are shared between both words.',
+ 'Nodes: c, a, t, r = 4 nodes. The "c" and "a" nodes are shared between both words.',
  5),
 
--- Trie Structure Questions
+-- Section: Trie Structure (Medium)
 ('trie', NULL, 'multiple-choice', 'medium',
  'What is the purpose of the isEnd flag in a Trie node?',
  NULL,
- '["To mark the root node", "To indicate a complete word ends at this node", "To count word frequency", "To link to parent node"]',
+ '["To mark the root node", "To indicate a complete word ends at this node", "To count word frequency", "To link to the parent node"]',
  '1',
- 'isEnd distinguishes between a prefix and a complete word. "car" has isEnd=true, but "ca" does not if only "car" was inserted.',
+ 'The isEnd flag distinguishes between a prefix and a complete word. For example, if "car" is inserted, the ''r'' node has isEnd=true, but "ca" does not end a word.',
  6),
 
 ('trie', NULL, 'code-output', 'medium',
  'After inserting "app", "apple", "application", which nodes have isEnd=true?',
- '// Words: app, apple, application
-//     root → a → p → p(✓) → l → e(✓) → ... → n(✓)',
- '["Only the last node", "Nodes for p, e, and n (end of each word)", "All nodes", "Only the root"]',
+ '// Words: app, apple, application\n//     root - a - p - p(?) - l - e(?) - ... - n(?)',
+ '["Only the last node", "Nodes for the second p, e, and n", "All nodes", "Only the root"]',
  '1',
- 'isEnd is true at: p (app), e (apple), n (application) - marking where each complete word ends.',
+ 'isEnd is true at: the second ''p'' (app ends), ''e'' (apple ends), ''n'' (application ends). Each marks where a complete word ends.',
  7),
 
 ('trie', NULL, 'multiple-choice', 'medium',
- 'In Java, why use TrieNode[26] instead of HashMap for children?',
+ 'When should you use TrieNode[26] array vs HashMap<Character, TrieNode> for children?',
  NULL,
- '["It is always faster", "Fixed alphabet size makes array more memory-efficient", "HashMap cannot store characters", "It handles Unicode better"]',
+ '["Array is always better", "Array for fixed alphabet (a-z), HashMap for Unicode or variable alphabets", "HashMap is always faster", "They have identical performance"]',
  '1',
- 'For lowercase English letters (26), an array is faster and uses predictable memory. HashMap is better for large/variable alphabets.',
+ 'Array provides O(1) lookup and is cache-friendly for fixed alphabets like lowercase a-z. HashMap is better for Unicode, mixed case, or sparse tries with few children per node.',
  8),
 
 ('trie', NULL, 'identify-bug', 'medium',
  'What is wrong with this search function?',
- 'search(word) {
-  let node = this.root;
-  for (let c of word) {
-    if (!node.children[c]) return false;
-    node = node.children[c];
-  }
-  return true;  // Bug here
-}',
- '["Should return false", "Should check node.isEnd instead of true", "Loop condition is wrong", "Should start from node.children"]',
+ 'search(word) {\n  let node = this.root;\n  for (let c of word) {\n    if (!node.children[c]) return false;\n    node = node.children[c];\n  }\n  return true;  // Bug here\n}',
+ '["Should return false", "Should check node.isEnd instead of returning true", "Loop condition is wrong", "Should start from node.children"]',
  '1',
- 'Returning true means "prefix exists". For search, we must return node.isEnd to confirm it is a complete word.',
+ 'Returning true only confirms the prefix exists. For search, we must return node.isEnd to verify it is a complete word, not just a prefix.',
  9),
 
 ('trie', NULL, 'code-output', 'medium',
- 'Trie has words: ["app", "apple"]. What does search("app") return?',
+ 'Trie contains words: ["app", "apple"]. What does search("app") return?',
  NULL,
  '["true", "false", "null", "undefined"]',
  '0',
- '"app" was explicitly inserted, so its node has isEnd=true. search("app") returns true.',
+ '"app" was explicitly inserted, so its final node has isEnd=true. search("app") returns true.',
  10),
 
 ('trie', NULL, 'code-output', 'medium',
- 'Trie has words: ["apple"]. What does search("app") return?',
+ 'Trie contains words: ["apple"]. What does search("app") return?',
  NULL,
  '["true", "false", "null", "undefined"]',
  '1',
- '"app" is a prefix of "apple" but was never inserted as a word. Its node has isEnd=false.',
+ '"app" is a prefix of "apple" but was never inserted as a word. The ''p'' node (second p) has isEnd=false.',
  11),
 
 ('trie', NULL, 'code-output', 'medium',
- 'Trie has words: ["apple"]. What does startsWith("app") return?',
+ 'Trie contains words: ["apple"]. What does startsWith("app") return?',
  NULL,
  '["true", "false", "null", "undefined"]',
  '0',
- 'startsWith only checks if the prefix path exists. "app" is a valid prefix of "apple", so returns true.',
+ 'startsWith only checks if the prefix path exists, not whether it is a complete word. "app" is a valid prefix of "apple", so it returns true.',
  12),
 
--- Insert and Search Operations
 ('trie', NULL, 'code-output', 'medium',
  'What is the output of this sequence?',
- 'const trie = new Trie();
-trie.insert("hello");
-trie.insert("help");
-console.log(trie.startsWith("hel"));
-console.log(trie.search("hel"));',
+ 'const trie = new Trie();\ntrie.insert("hello");\ntrie.insert("help");\nconsole.log(trie.startsWith("hel"));\nconsole.log(trie.search("hel"));',
  '["true, true", "true, false", "false, true", "false, false"]',
  '1',
- 'startsWith("hel") is true (prefix exists). search("hel") is false ("hel" was not inserted as a word).',
+ 'startsWith("hel") is true because the prefix path exists. search("hel") is false because "hel" was never inserted as a complete word.',
  13),
 
 ('trie', NULL, 'multiple-choice', 'medium',
- 'What is the space complexity of a Trie storing N words of average length L?',
+ 'What is the worst-case space complexity of a Trie storing N words of average length L?',
  NULL,
  '["O(N)", "O(L)", "O(N * L)", "O(N + L)"]',
  '2',
- 'Worst case: no shared prefixes, each word creates L nodes. Total: O(N * L) nodes.',
+ 'In the worst case with no shared prefixes, each of N words creates L nodes. Total space is O(N * L) for the nodes.',
  14),
 
 ('trie', NULL, 'true-false', 'medium',
@@ -144,25 +124,24 @@ console.log(trie.search("hel"));',
  NULL,
  NULL,
  'false',
- 'Tries can use MORE memory due to node overhead. They trade space for prefix operation efficiency.',
+ 'Tries often use MORE memory due to node pointer overhead (26 pointers per node for array-based). Tries trade space for efficient prefix operations.',
  15),
 
--- Wildcard Search
+-- Section: Wildcard Search (Hard)
 ('trie', NULL, 'multiple-choice', 'hard',
- 'For wildcard search with "." (matches any character), what approach is used?',
+ 'For wildcard search where "." matches any single character, what approach is used?',
  NULL,
- '["Binary search", "DFS trying all children when encountering \".\"", "Replace \".\" with all letters and search each", "Wildcards are not supported in Tries"]',
+ '["Binary search through all words", "DFS trying all existing children when encountering \".\"", "Generate all possible strings and search each", "Wildcards cannot be supported in Tries"]',
  '1',
- 'When we hit ".", we recursively try all existing children at that node using DFS.',
+ 'When we encounter ".", we recursively try all existing (non-null) children at that node using DFS, short-circuiting on the first match.',
  16),
 
 ('trie', NULL, 'code-output', 'hard',
  'Trie has ["bad", "dad", "mad"]. Does search("b.d") return true?',
- '// Pattern: "b.d" where . matches any character
-// Words in trie: bad, dad, mad',
+ '// Pattern: "b.d" where . matches any character\n// Words in trie: bad, dad, mad',
  '["true", "false"]',
  '0',
- '"b.d" matches "bad": b=b, .=a (any char), d=d. Pattern matches, returns true.',
+ '"b.d" matches "bad": b=b, .=a (matches any), d=d. The pattern matches, so it returns true.',
  17),
 
 ('trie', NULL, 'code-output', 'hard',
@@ -170,112 +149,204 @@ console.log(trie.search("hel"));',
  NULL,
  '["true", "false"]',
  '0',
- '"..d" matches all three words. First . matches b/d/m, second . matches a, d matches d.',
+ '"..d" matches all three words. First "." matches b/d/m, second "." matches a, "d" matches d.',
  18),
 
 ('trie', NULL, 'multiple-choice', 'hard',
- 'What is the worst-case time complexity of wildcard search with pattern "..."?',
+ 'What is the worst-case time complexity of wildcard search for pattern "..." (three dots)?',
  NULL,
  '["O(L)", "O(26^L) where L is pattern length", "O(N) where N is number of words", "O(1)"]',
  '1',
- 'Each "." can branch to 26 children. Pattern of all dots explores entire trie: O(26^L) worst case.',
+ 'Each "." can branch to up to 26 children. A pattern of all dots explores the entire trie, giving O(26^L) worst case.',
  19),
 
--- Word Search II (Trie + Grid)
+-- Section: Word Search II (Hard)
 ('trie', NULL, 'multiple-choice', 'hard',
- 'In "Word Search II" (find words in grid), why use Trie instead of searching each word?',
+ 'In "Word Search II" (find dictionary words in a grid), why use a Trie instead of searching for each word separately?',
  NULL,
- '["Trie uses less memory", "Single DFS traversal can find all words with shared prefixes", "Trie is easier to implement", "Grid search requires Trie"]',
+ '["Trie uses less memory", "A single DFS traversal can find multiple words that share prefixes", "Trie is easier to implement", "Grid search requires a Trie by definition"]',
  '1',
- 'Build Trie of all words. One DFS from each cell can find multiple words that share prefixes, avoiding redundant traversals.',
+ 'Build a Trie from all target words. One DFS from each cell can find multiple words sharing prefixes simultaneously, avoiding redundant grid traversals.',
  20),
 
 ('trie', NULL, 'multiple-choice', 'hard',
- 'In Word Search II, when should we stop DFS early?',
+ 'In Word Search II, when should DFS stop exploring a path early?',
  NULL,
- '["When we find any word", "When current path is not a prefix in the Trie", "When we reach grid boundary", "Never stop early"]',
+ '["When we find any word", "When the current path is not a prefix in the Trie", "When we reach the grid boundary", "We should never stop early"]',
  '1',
- 'If current path doesn''t exist in Trie (node is null), no words can be found - prune immediately.',
+ 'If the current path does not exist in the Trie (child node is null), no dictionary words can be formed. Prune immediately to save time.',
  21),
 
 ('trie', NULL, 'true-false', 'hard',
- 'In Word Search II, after finding a word, we should immediately remove it from the Trie.',
+ 'In Word Search II, after finding a word we should set node.word = null to prevent adding it again.',
  NULL,
  NULL,
  'true',
- 'Removing found words (setting isEnd=false or pruning) prevents duplicates and can improve performance.',
+ 'Setting node.word = null after finding prevents the same word from being added to results multiple times if it can be formed via different grid paths.',
  22),
 
--- Autocomplete and Applications
-('trie', NULL, 'multiple-choice', 'medium',
- 'For autocomplete with prefix "app", how do we find all matching words?',
+('trie', NULL, 'multiple-choice', 'hard',
+ 'In Word Search II, what is the backtracking pattern for marking visited cells?',
  NULL,
- '["Search for \"app\" only", "Navigate to prefix node, then DFS to collect all words below", "Check every word in dictionary", "Use binary search"]',
+ '["Use a separate visited[][] array", "Mark cell as ''#'' before DFS, restore original character after", "Never mark cells as visited", "Use BFS instead of DFS"]',
  '1',
- 'Traverse to the node for "app", then DFS from there, collecting all paths where isEnd=true.',
+ 'Mark board[i][j] = ''#'' before exploring neighbors, then restore the original character after DFS returns. This is more space-efficient than a separate visited array.',
  23),
 
+-- Section: Autocomplete (Medium)
+('trie', NULL, 'multiple-choice', 'medium',
+ 'To implement autocomplete for prefix "app", what is the algorithm?',
+ NULL,
+ '["Search for \"app\" and return it", "Navigate to the prefix node, then DFS to collect all words in that subtree", "Check every word in the dictionary", "Use binary search on sorted words"]',
+ '1',
+ 'First traverse to the node representing "app", then DFS from there to collect all paths where a complete word exists (node.word != null or isEnd = true).',
+ 24),
+
 ('trie', NULL, 'code-output', 'medium',
- 'Trie has ["apple", "app", "application", "banana"]. How many words match prefix "app"?',
+ 'Trie has ["apple", "app", "application", "banana"]. How many words match the prefix "app"?',
  NULL,
  '["1", "2", "3", "4"]',
  '2',
- '"apple", "app", "application" all start with "app". That''s 3 words.',
- 24),
-
-('trie', NULL, 'multiple-choice', 'medium',
- 'Which operation is NOT efficient with a basic Trie?',
- NULL,
- '["Insert word", "Search word", "Find words with prefix", "Delete word"]',
- '3',
- 'Deletion is tricky - must check if node is used by other words before removing. Requires careful cleanup.',
+ '"apple", "app", and "application" all start with "app". That is 3 matching words.',
  25),
 
--- Edge Cases
+-- Section: Search Suggestions System (Medium) - NEW
+('trie', NULL, 'multiple-choice', 'medium',
+ 'In the Search Suggestions problem, why does iterating children from index 0 to 25 give lexicographic order?',
+ NULL,
+ '["It does not give lexicographic order", "Index 0 = ''a'', index 1 = ''b'', etc., so DFS visits words alphabetically", "We must sort results afterwards", "Only works for uppercase letters"]',
+ '1',
+ 'Children[0] corresponds to ''a'', children[1] to ''b'', and so on. DFS in index order naturally visits words in alphabetical order.',
+ 26),
+
+('trie', NULL, 'code-output', 'medium',
+ 'For Search Suggestions with products ["mobile", "mouse", "moneypot"] and search word "mo", how many suggestions are returned?',
+ NULL,
+ '["1", "2", "3", "0"]',
+ '2',
+ 'After typing "mo", all three products match (mobile, moneypot, mouse). With a limit of 3 suggestions, all 3 are returned.',
+ 27),
+
+('trie', NULL, 'multiple-choice', 'medium',
+ 'In Search Suggestions, once we hit a dead end (no child for a character), what happens to all future results?',
+ NULL,
+ '["We backtrack and try again", "All future results are empty lists", "We restart from root", "We skip that character"]',
+ '1',
+ 'Once node.children[c] is null, no words can match the current prefix or any longer prefix. All subsequent keystroke results will be empty.',
+ 28),
+
+-- Section: Replace Words (Medium) - NEW
+('trie', NULL, 'multiple-choice', 'medium',
+ 'In the Replace Words problem, how do we find the shortest root for a word?',
+ NULL,
+ '["Find all matching roots, then pick shortest", "Stop traversal immediately when we hit the first node with word != null", "Always traverse to the end of the word", "Use a priority queue"]',
+ '1',
+ 'The first node.word we encounter during traversal is the shortest root. Return immediately for early termination.',
+ 29),
+
+('trie', NULL, 'code-output', 'medium',
+ 'Dictionary: ["a", "aa", "aaa"]. What does findShortestRoot("aaaa") return?',
+ NULL,
+ '["a", "aa", "aaa", "aaaa"]',
+ '0',
+ 'We traverse: a (word="a" found!) and return immediately. The shortest root "a" is returned, not "aa" or "aaa".',
+ 30),
+
+('trie', NULL, 'identify-bug', 'medium',
+ 'What is wrong with this findShortestRoot implementation?',
+ 'findShortestRoot(word) {\n  let node = root, shortest = word;\n  for (let c of word) {\n    if (!node.children[c]) break;\n    node = node.children[c];\n    if (node.word) shortest = node.word;\n  }\n  return shortest;\n}',
+ '["Should return word if no root found", "Should return immediately when node.word is found, not keep searching", "Loop direction is wrong", "Should check node.isEnd instead"]',
+ '1',
+ 'This code keeps overwriting shortest, returning the LONGEST root. It should return node.word immediately when found to get the SHORTEST root.',
+ 31),
+
+-- Section: Delete Operation (Medium) - NEW
+('trie', NULL, 'multiple-choice', 'medium',
+ 'What is the difference between lazy delete and recursive delete in a Trie?',
+ NULL,
+ '["They are the same", "Lazy just unmarks isEnd; recursive also removes unused nodes", "Recursive is faster", "Lazy delete is not possible in Tries"]',
+ '1',
+ 'Lazy delete sets isEnd=false and word=null but leaves nodes in place. Recursive delete also removes nodes that are no longer part of any word path.',
+ 32),
+
+('trie', NULL, 'code-output', 'medium',
+ 'Trie has ["app", "apple"]. After delete("apple"), what does search("app") return?',
+ NULL,
+ '["true", "false", "undefined", "Error"]',
+ '0',
+ 'Deleting "apple" should not affect "app". The shared nodes (a-p-p) remain, and "app" still has isEnd=true.',
+ 33),
+
+('trie', NULL, 'true-false', 'medium',
+ 'After deleting "apple" from a Trie containing only ["apple"], the Trie should have zero nodes (excluding root).',
+ NULL,
+ NULL,
+ 'true',
+ 'With recursive delete, after removing "apple", nodes l and e have no children and no word, so they are deleted. Then p, p, a are also deleted in reverse order.',
+ 34),
+
+-- Section: Edge Cases (Mixed)
 ('trie', NULL, 'code-output', 'easy',
- 'What does search("") return on a non-empty Trie?',
+ 'What does search("") return on a Trie that contains ["hello", "world"]?',
  NULL,
  '["true", "false", "Error", "undefined"]',
  '1',
- 'Empty string means we stay at root. Root typically has isEnd=false (unless "" was explicitly inserted).',
- 26),
+ 'Empty string means we stay at root. Root typically has isEnd=false unless "" was explicitly inserted as a word.',
+ 35),
 
 ('trie', NULL, 'multiple-choice', 'medium',
  'How should a Trie handle case-insensitive search?',
  NULL,
- '["Store uppercase only", "Convert to lowercase before insert and search", "Store both cases at each node", "Tries cannot be case-insensitive"]',
+ '["Store only uppercase letters", "Convert all characters to lowercase during both insert and search", "Store both cases at each node", "Tries cannot support case-insensitive search"]',
  '1',
- 'Normalize to one case (usually lowercase) during both insert and search operations.',
- 27),
+ 'Normalize to one case (usually lowercase) during both insert and search operations for consistent behavior.',
+ 36),
 
 ('trie', NULL, 'identify-bug', 'medium',
  'What is wrong with this insert function?',
- 'insert(word) {
-  let node = this.root;
-  for (let c of word) {
-    if (!node.children[c]) {
-      node.children[c] = new TrieNode();
-    }
-  }
-  node.isEnd = true;
-}',
- '["Should check if word is empty", "Missing node = node.children[c] to advance", "isEnd should be false", "Loop should go backwards"]',
+ 'insert(word) {\n  let node = this.root;\n  for (let c of word) {\n    if (!node.children[c]) {\n      node.children[c] = new TrieNode();\n    }\n  }\n  node.isEnd = true;\n}',
+ '["Should check if word is empty first", "Missing node = node.children[c] to advance pointer", "isEnd should be set to false", "Loop should iterate backwards"]',
  '1',
- 'We create children but never advance to them. Need: node = node.children[c] after creating/checking.',
- 28),
+ 'The code creates child nodes but never advances to them. It needs node = node.children[c] after creating or accessing the child.',
+ 37),
 
 ('trie', NULL, 'multiple-choice', 'hard',
- 'To count words with a given prefix, what should we store at each node?',
+ 'To efficiently count how many words have a given prefix, what should be stored at each node?',
  NULL,
- '["Nothing extra needed", "A count of words passing through this node", "All words as a list", "Parent pointer"]',
+ '["Nothing extra is needed", "A count that increments during each insert passing through", "A list of all words", "A parent pointer"]',
  '1',
- 'Store a count that increments during insert. The count at prefix end tells how many words share that prefix.',
- 29),
+ 'Store a prefixCount that increments during insert at each node visited. The count at the prefix end tells how many words share that prefix.',
+ 38),
 
 ('trie', NULL, 'true-false', 'medium',
  'A Trie can efficiently find the longest common prefix of all inserted words.',
  NULL,
  NULL,
  'true',
- 'Traverse from root while there is exactly one child and isEnd is false. This path is the longest common prefix.',
- 30);
+ 'Traverse from root while there is exactly one child and isEnd is false. This single-path represents the longest common prefix.',
+ 39),
+
+-- Section: Optimization (Hard) - NEW
+('trie', NULL, 'multiple-choice', 'hard',
+ 'What is a Compressed Trie (Radix Tree)?',
+ NULL,
+ '["A Trie that uses less memory by using HashMap", "A Trie that merges chains of single-child nodes into one edge with multiple characters", "A Trie without the isEnd flag", "A Trie that only stores unique words"]',
+ '1',
+ 'A Compressed Trie collapses chains of nodes with single children into edges storing multiple characters, reducing node count and improving traversal speed.',
+ 40),
+
+('trie', NULL, 'multiple-choice', 'hard',
+ 'Why store the complete word at end nodes instead of just isEnd = true?',
+ NULL,
+ '["It uses less memory", "We can retrieve the word directly without rebuilding it from the path", "It is required for search to work", "There is no advantage"]',
+ '1',
+ 'Storing node.word allows direct retrieval when a word is found (e.g., in autocomplete or Word Search II) without tracking and rebuilding the path.',
+ 41),
+
+('trie', NULL, 'multiple-choice', 'hard',
+ 'In Word Search II, what optimization can be applied after finding all words through a Trie branch?',
+ NULL,
+ '["Sort the results", "Prune the Trie branch by setting parent.children[c] = null if node is now empty", "Convert to HashMap", "None, optimization is not possible"]',
+ '1',
+ 'After a subtree has yielded all its words, pruning it prevents future DFS from exploring dead branches, improving performance.',
+ 42);

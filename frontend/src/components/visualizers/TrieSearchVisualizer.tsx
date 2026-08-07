@@ -1,448 +1,550 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useReducer,
-  startTransition,
-  useMemo,
-} from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 interface TrieNode {
-  children: Record<string, TrieNode>;
+  char: string;
   isEnd: boolean;
+  children: { [key: string]: TrieNode };
 }
 
-type PlayState = { step: number; isPlaying: boolean };
-type PlayAction =
-  | { type: "TOGGLE" }
-  | { type: "STOP" }
-  | { type: "ADVANCE" }
-  | { type: "RESET" };
+interface SearchStep {
+  query: string;
+  method: "search" | "startsWith";
+  charIndex: number;
+  char: string;
+  action: "navigate" | "notFound" | "checkEnd" | "result";
+  pathExists: boolean;
+  isEnd: boolean | null;
+  result: boolean | null;
+  description: string;
+  currentPath: string[];
+}
 
-function playReducer(state: PlayState, action: PlayAction): PlayState {
-  switch (action.type) {
-    case "TOGGLE":
-      return { ...state, isPlaying: !state.isPlaying };
-    case "STOP":
-      return { ...state, isPlaying: false };
-    case "ADVANCE":
-      return { ...state, step: state.step + 1 };
-    case "RESET":
-      return { step: 0, isPlaying: false };
-    default:
-      return state;
+// Build a pre-populated trie with ["app", "apple"]
+const buildTrie = (): TrieNode => {
+  const root: TrieNode = { char: "root", isEnd: false, children: {} };
+
+  // Insert "app"
+  let node = root;
+  for (const c of "app") {
+    node.children[c] = { char: c, isEnd: false, children: {} };
+    node = node.children[c];
   }
-}
+  node.isEnd = true; // "app" ends here
 
-// skipcq: JS-0067
-export default function TrieSearchVisualizer() {
-  const [{ isPlaying }, dispatch] = useReducer(playReducer, {
-    step: 0,
-    isPlaying: false,
-  });
-  const [speed, setSpeed] = useState(700);
-  const [searchMode, setSearchMode] = useState<"search" | "startsWith">(
-    "search"
-  );
-  const [query, setQuery] = useState("app");
-  const [charIndex, setCharIndex] = useState(-1);
-  const [currentPath, setCurrentPath] = useState<string[]>([]);
-  const [result, setResult] = useState<boolean | null>(null);
-  const [phase, setPhase] = useState<"init" | "searching" | "done">("init");
-  const [message, setMessage] = useState("Click Play to search in the Trie");
+  // Insert "apple" (continue from "app")
+  for (const c of "le") {
+    node.children[c] = { char: c, isEnd: false, children: {} };
+    node = node.children[c];
+  }
+  node.isEnd = true; // "apple" ends here
 
-  const trie: TrieNode = useMemo(
-    () => ({
-      children: {
-        a: {
-          children: {
-            p: {
-              children: {
-                p: {
-                  children: {
-                    l: {
-                      children: {
-                        e: { children: {}, isEnd: true },
-                      },
-                      isEnd: false,
-                    },
-                  },
-                  isEnd: true,
-                },
-                e: { children: {}, isEnd: true },
-              },
-              isEnd: false,
-            },
-          },
-          isEnd: false,
-        },
-        b: {
-          children: {
-            a: {
-              children: {
-                t: { children: {}, isEnd: true },
-              },
-              isEnd: false,
-            },
-          },
-          isEnd: false,
-        },
-      },
-      isEnd: false,
-    }),
-    []
-  );
+  return root;
+};
 
-  const words = ["apple", "app", "ape", "bat"];
-  const queries = ["app", "appl", "ap", "bat", "bad"];
+const generateSearchSteps = (
+  trie: TrieNode,
+  query: string,
+  method: "search" | "startsWith"
+): SearchStep[] => {
+  const steps: SearchStep[] = [];
+  let node: TrieNode | null = trie;
+  const currentPath: string[] = [];
 
-  const reset = useCallback(() => {
-    setCharIndex(-1);
-    setCurrentPath([]);
-    setResult(null);
-    setPhase("init");
-    setMessage(`Click Play to ${searchMode}("${query}")`);
-    dispatch({ type: "STOP" });
-  }, [searchMode, query]);
+  for (let i = 0; i < query.length; i++) {
+    const char = query[i];
 
-  useEffect(() => {
-    startTransition(() => {
-      reset();
-    });
-  }, [query, searchMode, reset]);
+    // Check if path exists
+    if (node && node.children[char]) {
+      currentPath.push(char);
+      node = node.children[char];
 
-  useEffect(() => {
-    if (!isPlaying) return;
+      steps.push({
+        query,
+        method,
+        charIndex: i,
+        char,
+        action: "navigate",
+        pathExists: true,
+        isEnd: node.isEnd,
+        result: null,
+        description: `'${char}' exists → move to '${char}' node`,
+        currentPath: [...currentPath],
+      });
+    } else {
+      // Path doesn't exist
+      steps.push({
+        query,
+        method,
+        charIndex: i,
+        char,
+        action: "notFound",
+        pathExists: false,
+        isEnd: null,
+        result: false,
+        description: `'${char}' not found → path doesn't exist`,
+        currentPath: [...currentPath],
+      });
 
-    const timer = setTimeout(() => {
-      if (phase === "init") {
-        setPhase("searching");
-        setCharIndex(0);
-        setMessage(`${searchMode}("${query}"): Starting at root`);
-      } else if (phase === "searching") {
-        if (charIndex >= query.length) {
-          // Reached end of query
-          let node: TrieNode | undefined = trie;
-          for (const c of currentPath) {
-            node = node?.children[c];
-          }
+      // Final result step
+      steps.push({
+        query,
+        method,
+        charIndex: i,
+        char,
+        action: "result",
+        pathExists: false,
+        isEnd: null,
+        result: false,
+        description: `${method}("${query}") = false (path broken)`,
+        currentPath: [...currentPath],
+      });
 
-          if (searchMode === "search") {
-            const found = node?.isEnd === true;
-            setResult(found);
-            setMessage(
-              found
-                ? `search("${query}"): Found! isEnd = true`
-                : `search("${query}"): Not found! isEnd = ${node?.isEnd ?? "N/A"}`
-            );
-          } else {
-            setResult(true);
-            setMessage(`startsWith("${query}"): Prefix exists!`);
-          }
+      return steps;
+    }
+  }
 
-          setPhase("done");
-          dispatch({ type: "STOP" });
-          return;
-        }
+  // Reached end of query - check isEnd for search
+  const finalNode = node as TrieNode;
 
-        const char = query[charIndex];
-        let node: TrieNode | undefined = trie;
-        for (const c of currentPath) {
-          node = node?.children[c];
-        }
-
-        if (!node?.children[char]) {
-          // Character not found
-          setResult(false);
-          setMessage(
-            `'${char}' not found in Trie. ${searchMode}("${query}") = false`
-          );
-          setPhase("done");
-          dispatch({ type: "STOP" });
-          return;
-        }
-
-        setCurrentPath([...currentPath, char]);
-        setMessage(`Found '${char}', moving to next character...`);
-        setCharIndex(charIndex + 1);
-      }
-    }, speed);
-
-    return () => clearTimeout(timer);
-  }, [
-    isPlaying,
-    phase,
-    charIndex,
+  steps.push({
     query,
-    currentPath,
-    searchMode,
-    trie,
-    speed,
-  ]);
+    method,
+    charIndex: query.length - 1,
+    char: query[query.length - 1],
+    action: "checkEnd",
+    pathExists: true,
+    isEnd: finalNode.isEnd,
+    result: null,
+    description:
+      method === "search"
+        ? `Check: node.isEnd = ${finalNode.isEnd}`
+        : `Check: node != null (path exists)`,
+    currentPath: [...currentPath],
+  });
 
-  const getNodePosition = (path: string[]): { x: number; y: number } | null => {
-    const positions: Record<string, { x: number; y: number }> = {
-      "": { x: 200, y: 30 },
-      a: { x: 120, y: 90 },
-      b: { x: 280, y: 90 },
-      ap: { x: 120, y: 150 },
-      ba: { x: 280, y: 150 },
-      app: { x: 80, y: 210 },
-      ape: { x: 160, y: 210 },
-      bat: { x: 280, y: 210 },
-      appl: { x: 80, y: 270 },
-      apple: { x: 80, y: 330 },
-    };
-    return positions[path.join("")] || null;
-  };
+  // Final result
+  const result = method === "search" ? finalNode.isEnd : true;
 
-  const renderTrieNode = (node: TrieNode, path: string[], char: string) => {
-    const pos = getNodePosition(path);
-    if (!pos) return null;
+  steps.push({
+    query,
+    method,
+    charIndex: query.length - 1,
+    char: query[query.length - 1],
+    action: "result",
+    pathExists: true,
+    isEnd: finalNode.isEnd,
+    result,
+    description: `${method}("${query}") = ${result}`,
+    currentPath: [...currentPath],
+  });
 
-    const pathStr = path.join("");
-    const currentPathStr = currentPath.join("");
-    const isInPath =
-      currentPathStr.startsWith(pathStr) &&
-      pathStr.length <= currentPathStr.length;
-    const isCurrent = pathStr === currentPathStr;
+  return steps;
+};
 
-    return (
-      <g key={pathStr || "root"}>
-        <motion.circle
-          cx={pos.x}
-          cy={pos.y}
-          r={18}
-          animate={{
-            fill: isCurrent
-              ? "#eab308"
+// Trie Tree Visualization
+const TrieTree = ({
+  node,
+  currentPath,
+  depth = 0,
+  pathSoFar = "",
+  highlightIsEnd = false,
+}: {
+  node: TrieNode;
+  currentPath: string[];
+  depth?: number;
+  pathSoFar?: string;
+  highlightIsEnd?: boolean;
+}) => {
+  /* v8 ignore next 2 -- sort comparator callback */
+  const children = Object.entries(node.children).sort((a, b) =>
+    a[0].localeCompare(b[0])
+  );
+
+  const isInPath =
+    depth === 0 || currentPath.slice(0, depth).join("") === pathSoFar;
+  const isCurrentNode = currentPath.join("") === pathSoFar && pathSoFar !== "";
+  const shouldHighlightIsEnd = highlightIsEnd && isCurrentNode && node.isEnd;
+
+  return (
+    <div className="flex flex-col items-center">
+      <motion.div
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        className={`
+          relative flex items-center justify-center
+          w-12 h-12 rounded-full border-3 font-bold text-lg
+          transition-all duration-300
+          ${
+            isCurrentNode
+              ? shouldHighlightIsEnd
+                ? "bg-green-500 border-green-400 text-white shadow-lg shadow-green-500/50"
+                : "bg-blue-500 border-blue-400 text-white shadow-lg shadow-blue-500/50"
               : isInPath
-                ? "#3b82f6"
-                : node.isEnd
-                  ? "#22c55e"
-                  : "#374151",
-            scale: isCurrent ? 1.2 : 1,
-          }}
-          className="stroke-gray-500 stroke-2"
-        />
-        <text
-          x={pos.x}
-          y={pos.y + 5}
-          textAnchor="middle"
-          className={`text-sm font-bold ${isCurrent ? "fill-black" : "fill-white"}`}
-        >
-          {char || "∅"}
-        </text>
+                ? "bg-blue-500/70 border-blue-400 text-white"
+                : "bg-gray-700 border-gray-600 text-gray-300"
+          }
+        `}
+      >
+        {node.char === "root" ? "○" : node.char}
         {node.isEnd && (
-          <text
-            x={pos.x + 22}
-            y={pos.y - 10}
-            className="fill-green-400 text-xs"
+          <div
+            className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+              shouldHighlightIsEnd
+                ? "bg-yellow-400 text-black ring-2 ring-yellow-300 animate-pulse"
+                : "bg-yellow-400 text-black"
+            }`}
           >
-            *
-          </text>
+            ✓
+          </div>
         )}
-      </g>
-    );
-  };
+      </motion.div>
 
-  const renderEdge = (from: string[], to: string[]) => {
-    const fromPos = getNodePosition(from);
-    const toPos = getNodePosition(to);
-    if (!fromPos || !toPos) return null;
+      {children.length > 0 && (
+        <>
+          <div className="w-0.5 h-6 bg-gray-600" />
+          <div className="flex gap-6">
+            {children.map(([char, child]) => (
+              <div key={char} className="flex flex-col items-center">
+                <TrieTree
+                  node={child}
+                  currentPath={currentPath}
+                  depth={depth + 1}
+                  pathSoFar={pathSoFar + char}
+                  highlightIsEnd={highlightIsEnd}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
-    return (
-      <line
-        key={`${from.join("")}-${to.join("")}`}
-        x1={fromPos.x}
-        y1={fromPos.y + 18}
-        x2={toPos.x}
-        y2={toPos.y - 18}
-        className="stroke-gray-600 stroke-2"
-      />
-    );
+// Query Progress Display
+const QueryProgress = ({
+  query,
+  charIndex,
+  action,
+}: {
+  query: string;
+  charIndex: number;
+  action: string;
+}) => (
+  <div className="flex items-center justify-center gap-1 text-2xl font-mono">
+    {query.split("").map((char, i) => (
+      <span
+        key={i}
+        className={`
+          w-10 h-10 flex items-center justify-center rounded-lg border-2 transition-all
+          ${
+            i < charIndex
+              ? "bg-green-500/20 border-green-500 text-green-400"
+              : i === charIndex
+                ? action === "result"
+                  ? "bg-green-500 border-green-400 text-white"
+                  : action === "notFound"
+                    ? "bg-red-500 border-red-400 text-white"
+                    : "bg-blue-500 border-blue-400 text-white animate-pulse"
+                : "bg-gray-800 border-gray-700 text-gray-500"
+          }
+        `}
+      >
+        {char}
+      </span>
+    ))}
+  </div>
+);
+
+// Code Display for Search/StartsWith
+const CodeDisplay = ({ step }: { step: SearchStep }) => {
+  const getCode = () => {
+    switch (step.action) {
+      case "navigate":
+        return `// '${step.char}' exists in children
+node = node.children['${step.char}'];`;
+      case "notFound":
+        return `// '${step.char}' not in children
+return ${step.method === "search" ? "false" : "false"};  // path broken`;
+      case "checkEnd":
+        return step.method === "search"
+          ? `// Reached end of "${step.query}"
+return node.isEnd;  // ${step.isEnd}`
+          : `// Reached end of "${step.query}"
+return node != null;  // true (path exists)`;
+      case "result":
+        return `// Result: ${step.method}("${step.query}") = ${step.result}`;
+      /* v8 ignore next 2 -- defensive: all actions handled above */
+      default:
+        return "";
+    }
   };
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 border-b border-gray-800">
-        <h3 className="text-lg font-semibold text-white">
+    <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 font-mono text-sm">
+      <pre
+        className={`${
+          step.action === "result"
+            ? step.result
+              ? "text-green-400"
+              : "text-red-400"
+            : step.action === "notFound"
+              ? "text-red-400"
+              : "text-blue-400"
+        }`}
+      >
+        {getCode()}
+      </pre>
+    </div>
+  );
+};
+
+// Method comparison display
+const MethodComparison = ({
+  method,
+  isEnd,
+  action,
+}: {
+  method: "search" | "startsWith";
+  isEnd: boolean | null;
+  action: string;
+}) => (
+  <div className="bg-gray-800 rounded-lg p-4">
+    <div className="text-sm text-gray-400 mb-3 text-center">
+      The One-Line Difference
+    </div>
+    <div className="space-y-2 font-mono text-sm">
+      <div
+        className={`p-2 rounded ${
+          method === "search" && action === "checkEnd"
+            ? "bg-blue-500/20 border border-blue-500"
+            : "bg-gray-700/50"
+        }`}
+      >
+        <span className="text-purple-400">search:</span>{" "}
+        <span className="text-gray-300">node != null</span>
+        <span className="text-yellow-400"> && node.isEnd</span>
+      </div>
+      <div
+        className={`p-2 rounded ${
+          method === "startsWith" && action === "checkEnd"
+            ? "bg-blue-500/20 border border-blue-500"
+            : "bg-gray-700/50"
+        }`}
+      >
+        <span className="text-purple-400">startsWith:</span>{" "}
+        <span className="text-gray-300">node != null</span>
+        <span className="text-gray-500"> (no isEnd check)</span>
+      </div>
+    </div>
+    {action === "checkEnd" && isEnd !== null && (
+      <div className="mt-3 text-center text-sm">
+        <span className="text-gray-400">Current node.isEnd = </span>
+        <span className={isEnd ? "text-green-400" : "text-red-400"}>
+          {String(isEnd)}
+        </span>
+      </div>
+    )}
+  </div>
+);
+
+// Predefined queries to demonstrate
+const QUERIES = [
+  { query: "app", method: "search" as const, expected: true },
+  { query: "appl", method: "search" as const, expected: false },
+  { query: "appl", method: "startsWith" as const, expected: true },
+  { query: "apply", method: "search" as const, expected: false },
+];
+
+// skipcq: JS-0067
+export default function TrieSearchVisualizer() {
+  const [queryIndex, setQueryIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const trie = React.useMemo(() => buildTrie(), []);
+
+  const currentQuery = QUERIES[queryIndex];
+  const steps = React.useMemo(
+    () => generateSearchSteps(trie, currentQuery.query, currentQuery.method),
+    [trie, currentQuery]
+  );
+
+  const step = steps[currentStep];
+  const maxStep = steps.length - 1;
+
+  const handleNext = () => {
+    if (currentStep < maxStep) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleQueryChange = (index: number) => {
+    setQueryIndex(index);
+    setCurrentStep(0);
+  };
+
+  if (!step) return null;
+
+  return (
+    <div className="bg-gray-900 rounded-xl p-6 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-bold text-white mb-2">
           Search vs StartsWith
         </h3>
-        <p className="text-gray-400 text-sm mt-1">
-          search() checks isEnd flag, startsWith() just checks path exists
+        <p className="text-gray-400 text-sm">
+          Trie contains: [&quot;app&quot;, &quot;apple&quot;]
         </p>
       </div>
 
-      <div className="p-4">
-        {/* Controls */}
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
+      {/* Query Selector */}
+      <div className="flex flex-wrap justify-center gap-2 mb-6">
+        {QUERIES.map((q, i) => (
           <button
-            onClick={() => dispatch({ type: "TOGGLE" })}
-            disabled={phase === "done"}
-            className={`px-4 py-2 rounded-lg font-medium transition ${
-              isPlaying ? "bg-yellow-500 text-black" : "bg-green-500 text-white"
-            } disabled:opacity-50`}
-          >
-            {isPlaying ? "Pause" : "Play"}
-          </button>
-          <button
-            onClick={reset}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600"
-          >
-            Reset
-          </button>
-          <div className="flex gap-1 ml-2">
-            <button
-              onClick={() => setSearchMode("search")}
-              disabled={isPlaying}
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
-                searchMode === "search"
-                  ? "bg-indigo-500 text-white"
-                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              } disabled:opacity-50`}
-            >
-              search()
-            </button>
-            <button
-              onClick={() => setSearchMode("startsWith")}
-              disabled={isPlaying}
-              className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
-                searchMode === "startsWith"
-                  ? "bg-indigo-500 text-white"
-                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              } disabled:opacity-50`}
-            >
-              startsWith()
-            </button>
-          </div>
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="text-gray-400 text-sm">Speed:</span>
-            <input
-              type="range"
-              min="400"
-              max="1200"
-              step="100"
-              value={1600 - speed}
-              onChange={(e) => setSpeed(1600 - Number(e.target.value))}
-              className="w-20 accent-indigo-500"
-            />
-          </div>
-        </div>
-
-        {/* Query selection */}
-        <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
-          <div className="text-sm text-gray-400 mb-2">
-            Select query (Trie contains: {words.join(", ")}):
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {queries.map((q) => (
-              <button
-                key={`q-${q}`}
-                onClick={() => setQuery(q)}
-                disabled={isPlaying}
-                className={`px-3 py-1 rounded-lg font-mono text-sm transition ${
-                  query === q
-                    ? "bg-yellow-500 text-black"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                } disabled:opacity-50`}
-              >
-                &ldquo;{q}&rdquo;
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Trie visualization */}
-        <div className="mb-4 flex justify-center">
-          <svg width="400" height="360" className="bg-gray-800/30 rounded-lg">
-            {/* Edges */}
-            {renderEdge([], ["a"])}
-            {renderEdge([], ["b"])}
-            {renderEdge(["a"], ["a", "p"])}
-            {renderEdge(["b"], ["b", "a"])}
-            {renderEdge(["a", "p"], ["a", "p", "p"])}
-            {renderEdge(["a", "p"], ["a", "p", "e"])}
-            {renderEdge(["b", "a"], ["b", "a", "t"])}
-            {renderEdge(["a", "p", "p"], ["a", "p", "p", "l"])}
-            {renderEdge(["a", "p", "p", "l"], ["a", "p", "p", "l", "e"])}
-
-            {/* Nodes */}
-            {renderTrieNode(trie, [], "")}
-            {renderTrieNode(trie.children.a, ["a"], "a")}
-            {renderTrieNode(trie.children.b, ["b"], "b")}
-            {renderTrieNode(trie.children.a.children.p, ["a", "p"], "p")}
-            {renderTrieNode(trie.children.b.children.a, ["b", "a"], "a")}
-            {renderTrieNode(
-              trie.children.a.children.p.children.p,
-              ["a", "p", "p"],
-              "p"
-            )}
-            {renderTrieNode(
-              trie.children.a.children.p.children.e,
-              ["a", "p", "e"],
-              "e"
-            )}
-            {renderTrieNode(
-              trie.children.b.children.a.children.t,
-              ["b", "a", "t"],
-              "t"
-            )}
-            {renderTrieNode(
-              trie.children.a.children.p.children.p.children.l,
-              ["a", "p", "p", "l"],
-              "l"
-            )}
-            {renderTrieNode(
-              trie.children.a.children.p.children.p.children.l.children.e,
-              ["a", "p", "p", "l", "e"],
-              "e"
-            )}
-          </svg>
-        </div>
-
-        {/* Result */}
-        {result !== null && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className={`mb-4 p-4 rounded-lg text-center text-lg font-bold ${
-              result
-                ? "bg-green-500/20 border border-green-500/50 text-green-400"
-                : "bg-red-500/20 border border-red-500/50 text-red-400"
+            key={i}
+            onClick={() => handleQueryChange(i)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-mono transition ${
+              i === queryIndex
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
             }`}
           >
-            {searchMode}(&quot;{query}&quot;) = {result.toString()}
-          </motion.div>
-        )}
+            {q.method}(&quot;{q.query}&quot;) → {String(q.expected)}
+          </button>
+        ))}
+      </div>
 
-        {/* Message */}
-        <motion.div
-          key={message}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`p-3 rounded-lg text-sm ${
-            phase === "done"
-              ? result
-                ? "bg-green-500/10 border border-green-500/30 text-green-400"
-                : "bg-red-500/10 border border-red-500/30 text-red-400"
-              : "bg-gray-800 text-gray-300"
+      {/* Current Query Progress */}
+      <div className="mb-6">
+        <div className="text-center text-sm text-gray-500 mb-2">
+          {step.method}(&quot;{step.query}&quot;)
+        </div>
+        <QueryProgress
+          query={step.query}
+          charIndex={step.charIndex}
+          action={step.action}
+        />
+      </div>
+
+      {/* Main Visualization Area */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Trie Tree */}
+        <div className="bg-gray-800/50 rounded-xl p-6 min-h-[280px] flex items-center justify-center">
+          <TrieTree
+            node={trie}
+            currentPath={step.currentPath}
+            highlightIsEnd={
+              step.action === "checkEnd" && step.method === "search"
+            }
+          />
+        </div>
+
+        {/* Right Panel */}
+        <div className="space-y-4">
+          {/* Method Comparison */}
+          <MethodComparison
+            method={step.method}
+            isEnd={step.isEnd}
+            action={step.action}
+          />
+
+          {/* Code */}
+          <CodeDisplay step={step} />
+        </div>
+      </div>
+
+      {/* Status Message */}
+      <div className="text-center mb-6">
+        <div
+          className={`inline-block px-6 py-3 rounded-lg text-sm font-medium ${
+            step.action === "result"
+              ? step.result
+                ? "bg-green-600/20 text-green-400 border border-green-600/30"
+                : "bg-red-600/20 text-red-400 border border-red-600/30"
+              : step.action === "notFound"
+                ? "bg-red-600/20 text-red-400 border border-red-600/30"
+                : step.action === "checkEnd"
+                  ? "bg-yellow-600/20 text-yellow-400 border border-yellow-600/30"
+                  : "bg-gray-800 text-gray-300 border border-gray-700"
           }`}
         >
-          {message}
-        </motion.div>
+          {step.description}
+        </div>
+      </div>
 
-        {/* Key difference */}
-        <div className="mt-4 p-3 bg-gray-800/30 rounded-lg text-sm text-gray-400">
-          <p>
-            <strong className="text-indigo-400">Key Difference:</strong>{" "}
-            search(&quot;appl&quot;) = false (not a word), but
-            startsWith(&quot;appl&quot;) = true (prefix exists). * marks isEnd =
-            true.
-          </p>
+      {/* Controls */}
+      <div className="flex items-center justify-center gap-4">
+        <button
+          onClick={handlePrev}
+          disabled={currentStep === 0}
+          className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-2"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Previous
+        </button>
+
+        <div className="text-gray-400 text-sm">
+          Step {currentStep + 1} of {maxStep + 1}
+        </div>
+
+        <button
+          onClick={handleNext}
+          disabled={currentStep >= maxStep}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-2"
+        >
+          Next
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* Legend */}
+      <div className="mt-6 pt-4 border-t border-gray-800 flex flex-wrap justify-center gap-6 text-xs text-gray-500">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-gray-700 border border-gray-600" />
+          <span>Node</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-blue-500" />
+          <span>Current Path</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-gray-700 border border-gray-600 relative">
+            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-yellow-400 rounded-full" />
+          </div>
+          <span>isEnd = true</span>
         </div>
       </div>
     </div>

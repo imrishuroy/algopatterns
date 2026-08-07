@@ -334,7 +334,9 @@ export default function SubsetsIIVisualizer() {
             y1={parentPos.y + radius}
             x2={pos.x}
             y2={pos.y - radius}
-            stroke={node.skipped ? "#ef4444" : isCurrent ? "#f43f5e" : "#6B7280"}
+            stroke={
+              node.skipped ? "#ef4444" : isCurrent ? "#f43f5e" : "#6B7280"
+            }
             strokeWidth={isCurrent ? 2.5 : 1.5}
             opacity={isVisible ? (node.skipped ? 0.4 : 0.6) : 0.2}
             strokeDasharray={node.skipped ? "4,4" : "none"}
@@ -348,11 +350,7 @@ export default function SubsetsIIVisualizer() {
               r={radius}
               fill={nodeColor}
               stroke={
-                node.skipped
-                  ? "#f87171"
-                  : isCurrent
-                    ? "#fb7185"
-                    : "#34d399"
+                node.skipped ? "#f87171" : isCurrent ? "#fb7185" : "#34d399"
               }
               strokeWidth={isCurrent ? 3 : 1.5}
               opacity={node.skipped ? 0.5 : 1}
@@ -497,7 +495,8 @@ export default function SubsetsIIVisualizer() {
           <span className="w-3 h-3 bg-green-500 rounded-full" /> saved
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-red-500 rounded-full opacity-50" /> skipped
+          <span className="w-3 h-3 bg-red-500 rounded-full opacity-50" />{" "}
+          skipped
         </span>
       </div>
 
@@ -543,7 +542,9 @@ export default function SubsetsIIVisualizer() {
       {/* Key insight */}
       <div className="mt-4 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
         <span className="text-rose-400">Key:</span> Sort first, then skip when{" "}
-        <code className="text-rose-400">i &gt; start && nums[i] == nums[i-1]</code>
+        <code className="text-rose-400">
+          i &gt; start && nums[i] == nums[i-1]
+        </code>
       </div>
     </div>
   );

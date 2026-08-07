@@ -116,8 +116,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Back"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
 
@@ -139,7 +149,11 @@ const Controls = ({
           className="w-12 h-12 flex items-center justify-center bg-green-600 rounded-full hover:bg-green-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-green-600/20"
           title="Play"
         >
-          <svg className="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-6 h-6 ml-0.5"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
@@ -151,8 +165,18 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         title="Step Forward"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
 
@@ -161,15 +185,27 @@ const Controls = ({
         className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-all ml-2"
         title="Reset"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </button>
     </div>
 
     <div className="flex items-center justify-center gap-4">
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Speed</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Speed
+        </span>
         <div className="flex gap-1">
           {[
             { value: 1000, label: "0.5x" },
@@ -192,7 +228,9 @@ const Controls = ({
       </div>
 
       <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg px-3 py-1.5">
-        <span className="text-xs text-gray-500 uppercase tracking-wide">Step</span>
+        <span className="text-xs text-gray-500 uppercase tracking-wide">
+          Step
+        </span>
         <span className="text-sm font-mono text-white">
           {step + 1} <span className="text-gray-500">/</span> {total + 1}
         </span>
@@ -240,7 +278,9 @@ const NodeCard = ({
       <div className="text-base font-mono font-bold text-white mb-1">
         [{getLabel()}]
       </div>
-      <div className={`text-xs ${node.isPruned ? "text-red-300" : node.isComplete ? "text-green-300" : "text-gray-400"}`}>
+      <div
+        className={`text-xs ${node.isPruned ? "text-red-300" : node.isComplete ? "text-green-300" : "text-gray-400"}`}
+      >
         {getStatus()}
       </div>
     </motion.div>
@@ -301,7 +341,8 @@ export default function PalindromePartitionVisualizer() {
   }, [nodeOrder]);
 
   const getMessage = () => {
-    if (step === 0) return `Start: Partition "${INPUT_STRING}" into palindromes`;
+    if (step === 0)
+      return `Start: Partition "${INPUT_STRING}" into palindromes`;
 
     const curr = currentNode;
 
@@ -329,7 +370,9 @@ export default function PalindromePartitionVisualizer() {
           <div key={node.id} className="flex flex-col items-center">
             {/* Edge label */}
             {node.substring && visibleNodes.has(node.id) && (
-              <div className={`text-sm font-mono mb-2 px-2 py-0.5 rounded ${node.isPruned ? "text-red-400 bg-red-900/30" : "text-amber-400 bg-amber-900/30"}`}>
+              <div
+                className={`text-sm font-mono mb-2 px-2 py-0.5 rounded ${node.isPruned ? "text-red-400 bg-red-900/30" : "text-amber-400 bg-amber-900/30"}`}
+              >
                 take &quot;{node.substring}&quot;
               </div>
             )}
@@ -351,7 +394,8 @@ export default function PalindromePartitionVisualizer() {
           Palindrome Partitioning
         </div>
         <div className="text-sm text-gray-400">
-          Partition &quot;{INPUT_STRING}&quot; such that every substring is a palindrome
+          Partition &quot;{INPUT_STRING}&quot; such that every substring is a
+          palindrome
         </div>
       </div>
 
@@ -377,7 +421,9 @@ export default function PalindromePartitionVisualizer() {
               }}
               className="w-14 h-14 rounded-xl flex items-center justify-center shadow-lg text-2xl font-bold text-white font-mono"
               style={{
-                boxShadow: highlighted ? "0 0 25px rgba(245, 158, 11, 0.5)" : "none",
+                boxShadow: highlighted
+                  ? "0 0 25px rgba(245, 158, 11, 0.5)"
+                  : "none",
               }}
             >
               {char}
@@ -432,16 +478,20 @@ export default function PalindromePartitionVisualizer() {
       {/* Legend */}
       <div className="flex justify-center gap-6 mt-4 text-sm text-gray-400">
         <span className="flex items-center gap-2">
-          <span className="w-4 h-4 bg-amber-600 rounded border-2 border-amber-400" /> current
+          <span className="w-4 h-4 bg-amber-600 rounded border-2 border-amber-400" />{" "}
+          current
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-4 h-4 bg-violet-900 rounded border-2 border-violet-500" /> exploring
+          <span className="w-4 h-4 bg-violet-900 rounded border-2 border-violet-500" />{" "}
+          exploring
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-4 h-4 bg-green-900 rounded border-2 border-green-500" /> complete
+          <span className="w-4 h-4 bg-green-900 rounded border-2 border-green-500" />{" "}
+          complete
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-4 h-4 bg-red-900/60 rounded border-2 border-red-500/50" /> pruned
+          <span className="w-4 h-4 bg-red-900/60 rounded border-2 border-red-500/50" />{" "}
+          pruned
         </span>
       </div>
 
@@ -480,7 +530,8 @@ export default function PalindromePartitionVisualizer() {
 
       {/* Key insight */}
       <div className="mt-4 pt-4 border-t border-gray-800 text-sm text-gray-500 text-center">
-        <span className="text-amber-400">Key insight:</span> Only continue exploring if the current substring is a palindrome (early pruning)
+        <span className="text-amber-400">Key insight:</span> Only continue
+        exploring if the current substring is a palindrome (early pruning)
       </div>
     </div>
   );

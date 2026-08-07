@@ -208,6 +208,26 @@ const TrieSearchVisualizer = dynamic(
   () => import("@/components/visualizers/TrieSearchVisualizer"),
   { loading: VisualizerLoading, ssr: false }
 );
+const TrieAutocompleteVisualizer = dynamic(
+  () => import("@/components/visualizers/TrieAutocompleteVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const SearchSuggestionsVisualizer = dynamic(
+  () => import("@/components/visualizers/SearchSuggestionsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const WildcardSearchVisualizer = dynamic(
+  () => import("@/components/visualizers/WildcardSearchVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const WordSearchIIVisualizer = dynamic(
+  () => import("@/components/visualizers/WordSearchIIVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
+const ReplaceWordsVisualizer = dynamic(
+  () => import("@/components/visualizers/ReplaceWordsVisualizer"),
+  { loading: VisualizerLoading, ssr: false }
+);
 const TwoSumSortedVisualizer = dynamic(
   () => import("@/components/visualizers/TwoSumSortedVisualizer"),
   { loading: VisualizerLoading, ssr: false }
@@ -1149,21 +1169,71 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
         )}
 
       {/* Trie Visualizers */}
-      {cat === "Trie" &&
-        title.includes("Interactive") &&
-        title.includes("Insert") && (
-          <div className="mt-8">
-            <TrieInsertVisualizer />
-          </div>
-        )}
+      {cat === "Trie" && title.includes("Implementing Insert") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Trie Insert
+          </h4>
+          <TrieInsertVisualizer />
+        </div>
+      )}
 
-      {cat === "Trie" &&
-        title.includes("Interactive") &&
-        title.includes("Search") && (
-          <div className="mt-8">
-            <TrieSearchVisualizer />
-          </div>
-        )}
+      {cat === "Trie" && title.includes("Search and StartsWith") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Search vs
+            StartsWith
+          </h4>
+          <TrieSearchVisualizer />
+        </div>
+      )}
+
+      {cat === "Trie" && title.includes("Autocomplete with Trie") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Autocomplete
+          </h4>
+          <TrieAutocompleteVisualizer />
+        </div>
+      )}
+
+      {cat === "Trie" && title.includes("Search Suggestions System") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Search
+            Suggestions
+          </h4>
+          <SearchSuggestionsVisualizer />
+        </div>
+      )}
+
+      {cat === "Trie" && title.includes("Wildcard Search") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Wildcard
+            Search
+          </h4>
+          <WildcardSearchVisualizer />
+        </div>
+      )}
+
+      {cat === "Trie" && title.includes("Word Search II") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Word Search II
+          </h4>
+          <WordSearchIIVisualizer />
+        </div>
+      )}
+
+      {cat === "Trie" && title.includes("Replace Words") && (
+        <div className="mt-8">
+          <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span className="text-green-400">▶</span> Interactive Replace Words
+          </h4>
+          <ReplaceWordsVisualizer />
+        </div>
+      )}
 
       {/* Two Pointers Visualizers */}
       {cat === "Two Pointers" &&
@@ -1250,8 +1320,8 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
         !title.includes("Handling Duplicates") && (
           <div className="mt-8">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <span className="text-purple-400">▶</span> Interactive Permutations
-              Generator
+              <span className="text-purple-400">▶</span> Interactive
+              Permutations Generator
             </h4>
             <PermutationsVisualizer />
           </div>
@@ -1262,8 +1332,8 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
         !title.includes("Letter") && (
           <div className="mt-8">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <span className="text-purple-400">▶</span> Interactive Combinations
-              Generator
+              <span className="text-purple-400">▶</span> Interactive
+              Combinations Generator
             </h4>
             <CombinationsVisualizer />
           </div>
@@ -1289,8 +1359,8 @@ const renderVisualizers = (pattern: Pattern, section: TutorialSectionType) => {
           </div>
           <div className="mt-8">
             <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <span className="text-indigo-400">▶</span> Interactive Permutations
-              II
+              <span className="text-indigo-400">▶</span> Interactive
+              Permutations II
             </h4>
             <PermutationsIIVisualizer />
           </div>

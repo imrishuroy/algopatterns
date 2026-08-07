@@ -245,7 +245,8 @@ export default function CombinationsVisualizer() {
 
   // Calculate C(n,k)
   const totalCombinations = useMemo(() => {
-    const factorial = (x: number): number => (x <= 1 ? 1 : x * factorial(x - 1));
+    const factorial = (x: number): number =>
+      x <= 1 ? 1 : x * factorial(x - 1);
     return factorial(N) / (factorial(K) * factorial(N - K));
   }, []);
 
@@ -355,7 +356,9 @@ export default function CombinationsVisualizer() {
               cy={pos.y}
               r={radius}
               fill={nodeColor}
-              stroke={isCurrent ? "#22d3ee" : isComplete ? "#34d399" : "#6B7280"}
+              stroke={
+                isCurrent ? "#22d3ee" : isComplete ? "#34d399" : "#6B7280"
+              }
               strokeWidth={isCurrent ? 3 : 1.5}
             />
             <text
@@ -378,8 +381,7 @@ export default function CombinationsVisualizer() {
   };
 
   const getMessage = () => {
-    if (step === 0)
-      return `Start: Choose ${K} elements from [1, 2, 3, 4]`;
+    if (step === 0) return `Start: Choose ${K} elements from [1, 2, 3, 4]`;
 
     const curr = currentNode;
     const prev = nodeOrder[step - 1];
@@ -493,7 +495,8 @@ export default function CombinationsVisualizer() {
           <span className="w-3 h-3 bg-violet-500 rounded-full" /> exploring
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-green-500 rounded-full" /> complete (k={K})
+          <span className="w-3 h-3 bg-green-500 rounded-full" /> complete (k={K}
+          )
         </span>
       </div>
 

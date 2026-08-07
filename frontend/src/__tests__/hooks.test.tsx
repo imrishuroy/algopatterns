@@ -1778,7 +1778,10 @@ describe("useGlobalSearch", () => {
     vi.restoreAllMocks();
   });
 
-  function fireKeydown(key: string, modifiers: { metaKey?: boolean; ctrlKey?: boolean } = {}) {
+  function fireKeydown(
+    key: string,
+    modifiers: { metaKey?: boolean; ctrlKey?: boolean } = {}
+  ) {
     const event = new KeyboardEvent("keydown", {
       key,
       metaKey: modifiers.metaKey ?? false,
@@ -1801,7 +1804,10 @@ describe("useGlobalSearch", () => {
     const { unmount } = renderHook(() => useGlobalSearch());
 
     unmount();
-    expect(removeEventSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+    expect(removeEventSpy).toHaveBeenCalledWith(
+      "keydown",
+      expect.any(Function)
+    );
   });
 
   it("should open search on Cmd+K (Mac)", () => {

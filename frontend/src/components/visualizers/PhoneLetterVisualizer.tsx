@@ -243,10 +243,7 @@ export default function PhoneLetterVisualizer() {
   }, [nodeOrder, step]);
 
   const totalCombinations = useMemo(() => {
-    return DIGITS.split("").reduce(
-      (acc, d) => acc * MAPPING[d].length,
-      1
-    );
+    return DIGITS.split("").reduce((acc, d) => acc * MAPPING[d].length, 1);
   }, []);
 
   // Tree positions
@@ -351,7 +348,9 @@ export default function PhoneLetterVisualizer() {
               cy={pos.y}
               r={radius}
               fill={nodeColor}
-              stroke={isCurrent ? "#fbbf24" : isComplete ? "#34d399" : "#6B7280"}
+              stroke={
+                isCurrent ? "#fbbf24" : isComplete ? "#34d399" : "#6B7280"
+              }
               strokeWidth={isCurrent ? 3 : 1.5}
             />
             <text

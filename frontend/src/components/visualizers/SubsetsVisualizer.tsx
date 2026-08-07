@@ -223,7 +223,10 @@ export default function SubsetsVisualizer() {
 
     const getSubtreeWidth = (node: TreeNode): number => {
       if (node.children.length === 0) return 60;
-      return node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) + (node.children.length - 1) * 10;
+      return (
+        node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
+        (node.children.length - 1) * 10
+      );
     };
 
     const assignPositions = (
@@ -237,10 +240,9 @@ export default function SubsetsVisualizer() {
 
       if (node.children.length === 0) return;
 
-      const totalWidth = node.children.reduce(
-        (sum, child) => sum + getSubtreeWidth(child),
-        0
-      ) + (node.children.length - 1) * 10;
+      const totalWidth =
+        node.children.reduce((sum, child) => sum + getSubtreeWidth(child), 0) +
+        (node.children.length - 1) * 10;
 
       let currentLeft = x - totalWidth / 2;
 
@@ -286,11 +288,7 @@ export default function SubsetsVisualizer() {
     if (!pos) return null;
 
     const radius = 22;
-    const nodeColor = isCurrent
-      ? "#a855f7"
-      : isVisible
-        ? "#10B981"
-        : "#374151";
+    const nodeColor = isCurrent ? "#a855f7" : isVisible ? "#10B981" : "#374151";
 
     return (
       <g key={node.id}>
@@ -335,10 +333,10 @@ export default function SubsetsVisualizer() {
   const getMessage = () => {
     if (step === 0) return "Save empty subset []";
     if (step >= maxSteps) return `Done! Generated all ${totalSubsets} subsets`;
-    
+
     const curr = currentNode;
     const prev = nodeOrder[step - 1];
-    
+
     if (curr.depth > prev.depth) {
       const added = curr.path[curr.path.length - 1];
       return `CHOOSE ${added} → Save [${curr.path.join(", ")}]`;
@@ -356,7 +354,8 @@ export default function SubsetsVisualizer() {
       <div className="text-center mb-4">
         <div className="text-lg font-medium text-white">Subsets Generator</div>
         <div className="text-sm text-gray-400">
-          Generate all 2^n = {Math.pow(2, NUMS.length)} subsets of [{NUMS.join(", ")}]
+          Generate all 2^n = {Math.pow(2, NUMS.length)} subsets of [
+          {NUMS.join(", ")}]
         </div>
       </div>
 
@@ -373,7 +372,9 @@ export default function SubsetsVisualizer() {
               }}
               className="w-14 h-14 rounded-lg flex flex-col items-center justify-center shadow-lg"
               style={{
-                boxShadow: isInPath ? "0 0 20px rgba(168, 85, 247, 0.4)" : "none",
+                boxShadow: isInPath
+                  ? "0 0 20px rgba(168, 85, 247, 0.4)"
+                  : "none",
               }}
             >
               <span className="text-xl font-bold text-white">{num}</span>
@@ -416,7 +417,13 @@ export default function SubsetsVisualizer() {
             preserveAspectRatio="xMidYMid meet"
             className="bg-gray-800/30 rounded-lg"
           >
-            {renderTreeNode(tree, undefined, visibleNodes, currentNode?.id, positions)}
+            {renderTreeNode(
+              tree,
+              undefined,
+              visibleNodes,
+              currentNode?.id,
+              positions
+            )}
           </svg>
         </motion.div>
       </AnimatePresence>

@@ -43,7 +43,12 @@ const buildCombinationSumTree = (): TreeNode => {
         children: [],
         depth: node.depth + 1,
         remaining: newRemaining,
-        status: newRemaining === 0 ? "found" : newRemaining < 0 ? "pruned" : "exploring",
+        status:
+          newRemaining === 0
+            ? "found"
+            : newRemaining < 0
+              ? "pruned"
+              : "exploring",
       };
       node.children.push(child);
 
@@ -541,7 +546,8 @@ export default function CombinationSumVisualizer() {
       {step >= maxSteps && (
         <div className="text-sm text-center bg-green-600/20 px-4 py-2 rounded-lg mt-4">
           <span className="text-green-400 font-bold">
-            Complete! Found {foundCombinations.length} combination(s) that sum to {TARGET}
+            Complete! Found {foundCombinations.length} combination(s) that sum
+            to {TARGET}
           </span>
         </div>
       )}

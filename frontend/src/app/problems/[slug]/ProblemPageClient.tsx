@@ -2710,7 +2710,12 @@ export default function ProblemPageClient({ params }: PageProps) {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
               {showLangDropdown && (
@@ -2730,8 +2735,18 @@ export default function ProblemPageClient({ params }: PageProps) {
                     >
                       <span>{t.languageName}</span>
                       {selectedLanguageId === t.languageId && (
-                        <svg className="w-4 h-4 ml-auto text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-4 h-4 ml-auto text-indigo-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       )}
                     </button>
@@ -2746,21 +2761,42 @@ export default function ProblemPageClient({ params }: PageProps) {
                 onClick={() => setFontSize(Math.max(10, fontSize - 2))}
                 className="px-2 text-gray-400 hover:text-white transition"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 12H4"
+                  />
                 </svg>
               </button>
-              <span className="text-gray-300 text-sm w-6 text-center font-mono">{fontSize}</span>
+              <span className="text-gray-300 text-sm w-6 text-center font-mono">
+                {fontSize}
+              </span>
               <button
                 onClick={() => setFontSize(Math.min(24, fontSize + 2))}
                 className="px-2 text-gray-400 hover:text-white transition"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
               </button>
             </div>
-
           </div>
 
           {/* Right section - Tab size, Timer, Run, Submit (always visible) */}
@@ -2770,7 +2806,9 @@ export default function ProblemPageClient({ params }: PageProps) {
               <button
                 onClick={() => setTabSize(2)}
                 className={`px-2 text-sm font-mono transition ${
-                  tabSize === 2 ? "bg-indigo-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  tabSize === 2
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                 }`}
               >
                 2
@@ -2778,7 +2816,9 @@ export default function ProblemPageClient({ params }: PageProps) {
               <button
                 onClick={() => setTabSize(4)}
                 className={`px-2 text-sm font-mono transition ${
-                  tabSize === 4 ? "bg-indigo-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  tabSize === 4
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                 }`}
               >
                 4
@@ -2787,10 +2827,22 @@ export default function ProblemPageClient({ params }: PageProps) {
 
             {/* Timer */}
             <div className="flex items-center gap-1 px-2 bg-gray-800 rounded-md border border-gray-700 h-8">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
-              <span className={`text-sm font-mono ${problemSolved ? "text-emerald-400" : "text-white"}`}>
+              <span
+                className={`text-sm font-mono ${problemSolved ? "text-emerald-400" : "text-white"}`}
+              >
                 {formatTime(timerSeconds)}
               </span>
               <button
@@ -2799,12 +2851,32 @@ export default function ProblemPageClient({ params }: PageProps) {
                 title={timerRunning ? "Pause timer" : "Start timer"}
               >
                 {timerRunning ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 9v6m4-6v6"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                    />
                   </svg>
                 )}
               </button>
@@ -2821,9 +2893,24 @@ export default function ProblemPageClient({ params }: PageProps) {
             >
               {isRunning ? (
                 <span className="flex items-center gap-1.5">
-                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="animate-spin w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Run
                 </span>
@@ -2844,9 +2931,24 @@ export default function ProblemPageClient({ params }: PageProps) {
             >
               {isSubmitting ? (
                 <span className="flex items-center gap-1.5">
-                  <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <svg
+                    className="animate-spin w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
                   </svg>
                   Submit
                 </span>

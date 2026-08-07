@@ -1,0 +1,7 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Superpowers plugin for structured development workflow
+  // Skills: brainstorming, writing-plans, executing-plans, test-driven-development,
+  //         requesting-code-review, systematic-debugging, subagent-driven-development
+  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"]
+}

@@ -20,6 +20,7 @@ type Config struct {
 	Email       EmailConfig
 	AI          AIConfig
 	Sentry      SentryConfig
+	PostHog     PostHogConfig
 }
 
 type SentryConfig struct {
@@ -38,6 +39,11 @@ type SentryConfig struct {
 	DisableMetrics   bool
 	TracePropagation bool
 	MaxSpans         int
+}
+
+type PostHogConfig struct {
+	APIKey string
+	Host   string
 }
 
 type AIConfig struct {
@@ -251,6 +257,10 @@ func Load() (*Config, error) {
 			DisableMetrics:   getBoolEnv("SENTRY_DISABLE_METRICS", false),
 			TracePropagation: getBoolEnv("SENTRY_TRACE_PROPAGATION", true),
 			MaxSpans:         getIntEnv("SENTRY_MAX_SPANS", 1000),
+		},
+		PostHog: PostHogConfig{
+			APIKey: getEnv("POSTHOG_API_KEY", ""),
+			Host:   getEnv("POSTHOG_HOST", "https://us.i.posthog.com"),
 		},
 	}
 

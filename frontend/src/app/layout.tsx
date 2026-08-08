@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Script from "next/script";
 import { Geist, Geist_Mono, Fredoka } from "next/font/google";
 import "./globals.css";
@@ -11,6 +12,7 @@ import { HighlightProvider } from "@/contexts/HighlightContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { PatternProgressProvider } from "@/contexts/PatternProgressContext";
 import { SearchProvider } from "@/contexts/SearchContext";
+import { PostHogProvider } from "@/contexts/PostHogContext";
 import { defaultMetadata } from "@/lib/seo";
 import { WebsiteJsonLd, OrganizationJsonLd } from "@/components/seo/JsonLd";
 import { GlobalSearchHandler } from "@/components/search/GlobalSearchHandler";
@@ -67,27 +69,31 @@ export default function RootLayout({
         className="min-h-full flex flex-col text-gray-100"
         suppressHydrationWarning
       >
-        <ThemeProvider>
-          <LanguageProvider>
-            <AuthProvider>
-              <SubscriptionProvider>
-                <HighlightProvider>
-                  <ProgressProvider>
-                    <PatternProgressProvider>
-                      <FilterProvider>
-                        <SearchProvider>
-                          <GlobalSearchHandler />
-                          <Header />
-                          <main className="flex-1">{children}</main>
-                        </SearchProvider>
-                      </FilterProvider>
-                    </PatternProgressProvider>
-                  </ProgressProvider>
-                </HighlightProvider>
-              </SubscriptionProvider>
-            </AuthProvider>
-          </LanguageProvider>
-        </ThemeProvider>
+        <Suspense fallback={null}>
+          <PostHogProvider>
+            <ThemeProvider>
+              <LanguageProvider>
+                <AuthProvider>
+                  <SubscriptionProvider>
+                    <HighlightProvider>
+                      <ProgressProvider>
+                        <PatternProgressProvider>
+                          <FilterProvider>
+                            <SearchProvider>
+                              <GlobalSearchHandler />
+                              <Header />
+                              <main className="flex-1">{children}</main>
+                            </SearchProvider>
+                          </FilterProvider>
+                        </PatternProgressProvider>
+                      </ProgressProvider>
+                    </HighlightProvider>
+                  </SubscriptionProvider>
+                </AuthProvider>
+              </LanguageProvider>
+            </ThemeProvider>
+          </PostHogProvider>
+        </Suspense>
       </body>
     </html>
   );

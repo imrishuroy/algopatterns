@@ -369,7 +369,7 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 		searchHandler := handlers.NewSearchHandler(searchService, authMW)
 		searchHandler.RegisterRoutes(v1)
 
-		paymentHandler := handlers.NewPaymentHandler(paymentService, webhookService, authMW)
+		paymentHandler := handlers.NewPaymentHandler(paymentService, webhookService, authMW, posthogClient)
 		paymentHandler.RegisterRoutes(v1)
 
 		if aiService != nil {

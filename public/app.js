@@ -1,6 +1,13 @@
-/* global patternsData, dataAdapter */
+/* global patternsData, dataAdapter, posthog */
 "use strict";
 const STORAGE_KEY = 'dsa-tracker-completed';
+
+// PostHog tracking helper
+const trackEvent = (event, properties = {}) => {
+    if (typeof posthog !== 'undefined' && posthog.capture) {
+        posthog.capture(event, properties);
+    }
+};
 const questions = [
     // Arrays & Strings
     { id: 'as-1', name: 'Two Sum', url: 'https://leetcode.com/problems/two-sum', difficulty: 'Easy', pattern: 'Hash Map', companies: ['Google', 'Amazon', 'Meta', 'Apple', 'Microsoft', 'Netflix', 'LinkedIn', 'Tesla', 'Databricks'], frequency: '🔥🔥🔥', category: 'Arrays & Strings' },

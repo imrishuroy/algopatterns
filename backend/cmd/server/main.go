@@ -342,7 +342,7 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 		patternHandler := handlers.NewPatternHandler(patternService, featureAccess, authMW)
 		patternHandler.RegisterRoutes(v1)
 
-		authHandler := handlers.NewAuthHandler(authService, authMW, secureCookie)
+		authHandler := handlers.NewAuthHandler(authService, authMW, secureCookie, posthogClient)
 		authHandler.RegisterRoutes(v1)
 
 		oauthHandler := handlers.NewOAuthHandler(oauthService, authService, sessionService, authMW, secureCookie)

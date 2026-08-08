@@ -19,16 +19,22 @@ const (
 )
 
 type AuthHandler struct {
-	authService  *services.AuthService
-	authMW       *middleware.AuthMiddleware
-	secureCookie bool
+	authService   *services.AuthService
+	authMW        *middleware.AuthMiddleware
+	secureCookie  bool
+	posthogClient interface {
+		Capture(distinctID, event string, properties map[string]any)
+	}
 }
 
-func NewAuthHandler(authService *services.AuthService, authMW *middleware.AuthMiddleware, secureCookie bool) *AuthHandler {
+func NewAuthHandler(authService *services.AuthService, authMW *middleware.AuthMiddleware, secureCookie bool, posthogClient interface {
+	Capture(distinctID, event string, properties map[string]any)
+}) *AuthHandler {
 	return &AuthHandler{
-		authService:  authService,
-		authMW:       authMW,
-		secureCookie: secureCookie,
+		authService:   authService,
+		authMW:        authMW,
+		secureCookie:  secureCookie,
+		posthogClient: posthogClient,
 	}
 }
 
@@ -85,6 +91,12 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	}
 
 	h.setRefreshTokenCookie(c, refreshToken)
+
+	if h.posthogClient != nil {
+		h.posthogClient.Capture(user.ID.String(), "user_registered", map[string]any{
+			"method": "email",
+		})
+	}
 
 	response.Created(c, models.AuthResponse{
 		User:        services.UserToResponse(user),

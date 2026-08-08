@@ -23,17 +23,24 @@ type PaymentHandler struct {
 	paymentService *services.PaymentService
 	webhookService *services.WebhookService
 	authMW         *middleware.AuthMiddleware
+	posthogClient  interface {
+		Capture(distinctID, event string, properties map[string]any)
+	}
 }
 
 func NewPaymentHandler(
 	paymentService *services.PaymentService,
 	webhookService *services.WebhookService,
 	authMW *middleware.AuthMiddleware,
+	posthogClient interface {
+		Capture(distinctID, event string, properties map[string]any)
+	},
 ) *PaymentHandler {
 	return &PaymentHandler{
 		paymentService: paymentService,
 		webhookService: webhookService,
 		authMW:         authMW,
+		posthogClient:  posthogClient,
 	}
 }
 
@@ -148,6 +155,12 @@ func (h *PaymentHandler) VerifyPayment(c *gin.Context) {
 	if err != nil {
 		h.handlePaymentError(c, err)
 		return
+	}
+
+	if h.posthogClient != nil {
+		h.posthogClient.Capture(userID.String(), "subscription_activated", map[string]any{
+			"order_id": req.RazorpayOrderID,
+		})
 	}
 
 	response.OK(c, result)

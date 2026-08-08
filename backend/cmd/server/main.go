@@ -23,6 +23,7 @@ import (
 	"github.com/imrishuroy/algopatterns/internal/handlers"
 	"github.com/imrishuroy/algopatterns/internal/metrics"
 	"github.com/imrishuroy/algopatterns/internal/middleware"
+	"github.com/imrishuroy/algopatterns/internal/posthog"
 	"github.com/imrishuroy/algopatterns/internal/razorpay"
 	"github.com/imrishuroy/algopatterns/internal/repository"
 	"github.com/imrishuroy/algopatterns/internal/services"
@@ -242,8 +243,14 @@ func main() {
 		log.Info().Msg("AI service disabled")
 	}
 
+	posthogClient := posthog.NewClient(cfg.PostHog.APIKey, cfg.PostHog.Host)
+	defer posthogClient.Close()
+	if posthogClient.IsEnabled() {
+		log.Info().Msg("PostHog analytics initialized")
+	}
+
 	gin.SetMode(cfg.Server.Mode)
-	router := setupRouter(cfg, db, patternService, authService, oauthService, sessionService, progressService, problemService, submissionService, highlightService, patternProgressService, quizService, searchService, paymentService, webhookService, featureAccess, aiService)
+	router := setupRouter(cfg, db, patternService, authService, oauthService, sessionService, progressService, problemService, submissionService, highlightService, patternProgressService, quizService, searchService, paymentService, webhookService, featureAccess, aiService, posthogClient)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port),
@@ -282,7 +289,7 @@ func setupLogger(cfg config.LoggingConfig) {
 	}
 }
 
-func setupRouter(cfg *config.Config, db *repository.Database, patternService *services.PatternService, authService *services.AuthService, oauthService *services.OAuthService, sessionService *services.SessionService, progressService *services.ProgressService, problemService *services.ProblemService, submissionService *services.SubmissionService, highlightService *services.HighlightService, patternProgressService *services.PatternProgressService, quizService *services.QuizService, searchService *services.SearchService, paymentService *services.PaymentService, webhookService *services.WebhookService, featureAccess *services.FeatureAccess, aiService *ai.Service) *gin.Engine {
+func setupRouter(cfg *config.Config, db *repository.Database, patternService *services.PatternService, authService *services.AuthService, oauthService *services.OAuthService, sessionService *services.SessionService, progressService *services.ProgressService, problemService *services.ProblemService, submissionService *services.SubmissionService, highlightService *services.HighlightService, patternProgressService *services.PatternProgressService, quizService *services.QuizService, searchService *services.SearchService, paymentService *services.PaymentService, webhookService *services.WebhookService, featureAccess *services.FeatureAccess, aiService *ai.Service, posthogClient *posthog.Client) *gin.Engine {
 	router := gin.New()
 
 	rateLimiter := middleware.NewRateLimiter(cfg.Server.RateLimitRPS, cfg.Server.RateLimitBurst)
@@ -335,7 +342,7 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 		patternHandler := handlers.NewPatternHandler(patternService, featureAccess, authMW)
 		patternHandler.RegisterRoutes(v1)
 
-		authHandler := handlers.NewAuthHandler(authService, authMW, secureCookie)
+		authHandler := handlers.NewAuthHandler(authService, authMW, secureCookie, posthogClient)
 		authHandler.RegisterRoutes(v1)
 
 		oauthHandler := handlers.NewOAuthHandler(oauthService, authService, sessionService, authMW, secureCookie)
@@ -362,7 +369,7 @@ func setupRouter(cfg *config.Config, db *repository.Database, patternService *se
 		searchHandler := handlers.NewSearchHandler(searchService, authMW)
 		searchHandler.RegisterRoutes(v1)
 
-		paymentHandler := handlers.NewPaymentHandler(paymentService, webhookService, authMW)
+		paymentHandler := handlers.NewPaymentHandler(paymentService, webhookService, authMW, posthogClient)
 		paymentHandler.RegisterRoutes(v1)
 
 		if aiService != nil {

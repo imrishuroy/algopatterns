@@ -1,6 +1,18 @@
 import * as Sentry from "@sentry/nextjs";
+import posthog from "posthog-js";
 
 const isProduction = process.env.NODE_ENV === "production";
+
+// PostHog initialization
+if (typeof window !== "undefined") {
+  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN!, {
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+    defaults: "2026-05-30",
+    capture_pageview: false, // We capture manually for SPA navigation
+    capture_pageleave: true,
+    persistence: "localStorage",
+  });
+}
 const release = process.env.NEXT_PUBLIC_SENTRY_RELEASE || process.env.NEXT_PUBLIC_GIT_TAG || process.env.NEXT_PUBLIC_GIT_COMMIT;
 
 Sentry.init({

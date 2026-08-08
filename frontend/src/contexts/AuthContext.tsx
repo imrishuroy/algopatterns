@@ -9,7 +9,8 @@ import {
   type ReactNode,
 } from "react";
 import { apiClient } from "@/lib/api";
-import { getPostHogClient } from "@/lib/posthog";
+import posthog from "posthog-js";
+import { isPostHogEnabled } from "@/lib/posthog";
 import type { User, RegisterRequest, LoginRequest } from "@/types";
 
 interface AuthContextType {
@@ -44,8 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await apiClient.getMe();
       if (response.success) {
         setUser(response.data);
-        const posthog = getPostHogClient();
-        if (posthog && response.data?.id) {
+        if (isPostHogEnabled() && response.data?.id) {
           posthog.identify(response.data.id);
         }
       } else {
@@ -84,8 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await apiClient.login(req);
       if (response.success) {
         setUser(response.data.user);
-        const posthog = getPostHogClient();
-        if (posthog && response.data.user.id) {
+        if (isPostHogEnabled() && response.data.user.id) {
           posthog.identify(response.data.user.id);
         }
         localStorage.setItem(ACCESS_TOKEN_KEY, response.data.accessToken);
@@ -105,8 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await apiClient.register(req);
       if (response.success) {
         setUser(response.data.user);
-        const posthog = getPostHogClient();
-        if (posthog && response.data.user.id) {
+        if (isPostHogEnabled() && response.data.user.id) {
           posthog.identify(response.data.user.id);
           posthog.capture("user_signed_up", { method: "email" });
         }
@@ -129,8 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       apiClient.setAccessToken(null);
       localStorage.removeItem(ACCESS_TOKEN_KEY);
-      const posthog = getPostHogClient();
-      if (posthog) {
+      if (isPostHogEnabled()) {
         posthog.reset();
       }
     }
@@ -163,8 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const response = await apiClient.googleCallback({ code, state });
         if (response.success) {
           setUser(response.data.user);
-          const posthog = getPostHogClient();
-          if (posthog && response.data.user.id) {
+          if (isPostHogEnabled() && response.data.user.id) {
             posthog.identify(response.data.user.id);
             posthog.capture("user_signed_up", { method: "google" });
           }

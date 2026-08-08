@@ -7,7 +7,7 @@ A full-stack algorithm learning platform featuring a **production-ready Go backe
 ![CockroachDB](https://img.shields.io/badge/CockroachDB-Distributed_SQL-6933FF?style=flat-square)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat-square&logo=docker)
 ![JWT](https://img.shields.io/badge/JWT-Authentication-000000?style=flat-square)
-![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-16-cablack?style=flat-square&logo=next.js)
 
 [![DeepSource](https://app.deepsource.com/gh/imrishuroy/algopatterns.svg/?label=code+coverage&show_trend=true&token=baG8jjVOCa_menM6lWMnIZ8a)](https://app.deepsource.com/gh/imrishuroy/algopatterns/)
 

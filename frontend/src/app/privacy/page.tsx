@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     "AlgoPatterns Privacy Policy. Learn how we collect, use, and protect your personal information when you use our DSA learning platform.",
   openGraph: {
-    title: "Privacy Policy | AlgoPatterns",
+    title: "Privacy Policy",
     description:
       "Learn how AlgoPatterns collects, uses, and protects your personal information.",
     type: "website",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Pattern } from "@/types";
 import { CourseSidebar, CourseNavigation } from "@/components/course";
 import TutorialSection from "@/components/course/TutorialSection";
@@ -11,13 +12,33 @@ import { slugify, findSectionIndexBySlug } from "@/lib/slugify";
 interface TutorialTabProps {
   pattern: Pattern;
   onAskAI?: (selectedText: string) => void;
+  initialSectionSlug?: string;
 }
 
-const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+const TutorialTab = ({
+  pattern,
+  onAskAI,
+  initialSectionSlug,
+}: TutorialTabProps) => {
+  const router = useRouter();
+  const sections = pattern.tutorial || [];
+
+  const getInitialSectionIndex = () => {
+    if (initialSectionSlug === "quiz") {
+      return sections.length;
+    }
+    if (initialSectionSlug) {
+      const index = findSectionIndexBySlug(sections, initialSectionSlug);
+      return index !== -1 ? index : 0;
+    }
+    return 0;
+  };
+
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(
+    getInitialSectionIndex
+  );
   const sidebarRef = useRef<HTMLDivElement>(null);
   const hasTutorial = pattern.tutorial && pattern.tutorial.length > 0;
-  const sections = pattern.tutorial || [];
   const sectionsRef = useRef(sections);
   const isQuizPage = currentSectionIndex === sections.length;
 
@@ -26,19 +47,22 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
     sectionsRef.current = sections;
   });
 
-  const handleSectionChange = useCallback((index: number) => {
-    const currentSections = sectionsRef.current;
-    setCurrentSectionIndex(index);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const handleSectionChange = useCallback(
+    (index: number) => {
+      const currentSections = sectionsRef.current;
+      setCurrentSectionIndex(index);
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
-    // Update URL hash with section slug for shareable links
-    if (index === currentSections.length) {
-      window.history.replaceState(null, "", "#quiz");
-    } else if (currentSections[index]) {
-      const sectionSlug = slugify(currentSections[index].title);
-      window.history.replaceState(null, "", `#${sectionSlug}`);
-    }
-  }, []);
+      // Navigate to new URL
+      if (index === currentSections.length) {
+        router.push(`/patterns/${pattern.id}/quiz`, { scroll: false });
+      } else if (currentSections[index]) {
+        const sectionSlug = slugify(currentSections[index].title);
+        router.push(`/patterns/${pattern.id}/${sectionSlug}`, { scroll: false });
+      }
+    },
+    [pattern.id, router]
+  );
 
   // Handle sidebar scroll independently
   useEffect(() => {
@@ -66,66 +90,37 @@ const TutorialTab = ({ pattern, onAskAI }: TutorialTabProps) => {
     };
   }, []);
 
-  // Handle URL hash for direct navigation to sections
-  // Supports: #quiz, #section-0 (numeric), #minimum-arrows-to-burst-balloons (slug)
-  // skipcq: JS-R1005
+  // Legacy hash support: redirect hash URLs to new format
   useEffect(() => {
-    // Skip hash navigation if there are no sections
-    if (sections.length === 0) return undefined;
+    if (sections.length === 0) return;
 
-    // skipcq: JS-R1005
-    // Reason: Hash routing supports legacy numeric anchors, slugs, and quiz anchors.
-    const handleHashNavigation = () => {
-      const currentSections = sectionsRef.current;
-      const hash = window.location.hash;
-      if (!hash || hash === "#") return;
+    const hash = window.location.hash;
+    if (!hash || hash === "#") return;
 
-      const hashValue = hash.slice(1); // Remove the # prefix
+    const hashValue = hash.slice(1);
 
-      if (hashValue === "quiz") {
-        requestAnimationFrame(() => {
-          setCurrentSectionIndex(currentSections.length);
-        });
+    if (hashValue === "quiz") {
+      router.replace(`/patterns/${pattern.id}/quiz`);
+      return;
+    }
+
+    // Try numeric format: #section-0, #section-1, etc.
+    if (hashValue.startsWith("section-")) {
+      const index = parseInt(hashValue.replace("section-", ""), 10);
+      if (!isNaN(index) && index >= 0 && index < sections.length) {
+        const sectionSlug = slugify(sections[index].title);
+        router.replace(`/patterns/${pattern.id}/${sectionSlug}`);
         return;
       }
+    }
 
-      // Try numeric format: #section-0, #section-1, etc.
-      if (hashValue.startsWith("section-")) {
-        const index = parseInt(hashValue.replace("section-", ""), 10);
-        if (!isNaN(index) && index >= 0 && index < currentSections.length) {
-          requestAnimationFrame(() => {
-            setCurrentSectionIndex(index);
-            // Normalize URL to use slug format
-            const sectionSlug = slugify(currentSections[index].title);
-            window.history.replaceState(null, "", `#${sectionSlug}`);
-          });
-          return;
-        }
-      }
-
-      // Try slug format: #minimum-arrows-to-burst-balloons
-      const slugIndex = findSectionIndexBySlug(currentSections, hashValue);
-      if (slugIndex !== -1) {
-        requestAnimationFrame(() => {
-          setCurrentSectionIndex(slugIndex);
-          // Normalize URL in case of case differences
-          const normalizedSlug = slugify(currentSections[slugIndex].title);
-          if (hashValue !== normalizedSlug) {
-            window.history.replaceState(null, "", `#${normalizedSlug}`);
-          }
-        });
-      }
-    };
-
-    // Run on mount
-    handleHashNavigation();
-
-    // Listen for hash changes (for client-side navigation)
-    window.addEventListener("hashchange", handleHashNavigation);
-    return () => {
-      window.removeEventListener("hashchange", handleHashNavigation);
-    };
-  }, [sections.length]);
+    // Try slug format: #minimum-arrows-to-burst-balloons
+    const slugIndex = findSectionIndexBySlug(sections, hashValue);
+    if (slugIndex !== -1) {
+      const normalizedSlug = slugify(sections[slugIndex].title);
+      router.replace(`/patterns/${pattern.id}/${normalizedSlug}`);
+    }
+  }, [pattern.id, router, sections]);
 
   if (!hasTutorial) {
     return (

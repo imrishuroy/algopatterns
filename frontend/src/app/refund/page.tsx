@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     "AlgoPatterns refund and cancellation policy. Learn about our 7-day money-back guarantee, subscription cancellation process, and refund eligibility.",
   openGraph: {
-    title: "Refund and Cancellation Policy | AlgoPatterns",
+    title: "Refund and Cancellation Policy",
     description:
       "Learn about AlgoPatterns 7-day money-back guarantee and cancellation process.",
     type: "website",

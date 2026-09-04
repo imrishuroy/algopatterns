@@ -1,12 +1,20 @@
 import { Metadata } from "next";
 import ProblemPageClient from "./ProblemPageClient";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { questions } from "@/lib/questions";
+import { slugify } from "@/lib/slugify";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
+
+export const generateStaticParams = () => {
+  return questions.map((q) => ({
+    slug: slugify(q.name),
+  }));
+};
 
 // skipcq: JS-0067 — Next.js metadata generation function
 export async function generateMetadata({

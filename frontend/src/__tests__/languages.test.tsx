@@ -13,6 +13,23 @@ import type {
   CheatsheetContent,
 } from "@/types/languages";
 import { difficultyColors, languageAccents } from "@/types/languages";
+import { apiClient } from "@/lib/api";
+
+const mockPush = vi.fn();
+const mockReplace = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => ({
+    push: mockPush,
+    replace: mockReplace,
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  })),
+  usePathname: vi.fn(() => "/languages/go"),
+  useSearchParams: vi.fn(() => new URLSearchParams()),
+}));
 
 // Mocks
 vi.mock("@/hooks/useAIChat", () => ({
@@ -49,6 +66,15 @@ vi.mock("@/contexts/AuthContext", () => ({
     loginWithGoogle: vi.fn(),
     handleGoogleCallback: vi.fn(),
   })),
+}));
+
+vi.mock("@/lib/api", () => ({
+  apiClient: {
+    getPatternProgress: vi.fn(() => Promise.resolve({ success: true, data: { progress: {} } })),
+    syncPatternProgress: vi.fn(() => Promise.resolve({ success: true, data: {} })),
+    markSectionComplete: vi.fn(() => Promise.resolve({ success: true, data: {} })),
+    markSectionIncomplete: vi.fn(() => Promise.resolve({ success: true, data: {} })),
+  },
 }));
 
 vi.mock("@/contexts/HighlightContext", () => ({
@@ -1151,10 +1177,14 @@ describe("LanguageGuideClient", () => {
       handleGoogleCallback: vi.fn(),
     });
     Element.prototype.scrollIntoView = vi.fn();
+    mockPush.mockClear();
+    mockReplace.mockClear();
+    window.location.hash = "";
   });
 
   afterEach(() => {
     cleanup();
+    window.location.hash = "";
   });
 
   describe("Header", () => {
@@ -1183,9 +1213,12 @@ describe("LanguageGuideClient", () => {
       expect(backLinks.length).toBeGreaterThan(0);
     });
 
-    it("renders progress indicator", () => {
+    it("renders progress indicator", async () => {
       render(<LanguageGuideClient guide={mockGuide} />);
-      expect(screen.getByText("0/2")).toBeInTheDocument();
+      // Wait for progress loading to complete
+      await waitFor(() => {
+        expect(screen.getByText("0/2")).toBeInTheDocument();
+      });
       expect(screen.getByText("sections completed")).toBeInTheDocument();
     });
   });
@@ -1264,8 +1297,8 @@ describe("LanguageGuideClient", () => {
   });
 
   describe("Section Navigation", () => {
-    it("updates URL hash when section changes", async () => {
-      const replaceStateSpy = vi.spyOn(window.history, "replaceState");
+    it("updates URL when section changes", async () => {
+      mockPush.mockClear();
       render(<LanguageGuideClient guide={mockGuide} />);
 
       // Find and click on the Essential Concepts section (in sidebar)
@@ -1275,10 +1308,9 @@ describe("LanguageGuideClient", () => {
         fireEvent.click(sidebarButton.closest("button")!);
 
         await waitFor(() => {
-          expect(replaceStateSpy).toHaveBeenCalledWith(
-            null,
-            "",
-            "#essential-concepts"
+          expect(mockPush).toHaveBeenCalledWith(
+            "/languages/go/essential-concepts",
+            { scroll: false }
           );
         });
       }
@@ -1309,6 +1341,11 @@ describe("LanguageGuideClient", () => {
     it("tracks completed sections count", async () => {
       render(<LanguageGuideClient guide={mockGuide} />);
 
+      // Wait for progress loading to complete
+      await waitFor(() => {
+        expect(screen.getByText("0/2")).toBeInTheDocument();
+      });
+
       fireEvent.click(screen.getByText("Mark complete"));
 
       await waitFor(() => {
@@ -1317,15 +1354,19 @@ describe("LanguageGuideClient", () => {
     });
   });
 
-  describe("Hash Navigation", () => {
-    it("navigates to section based on URL hash", () => {
+  describe("Hash Navigation (Legacy Support)", () => {
+    it("redirects hash URLs to new format", async () => {
+      mockReplace.mockClear();
       // Set up hash
       window.location.hash = "#essential-concepts";
 
       render(<LanguageGuideClient guide={mockGuide} />);
 
-      // Trigger hashchange
-      fireEvent(window, new HashChangeEvent("hashchange"));
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalledWith(
+          "/languages/go/essential-concepts"
+        );
+      });
     });
   });
 
@@ -1351,6 +1392,11 @@ describe("LanguageGuideClient", () => {
   describe("Toggle Complete", () => {
     it("toggles section completion on and off", async () => {
       render(<LanguageGuideClient guide={mockGuide} />);
+
+      // Wait for progress loading to complete
+      await waitFor(() => {
+        expect(screen.getByText("0/2")).toBeInTheDocument();
+      });
 
       // Click mark complete
       const markCompleteButton = screen.getByText("Mark complete");
@@ -1387,6 +1433,139 @@ describe("LanguageGuideClient", () => {
         // Simulate mouse up
         fireEvent.mouseUp(document);
       }
+    });
+  });
+
+  describe("Progress API Integration", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+      localStorage.clear();
+    });
+
+    it("loads progress from API for authenticated users", async () => {
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValueOnce({
+        success: true,
+        data: { progress: { "tutorial-go": [0, 1] } },
+      });
+
+      render(<LanguageGuideClient guide={mockGuide} />);
+
+      await waitFor(() => {
+        expect(apiClient.getPatternProgress).toHaveBeenCalled();
+      });
+
+      // Should show 2/2 sections completed (mockGuide has 2 sections)
+      await waitFor(() => {
+        expect(screen.getByText("2/2")).toBeInTheDocument();
+      });
+    });
+
+    it("syncs local progress to backend when user has local data", async () => {
+      // Set up local storage with some progress
+      localStorage.setItem(
+        "algopatterns-tutorial-go-completed",
+        JSON.stringify([0])
+      );
+
+      // Server has no progress yet
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValueOnce({
+        success: true,
+        data: { progress: {} },
+      });
+
+      render(<LanguageGuideClient guide={mockGuide} />);
+
+      await waitFor(() => {
+        expect(apiClient.syncPatternProgress).toHaveBeenCalledWith({
+          "tutorial-go": [0],
+        });
+      });
+
+      // Local storage should be cleared after sync
+      await waitFor(() => {
+        expect(
+          localStorage.getItem("algopatterns-tutorial-go-completed")
+        ).toBeNull();
+      });
+    });
+
+    it("calls markSectionComplete when toggling a section complete", async () => {
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValueOnce({
+        success: true,
+        data: { progress: {} },
+      });
+
+      render(<LanguageGuideClient guide={mockGuide} />);
+
+      // Wait for loading to complete (mockGuide has 2 sections)
+      await waitFor(() => {
+        expect(screen.getByText("0/2")).toBeInTheDocument();
+      });
+
+      // Click mark complete (may be for any section depending on render order)
+      fireEvent.click(screen.getByText("Mark complete"));
+
+      await waitFor(() => {
+        expect(apiClient.markSectionComplete).toHaveBeenCalledWith(
+          "tutorial-go",
+          expect.any(Number)
+        );
+      });
+    });
+
+    it("calls markSectionIncomplete when toggling a section incomplete", async () => {
+      // Start with both sections completed so "Completed" button is always visible
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValueOnce({
+        success: true,
+        data: { progress: { "tutorial-go": [0, 1] } },
+      });
+
+      render(<LanguageGuideClient guide={mockGuide} />);
+
+      // Wait for loading to complete (mockGuide has 2 sections, both completed)
+      await waitFor(() => {
+        expect(screen.getByText("2/2")).toBeInTheDocument();
+      });
+
+      // Click "Completed" to toggle off (any section)
+      fireEvent.click(screen.getByText("Completed"));
+
+      await waitFor(() => {
+        expect(apiClient.markSectionIncomplete).toHaveBeenCalledWith(
+          "tutorial-go",
+          expect.any(Number)
+        );
+      });
+    });
+
+    it("reverts optimistic update on API error", async () => {
+      vi.mocked(apiClient.getPatternProgress).mockResolvedValueOnce({
+        success: true,
+        data: { progress: {} },
+      });
+      vi.mocked(apiClient.markSectionComplete).mockRejectedValueOnce(
+        new Error("API Error")
+      );
+
+      render(<LanguageGuideClient guide={mockGuide} />);
+
+      // Wait for loading to complete (mockGuide has 2 sections)
+      await waitFor(() => {
+        expect(screen.getByText("0/2")).toBeInTheDocument();
+      });
+
+      // Click mark complete (will fail)
+      fireEvent.click(screen.getByText("Mark complete"));
+
+      // Optimistic update shows "Completed" briefly
+      await waitFor(() => {
+        expect(screen.getByText("Completed")).toBeInTheDocument();
+      });
+
+      // After error, should revert back to "Mark complete"
+      await waitFor(() => {
+        expect(screen.getByText("Mark complete")).toBeInTheDocument();
+      });
     });
   });
 });

@@ -107,7 +107,7 @@ const FeaturesGrid = () => (
 
 export const metadata: Metadata = {
   title:
-    "Language-Specific Data Structures and Algorithms Guides | AlgoPatterns",
+    "Language-Specific Data Structures and Algorithms Guides",
   description:
     "Master data structures and algorithms in your favorite programming language. Comprehensive guides for Go, Rust, Java, and Python with practical examples for coding interviews.",
   keywords: [
@@ -122,7 +122,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title:
-      "Language-Specific Data Structures and Algorithms Guides | AlgoPatterns",
+      "Language-Specific Data Structures and Algorithms Guides",
     description:
       "Learn Data Structures and Algorithms in your favorite language with comprehensive guides and practical examples.",
     type: "website",
@@ -132,7 +132,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Language-Specific DSA Guides | AlgoPatterns",
+    title: "Language-Specific DSA Guides",
     description:
       "Master DSA in Go, Rust, Java, and Python with comprehensive guides.",
     images: ["/opengraph-image"],

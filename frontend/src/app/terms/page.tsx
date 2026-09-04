@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     "AlgoPatterns Terms of Service. Read our terms and conditions for using the DSA learning platform, subscriptions, and code execution services.",
   openGraph: {
-    title: "Terms of Service | AlgoPatterns",
+    title: "Terms of Service",
     description:
       "Terms and conditions for using AlgoPatterns DSA learning platform.",
     type: "website",

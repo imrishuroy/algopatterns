@@ -7,7 +7,7 @@ const siteUrl = siteConfig.url;
 
 export const metadata: Metadata = {
   title:
-    "Pattern Recognition Guide - Identify the Right Algorithm | AlgoPatterns",
+    "Pattern Recognition Guide - Identify the Right Algorithm",
   description:
     "Learn to identify the correct algorithm pattern for any coding problem. Constraint-based lookups, pattern cheatsheets, and keyword-to-algorithm mappings for FAANG interview prep.",
   keywords: [
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title:
-      "Pattern Recognition Guide - Identify the Right Algorithm | AlgoPatterns",
+      "Pattern Recognition Guide - Identify the Right Algorithm",
     description:
       "Constraint-based algorithm lookups, pattern cheatsheets, and keyword-to-algorithm mappings for coding interviews.",
     type: "article",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pattern Recognition Guide | AlgoPatterns",
+    title: "Pattern Recognition Guide",
     description:
       "Learn to identify the right algorithm for any coding problem with constraint and keyword lookups.",
     images: ["/opengraph-image"],

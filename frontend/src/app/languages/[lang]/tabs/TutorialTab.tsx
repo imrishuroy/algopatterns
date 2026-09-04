@@ -241,11 +241,13 @@ const ContentRenderer = ({
   language: string;
 }) => {
   // Generate a stable key for each content block
+  // Always include index to guarantee uniqueness
   const getBlockKey = (block: SectionContent, index: number): string => {
-    if (block.text) return `${block.type}-${block.text.slice(0, 30)}`;
-    if (block.code) return `code-${block.code.slice(0, 30)}`;
-    if (block.title) return `${block.type}-${block.title}`;
-    if (block.message) return `${block.type}-${block.message.slice(0, 30)}`;
+    if (block.text) return `${block.type}-${index}-${block.text.slice(0, 30)}`;
+    if (block.code) return `code-${index}-${block.code.slice(0, 30)}`;
+    if (block.title) return `${block.type}-${index}-${block.title}`;
+    if (block.message)
+      return `${block.type}-${index}-${block.message.slice(0, 30)}`;
     return `${block.type}-${index}`;
   };
 
@@ -458,14 +460,14 @@ const ContentRenderer = ({
                     </thead>
                   )}
                   <tbody className="divide-y divide-gray-700/50">
-                    {block.rows?.map((row) => (
+                    {block.rows?.map((row, rowIndex) => (
                       <tr
-                        key={row[0]}
+                        key={`row-${rowIndex}-${row[0]}`}
                         className="bg-gray-800/30 hover:bg-gray-800/50 transition-colors"
                       >
                         {row.map((cell, cellIndex) => (
                           <td
-                            key={cell}
+                            key={`${cellIndex}-${cell}`}
                             className={`px-4 py-3 ${cellIndex === 0 ? "font-mono text-emerald-400" : "text-gray-300"}`}
                           >
                             {cell}
@@ -497,8 +499,15 @@ export default function TutorialTab({
   onAskAI,
 }: TutorialTabProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const currentSection = guide.sections[currentSectionIndex];
   const isCompleted = completedSections.has(currentSectionIndex);
+
+  useEffect(() => {
+    if (contentRef.current && typeof contentRef.current.scrollTo === "function") {
+      contentRef.current.scrollTo(0, 0);
+    }
+  }, [currentSectionIndex]);
 
   return (
     <div className="flex h-full">
@@ -540,6 +549,7 @@ export default function TutorialTab({
 
       {/* Main Content - independent scroll */}
       <div
+        ref={contentRef}
         className={`flex-1 min-w-0 h-full overflow-y-auto transition-all duration-300 ease-in-out ${
           isSidebarCollapsed ? "lg:pl-4" : "lg:pl-8"
         } pr-4 lg:pr-8 py-4 md:py-8`}

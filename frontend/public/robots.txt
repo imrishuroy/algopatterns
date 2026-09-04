@@ -11,5 +11,30 @@ Disallow: /auth/
 Disallow: /sentry-example-page/
 Disallow: /sentry-tunnel
 
+# Allow AI crawlers for AI search visibility
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
 # Sitemap
 Sitemap: https://algopatterns.in/sitemap.xml

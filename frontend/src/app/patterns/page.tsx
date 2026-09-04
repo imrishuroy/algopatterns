@@ -16,7 +16,7 @@ const patterns = patternsData as Pattern[];
 const siteUrl = siteConfig.url;
 
 export const metadata: Metadata = {
-  title: "DSA Patterns - All Algorithm Patterns | AlgoPatterns",
+  title: "DSA Patterns - All Algorithm Patterns",
   description:
     "Master Data Structures & Algorithms with AI Enabled pattern-first learning. 18 patterns including Sliding Window, Two Pointers, Binary Search, DP, Graphs, Trees, and 300+ curated problems.",
   keywords: [
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     "data structures",
   ],
   openGraph: {
-    title: "DSA Patterns - All Algorithm Patterns | AlgoPatterns",
+    title: "DSA Patterns - All Algorithm Patterns",
     description:
       "Master DSA with AI Enabled pattern-first learning. Interactive visualizations and 300+ curated problems.",
     type: "website",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "DSA Patterns - All Algorithm Patterns | AlgoPatterns",
+    title: "DSA Patterns - All Algorithm Patterns",
     description:
       "Master DSA with AI Enabled pattern-first learning and interactive visualizations.",
     images: ["/opengraph-image"],

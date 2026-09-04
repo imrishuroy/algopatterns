@@ -38,6 +38,22 @@ vi.mock("next/dynamic", () => ({
   },
 }));
 
+const mockPush = vi.fn();
+const mockReplace = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => ({
+    push: mockPush,
+    replace: mockReplace,
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  })),
+  usePathname: vi.fn(() => "/patterns/test-pattern"),
+  useSearchParams: vi.fn(() => new URLSearchParams()),
+}));
+
 // Third-party mocks
 
 vi.mock("react-markdown", () => ({
@@ -440,6 +456,9 @@ function resetMockState() {
   mockSyncFromLocal.mockReset();
   mockSetCompanyFilter.mockReset();
   mockSetLanguage.mockReset();
+  mockPush.mockClear();
+  mockReplace.mockClear();
+  window.location.hash = "";
 }
 
 beforeEach(() => {

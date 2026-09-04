@@ -3,6 +3,10 @@ import patternsData from "@/lib/patterns.json";
 import { Pattern } from "@/types";
 import { concepts } from "@/lib/dsa-fundamentals";
 import { articles } from "@/content/articles";
+import { getLanguageMetas, getLanguageGuide } from "@/lib/languages";
+import type { SupportedGuideLanguage } from "@/types/languages";
+import { slugify } from "@/lib/slugify";
+import { questions } from "@/lib/questions";
 
 const patterns = patternsData as Pattern[];
 
@@ -90,12 +94,27 @@ const sitemap = (): MetadataRoute.Sitemap => {
     // login/register/account/auth excluded — no SEO value and wastes crawl budget
   ];
 
-  const patternPages: MetadataRoute.Sitemap = patterns.map((pattern) => ({
-    url: `${baseUrl}/patterns/${pattern.id}`,
-    lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.9,
-  }));
+  const patternSectionPages: MetadataRoute.Sitemap = [];
+  for (const pattern of patterns) {
+    if (pattern.tutorial && pattern.tutorial.length > 0) {
+      for (const section of pattern.tutorial) {
+        patternSectionPages.push({
+          url: `${baseUrl}/patterns/${pattern.id}/${slugify(section.title)}`,
+          lastModified: now,
+          changeFrequency: "monthly" as const,
+          priority: 0.9,
+        });
+      }
+      patternSectionPages.push({
+        url: `${baseUrl}/patterns/${pattern.id}/quiz`,
+        lastModified: now,
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+      });
+    }
+  }
+
+  const patternPages = patternSectionPages;
 
   const conceptPages: MetadataRoute.Sitemap = concepts.map((concept) => ({
     url: `${baseUrl}/dsa-fundamentals/${concept.slug}`,
@@ -104,14 +123,71 @@ const sitemap = (): MetadataRoute.Sitemap => {
     priority: 0.85,
   }));
 
-  const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${baseUrl}/articles/${article.slug}`,
+  const articleSectionPages: MetadataRoute.Sitemap = [];
+  for (const article of articles) {
+    for (const section of article.sections) {
+      articleSectionPages.push({
+        url: `${baseUrl}/articles/${article.slug}/${section.slug}`,
+        lastModified: now,
+        changeFrequency: "monthly" as const,
+        priority: 0.85,
+      });
+    }
+  }
+
+  const articlePages: MetadataRoute.Sitemap = [
+    ...articles.map((article) => ({
+      url: `${baseUrl}/articles/${article.slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    ...articleSectionPages,
+  ];
+
+  const languageHubPage: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/languages`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+  ];
+
+  const languageSectionPages: MetadataRoute.Sitemap = [];
+  for (const langMeta of getLanguageMetas()) {
+    if (!langMeta.available) continue;
+
+    const guide = getLanguageGuide(langMeta.id as SupportedGuideLanguage);
+    if (!guide) continue;
+
+    for (const section of guide.sections) {
+      languageSectionPages.push({
+        url: `${baseUrl}/languages/${langMeta.id}/${section.id}`,
+        lastModified: now,
+        changeFrequency: "weekly" as const,
+        priority: section.category === "Concurrency" ? 0.9 : 0.85,
+      });
+    }
+  }
+
+  const languagePages = [...languageHubPage, ...languageSectionPages];
+
+  const problemPages: MetadataRoute.Sitemap = questions.map((question) => ({
+    url: `${baseUrl}/problems/${slugify(question.name)}`,
     lastModified: now,
     changeFrequency: "monthly" as const,
-    priority: 0.8,
+    priority: 0.75,
   }));
 
-  return [...staticPages, ...patternPages, ...conceptPages, ...articlePages];
+  return [
+    ...staticPages,
+    ...patternPages,
+    ...conceptPages,
+    ...articlePages,
+    ...languagePages,
+    ...problemPages,
+  ];
 };
 
 export default sitemap;

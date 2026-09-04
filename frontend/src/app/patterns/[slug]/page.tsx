@@ -1,9 +1,10 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import patternsData from "@/lib/patterns.json";
 import { Pattern } from "@/types";
 import { getPatternMetadata } from "@/lib/seo";
+import { slugify } from "@/lib/slugify";
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import PatternPageClient from "./PatternPageClient";
 
@@ -47,6 +48,14 @@ export default async function PatternPage({ params }: PageProps) {
     notFound();
   }
 
+  // Redirect to first tutorial section if available
+  if (pattern.tutorial && pattern.tutorial.length > 0) {
+    const firstSection = pattern.tutorial[0];
+    const sectionSlug = slugify(firstSection.title);
+    redirect(`/patterns/${slug}/${sectionSlug}`);
+  }
+
+  // For patterns without tutorials, show the overview page
   const breadcrumbs = [
     { name: "Home", url: siteUrl },
     { name: "Patterns", url: `${siteUrl}/patterns` },

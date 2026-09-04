@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LanguageGuide, languageAccents } from "@/types/languages";
 import { getSectionCategories } from "@/lib/languages";
 import { Highlightable } from "@/components/ui/Highlightable";
 import { AIChatPanel } from "@/components/ai";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiClient } from "@/lib/api";
 import TutorialTab from "./tabs/TutorialTab";
 import CheatsheetTab from "./tabs/CheatsheetTab";
 
@@ -13,14 +16,36 @@ type Tab = "tutorial" | "cheatsheet";
 
 interface LanguageGuideClientProps {
   guide: LanguageGuide;
+  initialSectionId?: string;
 }
+
+// Storage key for tutorial progress (per language) - used for unauthenticated users
+const getStorageKey = (guideId: string) =>
+  `algopatterns-tutorial-${guideId}-completed`;
+
+// Convert guide ID to tutorial pattern ID (e.g., "go" -> "tutorial-go")
+const getTutorialPatternId = (guideId: string) => `tutorial-${guideId}`;
 
 // skipcq: JS-0067, JS-R1005, JS-0415
 export default function LanguageGuideClient({
   guide,
+  initialSectionId,
 }: LanguageGuideClientProps) {
+  const router = useRouter();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("tutorial");
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+
+  const getInitialSectionIndex = () => {
+    if (initialSectionId) {
+      const index = guide.sections.findIndex((s) => s.id === initialSectionId);
+      return index !== -1 ? index : 0;
+    }
+    return 0;
+  };
+
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(
+    getInitialSectionIndex
+  );
   const [isAIChatOpen, setIsAIChatOpen] = useState(true);
   const [aiPanelWidth, setAiPanelWidth] = useState(28);
   const [aiInitialMessage, setAiInitialMessage] = useState<string>();
@@ -28,6 +53,7 @@ export default function LanguageGuideClient({
   const [completedSections, setCompletedSections] = useState<Set<number>>(
     new Set()
   );
+  const [isProgressLoading, setIsProgressLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const accentColor = languageAccents[guide.id] || "#6366f1";
@@ -35,36 +61,84 @@ export default function LanguageGuideClient({
   const totalSections = guide.sections.length;
   const progress = Math.round((completedSections.size / totalSections) * 100);
 
-  // Hash navigation: find section index from hash (supports section id)
-  const findSectionFromHash = useCallback(
-    (hash: string): number => {
-      if (!hash) return -1;
-      // Try to find by section id (e.g., #printing-output, #arrays-slices)
-      const index = guide.sections.findIndex((s) => s.id === hash);
-      return index;
-    },
-    [guide.sections]
-  );
-
-  // Set initial section from hash on mount and listen for hash changes
+  // Support legacy hash navigation (redirect to new URL format)
   useEffect(() => {
-    const handleHashNavigation = () => {
-      const hash = window.location.hash.slice(1);
-      if (!hash) return;
-
-      const index = findSectionFromHash(hash);
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const index = guide.sections.findIndex((s) => s.id === hash);
       if (index !== -1) {
-        setCurrentSectionIndex(index);
+        router.replace(`/languages/${guide.id}/${hash}`);
       }
+    }
+  }, [guide.id, guide.sections, router]);
+
+  // Load tutorial progress from backend (authenticated) or localStorage (guest)
+  useEffect(() => {
+    const loadProgress = async () => {
+      setIsProgressLoading(true);
+      const tutorialId = getTutorialPatternId(guide.id);
+
+      if (user) {
+        // Authenticated: fetch from backend
+        try {
+          const response = await apiClient.getPatternProgress();
+          if (response.data?.progress) {
+            const sections = response.data.progress[tutorialId] || [];
+            setCompletedSections(new Set(sections));
+
+            // Sync any local progress to backend on first load
+            const localKey = getStorageKey(guide.id);
+            const localData = localStorage.getItem(localKey);
+            if (localData) {
+              try {
+                const localSections = JSON.parse(localData) as number[];
+                if (localSections.length > 0) {
+                  // Merge local progress with server progress
+                  const merged = new Set([...sections, ...localSections]);
+                  if (merged.size > sections.length) {
+                    await apiClient.syncPatternProgress({
+                      [tutorialId]: [...merged],
+                    });
+                    setCompletedSections(merged);
+                  }
+                  // Clear local storage after sync
+                  localStorage.removeItem(localKey);
+                }
+              } catch {
+                // Ignore parse errors
+              }
+            }
+          }
+        } catch {
+          // Fallback to localStorage on error
+          try {
+            const saved = localStorage.getItem(getStorageKey(guide.id));
+            if (saved) {
+              setCompletedSections(new Set(JSON.parse(saved) as number[]));
+            }
+          } catch {
+            // Ignore
+          }
+        }
+      } else if (!isAuthLoading) {
+        // Guest: load from localStorage
+        try {
+          const saved = localStorage.getItem(getStorageKey(guide.id));
+          if (saved) {
+            setCompletedSections(new Set(JSON.parse(saved) as number[]));
+          }
+        } catch {
+          // Ignore parse errors
+        }
+      }
+
+      setIsProgressLoading(false);
     };
 
-    // Run on mount to handle initial hash
-    handleHashNavigation();
-
-    // Listen for hash changes
-    window.addEventListener("hashchange", handleHashNavigation);
-    return () => window.removeEventListener("hashchange", handleHashNavigation);
-  }, [findSectionFromHash]);
+    if (!isAuthLoading) {
+      loadProgress();
+    }
+  }, [user, isAuthLoading, guide.id]);
 
   // Derive active section from current state (no effect needed)
   const derivedActiveSection =
@@ -148,22 +222,65 @@ export default function LanguageGuideClient({
   const handleSectionChange = useCallback(
     (index: number) => {
       setCurrentSectionIndex(index);
-      window.history.replaceState(null, "", `#${guide.sections[index].id}`);
+      const sectionId = guide.sections[index].id;
+      router.push(`/languages/${guide.id}/${sectionId}`, { scroll: false });
     },
-    [guide.sections]
+    [guide.sections, guide.id, router]
   );
 
-  const handleToggleComplete = useCallback((index: number) => {
-    setCompletedSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) {
-        next.delete(index);
+  const handleToggleComplete = useCallback(
+    async (index: number) => {
+      const tutorialId = getTutorialPatternId(guide.id);
+      const isCompleting = !completedSections.has(index);
+
+      // Optimistic update
+      setCompletedSections((prev) => {
+        const next = new Set(prev);
+        if (next.has(index)) {
+          next.delete(index);
+        } else {
+          next.add(index);
+        }
+        return next;
+      });
+
+      if (user) {
+        // Authenticated: save to backend
+        try {
+          if (isCompleting) {
+            await apiClient.markSectionComplete(tutorialId, index);
+          } else {
+            await apiClient.markSectionIncomplete(tutorialId, index);
+          }
+        } catch {
+          // Revert on error
+          setCompletedSections((prev) => {
+            const reverted = new Set(prev);
+            if (isCompleting) {
+              reverted.delete(index);
+            } else {
+              reverted.add(index);
+            }
+            return reverted;
+          });
+        }
       } else {
-        next.add(index);
+        // Guest: save to localStorage
+        setCompletedSections((prev) => {
+          try {
+            localStorage.setItem(
+              getStorageKey(guide.id),
+              JSON.stringify([...prev])
+            );
+          } catch {
+            // Ignore storage errors
+          }
+          return prev;
+        });
       }
-      return next;
-    });
-  }, []);
+    },
+    [guide.id, user, completedSections]
+  );
 
   const tabs = [
     { id: "tutorial" as Tab, label: "Tutorial" },
@@ -221,7 +338,11 @@ export default function LanguageGuideClient({
               <div className="flex items-center gap-4">
                 <div className="text-right">
                   <div className="text-2xl font-bold text-white">
-                    {completedSections.size}/{totalSections}
+                    {isProgressLoading ? (
+                      <span className="inline-block w-12 h-6 bg-gray-800 animate-pulse rounded" />
+                    ) : (
+                      `${completedSections.size}/${totalSections}`
+                    )}
                   </div>
                   <div className="text-sm text-gray-500">
                     sections completed

@@ -31,6 +31,7 @@ const FREE_PATTERN_IDS = new Set([
 
 interface PatternPageClientProps {
   pattern: Pattern;
+  initialSectionSlug?: string;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -42,7 +43,10 @@ const difficultyColors: Record<string, string> = {
 };
 
 // skipcq: JS-0067, JS-R1005
-export default function PatternPageClient({ pattern }: PatternPageClientProps) {
+export default function PatternPageClient({
+  pattern,
+  initialSectionSlug,
+}: PatternPageClientProps) {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -377,7 +381,11 @@ export default function PatternPageClient({ pattern }: PatternPageClientProps) {
             ) : (
               <>
                 {activeTab === "tutorial" && (
-                  <TutorialTab pattern={pattern} onAskAI={handleAskAI} />
+                  <TutorialTab
+                    pattern={pattern}
+                    onAskAI={handleAskAI}
+                    initialSectionSlug={initialSectionSlug}
+                  />
                 )}
                 {activeTab === "problems" && (
                   <ProblemsTab

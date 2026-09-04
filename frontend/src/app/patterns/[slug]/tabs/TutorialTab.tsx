@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Pattern } from "@/types";
 import { CourseSidebar, CourseNavigation } from "@/components/course";
@@ -21,7 +21,7 @@ const TutorialTab = ({
   initialSectionSlug,
 }: TutorialTabProps) => {
   const router = useRouter();
-  const sections = pattern.tutorial || [];
+  const sections = useMemo(() => pattern.tutorial || [], [pattern.tutorial]);
 
   const getInitialSectionIndex = () => {
     if (initialSectionSlug === "quiz") {

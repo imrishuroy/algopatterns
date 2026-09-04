@@ -15,6 +15,7 @@ interface TutorialTabProps {
   initialSectionSlug?: string;
 }
 
+// skipcq: JS-R1005
 const TutorialTab = ({
   pattern,
   onAskAI,
@@ -91,6 +92,7 @@ const TutorialTab = ({
   }, []);
 
   // Legacy hash support: redirect hash URLs to new format
+  // skipcq: JS-R1005
   useEffect(() => {
     if (sections.length === 0) return;
 

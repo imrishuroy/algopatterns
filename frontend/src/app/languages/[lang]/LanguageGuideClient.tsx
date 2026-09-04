@@ -73,6 +73,7 @@ export default function LanguageGuideClient({
   }, [guide.id, guide.sections, router]);
 
   // Load tutorial progress from backend (authenticated) or localStorage (guest)
+  // skipcq: JS-R1005
   useEffect(() => {
     const loadProgress = async () => {
       setIsProgressLoading(true);

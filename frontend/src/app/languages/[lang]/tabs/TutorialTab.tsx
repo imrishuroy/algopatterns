@@ -460,11 +460,13 @@ const ContentRenderer = ({
                     </thead>
                   )}
                   <tbody className="divide-y divide-gray-700/50">
+                    {/* skipcq: JS-0437 — table rows have no unique ID */}
                     {block.rows?.map((row, rowIndex) => (
                       <tr
                         key={`row-${rowIndex}-${row[0]}`}
                         className="bg-gray-800/30 hover:bg-gray-800/50 transition-colors"
                       >
+                        {/* skipcq: JS-0437 — table cells have no unique ID */}
                         {row.map((cell, cellIndex) => (
                           <td
                             key={`${cellIndex}-${cell}`}

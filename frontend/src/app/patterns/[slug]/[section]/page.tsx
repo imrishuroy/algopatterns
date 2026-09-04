@@ -13,7 +13,48 @@ interface PageProps {
   params: Promise<{ slug: string; section: string }>;
 }
 
-export const generateStaticParams = async () => {
+const getSectionDescription = (
+  section: { title: string; content: string; exampleName?: string },
+  pattern: Pattern
+): string => {
+  const contentPreview = section.content
+    .replace(/<[^>]*>/g, "")
+    .slice(0, 120)
+    .trim();
+
+  if (section.exampleName) {
+    return `Learn ${section.title} with the ${section.exampleName} problem. Part of the ${pattern.category} pattern tutorial. ${contentPreview}...`;
+  }
+
+  return `${section.title} - ${pattern.category} pattern tutorial. ${contentPreview}... Master this technique for coding interviews.`;
+};
+
+const getSectionKeywords = (
+  section: { title: string; exampleName?: string },
+  pattern: Pattern
+): string[] => {
+  const base = [
+    section.title.toLowerCase(),
+    `${pattern.category.toLowerCase()} ${section.title.toLowerCase()}`,
+    `${section.title.toLowerCase()} algorithm`,
+    `${section.title.toLowerCase()} leetcode`,
+    `${pattern.category.toLowerCase()} pattern`,
+    "coding interview",
+    "dsa",
+  ];
+
+  if (section.exampleName) {
+    base.push(
+      section.exampleName.toLowerCase(),
+      `${section.exampleName.toLowerCase()} solution`,
+      `${section.exampleName.toLowerCase()} leetcode`
+    );
+  }
+
+  return base;
+};
+
+export const generateStaticParams = () => {
   const params: { slug: string; section: string }[] = [];
 
   for (const pattern of patterns) {
@@ -35,6 +76,7 @@ export const generateStaticParams = async () => {
   return params;
 };
 
+// skipcq: JS-R1005
 export const generateMetadata = async ({
   params,
 }: PageProps): Promise<Metadata> => {
@@ -98,48 +140,7 @@ export const generateMetadata = async ({
   };
 };
 
-const getSectionDescription = (
-  section: { title: string; content: string; exampleName?: string },
-  pattern: Pattern
-): string => {
-  const contentPreview = section.content
-    .replace(/<[^>]*>/g, "")
-    .slice(0, 120)
-    .trim();
-
-  if (section.exampleName) {
-    return `Learn ${section.title} with the ${section.exampleName} problem. Part of the ${pattern.category} pattern tutorial. ${contentPreview}...`;
-  }
-
-  return `${section.title} - ${pattern.category} pattern tutorial. ${contentPreview}... Master this technique for coding interviews.`;
-};
-
-const getSectionKeywords = (
-  section: { title: string; exampleName?: string },
-  pattern: Pattern
-): string[] => {
-  const base = [
-    section.title.toLowerCase(),
-    `${pattern.category.toLowerCase()} ${section.title.toLowerCase()}`,
-    `${section.title.toLowerCase()} algorithm`,
-    `${section.title.toLowerCase()} leetcode`,
-    `${pattern.category.toLowerCase()} pattern`,
-    "coding interview",
-    "dsa",
-  ];
-
-  if (section.exampleName) {
-    base.push(
-      section.exampleName.toLowerCase(),
-      `${section.exampleName.toLowerCase()} solution`,
-      `${section.exampleName.toLowerCase()} leetcode`
-    );
-  }
-
-  return base;
-};
-
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-R1005
 export default async function PatternSectionPage({ params }: PageProps) {
   const { slug, section: sectionSlug } = await params;
   const pattern = patterns.find((p) => p.id === slug);

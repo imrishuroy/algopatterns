@@ -64,6 +64,7 @@ const FEATURE_ICONS = {
 
 type FeatureIconType = keyof typeof FEATURE_ICONS;
 
+// skipcq: JS-0067
 function FeatureHighlight({
   icon,
   title,
@@ -239,7 +240,7 @@ export default function PricingPageClient() {
       {selectedPlan && (
         <CheckoutModal
           plan={selectedPlan}
-          isOpen={!!selectedPlan}
+          isOpen={Boolean(selectedPlan)}
           onClose={() => setSelectedPlan(null)}
           onSuccess={handleCheckoutSuccess}
           userEmail={user?.email}

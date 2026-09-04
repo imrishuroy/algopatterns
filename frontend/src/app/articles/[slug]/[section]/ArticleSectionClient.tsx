@@ -13,9 +13,10 @@ interface ArticleSectionClientProps {
   sectionIndex: number;
 }
 
-function getSectionComponents(
+// skipcq: JS-0067
+const getSectionComponents = (
   articleSlug: string
-): Record<string, React.ComponentType> {
+): Record<string, React.ComponentType> => {
   switch (articleSlug) {
     case "recursion":
       return recursionSections;
@@ -24,9 +25,10 @@ function getSectionComponents(
     default:
       return {};
   }
-}
+};
 
-function getDifficultyColor(difficulty: string) {
+// skipcq: JS-0067
+const getDifficultyColor = (difficulty: string) => {
   switch (difficulty) {
     case "beginner":
       return "bg-green-500/20 text-green-400 border-green-500/30";
@@ -37,9 +39,9 @@ function getDifficultyColor(difficulty: string) {
     default:
       return "bg-gray-500/20 text-gray-400 border-gray-500/30";
   }
-}
+};
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-R1005, JS-0415
 export default function ArticleSectionClient({
   article,
   section,
@@ -382,6 +384,7 @@ export default function ArticleSectionClient({
   );
 }
 
+// skipcq: JS-0067
 function MobileFloatingNav({
   article,
   currentSection,

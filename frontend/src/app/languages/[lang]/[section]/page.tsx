@@ -16,7 +16,54 @@ interface PageProps {
   params: Promise<{ lang: string; section: string }>;
 }
 
-export const generateStaticParams = async () => {
+const getSectionDescription = (
+  section: { title: string; category: string; content: { text?: string }[] },
+  langName: string
+): string => {
+  const firstText = section.content.find((c) => c.text)?.text || "";
+  const truncated = firstText.slice(0, 150).replace(/\s+/g, " ").trim();
+  const ellipsis = firstText.length > 150 ? "..." : "";
+
+  if (truncated) {
+    return `${truncated}${ellipsis} Learn ${section.title} in ${langName} with examples and best practices.`;
+  }
+
+  return `Learn ${section.title} in ${langName}. Part of the ${section.category} section in our comprehensive ${langName} DSA guide.`;
+};
+
+const getSectionKeywords = (
+  section: { title: string; category: string; id: string },
+  langLower: string
+): string[] => {
+  const base = [
+    `${langLower} ${section.title.toLowerCase()}`,
+    `${section.title.toLowerCase()} ${langLower}`,
+    `${langLower} ${section.category.toLowerCase()}`,
+    `${langLower} tutorial`,
+    `learn ${langLower}`,
+  ];
+
+  if (section.category === "Concurrency") {
+    base.push(
+      `${langLower} concurrency`,
+      `${langLower} goroutines`,
+      `${langLower} channels`,
+      `${langLower} parallel programming`
+    );
+  }
+
+  if (section.category === "Data Structures") {
+    base.push(
+      `${langLower} data structures`,
+      `${langLower} dsa`,
+      `${langLower} algorithms`
+    );
+  }
+
+  return base;
+};
+
+export const generateStaticParams = () => {
   const params: { lang: string; section: string }[] = [];
 
   for (const lang of getSupportedLanguages()) {
@@ -77,53 +124,6 @@ export const generateMetadata = async ({
       canonical: `${siteConfig.url}/languages/${lang}/${sectionId}`,
     },
   };
-};
-
-const getSectionDescription = (
-  section: { title: string; category: string; content: { text?: string }[] },
-  langName: string
-): string => {
-  const firstText = section.content.find((c) => c.text)?.text || "";
-  const truncated = firstText.slice(0, 150).replace(/\s+/g, " ").trim();
-  const ellipsis = firstText.length > 150 ? "..." : "";
-
-  if (truncated) {
-    return `${truncated}${ellipsis} Learn ${section.title} in ${langName} with examples and best practices.`;
-  }
-
-  return `Learn ${section.title} in ${langName}. Part of the ${section.category} section in our comprehensive ${langName} DSA guide.`;
-};
-
-const getSectionKeywords = (
-  section: { title: string; category: string; id: string },
-  langLower: string
-): string[] => {
-  const base = [
-    `${langLower} ${section.title.toLowerCase()}`,
-    `${section.title.toLowerCase()} ${langLower}`,
-    `${langLower} ${section.category.toLowerCase()}`,
-    `${langLower} tutorial`,
-    `learn ${langLower}`,
-  ];
-
-  if (section.category === "Concurrency") {
-    base.push(
-      `${langLower} concurrency`,
-      `${langLower} goroutines`,
-      `${langLower} channels`,
-      `${langLower} parallel programming`
-    );
-  }
-
-  if (section.category === "Data Structures") {
-    base.push(
-      `${langLower} data structures`,
-      `${langLower} dsa`,
-      `${langLower} algorithms`
-    );
-  }
-
-  return base;
 };
 
 // skipcq: JS-0067

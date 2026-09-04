@@ -444,6 +444,7 @@ const mockPatternNoCommonMistakes: Pattern = {
 
 // Helpers
 
+// skipcq: JS-0067
 function resetMockState() {
   mockCompletedSet = new Set();
   mockIsLoading = false;

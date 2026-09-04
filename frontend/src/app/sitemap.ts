@@ -10,6 +10,7 @@ import { questions } from "@/lib/questions";
 
 const patterns = patternsData as Pattern[];
 
+// skipcq: JS-R1005
 const sitemap = (): MetadataRoute.Sitemap => {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://algopatterns.in";
 

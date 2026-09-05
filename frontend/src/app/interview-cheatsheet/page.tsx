@@ -7,7 +7,7 @@ const siteUrl = siteConfig.url;
 
 export const metadata: Metadata = {
   title:
-    "Interview Cheatsheet - Algorithm Patterns Quick Reference | AlgoPatterns",
+    "Interview Cheatsheet - Algorithm Patterns Quick Reference",
   description:
     "Complete interview cheatsheet: constraint-to-complexity guide, pattern quick-reference table, keyword-to-algorithm mappings, and code templates for all major DSA patterns. Essential for FAANG interviews.",
   keywords: [
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title:
-      "Interview Cheatsheet - Algorithm Patterns Quick Reference | AlgoPatterns",
+      "Interview Cheatsheet - Algorithm Patterns Quick Reference",
     description:
       "Constraint guide, pattern lookup, keyword-to-algorithm mappings, and code templates for all major DSA patterns.",
     type: "article",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Interview Cheatsheet | AlgoPatterns",
+    title: "Interview Cheatsheet",
     description:
       "Algorithm patterns quick reference: constraint guide, keyword mappings, and code templates.",
     images: ["/opengraph-image"],

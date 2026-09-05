@@ -7,7 +7,7 @@ import { JsonLdScript } from "@/components/seo/JsonLd";
 const siteUrl = siteConfig.url;
 
 export const metadata: Metadata = {
-  title: "Articles - DSA Deep Dives & Algorithm Guides | AlgoPatterns",
+  title: "Articles - DSA Deep Dives & Algorithm Guides",
   description:
     "In-depth articles on recursion, dynamic programming, graph algorithms, and interview preparation. Comprehensive guides with code examples in Java, Python, C++, and JavaScript.",
   keywords: [
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "data structures deep dive",
   ],
   openGraph: {
-    title: "Articles - DSA Deep Dives & Algorithm Guides | AlgoPatterns",
+    title: "Articles - DSA Deep Dives & Algorithm Guides",
     description:
       "In-depth articles on recursion, dynamic programming, graph algorithms, and more with code examples.",
     type: "website",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Articles - DSA Deep Dives & Algorithm Guides | AlgoPatterns",
+    title: "Articles - DSA Deep Dives & Algorithm Guides",
     description:
       "In-depth articles on algorithms and data structures for coding interview prep.",
     images: ["/opengraph-image"],

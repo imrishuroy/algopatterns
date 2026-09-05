@@ -3,7 +3,6 @@ import {
   render,
   screen,
   fireEvent,
-  act,
   waitFor,
 } from "@testing-library/react";
 import TutorialTab from "@/app/patterns/[slug]/tabs/TutorialTab";
@@ -30,6 +29,22 @@ vi.mock("next/link", () => ({
     children: React.ReactNode;
     href: string;
   }) => <a href={href}>{children}</a>,
+}));
+
+const mockPush = vi.fn();
+const mockReplace = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => ({
+    push: mockPush,
+    replace: mockReplace,
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  })),
+  usePathname: vi.fn(() => "/patterns/test-pattern"),
+  useSearchParams: vi.fn(() => new URLSearchParams()),
 }));
 
 vi.mock("@/components/quiz", () => ({
@@ -113,6 +128,8 @@ describe("TutorialTab", () => {
     mockHash = "";
     hashChangeListeners = [];
     mockReplaceState = vi.fn();
+    mockPush.mockClear();
+    mockReplace.mockClear();
 
     // Mock window.location
     Object.defineProperty(window, "location", {
@@ -255,17 +272,16 @@ describe("TutorialTab", () => {
       });
     });
 
-    it("updates URL hash when section changes", async () => {
+    it("updates URL when section changes", async () => {
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       const sectionButtons = screen.getAllByText(/3\. Insert Interval/);
       fireEvent.click(sectionButtons[0]);
 
       await waitFor(() => {
-        expect(mockReplaceState).toHaveBeenCalledWith(
-          null,
-          "",
-          "#insert-interval"
+        expect(mockPush).toHaveBeenCalledWith(
+          "/patterns/intervals/insert-interval",
+          { scroll: false }
         );
       });
     });
@@ -299,21 +315,22 @@ describe("TutorialTab", () => {
       });
     });
 
-    it("updates URL hash to #quiz when quiz is selected", async () => {
+    it("updates URL to quiz when quiz is selected", async () => {
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       const quizButtons = screen.getAllByText("Take Quiz");
       fireEvent.click(quizButtons[0]);
 
       await waitFor(() => {
-        expect(mockReplaceState).toHaveBeenCalledWith(null, "", "#quiz");
+        expect(mockPush).toHaveBeenCalledWith("/patterns/intervals/quiz", {
+          scroll: false,
+        });
       });
     });
   });
 
   describe("edge cases for handleSectionChange", () => {
-    it("handles invalid section index gracefully", async () => {
-      // This tests the else branch when currentSections[index] is undefined
+    it("navigates to quiz correctly for pattern with single section", async () => {
       const patternWithSingleSection: Pattern = {
         ...mockPatternWithTutorial,
         tutorial: [{ title: "Only Section", content: "Content" }],
@@ -329,86 +346,85 @@ describe("TutorialTab", () => {
       fireEvent.click(quizButtons[0]);
 
       await waitFor(() => {
-        expect(mockReplaceState).toHaveBeenCalledWith(null, "", "#quiz");
+        expect(mockPush).toHaveBeenCalledWith("/patterns/intervals/quiz", {
+          scroll: false,
+        });
       });
     });
   });
 
-  describe("URL hash navigation on mount", () => {
-    it("navigates to section based on slug hash on mount", async () => {
+  describe("Legacy hash URL redirect on mount", () => {
+    it("redirects slug hash to new URL format", async () => {
       mockHash = "#minimum-arrows-to-burst-balloons";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       await waitFor(() => {
-        expect(screen.getByTestId("tutorial-section-4")).toBeInTheDocument();
+        expect(mockReplace).toHaveBeenCalledWith(
+          "/patterns/intervals/minimum-arrows-to-burst-balloons"
+        );
       });
     });
 
-    it("navigates to section based on numeric hash on mount", async () => {
+    it("redirects numeric hash to new URL format", async () => {
       mockHash = "#section-2";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       await waitFor(() => {
-        expect(screen.getByTestId("tutorial-section-2")).toBeInTheDocument();
+        expect(mockReplace).toHaveBeenCalledWith(
+          "/patterns/intervals/insert-interval"
+        );
       });
     });
 
-    it("navigates to quiz based on #quiz hash on mount", async () => {
+    it("redirects #quiz hash to new URL format", async () => {
       mockHash = "#quiz";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       await waitFor(() => {
-        expect(screen.getByTestId("quiz-card")).toBeInTheDocument();
+        expect(mockReplace).toHaveBeenCalledWith("/patterns/intervals/quiz");
       });
     });
 
-    it("normalizes numeric hash to slug format", async () => {
+    it("redirects numeric hash to slug URL", async () => {
       mockHash = "#section-1";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       await waitFor(() => {
-        expect(mockReplaceState).toHaveBeenCalledWith(
-          null,
-          "",
-          "#merge-overlapping-intervals"
+        expect(mockReplace).toHaveBeenCalledWith(
+          "/patterns/intervals/merge-overlapping-intervals"
         );
       });
     });
 
-    it("normalizes uppercase slug to lowercase", async () => {
+    it("redirects uppercase slug to lowercase URL", async () => {
       mockHash = "#MEETING-ROOMS-LINE-SWEEP";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
       await waitFor(() => {
-        expect(mockReplaceState).toHaveBeenCalledWith(
-          null,
-          "",
-          "#meeting-rooms-line-sweep"
+        expect(mockReplace).toHaveBeenCalledWith(
+          "/patterns/intervals/meeting-rooms-line-sweep"
         );
       });
     });
 
-    it("does not update hash if already normalized", async () => {
+    it("redirects normalized hash to new URL format", async () => {
       mockHash = "#insert-interval";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
 
-      // Wait a bit to ensure no unnecessary replaceState calls
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      // replaceState should not be called with the same hash
-      const calls = mockReplaceState.mock.calls.filter(
-        (call) => call[2] === "#insert-interval"
-      );
-      expect(calls.length).toBe(0);
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalledWith(
+          "/patterns/intervals/insert-interval"
+        );
+      });
     });
 
-    it("stays on first section for invalid hash", async () => {
+    it("does not redirect for invalid hash", async () => {
       mockHash = "#non-existent-section";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
@@ -416,9 +432,11 @@ describe("TutorialTab", () => {
       await waitFor(() => {
         expect(screen.getByTestId("tutorial-section-0")).toBeInTheDocument();
       });
+
+      expect(mockReplace).not.toHaveBeenCalled();
     });
 
-    it("stays on first section for out-of-range numeric hash", async () => {
+    it("does not redirect for out-of-range numeric hash", async () => {
       mockHash = "#section-99";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
@@ -426,9 +444,11 @@ describe("TutorialTab", () => {
       await waitFor(() => {
         expect(screen.getByTestId("tutorial-section-0")).toBeInTheDocument();
       });
+
+      expect(mockReplace).not.toHaveBeenCalled();
     });
 
-    it("handles empty hash", async () => {
+    it("handles empty hash without redirect", async () => {
       mockHash = "";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
@@ -436,9 +456,11 @@ describe("TutorialTab", () => {
       await waitFor(() => {
         expect(screen.getByTestId("tutorial-section-0")).toBeInTheDocument();
       });
+
+      expect(mockReplace).not.toHaveBeenCalled();
     });
 
-    it("handles hash with only #", async () => {
+    it("handles hash with only # without redirect", async () => {
       mockHash = "#";
 
       render(<TutorialTab pattern={mockPatternWithTutorial} />);
@@ -446,37 +468,63 @@ describe("TutorialTab", () => {
       await waitFor(() => {
         expect(screen.getByTestId("tutorial-section-0")).toBeInTheDocument();
       });
+
+      expect(mockReplace).not.toHaveBeenCalled();
     });
   });
 
-  describe("hashchange event handling", () => {
-    it("responds to hashchange events", async () => {
-      render(<TutorialTab pattern={mockPatternWithTutorial} />);
-
-      // Verify first section is shown
-      expect(screen.getByTestId("tutorial-section-0")).toBeInTheDocument();
-
-      // Simulate hash change
-      mockHash = "#insert-interval";
-      act(() => {
-        hashChangeListeners.forEach((listener) => listener());
-      });
+  describe("initialSectionSlug prop", () => {
+    it("starts at section specified by initialSectionSlug", async () => {
+      render(
+        <TutorialTab
+          pattern={mockPatternWithTutorial}
+          initialSectionSlug="insert-interval"
+        />
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId("tutorial-section-2")).toBeInTheDocument();
       });
     });
 
-    it("removes hashchange listener on unmount", () => {
-      const { unmount } = render(
-        <TutorialTab pattern={mockPatternWithTutorial} />
+    it("starts at quiz when initialSectionSlug is quiz", async () => {
+      render(
+        <TutorialTab
+          pattern={mockPatternWithTutorial}
+          initialSectionSlug="quiz"
+        />
       );
 
-      const initialListenerCount = hashChangeListeners.length;
-      unmount();
+      await waitFor(() => {
+        expect(screen.getByTestId("quiz-card")).toBeInTheDocument();
+      });
+    });
+  });
 
-      // After unmount, the listener should be removed
-      expect(hashChangeListeners.length).toBeLessThan(initialListenerCount);
+  describe("URL-based navigation (hashchange removed)", () => {
+    it("uses router.push for navigation instead of hashchange", async () => {
+      render(<TutorialTab pattern={mockPatternWithTutorial} />);
+
+      // Verify first section is shown
+      expect(screen.getByTestId("tutorial-section-0")).toBeInTheDocument();
+
+      // Click to navigate
+      const sectionButtons = screen.getAllByText(/3\. Insert Interval/);
+      fireEvent.click(sectionButtons[0]);
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          "/patterns/intervals/insert-interval",
+          { scroll: false }
+        );
+      });
+    });
+
+    it("does not add hashchange listeners", () => {
+      render(<TutorialTab pattern={mockPatternWithTutorial} />);
+
+      // No hashchange listeners should be added (URL routing instead)
+      expect(hashChangeListeners.length).toBe(0);
     });
   });
 
@@ -503,10 +551,9 @@ describe("TutorialTab", () => {
       fireEvent.click(sectionButtons[0]);
 
       await waitFor(() => {
-        expect(mockReplaceState).toHaveBeenCalledWith(
-          null,
-          "",
-          "#meeting-rooms-line-sweep"
+        expect(mockPush).toHaveBeenCalledWith(
+          "/patterns/intervals/meeting-rooms-line-sweep",
+          { scroll: false }
         );
       });
     });

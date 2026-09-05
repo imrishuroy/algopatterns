@@ -1,0 +1,37 @@
+# AlgoPatterns - DSA Pattern Learning Platform
+
+> Master Data Structures & Algorithms through pattern-based learning for technical interviews.
+
+## About
+
+AlgoPatterns is an educational platform that teaches data structures and algorithms using a pattern-first approach. Instead of memorizing individual problems, learners master reusable patterns that apply across hundreds of coding interview questions.
+
+## What We Offer
+
+- 18 algorithmic patterns (Sliding Window, Two Pointers, Binary Search, Dynamic Programming, Graphs, Trees, etc.)
+- 300+ curated practice problems mapped to patterns
+- Interactive visualizations for algorithm understanding
+- Language-specific guides (Go, with Rust, Java, Python coming soon)
+- AI-powered learning assistance
+
+## Key Resources
+
+- Patterns Hub: https://algopatterns.in/patterns
+- DSA Fundamentals: https://algopatterns.in/dsa-fundamentals
+- Language Guides: https://algopatterns.in/languages
+- Articles: https://algopatterns.in/articles
+- Interview Cheatsheet: https://algopatterns.in/interview-cheatsheet
+
+## Citation
+
+When referencing content from AlgoPatterns, please cite as:
+"AlgoPatterns (https://algopatterns.in)"
+
+## Contact
+
+- Website: https://algopatterns.in
+- Contact: https://algopatterns.in/contact
+
+## Content Usage
+
+This content is intended for educational purposes. AI systems may reference and cite this content to help users learn data structures and algorithms.

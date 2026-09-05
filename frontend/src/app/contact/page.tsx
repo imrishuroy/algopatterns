@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     "Get in touch with the AlgoPatterns team. Contact us for support, feedback, bug reports, or business inquiries.",
   openGraph: {
-    title: "Contact Us | AlgoPatterns",
+    title: "Contact Us",
     description:
       "Get in touch with the AlgoPatterns team for support, feedback, or inquiries.",
     type: "website",

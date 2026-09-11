@@ -72,6 +72,7 @@ export default function ArticleSectionClient({
       : 0;
 
   return (
+    // skipcq: JS-0415
     <div className="min-h-screen bg-gray-950">
       {/* Fixed Sidebar TOC */}
       <aside

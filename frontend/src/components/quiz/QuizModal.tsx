@@ -44,6 +44,7 @@ export default function QuizModal({
   } | null>(null);
   const [isLimited, setIsLimited] = useState(false);
   const [totalAvailable, setTotalAvailable] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const questionStartTime = useRef<number>(0);
   const quizStartTime = useRef<number>(0);
@@ -68,6 +69,7 @@ export default function QuizModal({
     setResults(null);
     setIsLimited(false);
     setTotalAvailable(0);
+    setIsSubmitting(false);
 
     try {
       const questionsRes = await quizService.getQuestions(
@@ -110,8 +112,9 @@ export default function QuizModal({
   }, [initQuiz]);
 
   const handleAnswer = async (answer: unknown) => {
-    if (!attemptId || !currentQuestion || hasAnswered) return;
+    if (!attemptId || !currentQuestion || hasAnswered || isSubmitting) return;
 
+    setIsSubmitting(true);
     const timeTakenMs = Date.now() - questionStartTime.current;
 
     try {
@@ -133,6 +136,8 @@ export default function QuizModal({
       setShowExplanation(true);
     } catch (err) {
       console.error("Failed to submit answer:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -309,7 +314,7 @@ export default function QuizModal({
                 question={currentQuestion}
                 answer={answers.get(currentQuestion.id)}
                 onAnswer={handleAnswer}
-                disabled={hasAnswered}
+                disabled={hasAnswered || isSubmitting}
               />
 
               {showExplanation && answers.get(currentQuestion.id) && (

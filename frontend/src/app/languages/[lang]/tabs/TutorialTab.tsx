@@ -22,6 +22,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
+import QuizCard from "@/components/quiz/QuizCard";
 
 interface TutorialTabProps {
   guide: LanguageGuide;
@@ -41,6 +42,7 @@ const Sidebar = ({
   completedSections,
   onSectionChange,
   onCollapse,
+  containerRef,
 }: {
   guide: LanguageGuide;
   categories: string[];
@@ -48,6 +50,7 @@ const Sidebar = ({
   completedSections: Set<number>;
   onSectionChange: (index: number) => void;
   onCollapse: () => void;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }) => {
   const sectionRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
   const totalSections = guide.sections.length;
@@ -55,13 +58,20 @@ const Sidebar = ({
 
   useEffect(() => {
     const currentRef = sectionRefs.current.get(currentSectionIndex);
-    if (currentRef && typeof currentRef.scrollIntoView === "function") {
-      currentRef.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
+    const container = containerRef.current;
+    if (currentRef && container) {
+      const containerRect = container.getBoundingClientRect();
+      const buttonRect = currentRef.getBoundingClientRect();
+      const relativeTop = buttonRect.top - containerRect.top + container.scrollTop;
+      const relativeBottom = relativeTop + buttonRect.height;
+
+      if (relativeTop < container.scrollTop) {
+        container.scrollTop = relativeTop - 8;
+      } else if (relativeBottom > container.scrollTop + containerRect.height) {
+        container.scrollTop = relativeBottom - containerRect.height + 8;
+      }
     }
-  }, [currentSectionIndex]);
+  }, [currentSectionIndex, containerRef]);
 
   return (
     <div className="p-4 space-y-4">
@@ -460,15 +470,15 @@ const ContentRenderer = ({
                     </thead>
                   )}
                   <tbody className="divide-y divide-gray-700/50">
-                    {/* skipcq: JS-0437 — table rows have no unique ID */}
                     {block.rows?.map((row, rowIndex) => (
                       <tr
+                        // skipcq: JS-0437
                         key={`row-${rowIndex}-${row[0]}`}
                         className="bg-gray-800/30 hover:bg-gray-800/50 transition-colors"
                       >
-                        {/* skipcq: JS-0437 — table cells have no unique ID */}
                         {row.map((cell, cellIndex) => (
                           <td
+                            // skipcq: JS-0437
                             key={`${cellIndex}-${cell}`}
                             className={`px-4 py-3 ${cellIndex === 0 ? "font-mono text-emerald-400" : "text-gray-300"}`}
                           >
@@ -502,6 +512,7 @@ export default function TutorialTab({
 }: TutorialTabProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const currentSection = guide.sections[currentSectionIndex];
   const isCompleted = completedSections.has(currentSectionIndex);
 
@@ -521,6 +532,7 @@ export default function TutorialTab({
       >
         {/* Scrollable Sidebar Content - independent scroll */}
         <div
+          ref={sidebarRef}
           className={`h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent transition-opacity duration-300 ${
             isSidebarCollapsed ? "opacity-0" : "opacity-100"
           }`}
@@ -532,6 +544,7 @@ export default function TutorialTab({
             completedSections={completedSections}
             onSectionChange={onSectionChange}
             onCollapse={() => setIsSidebarCollapsed(true)}
+            containerRef={sidebarRef}
           />
         </div>
       </aside>
@@ -593,6 +606,15 @@ export default function TutorialTab({
             />
           </div>
         </Highlightable>
+
+        {/* Quiz Card for OOP sections */}
+        {currentSection.category === "Object-Oriented Design & LLD" && (
+          <QuizCard
+            patternId="go-oop"
+            sectionSlug={currentSection.id}
+            questionCount={15}
+          />
+        )}
 
         {/* Navigation */}
         <SectionNavigation

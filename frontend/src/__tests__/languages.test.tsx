@@ -17,6 +17,7 @@ import { apiClient } from "@/lib/api";
 
 const mockPush = vi.fn();
 const mockReplace = vi.fn();
+const mockPushState = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => ({
@@ -99,6 +100,9 @@ class MockResizeObserver {
 }
 globalThis.ResizeObserver =
   MockResizeObserver as unknown as typeof ResizeObserver;
+
+// Mock history.pushState for section navigation tests
+window.history.pushState = mockPushState;
 
 // Types tests
 describe("Language Types", () => {
@@ -1298,7 +1302,7 @@ describe("LanguageGuideClient", () => {
 
   describe("Section Navigation", () => {
     it("updates URL when section changes", async () => {
-      mockPush.mockClear();
+      mockPushState.mockClear();
       render(<LanguageGuideClient guide={mockGuide} />);
 
       // Find and click on the Essential Concepts section (in sidebar)
@@ -1308,9 +1312,10 @@ describe("LanguageGuideClient", () => {
         fireEvent.click(sidebarButton.closest("button")!);
 
         await waitFor(() => {
-          expect(mockPush).toHaveBeenCalledWith(
-            "/languages/go/essential-concepts",
-            { scroll: false }
+          expect(mockPushState).toHaveBeenCalledWith(
+            null,
+            "",
+            "/languages/go/essential-concepts"
           );
         });
       }

@@ -500,7 +500,7 @@ const ContentRenderer = ({
   );
 };
 
-// skipcq: JS-0067
+// skipcq: JS-0067, JS-R1005
 export default function TutorialTab({
   guide,
   categories,

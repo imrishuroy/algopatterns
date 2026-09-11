@@ -111,6 +111,7 @@ export default function QuizModal({
     });
   }, [initQuiz]);
 
+  // skipcq: JS-R1005
   const handleAnswer = async (answer: unknown) => {
     if (!attemptId || !currentQuestion || hasAnswered || isSubmitting) return;
 

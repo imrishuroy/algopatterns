@@ -49,8 +49,8 @@ function parseQuestionText(text: string): {
   return { question: text, code: null };
 }
 
+// skipcq: JS-0067
 export default function MultipleChoice({
-  // skipcq: JS-0067
   question,
   answer,
   onAnswer,

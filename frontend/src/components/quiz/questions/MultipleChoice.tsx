@@ -1,5 +1,7 @@
 "use client";
 
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import type { QuizQuestion, Answer } from "@/types/quiz";
 
 interface MultipleChoiceProps {
@@ -47,8 +49,8 @@ function parseQuestionText(text: string): {
   return { question: text, code: null };
 }
 
+// skipcq: JS-0067
 export default function MultipleChoice({
-  // skipcq: JS-0067
   question,
   answer,
   onAnswer,
@@ -68,11 +70,27 @@ export default function MultipleChoice({
       </p>
 
       {codeToShow && (
-        <pre className="bg-gray-950 border border-gray-800 rounded-md p-5 overflow-x-auto">
-          <code className="text-gray-300 whitespace-pre-wrap font-mono text-sm leading-relaxed">
-            {codeToShow}
-          </code>
-        </pre>
+        <div className="rounded-md overflow-hidden border border-gray-800">
+          <SyntaxHighlighter
+            language="go"
+            style={oneDark}
+            customStyle={{
+              margin: 0,
+              padding: "1.25rem",
+              fontSize: "0.875rem",
+              lineHeight: "1.6",
+              background: "#011627",
+            }}
+            codeTagProps={{
+              style: {
+                fontFamily:
+                  "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+              },
+            }}
+          >
+            {codeToShow.replace(/\\n/g, "\n")}
+          </SyntaxHighlighter>
+        </div>
       )}
 
       <div className="space-y-3">

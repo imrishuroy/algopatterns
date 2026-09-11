@@ -73,8 +73,8 @@ export default function LanguageGuideClient({
   }, [guide.id, guide.sections, router]);
 
   // Load tutorial progress from backend (authenticated) or localStorage (guest)
-  // skipcq: JS-R1005
   useEffect(() => {
+    // skipcq: JS-R1005
     const loadProgress = async () => {
       setIsProgressLoading(true);
       const tutorialId = getTutorialPatternId(guide.id);
@@ -224,9 +224,10 @@ export default function LanguageGuideClient({
     (index: number) => {
       setCurrentSectionIndex(index);
       const sectionId = guide.sections[index].id;
-      router.push(`/languages/${guide.id}/${sectionId}`, { scroll: false });
+      const newUrl = `/languages/${guide.id}/${sectionId}`;
+      window.history.pushState(null, "", newUrl);
     },
-    [guide.sections, guide.id, router]
+    [guide.sections, guide.id]
   );
 
   const handleToggleComplete = useCallback(

@@ -1,5 +1,3 @@
-@../AGENTS.md
-
 # DeepSource Integration
 
 ## Skills Available

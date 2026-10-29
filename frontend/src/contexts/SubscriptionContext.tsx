@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { apiClient } from "@/lib/api";
+import { captureError } from "@/lib/sentry";
 import { useAuth } from "./AuthContext";
 import type {
   Plan,
@@ -102,8 +103,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       if (response.success) {
         setPlans(response.data.plans);
       }
-    } catch {
-      console.error("Failed to fetch plans");
+    } catch (err) {
+      captureError(err, { level: "warning", tags: { context: "fetchPlans" } });
     }
   }, []);
 

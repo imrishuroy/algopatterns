@@ -18299,6 +18299,277 @@
           "message": "Before submitting, mentally run your solution through: empty input, single element, two elements, all same values, already sorted (both directions), negative numbers, zeros, and maximum values. Most bugs hide in these cases."
         }
       ]
+    },
+    {
+      "id": "go-stdlib-dsa",
+      "title": "Standard Library",
+      "category": "Getting Started",
+      "difficulty": "beginner",
+      "estimatedTime": "20 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "You don't need to memorize all of Go's standard library to ace coding interviews. A small set of packages covers nearly every LeetCode and interview scenario. This section is a focused reference: which packages exist, when to reach for each one, and the patterns you'll use most."
+        },
+        {
+          "type": "heading",
+          "text": "Packages at a Glance",
+          "level": 3
+        },
+        {
+          "type": "comparison",
+          "items": [
+            {
+              "label": "sort",
+              "description": "Sort slices and binary search. Essential for intervals, two pointers, and greedy algorithms."
+            },
+            {
+              "label": "math",
+              "description": "MaxInt, MinInt, Abs, Sqrt. Mostly used for DP initialization and boundary checks."
+            },
+            {
+              "label": "strings",
+              "description": "Split, Join, Builder, Contains. String manipulation, palindromes, and sliding window problems."
+            },
+            {
+              "label": "strconv",
+              "description": "Atoi (string to int), Itoa (int to string). Essential for digit extraction and number parsing."
+            },
+            {
+              "label": "slices",
+              "description": "Modern slice operations introduced in Go 1.21: sort, search, reverse, contains, and min/max."
+            },
+            {
+              "label": "container/heap",
+              "description": "Priority queues for Top K problems, merge sorted lists, and scheduling."
+            },
+            {
+              "label": "container/list",
+              "description": "Doubly linked list. The backbone of an LRU cache implementation."
+            },
+            {
+              "label": "math/bits",
+              "description": "Count set bits, bit length, and trailing zeros. For bit manipulation problems."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Built-in Functions (No Import Needed)",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "These are part of the Go language itself. You will use them in every solution. Know them before touching any package."
+        },
+        {
+          "type": "code",
+          "code": "// len, make, append, copy: the four you'll use everywhere\nnums := make([]int, 5)         // [0 0 0 0 0]\nnums = append(nums, 10)        // adds to end\nfmt.Println(len(nums))         // 6\n\nsrc := []int{1, 2, 3}\ndst := make([]int, len(src))\ncopy(dst, src)                 // copies min(len(dst), len(src)) elements\n\n// min and max (Go 1.21+): no more math.Min(float64(a), float64(b))\na, b := 10, 20\nsmaller := min(a, b)  // 10\nlarger  := max(a, b)  // 20\n\n// delete and clear: for maps\nfreq := map[int]int{1: 2, 2: 3}\ndelete(freq, 1)   // removes key 1\nclear(freq)       // removes all keys (Go 1.21+)",
+          "language": "go",
+          "filename": "builtins.go"
+        },
+        {
+          "type": "code",
+          "code": "// Frequency map: the most common DSA pattern\nnums := []int{1, 2, 2, 3, 3, 3}\nfreq := make(map[int]int)\nfor _, n := range nums {\n    freq[n]++\n}\n// freq: {1:1, 2:2, 3:3}\n\n// DP array initialized to -1 (uncomputed state)\nn := 6\ndp := make([]int, n)\nfor i := range dp {\n    dp[i] = -1\n}",
+          "language": "go",
+          "filename": "builtins_patterns.go"
+        },
+        {
+          "type": "tip",
+          "title": "Version Note",
+          "message": "The built-in min, max, and clear functions require Go 1.21 or later. LeetCode supports Go 1.21+, so you can use them freely in submissions."
+        },
+        {
+          "type": "heading",
+          "text": "sort Package",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The sort package covers sorting and binary search. You'll use it in interval problems, two-pointer setups, and greedy algorithms. The Sorting in Go section has the full deep-dive; this is the essential subset."
+        },
+        {
+          "type": "code",
+          "code": "import \"sort\"\n\n// Sort integers in ascending order\nnums := []int{5, 2, 8, 1, 3}\nsort.Ints(nums)\n// [1 2 3 5 8]\n\n// Sort strings alphabetically\nwords := []string{\"cherry\", \"apple\", \"banana\"}\nsort.Strings(words)\n// [apple banana cherry]\n\n// Custom comparator: sort 2D intervals by start time\nintervals := [][]int{{3, 5}, {1, 4}, {2, 6}}\nsort.Slice(intervals, func(i, j int) bool {\n    return intervals[i][0] < intervals[j][0]\n})\n// [[1 4] [2 6] [3 5]]\n\n// Descending order\nsort.Sort(sort.Reverse(sort.IntSlice(nums)))\n\n// Binary search: first index where sorted[i] >= target\nsorted := []int{1, 3, 5, 7, 9}\nidx := sort.SearchInts(sorted, 5)\nif idx < len(sorted) && sorted[idx] == 5 {\n    fmt.Println(\"found at index\", idx)  // found at index 2\n}",
+          "language": "go",
+          "filename": "sort_dsa.go"
+        },
+        {
+          "type": "heading",
+          "text": "math Package",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "You mainly use the math package for integer boundary constants when initializing DP tables or tracking running minimums and maximums."
+        },
+        {
+          "type": "code",
+          "code": "import \"math\"\n\n// Initialize with the largest possible value (common in DP)\nminCost := math.MaxInt\nfor _, cost := range costs {\n    if cost < minCost {\n        minCost = cost\n    }\n}\n\n// Useful constants\n// math.MaxInt    =  9223372036854775807 (64-bit platform)\n// math.MinInt    = -9223372036854775808\n// math.MaxInt32  =  2147483647\n// math.MaxFloat64\n\n// Square root for prime checks and factoring\nfor i := 2; i <= int(math.Sqrt(float64(n))); i++ {\n    if n%i == 0 {\n        // n is not prime\n    }\n}",
+          "language": "go",
+          "filename": "math_dsa.go"
+        },
+        {
+          "type": "tip",
+          "title": "Use Built-in min/max for Integers",
+          "message": "math.Max and math.Min only work on float64. For integer comparisons, use Go's built-in min(a, b) and max(a, b) (Go 1.21+). No float64 conversion needed."
+        },
+        {
+          "type": "heading",
+          "text": "strings Package",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The strings package handles everything from splitting input to efficiently building output. strings.Builder is important for performance: concatenating strings with + in a loop is O(n^2). Builder is O(n)."
+        },
+        {
+          "type": "code",
+          "code": "import \"strings\"\n\n// Split and Join\nparts := strings.Split(\"apple,banana,orange\", \",\")\n// [\"apple\" \"banana\" \"orange\"]\njoined := strings.Join(parts, \" - \")\n// \"apple - banana - orange\"\n\n// Check and find\nstrings.Contains(\"hello world\", \"world\")  // true\nstrings.Index(\"hello\", \"ll\")              // 2\nstrings.HasPrefix(\"golang\", \"go\")         // true\nstrings.Count(\"hello\", \"l\")               // 2\n\n// Case conversion and trimming\nstrings.ToLower(\"HELLO\")     // \"hello\"\nstrings.ToUpper(\"hello\")     // \"HELLO\"\nstrings.TrimSpace(\"  hi  \")  // \"hi\"",
+          "language": "go",
+          "filename": "strings_dsa.go"
+        },
+        {
+          "type": "code",
+          "code": "import \"strings\"\n\n// Build strings efficiently with Builder (O(n) vs O(n^2) with +)\nvar sb strings.Builder\nsb.WriteString(\"hello\")\nsb.WriteString(\" \")\nsb.WriteString(\"world\")\nfmt.Println(sb.String())  // hello world\n\n// Process a string character by character\ns := \"abc\"\nvar sb2 strings.Builder\nfor _, ch := range s {\n    sb2.WriteRune(ch)  // WriteRune handles Unicode correctly\n}\nfmt.Println(sb2.String())  // abc\n\n// Reverse a string (handles Unicode via rune slice)\n// reverseString(\"hello\") => \"olleh\"\nfunc reverseString(s string) string {\n    r := []rune(s)\n    for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {\n        r[i], r[j] = r[j], r[i]\n    }\n    return string(r)\n}",
+          "language": "go",
+          "filename": "strings_builder.go"
+        },
+        {
+          "type": "heading",
+          "text": "strconv Package",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "strconv converts between strings and numeric types. Atoi and Itoa are the two functions you'll use in most problems."
+        },
+        {
+          "type": "code",
+          "code": "import \"strconv\"\n\n// String to int\nnum, err := strconv.Atoi(\"123\")\nif err != nil {\n    return -1  // handle invalid input\n}\nfmt.Println(num)  // 123\n\n// Int to string\ns := strconv.Itoa(456)\nfmt.Println(s)  // 456\n\n// Extract individual digits from a number\nnum = 12345\nfor _, ch := range strconv.Itoa(num) {\n    digit := int(ch - '0')  // ch is a rune; '0' == 48\n    fmt.Println(digit)      // 1, 2, 3, 4, 5\n}",
+          "language": "go",
+          "filename": "strconv_dsa.go"
+        },
+        {
+          "type": "heading",
+          "text": "slices Package (Go 1.21+)",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The slices package is the modern, type-safe alternative to sort for working with slices. On LeetCode, Go 1.21 is available, so you can use it freely."
+        },
+        {
+          "type": "code",
+          "code": "import \"slices\"\n\nnums := []int{5, 2, 8, 1, 3}\n\nslices.Sort(nums)              // sort in place: [1 2 3 5 8]\nslices.Reverse(nums)           // reverse in place: [8 5 3 2 1]\n\nexists := slices.Contains(nums, 5)  // true\n\n// Binary search (slice must already be sorted)\nslices.Sort(nums)\nindex, found := slices.BinarySearch(nums, 5)\nfmt.Println(index, found)      // 3 true\n\n// Min and max of the entire slice\nfmt.Println(slices.Min(nums))  // 1\nfmt.Println(slices.Max(nums))  // 8\n\n// Shallow copy\ncloned := slices.Clone(nums)",
+          "language": "go",
+          "filename": "slices_dsa.go"
+        },
+        {
+          "type": "heading",
+          "text": "container/heap (Priority Queue)",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go doesn't have a built-in priority queue. You implement the heap.Interface (5 methods) and then use heap.Push and heap.Pop. This is the pattern for Top K, Kth Largest, and merging sorted lists. See the Heaps section for the full walkthrough."
+        },
+        {
+          "type": "code",
+          "code": "import \"container/heap\"\n\n// MinHeap template: copy and adapt for any type\ntype MinHeap []int\n\nfunc (h MinHeap) Len() int            { return len(h) }\nfunc (h MinHeap) Less(i, j int) bool  { return h[i] < h[j] }  // < = min-heap\nfunc (h MinHeap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }\nfunc (h *MinHeap) Push(x any)         { *h = append(*h, x.(int)) }\nfunc (h *MinHeap) Pop() any {\n    old := *h\n    n := len(old)\n    x := old[n-1]\n    *h = old[:n-1]\n    return x\n}\n\n// Usage\nh := &MinHeap{}\nheap.Init(h)\nheap.Push(h, 30)\nheap.Push(h, 10)\nheap.Push(h, 20)\nfmt.Println(heap.Pop(h))  // 10 (smallest first)\nfmt.Println((*h)[0])      // peek the next min without removing",
+          "language": "go",
+          "filename": "heap_template.go"
+        },
+        {
+          "type": "tip",
+          "title": "Max-Heap: One Change",
+          "message": "Change Less to h[i] > h[j] and you have a max-heap. Everything else stays the same."
+        },
+        {
+          "type": "heading",
+          "text": "container/list (Doubly Linked List)",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "container/list is a doubly linked list. Its main use in interviews is implementing an LRU Cache, which needs O(1) insert, delete, and move-to-front."
+        },
+        {
+          "type": "code",
+          "code": "import \"container/list\"\n\n// Basic operations\nl := list.New()\nl.PushBack(10)\nl.PushBack(20)\nl.PushFront(5)\nfmt.Println(l.Len())  // 3\n\nfor e := l.Front(); e != nil; e = e.Next() {\n    fmt.Println(e.Value)  // 5, 10, 20\n}\n\n// LRU Cache: map[key]*list.Element + doubly linked list\ntype entry struct{ key, val int }\n\ntype LRUCache struct {\n    cap   int\n    cache map[int]*list.Element\n    list  *list.List\n}\n\nfunc Constructor(cap int) LRUCache {\n    return LRUCache{cap: cap, cache: make(map[int]*list.Element), list: list.New()}\n}\n\nfunc (c *LRUCache) Get(key int) int {\n    if el, ok := c.cache[key]; ok {\n        c.list.MoveToFront(el)\n        return el.Value.(*entry).val\n    }\n    return -1\n}\n\nfunc (c *LRUCache) Put(key, val int) {\n    if el, ok := c.cache[key]; ok {\n        el.Value.(*entry).val = val\n        c.list.MoveToFront(el)\n        return\n    }\n    if c.list.Len() == c.cap {\n        back := c.list.Back()\n        c.list.Remove(back)\n        delete(c.cache, back.Value.(*entry).key)\n    }\n    c.cache[key] = c.list.PushFront(&entry{key, val})\n}",
+          "language": "go",
+          "filename": "lru_cache.go"
+        },
+        {
+          "type": "heading",
+          "text": "math/bits (Bit Manipulation)",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "For most LeetCode bit problems, plain bitwise operators (&, |, ^, <<, >>) are sufficient. Use math/bits when you need optimized functions like counting set bits."
+        },
+        {
+          "type": "code",
+          "code": "import \"math/bits\"\n\n// math/bits functions take uint\nn := uint(11)                           // binary: 1011\nfmt.Println(bits.OnesCount(n))          // 3 (three set bits)\nfmt.Println(bits.Len(uint(8)))          // 4 (1000 needs 4 bits)\nfmt.Println(bits.TrailingZeros(uint(12))) // 2 (12 = 1100)\n\n// For 32-bit problems on LeetCode\nfmt.Println(bits.OnesCount32(uint32(11)))  // 3\n\n// Plain bitwise operators (no import needed)\n// Use int, as LeetCode problem signatures typically use int\nnum := 11  // binary: 1011\nk   := 2\ncheck   := (num >> k) & 1 == 1  // check if bit k is set: false (bit 2 of 1011 is 0)\nset     := num | (1 << k)       // set bit k:    1011 | 0100 = 1111\ncleared := num &^ (1 << k)      // clear bit k:  1011 &^ 0100 = 1011 (bit 2 already 0)\ntoggle  := num ^ (1 << k)       // toggle bit k: 1011 ^ 0100 = 1111\nfmt.Println(check, set, cleared, toggle)  // false 15 11 15",
+          "language": "go",
+          "filename": "bits_dsa.go"
+        },
+        {
+          "type": "heading",
+          "text": "Data Structures Without Packages",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Many interview data structures need no special import. Build them directly with slices and maps."
+        },
+        {
+          "type": "comparison",
+          "items": [
+            {
+              "label": "Stack",
+              "description": "[]int: push with append, pop with s = s[:len(s)-1]"
+            },
+            {
+              "label": "Queue",
+              "description": "[]int with a head index. Dequeue by incrementing head instead of reslicing."
+            },
+            {
+              "label": "Set",
+              "description": "map[int]struct{} for memory efficiency, or map[int]bool for readability"
+            },
+            {
+              "label": "Graph",
+              "description": "map[int][]int for sparse graphs, [][]int for matrix or dense adjacency"
+            },
+            {
+              "label": "Trie node",
+              "description": "struct with children [26]*TrieNode and a bool isEnd field"
+            },
+            {
+              "label": "Union-Find",
+              "description": "Two slices: parent []int and rank []int"
+            }
+          ]
+        },
+        {
+          "type": "code",
+          "code": "// Stack (LIFO)\nstack := []int{}\nstack = append(stack, 10)          // push\ntop  := stack[len(stack)-1]        // peek\nstack = stack[:len(stack)-1]       // pop\n\n// Queue (FIFO) with head index\nqueue := []int{10, 20, 30}\nhead := 0\nval  := queue[head]; head++        // dequeue 10\nqueue = append(queue, 40)          // enqueue 40\n\n// Set with struct{} (zero bytes per entry)\nseen := make(map[int]struct{})\nseen[5] = struct{}{}\n_, exists := seen[5]  // true\n\n// Adjacency list (undirected graph)\ngraph := make(map[int][]int)\ngraph[1] = append(graph[1], 2)\ngraph[2] = append(graph[2], 1)",
+          "language": "go",
+          "filename": "data_structures.go"
+        },
+        {
+          "type": "warning",
+          "title": "Go Rejects Unused Imports",
+          "message": "Unlike Python or Java, Go refuses to compile if you import a package you don't actually use. Only add imports for packages whose functions appear in your solution."
+        },
+        {
+          "type": "tip",
+          "title": "What to Master First",
+          "message": "Prioritize these five: (1) built-in functions (len, make, append, copy, min, max), (2) sort for sorting and binary search, (3) math for integer limits in DP, (4) strings and strconv for string problems, (5) container/heap for priority queues. These cover 90% of interview scenarios. Add slices, container/list, and math/bits once you are comfortable with the basics."
+        }
+      ]
     }
   ],
   "commonProblems": [

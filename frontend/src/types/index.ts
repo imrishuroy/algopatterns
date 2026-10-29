@@ -50,6 +50,7 @@ export interface Concept {
 export interface VariationTemplate {
   javascript?: string;
   java?: string;
+  go?: string;
 }
 
 export interface PatternVariation {

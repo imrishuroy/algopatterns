@@ -6241,29 +6241,6 @@
         },
         {
           "type": "heading",
-          "text": "Parallel File Processing",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "Processing 4 files one by one takes 400ms (100ms each). Processing them in parallel takes only 100ms because all 4 run at the same time. WaitGroup lets you start all goroutines and wait for all of them to finish."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc processFile(filename string) {\n\ttime.Sleep(100 * time.Millisecond) // Simulate work\n\tfmt.Printf(\"Processed: %s\\n\", filename)\n}\n\nfunc main() {\n\tfiles := []string{\"report.csv\", \"users.json\", \"config.yaml\", \"data.xml\"}\n\tvar wg sync.WaitGroup\n\n\tstart := time.Now()\n\n\twg.Add(len(files)) // Add count for all files\n\tfor _, f := range files {\n\t\tgo func(filename string) {\n\t\t\tdefer wg.Done()\n\t\t\tprocessFile(filename)\n\t\t}(f)\n\t}\n\n\twg.Wait() // Wait for all to finish\n\tfmt.Printf(\"Total time: %v\\n\", time.Since(start))\n}",
-          "language": "go",
-          "filename": "parallel_files.go"
-        },
-        {
-          "type": "output",
-          "output": "$ go run parallel_files.go\nProcessed: config.yaml\nProcessed: users.json\nProcessed: report.csv\nProcessed: data.xml\nTotal time: 101.5ms"
-        },
-        {
-          "type": "text",
-          "text": "Notice the output order is different from the code order. That's because goroutines run concurrently and finish in unpredictable order. The Go scheduler decides which goroutine runs when. But WaitGroup doesn't care about order. It just waits until all goroutines call Done(), regardless of which finishes first. All 4 files finish in about 100ms, not 400ms. That's the power of parallel processing with WaitGroup."
-        },
-        {
-          "type": "heading",
           "text": "Passing WaitGroup to Functions",
           "level": 3
         },
@@ -6289,72 +6266,7 @@
         },
         {
           "type": "text",
-          "text": "Use WaitGroup when you need to wait for goroutines to finish but don't need to collect results from them. If goroutines need to send data back, use channels instead (covered in the next section). Here are common scenarios:"
-        },
-        {
-          "type": "heading",
-          "text": "Scenario 1: Download Files (Don't Need Content)",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "You want to download multiple files to disk. You don't need the content in your program, just need to know when all downloads finish."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc downloadFile(url string) {\n\tfmt.Printf(\"Downloading %s...\\n\", url)\n\ttime.Sleep(100 * time.Millisecond) // Simulate download\n\tfmt.Printf(\"Saved %s to disk\\n\", url)\n}\n\nfunc main() {\n\turls := []string{\n\t\t\"image1.png\",\n\t\t\"image2.png\",\n\t\t\"image3.png\",\n\t}\n\n\tvar wg sync.WaitGroup\n\twg.Add(len(urls))\n\n\tfor _, url := range urls {\n\t\tgo func(u string) {\n\t\t\tdefer wg.Done()\n\t\t\tdownloadFile(u)\n\t\t}(url)\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"All downloads complete!\")\n}",
-          "language": "go",
-          "filename": "download_files.go"
-        },
-        {
-          "type": "output",
-          "output": "$ go run download_files.go\nDownloading image2.png...\nDownloading image1.png...\nDownloading image3.png...\nSaved image2.png to disk\nSaved image1.png to disk\nSaved image3.png to disk\nAll downloads complete!"
-        },
-        {
-          "type": "text",
-          "text": "All three downloads start almost simultaneously and each takes 100ms. Because they run in parallel, total time is about 100ms, not 300ms. WaitGroup ensures we don't print 'All downloads complete!' until every file is saved."
-        },
-        {
-          "type": "heading",
-          "text": "Scenario 2: Fire-and-Forget Tasks",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "You want to send emails or log events in the background. You don't care about the result, just need to make sure they complete before the program exits."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc sendEmail(to string) {\n\tfmt.Printf(\"Sending email to %s...\\n\", to)\n\ttime.Sleep(50 * time.Millisecond) // Simulate sending\n\tfmt.Printf(\"Email sent to %s\\n\", to)\n}\n\nfunc main() {\n\temails := []string{\"alice@example.com\", \"bob@example.com\", \"carol@example.com\"}\n\n\tvar wg sync.WaitGroup\n\tfor _, email := range emails {\n\t\twg.Add(1)\n\t\tgo func(e string) {\n\t\t\tdefer wg.Done()\n\t\t\tsendEmail(e)\n\t\t}(email)\n\t}\n\n\tfmt.Println(\"Emails queued, waiting...\")\n\twg.Wait()\n\tfmt.Println(\"All emails sent!\")\n}",
-          "language": "go",
-          "filename": "fire_and_forget.go"
-        },
-        {
-          "type": "output",
-          "output": "$ go run fire_and_forget.go\nEmails queued, waiting...\nSending email to carol@example.com...\nSending email to alice@example.com...\nSending email to bob@example.com...\nEmail sent to carol@example.com\nEmail sent to alice@example.com\nEmail sent to bob@example.com\nAll emails sent!"
-        },
-        {
-          "type": "text",
-          "text": "Notice 'Emails queued, waiting...' prints before any 'Sending' messages. That's because main prints it immediately after starting the goroutines, before they have a chance to run. The wg.Wait() then blocks until all emails finish sending."
-        },
-        {
-          "type": "heading",
-          "text": "Scenario 3: When NOT to Use WaitGroup",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "If you need to collect results from goroutines, WaitGroup alone is not enough. You need channels. This example shows the problem:"
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc fetchPrice(product string) int {\n\ttime.Sleep(50 * time.Millisecond)\n\tprices := map[string]int{\"apple\": 100, \"banana\": 50, \"orange\": 75}\n\treturn prices[product]\n}\n\nfunc main() {\n\tproducts := []string{\"apple\", \"banana\", \"orange\"}\n\ttotal := 0 // We want to sum all prices\n\n\tvar wg sync.WaitGroup\n\tfor _, p := range products {\n\t\twg.Add(1)\n\t\tgo func(product string) {\n\t\t\tdefer wg.Done()\n\t\t\tprice := fetchPrice(product)\n\t\t\ttotal += price // BUG: race condition!\n\t\t}(p)\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Total:\", total) // Result is unpredictable!\n}",
-          "language": "go",
-          "filename": "wrong_approach.go"
-        },
-        {
-          "type": "text",
-          "text": "This code has a race condition. Here's what goes wrong: the line 'total += price' is not atomic. It actually does three steps: (1) read current value of total, (2) add price to it, (3) write the result back. When two goroutines do this at the same time, they might both read total as 0, both add their price, and both write back. One update gets lost. Expected total: 225 (100+50+75). Actual result: could be 100, 125, 150, or 225 depending on timing. WaitGroup only waits for goroutines to finish. It doesn't protect shared data. To collect results safely, use channels (covered in the next section)."
+          "text": "Use WaitGroup when you need to wait for goroutines to finish but don't need to collect results from them. If goroutines need to send data back, use channels instead (covered in the next section)."
         },
         {
           "type": "heading",
@@ -6488,7 +6400,7 @@
         },
         {
           "type": "code",
-          "code": "// DEADLOCK! Don't do this.\nfunc main() {\n\tch := make(chan int)\n\tch <- 1   // Blocks forever - no receiver running\n\tv := <-ch // Never reached\n\t_ = v\n}",
+          "code": "package main\n\n// DEADLOCK! Don't do this.\nfunc main() {\n\tch := make(chan int)\n\tch <- 1   // Blocks forever - no receiver running\n\tv := <-ch // Never reached\n\t_ = v\n}",
           "language": "go",
           "filename": "deadlock_example.go"
         },
@@ -6547,73 +6459,6 @@
           "type": "tip",
           "title": "Why struct{}?",
           "message": "For signal channels, use `chan struct{}` instead of `chan bool`. An empty struct takes zero bytes of memory, making it clear this channel is for signaling, not data. The syntax `struct{}{}` looks odd: `struct{}` is the type (empty struct), and the second `{}` creates a value of that type. It's like how `int` is a type and `42` is a value."
-        },
-        {
-          "type": "heading",
-          "text": "When to Use Channels",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "Unbuffered channels are perfect for synchronization and signaling. Here are common patterns:"
-        },
-        {
-          "type": "heading",
-          "text": "Graceful Shutdown",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "When your program needs to stop, you can't just kill goroutines. They might be in the middle of writing to a file or processing a request. Graceful shutdown means telling goroutines to finish what they're doing and exit cleanly. A signal channel solves this. You create an unbuffered channel and pass it to all goroutines. When it's time to stop, you close the channel. Closing broadcasts to all receivers at once: every goroutine waiting on that channel wakes up immediately. This is why unbuffered channels are perfect here. You don't need to send a value to each goroutine, just close once and everyone gets the signal."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc server(id int, shutdown <-chan struct{}) {\n\tfor {\n\t\tselect {\n\t\tcase <-shutdown:\n\t\t\tfmt.Printf(\"Server %d: shutting down\\n\", id)\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Printf(\"Server %d: handling request\\n\", id)\n\t\t\ttime.Sleep(100 * time.Millisecond)\n\t\t}\n\t}\n}\n\nfunc main() {\n\tshutdown := make(chan struct{})\n\n\t// Start 3 servers\n\tfor i := 1; i <= 3; i++ {\n\t\tgo server(i, shutdown)\n\t}\n\n\t// Let them run for a bit\n\ttime.Sleep(250 * time.Millisecond)\n\n\t// Signal all servers to stop\n\tfmt.Println(\"Main: sending shutdown signal\")\n\tclose(shutdown) // Broadcasts to ALL receivers\n\n\ttime.Sleep(50 * time.Millisecond) // Let them finish\n\tfmt.Println(\"Main: all servers stopped\")\n}",
-          "language": "go",
-          "filename": "graceful_shutdown.go"
-        },
-        {
-          "type": "text",
-          "text": "Output (server order may vary):"
-        },
-        {
-          "type": "code",
-          "code": "Server 1: handling request\nServer 2: handling request\nServer 3: handling request\nServer 1: handling request\nServer 2: handling request\nServer 3: handling request\nMain: sending shutdown signal\nServer 1: shutting down\nServer 3: shutting down\nServer 2: shutting down\nMain: all servers stopped",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "The shutdown channel uses struct{} because we don't need to send any data, just a signal. Closing the channel wakes up all goroutines waiting on it simultaneously."
-        },
-        {
-          "type": "heading",
-          "text": "Pipeline Processing",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "A pipeline is a chain of steps. Each step takes input, does one thing, and passes the output to the next step. Think of making a sandwich: one person slices bread, passes it to someone who adds filling, who passes it to someone who wraps it. Each person focuses on one task. In Go, each step is a goroutine. Channels connect the steps. Step 1 sends to a channel, Step 2 reads from that channel and sends to another, and so on. The best part: all steps run at the same time. While Step 3 wraps sandwich 1, Step 2 is filling sandwich 2, and Step 1 is slicing bread for sandwich 3."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport \"fmt\"\n\n// Stage 1: Generate numbers\nfunc generate(nums ...int) <-chan int {\n\tout := make(chan int)\n\tgo func() {\n\t\tfor _, n := range nums {\n\t\t\tout <- n\n\t\t}\n\t\tclose(out)\n\t}()\n\treturn out\n}\n\n// Stage 2: Square each number\nfunc square(in <-chan int) <-chan int {\n\tout := make(chan int)\n\tgo func() {\n\t\tfor n := range in {\n\t\t\tout <- n * n\n\t\t}\n\t\tclose(out)\n\t}()\n\treturn out\n}\n\n// Stage 3: Double each number\nfunc double(in <-chan int) <-chan int {\n\tout := make(chan int)\n\tgo func() {\n\t\tfor n := range in {\n\t\t\tout <- n * 2\n\t\t}\n\t\tclose(out)\n\t}()\n\treturn out\n}\n\nfunc main() {\n\t// Connect stages: generate -> square -> double\n\tnums := generate(1, 2, 3, 4)\n\tsquared := square(nums)\n\tdoubled := double(squared)\n\n\t// Consume final output\n\tfor result := range doubled {\n\t\tfmt.Println(result)\n\t}\n}",
-          "language": "go",
-          "filename": "pipeline.go"
-        },
-        {
-          "type": "code",
-          "code": "2\n8\n18\n32",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Let's trace through: 1 goes in, gets squared to 1, then doubled to 2. Same for others: 2→4→8, 3→9→18, 4→16→32. All three stages run at the same time. While the double stage works on the first number, the square stage is already working on the second number."
-        },
-        {
-          "type": "text",
-          "text": "Why unbuffered channels here? They create backpressure. Backpressure means 'slow down if the next step can't keep up.' If the double stage is slow, the square stage can't send its result until double is ready to receive. This automatically prevents fast stages from overwhelming slow ones. No data piles up, no memory grows out of control."
         },
         {
           "type": "heading",
@@ -6775,40 +6620,7 @@
         },
         {
           "type": "text",
-          "text": "Buffered channels shine in specific patterns. Here are the most common ones:"
-        },
-        {
-          "type": "heading",
-          "text": "Worker Pool",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "A worker pool is a group of goroutines that process jobs from a shared queue. Instead of creating a new goroutine for every job, you reuse a fixed number of workers. This is more efficient because creating goroutines has overhead, and too many goroutines can exhaust memory. Think of a restaurant kitchen with 3 chefs. Orders come in and wait on a ticket rail. Each chef takes the next order when ready. If orders arrive faster than chefs can cook, orders queue up on the rail. In Go, a buffered channel is the ticket rail. Workers receive jobs from the channel. The buffer lets jobs queue up instead of blocking the sender."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc main() {\n\tjobs := make(chan int, 10) // Buffer holds up to 10 pending jobs\n\tvar wg sync.WaitGroup\n\n\t// Start 3 workers\n\tfor w := 1; w <= 3; w++ {\n\t\twg.Add(1)\n\t\tgo func(id int) {\n\t\t\tdefer wg.Done()\n\t\t\tfor job := range jobs {\n\t\t\t\tfmt.Printf(\"Worker %d processing job %d\\n\", id, job)\n\t\t\t\ttime.Sleep(500 * time.Millisecond) // Simulate work\n\t\t\t}\n\t\t}(w)\n\t}\n\n\t// Send 9 jobs - won't block until buffer is full\n\tfor j := 1; j <= 9; j++ {\n\t\tfmt.Printf(\"Sending job %d\\n\", j)\n\t\tjobs <- j\n\t}\n\tclose(jobs) // Signal no more jobs\n\twg.Wait()\n\tfmt.Println(\"All jobs done\")\n}",
-          "language": "go",
-          "filename": "worker_pool.go"
-        },
-        {
-          "type": "text",
-          "text": "Output (worker order may vary):"
-        },
-        {
-          "type": "code",
-          "code": "Sending job 1\nSending job 2\nSending job 3\nSending job 4\nSending job 5\nSending job 6\nSending job 7\nSending job 8\nSending job 9\nWorker 1 processing job 1\nWorker 2 processing job 2\nWorker 3 processing job 3\nWorker 1 processing job 4\nWorker 2 processing job 5\nWorker 3 processing job 6\nWorker 1 processing job 7\nWorker 2 processing job 8\nWorker 3 processing job 9\nAll jobs done",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Notice all 9 jobs are sent immediately without blocking. The buffer (capacity 10) holds them until workers are ready. Three workers process jobs in parallel: while Worker 1 handles job 1, Workers 2 and 3 handle jobs 2 and 3. Each worker takes the next available job from the channel. When all jobs are sent, we close the channel. The 'range jobs' loop in each worker exits when the channel is closed and empty."
-        },
-        {
-          "type": "text",
-          "text": "Why do we need WaitGroup here? The channel handles job distribution, but closing a channel doesn't mean workers are done. Closing only signals 'no more jobs will be sent.' Workers can still receive and process jobs that are already in the buffer. The 'range jobs' loop keeps receiving until the channel is both closed AND empty. After that, each worker might still be processing its last job. Without WaitGroup, main would exit immediately after close(jobs), killing workers mid-work. WaitGroup solves this: each worker calls Done() after finishing all its work. Main calls Wait() to block until all workers are truly done."
+          "text": "Buffered channels shine when the sender should not block waiting for the receiver. Async logging is the clearest example of this."
         },
         {
           "type": "heading",
@@ -6838,134 +6650,6 @@
         {
           "type": "text",
           "text": "Why use a 'done' channel instead of WaitGroup? Both work, but here we have only one goroutine. A channel is simpler for single goroutine: send a signal when done, receive to wait. WaitGroup is better when you have multiple goroutines to wait for. The 'done' channel also demonstrates that channels themselves can be used for synchronization, not just data transfer."
-        },
-        {
-          "type": "heading",
-          "text": "Rate Limiting",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "Rate limiting controls how many requests a system handles at once. Without limits, a sudden spike in traffic can crash your server or overwhelm a database. Rate limiting protects your system by making excess requests wait or rejecting them. Think of a doctor's office with a waiting room that holds 10 people. If 15 patients arrive, 5 must wait outside until someone leaves. In Go, a buffered channel acts as the waiting room. The buffer capacity is the maximum waiting requests. When full, new requests block until space opens up."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc main() {\n\trequests := make(chan int, 5) // Accept up to 5 waiting requests\n\tvar wg sync.WaitGroup\n\n\t// Request handler\n\twg.Add(1)\n\tgo func() {\n\t\tdefer wg.Done()\n\t\tfor req := range requests {\n\t\t\tfmt.Printf(\"Handling request %d\\n\", req)\n\t\t\ttime.Sleep(200 * time.Millisecond) // Simulate processing\n\t\t}\n\t}()\n\n\t// Simulate 10 incoming requests\n\tfor i := 1; i <= 10; i++ {\n\t\tfmt.Printf(\"Request %d arrived\\n\", i)\n\t\trequests <- i // Blocks if 5 already waiting\n\t\tfmt.Printf(\"Request %d queued\\n\", i)\n\t}\n\n\tclose(requests)\n\twg.Wait()\n\tfmt.Println(\"All requests handled\")\n}",
-          "language": "go",
-          "filename": "rate_limiting.go"
-        },
-        {
-          "type": "code",
-          "code": "Request 1 arrived\nRequest 1 queued\nRequest 2 arrived\nRequest 2 queued\nRequest 3 arrived\nRequest 3 queued\nRequest 4 arrived\nRequest 4 queued\nRequest 5 arrived\nRequest 5 queued\nRequest 6 arrived\nRequest 6 queued\nHandling request 1\nRequest 7 arrived\nHandling request 2\nRequest 7 queued\nRequest 8 arrived\nHandling request 3\nRequest 8 queued\nRequest 9 arrived\nHandling request 4\nRequest 9 queued\nRequest 10 arrived\nHandling request 5\nRequest 10 queued\nHandling request 6\nHandling request 7\nHandling request 8\nHandling request 9\nHandling request 10\nAll requests handled",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Watch the pattern: requests 1-6 queue immediately (buffer holds 5 + handler takes 1). But request 7 must wait. It arrives, then the handler finishes request 1, and only then is request 7 queued. Same for 8, 9, 10. The buffer acts as a waiting room with limited capacity."
-        },
-        {
-          "type": "text",
-          "text": "This is rate limiting through backpressure. When the system is overwhelmed, new requests naturally slow down because they block waiting for buffer space. The sender (incoming requests) can't outpace the receiver (handler) by more than the buffer size. In production, you might add a timeout: if a request can't be queued within N seconds, reject it with 'server too busy' instead of waiting forever."
-        },
-        {
-          "type": "heading",
-          "text": "Batch Processing",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "Batch processing means collecting multiple items and processing them together instead of one by one. This is faster because some operations have overhead: opening a database connection, making a network call, or writing to disk. Doing it once for 100 items is cheaper than doing it 100 times. Think of a mail carrier: delivering 50 letters in one trip is faster than making 50 separate trips. In Go, a buffered channel collects items. A goroutine reads from the channel, groups items into a batch, and processes the batch when full."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\titems := make(chan int, 5) // Batch size of 5\n\tdone := make(chan bool)\n\n\t// Batch processor\n\tgo func() {\n\t\tbatch := make([]int, 0, 5)\n\t\tfor item := range items {\n\t\t\tbatch = append(batch, item)\n\t\t\tif len(batch) == 5 {\n\t\t\t\tfmt.Printf(\"Processing batch: %v\\n\", batch)\n\t\t\t\ttime.Sleep(500 * time.Millisecond) // Simulate batch processing\n\t\t\t\tbatch = batch[:0] // Reset slice\n\t\t\t}\n\t\t}\n\t\t// Handle remaining items\n\t\tif len(batch) > 0 {\n\t\t\tfmt.Printf(\"Processing final batch: %v\\n\", batch)\n\t\t}\n\t\tdone <- true\n\t}()\n\n\t// Send 12 items\n\tfor i := 1; i <= 12; i++ {\n\t\tfmt.Printf(\"Sending item %d\\n\", i)\n\t\titems <- i\n\t}\n\n\tclose(items)\n\t<-done\n\tfmt.Println(\"All batches processed\")\n}",
-          "language": "go",
-          "filename": "batch_processing.go"
-        },
-        {
-          "type": "code",
-          "code": "Sending item 1\nSending item 2\nSending item 3\nSending item 4\nSending item 5\nSending item 6\nSending item 7\nSending item 8\nSending item 9\nSending item 10\nProcessing batch: [1 2 3 4 5]\nSending item 11\nSending item 12\nProcessing batch: [6 7 8 9 10]\nProcessing final batch: [11 12]\nAll batches processed",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Items 1-10 are sent quickly while the processor collects them. When 5 items accumulate, the processor handles them as one batch. Notice 'Processing batch: [1 2 3 4 5]' appears after item 10 is sent. The final batch [11, 12] has only 2 items because 12 doesn't divide evenly by 5."
-        },
-        {
-          "type": "text",
-          "text": "Why is batching faster? Imagine writing to a database. Each write has overhead: open connection, authenticate, execute, close. Writing 5 items one by one = 5x overhead. Writing 5 items in one batch = 1x overhead. The 'batch = batch[:0]' line resets the slice without allocating new memory. It keeps the underlying array but sets length to 0, ready for the next batch."
-        },
-        {
-          "type": "heading",
-          "text": "Semaphore Pattern",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "A semaphore is a counter that controls access to a shared resource. It tracks how many slots are available. When a goroutine wants access, it takes a slot. When done, it returns the slot. If no slots are available, the goroutine waits. Think of a swimming pool with 3 lanes: only 3 people can swim at once, and person 4 must wait until someone finishes. In Go, a buffered channel works as a semaphore. The buffer capacity is the number of slots. Sending takes a slot, receiving returns a slot. If the buffer is full, sending blocks until a slot opens."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc main() {\n\t// Semaphore: only 3 goroutines can run at once\n\t// Buffer capacity = number of slots\n\tsem := make(chan struct{}, 3)\n\tvar wg sync.WaitGroup\n\n\tfor i := 1; i <= 10; i++ {\n\t\twg.Add(1)\n\t\tgo func(id int) {\n\t\t\tdefer wg.Done()\n\n\t\t\t// Acquire slot (blocks if 3 already running)\n\t\t\tsem <- struct{}{}\n\t\t\tfmt.Printf(\"Worker %d: started\\n\", id)\n\n\t\t\t// Do work\n\t\t\ttime.Sleep(time.Second)\n\n\t\t\tfmt.Printf(\"Worker %d: done\\n\", id)\n\t\t\t// Release slot (lets another goroutine start)\n\t\t\t<-sem\n\t\t}(i)\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"All workers finished\")\n}",
-          "language": "go",
-          "filename": "semaphore_pattern.go"
-        },
-        {
-          "type": "text",
-          "text": "Output (worker order may vary):"
-        },
-        {
-          "type": "code",
-          "code": "Worker 3: started\nWorker 1: started\nWorker 2: started\nWorker 2: done\nWorker 4: started\nWorker 3: done\nWorker 5: started\nWorker 1: done\nWorker 6: started\nWorker 4: done\nWorker 7: started\nWorker 5: done\nWorker 8: started\nWorker 6: done\nWorker 9: started\nWorker 7: done\nWorker 10: started\nWorker 8: done\nWorker 9: done\nWorker 10: done\nAll workers finished",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Notice the pattern: only 3 workers run at the same time. Workers 1, 2, 3 start immediately. Worker 4 can't start until one of them finishes. When Worker 2 finishes and releases its slot, Worker 4 grabs it and starts. This continues until all 10 workers complete."
-        },
-        {
-          "type": "text",
-          "text": "How does it work? The semaphore is a buffered channel with capacity 3. Sending to the channel (sem <- struct{}{}) acquires a slot. If 3 slots are taken, the send blocks. Receiving from the channel (<-sem) releases a slot, letting a waiting goroutine proceed. This pattern is useful for limiting concurrent access to databases, APIs, file handles, or any resource that can't handle unlimited parallel requests."
-        },
-        {
-          "type": "heading",
-          "text": "Pub/Sub Within Service",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "Pub/Sub (publish-subscribe) lets one publisher send events to multiple subscribers. Each subscriber has its own channel and processes events independently. The publisher doesn't need to know how many subscribers exist or how fast they process. Think of a news broadcast: the station sends once, and every TV tuned in receives it. In Go, each subscriber gets a buffered channel. The publisher sends to all channels. Buffering is important here because slow subscribers shouldn't block the publisher or other subscribers."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\ntype PubSub struct {\n\tmu   sync.RWMutex\n\tsubs []chan string\n}\n\nfunc (ps *PubSub) Subscribe() <-chan string {\n\tps.mu.Lock()\n\tdefer ps.mu.Unlock()\n\tch := make(chan string, 10) // Buffered: subscriber won't block publisher\n\tps.subs = append(ps.subs, ch)\n\treturn ch\n}\n\nfunc (ps *PubSub) Publish(msg string) {\n\tps.mu.RLock()\n\tdefer ps.mu.RUnlock()\n\tfor _, ch := range ps.subs {\n\t\tch <- msg\n\t}\n}\n\nfunc (ps *PubSub) Close() {\n\tps.mu.Lock()\n\tdefer ps.mu.Unlock()\n\tfor _, ch := range ps.subs {\n\t\tclose(ch)\n\t}\n}\n\nfunc main() {\n\tps := &PubSub{}\n\n\t// Create 3 subscribers\n\tvar wg sync.WaitGroup\n\tfor i := 1; i <= 3; i++ {\n\t\twg.Add(1)\n\t\tch := ps.Subscribe()\n\t\tgo func(id int, ch <-chan string) {\n\t\t\tdefer wg.Done()\n\t\t\tfor msg := range ch {\n\t\t\t\tfmt.Printf(\"Subscriber %d received: %s\\n\", id, msg)\n\t\t\t}\n\t\t}(i, ch)\n\t}\n\n\t// Publish events\n\ttime.Sleep(10 * time.Millisecond) // Let subscribers start\n\tps.Publish(\"event-1\")\n\tps.Publish(\"event-2\")\n\n\ttime.Sleep(10 * time.Millisecond) // Let messages deliver\n\tps.Close()\n\twg.Wait()\n\tfmt.Println(\"All subscribers done\")\n}",
-          "language": "go",
-          "filename": "pubsub.go"
-        },
-        {
-          "type": "text",
-          "text": "Output (subscriber order may vary):"
-        },
-        {
-          "type": "code",
-          "code": "Subscriber 1 received: event-1\nSubscriber 2 received: event-1\nSubscriber 3 received: event-1\nSubscriber 1 received: event-2\nSubscriber 2 received: event-2\nSubscriber 3 received: event-2\nAll subscribers done",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Each subscriber receives both events. The publisher sends once, and all 3 subscribers get the message. This is fan-out: one input becomes multiple outputs. Each subscriber has its own buffered channel (capacity 10), so they process independently."
-        },
-        {
-          "type": "text",
-          "text": "Why buffered channels? Without buffers, the publisher would block on each subscriber. If Subscriber 1 is slow, Subscribers 2 and 3 wait too. With buffers, the publisher sends to all channels quickly and continues. Each subscriber processes at its own pace."
-        },
-        {
-          "type": "text",
-          "text": "What is sync.RWMutex? A mutex (mutual exclusion) prevents multiple goroutines from accessing shared data at the same time. RWMutex is a special mutex with two modes: read lock (RLock) and write lock (Lock). Multiple goroutines can hold read locks simultaneously because reading doesn't change data. But a write lock is exclusive: only one goroutine can hold it, and no readers allowed. In our PubSub, Publish only reads the subscriber list (uses RLock), so multiple Publish calls can run in parallel. Subscribe and Close modify the list (use Lock), so they block everything else. This gives us both safety and performance."
         },
         {
           "type": "heading",
@@ -7623,50 +7307,15 @@
               "HTTP handler respecting client disconnect"
             ],
             [
-              "First response wins",
-              "Use fastest result",
-              "Query multiple replicas, use first response"
-            ],
-            [
-              "Fan-in",
-              "Combine multiple input channels",
-              "Merge log streams from multiple sources"
-            ],
-            [
-              "Heartbeat",
-              "Periodic action while waiting",
-              "Send keepalive every 30 seconds"
+              "select in a loop",
+              "Handle events continuously until done",
+              "Ticker with shutdown signal"
             ]
           ]
         },
         {
           "type": "text",
-          "text": "Let's see each pattern in action."
-        },
-        {
-          "type": "heading",
-          "text": "Timeout",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "Waiting forever is dangerous. A slow server, a network hiccup, or a stuck database can freeze your entire program. Timeouts let you say 'I'll wait this long, but no longer.' Think of ordering food at a restaurant: if your meal doesn't arrive in 30 minutes, you might leave. In Go, time.After creates a channel that receives after a duration. Put it in a select alongside your real work. Whichever happens first wins."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc fetchData() chan string {\n\tch := make(chan string, 1)\n\tgo func() {\n\t\ttime.Sleep(3 * time.Second) // Slow API\n\t\tch <- \"data from server\"\n\t}()\n\treturn ch\n}\n\nfunc main() {\n\tfmt.Println(\"Fetching data...\")\n\n\tselect {\n\tcase data := <-fetchData():\n\t\tfmt.Println(\"Got:\", data)\n\tcase <-time.After(1 * time.Second):\n\t\tfmt.Println(\"Timeout: server too slow\")\n\t}\n}",
-          "language": "go",
-          "filename": "pattern_timeout.go"
-        },
-        {
-          "type": "code",
-          "code": "Fetching data...\nTimeout: server too slow",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "The server takes 3 seconds, but we only wait 1 second. The timeout fires first, so we print the timeout message and move on. The slow goroutine continues running in the background, but we don't wait for it. Notice the buffered channel (capacity 1): this prevents a goroutine leak when the timeout fires."
+          "text": "Cancellation is the most critical pattern. Here it is using context, which is Go's standard way to handle cancellation in real code."
         },
         {
           "type": "heading",
@@ -7692,85 +7341,6 @@
         {
           "type": "text",
           "text": "The work takes 500ms, but the context times out after 200ms. The ctx.Done() case fires first, returning an error. In HTTP handlers, the context comes from the request and cancels automatically when the client disconnects. Always pass context to functions that do slow work, and always check ctx.Done() in your select."
-        },
-        {
-          "type": "heading",
-          "text": "First Response Wins",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "Sometimes you have multiple ways to get the same data: replicated databases, CDN edge servers, or redundant APIs. Instead of picking one and hoping it's fast, query them all and use whichever responds first. This is called 'hedging' or 'racing.' Think of sending three couriers to fetch a document: you use whichever courier returns first. In Go, start a goroutine for each source, and select on all their channels."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc queryReplica(name string, delay time.Duration) chan string {\n\tch := make(chan string, 1)\n\tgo func() {\n\t\ttime.Sleep(delay)\n\t\tch <- fmt.Sprintf(\"response from %s\", name)\n\t}()\n\treturn ch\n}\n\nfunc main() {\n\t// Query 3 replicas with different latencies\n\treplica1 := queryReplica(\"server-A\", 300*time.Millisecond)\n\treplica2 := queryReplica(\"server-B\", 100*time.Millisecond) // Fastest\n\treplica3 := queryReplica(\"server-C\", 200*time.Millisecond)\n\n\t// Use first response\n\tselect {\n\tcase r := <-replica1:\n\t\tfmt.Println(r)\n\tcase r := <-replica2:\n\t\tfmt.Println(r)\n\tcase r := <-replica3:\n\t\tfmt.Println(r)\n\t}\n}",
-          "language": "go",
-          "filename": "pattern_first_wins.go"
-        },
-        {
-          "type": "code",
-          "code": "response from server-B",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Server-B responds in 100ms, beating Server-C (200ms) and Server-A (300ms). We get Server-B's response and ignore the others. The other goroutines keep running and eventually send to their channels, but nobody receives. The buffered channels (capacity 1) let them complete without blocking forever."
-        },
-        {
-          "type": "heading",
-          "text": "Fan-in",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "Fan-in means combining multiple input streams into one. You have several producers sending data, and you want one consumer to handle all of it. Think of a call center: multiple phone lines ring, but one operator answers whichever rings first. In Go, you select on multiple channels and process whichever has data. This merges the streams into a single flow."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc producer(name string, count int) chan string {\n\tch := make(chan string)\n\tgo func() {\n\t\tfor i := 1; i <= count; i++ {\n\t\t\tch <- fmt.Sprintf(\"%s: message %d\", name, i)\n\t\t\ttime.Sleep(50 * time.Millisecond)\n\t\t}\n\t\tclose(ch)\n\t}()\n\treturn ch\n}\n\nfunc main() {\n\tlogs1 := producer(\"web-server\", 2)\n\tlogs2 := producer(\"database\", 2)\n\n\t// Fan-in: merge both streams\n\tfor i := 0; i < 4; i++ {\n\t\tselect {\n\t\tcase msg := <-logs1:\n\t\t\tfmt.Println(msg)\n\t\tcase msg := <-logs2:\n\t\t\tfmt.Println(msg)\n\t\t}\n\t}\n}",
-          "language": "go",
-          "filename": "pattern_fanin.go"
-        },
-        {
-          "type": "text",
-          "text": "Output (order may vary):"
-        },
-        {
-          "type": "code",
-          "code": "web-server: message 1\ndatabase: message 1\nweb-server: message 2\ndatabase: message 2",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Both producers send messages at roughly the same time. The select picks whichever is ready, interleaving messages from both sources. The consumer doesn't need to know how many producers exist. It just keeps receiving until it has all 4 messages. You can use a nil channel pattern (covered later) to handle producers that close at different times."
-        },
-        {
-          "type": "heading",
-          "text": "Heartbeat",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "Long operations need signs of life. Users want to know something is happening. Network connections need keepalive signals. A heartbeat sends periodic messages while waiting for the main work to complete. Think of a loading spinner: it doesn't mean the work is faster, but it tells you the app isn't frozen. In Go, use a Ticker alongside your work channel. The select handles whichever fires."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\twork := make(chan string, 1)\n\n\t// Simulate work completing after 2 seconds\n\tgo func() {\n\t\ttime.Sleep(2 * time.Second)\n\t\twork <- \"job finished\"\n\t}()\n\n\theartbeat := time.NewTicker(500 * time.Millisecond)\n\tdefer heartbeat.Stop()\n\n\tfor {\n\t\tselect {\n\t\tcase result := <-work:\n\t\t\tfmt.Println(result)\n\t\t\treturn\n\t\tcase <-heartbeat.C:\n\t\t\tfmt.Println(\"still working...\")\n\t\t}\n\t}\n}",
-          "language": "go",
-          "filename": "pattern_heartbeat.go"
-        },
-        {
-          "type": "code",
-          "code": "still working...\nstill working...\nstill working...\njob finished",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "The ticker fires every 500ms, printing 'still working...' three times during the 2-second wait. When the work finally completes, that case fires, we print the result and return. Always call ticker.Stop() when done to free resources. The defer ensures this happens even if we return early."
         },
         {
           "type": "heading",
@@ -7807,35 +7377,6 @@
           "code": "// BAD: Busy loop wastes CPU\nfor {\n\tselect {\n\tcase v := <-ch:\n\t\tprocess(v)\n\tdefault:\n\t\t// Spins constantly!\n\t}\n}\n\n// BETTER: Block until something happens\nfor {\n\tselect {\n\tcase v := <-ch:\n\t\tprocess(v)\n\tcase <-done:\n\t\treturn\n\t}\n}",
           "language": "go",
           "filename": "busy_loop.go"
-        },
-        {
-          "type": "heading",
-          "text": "Multiple Ready Cases",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "What happens when two channels are ready at the exact same moment? If select always picked the first case, that channel would get priority and the second channel might never be served. This is called starvation. To prevent it, Go's select uses pseudo-random selection when multiple cases are ready. Think of a coin flip: if two people arrive at a door simultaneously, you flip a coin to decide who goes first. Over many iterations, both get roughly equal turns."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch1 := make(chan int, 1)\n\tch2 := make(chan int, 1)\n\n\tfor i := 0; i < 10; i++ {\n\t\tch1 <- 1\n\t\tch2 <- 2\n\n\t\t// Both channels ready - Go picks randomly\n\t\tselect {\n\t\tcase <-ch1:\n\t\t\tfmt.Print(\"1\")\n\t\t\t<-ch2 // drain the other\n\t\tcase <-ch2:\n\t\t\tfmt.Print(\"2\")\n\t\t\t<-ch1 // drain the other\n\t\t}\n\t}\n\tfmt.Println()\n}",
-          "language": "go",
-          "filename": "random_select.go"
-        },
-        {
-          "type": "text",
-          "text": "Output (varies each run):"
-        },
-        {
-          "type": "code",
-          "code": "2112211221",
-          "language": "text",
-          "filename": "output.txt"
-        },
-        {
-          "type": "text",
-          "text": "Each iteration fills both channels, then selects from them. Since both are ready, Go randomly picks one. Run it multiple times and you'll get different sequences. Over many runs, you'll see roughly equal distribution of 1s and 2s. This randomness is intentional: it guarantees fairness and prevents bugs where one channel dominates."
         },
         {
           "type": "heading",
@@ -8348,17 +7889,6 @@
         },
         {
           "type": "heading",
-          "text": "Common Mistakes",
-          "level": 3
-        },
-        {
-          "type": "code",
-          "code": "// MISTAKE 1: Copying a mutex (mutex has internal state)\ntype Counter struct {\n\tmu    sync.Mutex\n\tcount int\n}\n\nc1 := Counter{}\nc2 := c1  // BUG: copies the mutex!\n// c1 and c2 have different mutexes, no protection\n\n// MISTAKE 2: Locking twice (deadlock)\nfunc (c *Counter) Double() {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\tc.Increment() // BUG: Increment also locks!\n}\n\nfunc (c *Counter) Increment() {\n\tc.mu.Lock()   // Deadlock: already locked\n\tdefer c.mu.Unlock()\n\tc.count++\n}\n\n// FIX: Use internal helper without locking\nfunc (c *Counter) increment() { // lowercase = private\n\tc.count++\n}\n\nfunc (c *Counter) Increment() {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\tc.increment()\n}\n\nfunc (c *Counter) Double() {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\tc.increment()\n\tc.increment()\n}",
-          "language": "go",
-          "filename": "mutex_mistakes.go"
-        },
-        {
-          "type": "heading",
           "text": "Finding Race Conditions: The -race Flag",
           "level": 3
         },
@@ -8863,42 +8393,6 @@
           ]
         },
         {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync/atomic\"\n)\n\nfunc main() {\n\tvar counter int64 = 10\n\n\t// Add: atomically add delta, returns new value\n\tnewVal := atomic.AddInt64(&counter, 5)\n\tfmt.Println(\"After Add(5):\", newVal) // 15\n\n\t// Load: atomically read the value\n\tcurrent := atomic.LoadInt64(&counter)\n\tfmt.Println(\"Load:\", current) // 15\n\n\t// Store: atomically write a new value\n\tatomic.StoreInt64(&counter, 100)\n\tfmt.Println(\"After Store(100):\", atomic.LoadInt64(&counter)) // 100\n\n\t// Swap: atomically replace and get old value\n\told := atomic.SwapInt64(&counter, 200)\n\tfmt.Println(\"Swap returned:\", old)                    // 100\n\tfmt.Println(\"New value:\", atomic.LoadInt64(&counter)) // 200\n\n\t// CompareAndSwap: replace if current equals expected\n\t// Only succeeds if counter is currently 200\n\tswapped := atomic.CompareAndSwapInt64(&counter, 200, 300)\n\tfmt.Println(\"CAS succeeded:\", swapped)            // true\n\tfmt.Println(\"Value:\", atomic.LoadInt64(&counter)) // 300\n\n\t// CAS fails if value changed\n\tswapped = atomic.CompareAndSwapInt64(&counter, 999, 400)\n\tfmt.Println(\"CAS with wrong expected:\", swapped)            // false\n\tfmt.Println(\"Value unchanged:\", atomic.LoadInt64(&counter)) // 300\n}",
-          "language": "go",
-          "filename": "atomic_operations.go"
-        },
-        {
-          "type": "code",
-          "code": "After Add(5): 15\nLoad: 15\nAfter Store(100): 100\nSwap returned: 100\nNew value: 200\nCAS succeeded: true\nValue: 300\nCAS with wrong expected: false\nValue unchanged: 300",
-          "language": "text",
-          "filename": "output"
-        },
-        {
-          "type": "text",
-          "text": "Each operation takes a pointer to the variable (&counter) and works directly on that memory location. Here's what each one does:"
-        },
-        {
-          "type": "text",
-          "text": "Add adds a number and returns the new value. Use it for counters. You can subtract by adding a negative number: atomic.AddInt64(&counter, -1)."
-        },
-        {
-          "type": "text",
-          "text": "Load reads the current value safely. Use it when you need to check a value that other goroutines might be changing."
-        },
-        {
-          "type": "text",
-          "text": "Store writes a new value. Use it to set flags or reset counters."
-        },
-        {
-          "type": "text",
-          "text": "Swap writes a new value and returns the old one. Use it when you need to know what value you replaced."
-        },
-        {
-          "type": "text",
-          "text": "CompareAndSwap (CAS) is the most powerful. It only updates the value if it currently equals what you expect. If another goroutine changed it first, CAS fails and returns false. This lets you retry with the new value instead of blindly overwriting."
-        },
-        {
           "type": "heading",
           "text": "Go 1.19+ Atomic Types",
           "level": 3
@@ -9007,81 +8501,6 @@
         {
           "type": "text",
           "text": "The BrokenAccount shows a common mistake. Each atomic operation is safe on its own, but the two operations together are not atomic. If balance starts at 100 and pending at 0, another goroutine might see balance=50 and pending=0 (total=50) instead of the correct total of 100."
-        },
-        {
-          "type": "heading",
-          "text": "CompareAndSwap: Building Lock-Free Structures",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "Sometimes Add, Store, and Swap aren't enough. What if you need to update a value only if it hasn't changed since you last read it? That's what CompareAndSwap (CAS) does."
-        },
-        {
-          "type": "text",
-          "text": "CAS takes two things: the value you expect, and the new value you want. If the actual value matches your expected value, CAS updates it and returns true. If someone else changed it first, CAS does nothing and returns false. You can then retry with the new value."
-        },
-        {
-          "type": "text",
-          "text": "This pattern is called optimistic concurrency: assume no conflict, try the operation, and retry if there was one. It's faster than locking when conflicts are rare."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"sync/atomic\"\n)\n\n// atomicMax updates the max value without locks\n// Multiple goroutines can call this safely\nfunc atomicMax(addr *atomic.Int64, val int64) {\n\tfor {\n\t\t// Step 1: Read the current maximum\n\t\told := addr.Load()\n\n\t\t// Step 2: If our value isn't larger, we're done\n\t\tif val <= old {\n\t\t\treturn\n\t\t}\n\n\t\t// Step 3: Try to update (only succeeds if still equals 'old')\n\t\tif addr.CompareAndSwap(old, val) {\n\t\t\treturn // Success! We set the new max\n\t\t}\n\n\t\t// Step 4: CAS failed, someone else updated it\n\t\t// Loop back and try again with the new value\n\t}\n}\n\nfunc main() {\n\tvar maxSeen atomic.Int64\n\tvar wg sync.WaitGroup\n\n\t// 8 goroutines race to update the maximum\n\tvalues := []int64{42, 17, 99, 3, 88, 99, 100, 50}\n\n\tfor _, v := range values {\n\t\twg.Add(1)\n\t\tgo func(val int64) {\n\t\t\tdefer wg.Done()\n\t\t\tatomicMax(&maxSeen, val)\n\t\t}(v)\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Maximum:\", maxSeen.Load())\n}",
-          "language": "go",
-          "filename": "cas_example.go"
-        },
-        {
-          "type": "code",
-          "code": "Maximum: 100",
-          "language": "text",
-          "filename": "output"
-        },
-        {
-          "type": "text",
-          "text": "Here's what happens when two goroutines try to update at the same time. Say maxSeen is 50, and goroutines with values 99 and 100 both read old=50. The first one to call CAS(50, 99) succeeds. The second calls CAS(50, 100), but maxSeen is now 99, not 50, so CAS fails. It loops, reads old=99, and CAS(99, 100) succeeds."
-        },
-        {
-          "type": "text",
-          "text": "The retry loop is the key pattern. Read the current value, compute what you want to do, try CAS. If it fails, someone else made progress, so start over. This is how lock-free data structures work."
-        },
-        {
-          "type": "warning",
-          "title": "Memory Ordering Complexity",
-          "message": "Atomic operations only guarantee atomicity of single values, not ordering between operations on different variables. If you need multiple values to be consistent, use a mutex. When in doubt, use a mutex. Correctness beats performance."
-        },
-        {
-          "type": "heading",
-          "text": "Atomic Flags: Shutdown Signaling",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "How do you tell worker goroutines to stop? You could use a channel, but for a simple yes/no signal, atomic.Bool is easier. One goroutine sets the flag to true, and all workers see it on their next check."
-        },
-        {
-          "type": "text",
-          "text": "The pattern is simple: workers check the flag in their loop. When main wants them to stop, it sets the flag. Each worker finishes its current work, sees the flag is true, and exits cleanly."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"sync/atomic\"\n\t\"time\"\n)\n\ntype Worker struct {\n\t// atomic.Bool starts as false (keep running)\n\t// When set to true, workers should stop\n\tshutdown atomic.Bool\n}\n\nfunc (w *Worker) Run(id int, wg *sync.WaitGroup) {\n\tdefer wg.Done()\n\n\t// Keep working until shutdown is true\n\tfor !w.shutdown.Load() {\n\t\tfmt.Printf(\"Worker %d: processing...\\n\", id)\n\t\ttime.Sleep(200 * time.Millisecond)\n\t}\n\n\t// Clean exit\n\tfmt.Printf(\"Worker %d: shutting down\\n\", id)\n}\n\nfunc (w *Worker) Stop() {\n\t// Set flag to true - all workers will see this\n\tw.shutdown.Store(true)\n}\n\nfunc main() {\n\tvar wg sync.WaitGroup\n\tworker := &Worker{}\n\n\t// Start 3 workers sharing the same shutdown flag\n\tfor i := 1; i <= 3; i++ {\n\t\twg.Add(1)\n\t\tgo worker.Run(i, &wg)\n\t}\n\n\t// Let them work for a bit\n\ttime.Sleep(500 * time.Millisecond)\n\n\t// Tell all workers to stop\n\tfmt.Println(\"Sending shutdown signal...\")\n\tworker.Stop()\n\n\t// Wait for all workers to finish\n\twg.Wait()\n\tfmt.Println(\"All workers stopped\")\n}",
-          "language": "go",
-          "filename": "atomic_shutdown.go"
-        },
-        {
-          "type": "code",
-          "code": "Worker 1: processing...\nWorker 2: processing...\nWorker 3: processing...\nWorker 1: processing...\nWorker 3: processing...\nWorker 2: processing...\nSending shutdown signal...\nWorker 1: shutting down\nWorker 2: shutting down\nWorker 3: shutting down\nAll workers stopped",
-          "language": "text",
-          "filename": "output"
-        },
-        {
-          "type": "text",
-          "text": "All three workers share one atomic.Bool. When Stop() sets it to true, each worker sees the change on their next loop iteration and exits cleanly. Note that workers don't stop immediately. They complete their current sleep, then check the flag on the next iteration."
-        },
-        {
-          "type": "text",
-          "text": "Use atomic.Bool for simple on/off signals like shutdown flags, feature toggles, or circuit breakers. Use channels when you need to send data along with the signal, or when you need to wait for the signal with select."
         },
         {
           "type": "comparison",
@@ -10440,11 +9859,11 @@
         },
         {
           "type": "text",
-          "text": "There are two ways to fix this. First, you can use a separate goroutine for the send operation, allowing the main goroutine to reach the receive. Second, you can use a buffered channel, which allows the send to complete immediately without blocking."
+          "text": "The fix: move the send into a separate goroutine so the main goroutine can proceed to the receive."
         },
         {
           "type": "code",
-          "code": "package main\n\nfunc main() {\n\tch := make(chan int)\n\t\n\t// Fix 1: Send in separate goroutine\n\tgo func() {\n\t\tch <- 42  // This goroutine sends\n\t}()\n\t\n\tv := <-ch // Main goroutine receives\n\tprintln(v)\n}",
+          "code": "package main\n\nfunc main() {\n\tch := make(chan int)\n\t\n\t// Fix: Send in separate goroutine\n\tgo func() {\n\t\tch <- 42  // This goroutine sends\n\t}()\n\t\n\tv := <-ch // Main goroutine receives\n\tprintln(v)\n}",
           "language": "go",
           "filename": "deadlock_unbuffered_fix1.go"
         },
@@ -10455,20 +9874,6 @@
         {
           "type": "text",
           "text": "With the send in a separate goroutine, main can proceed to the receive. The spawned goroutine sends 42, and main receives and prints it."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nfunc main() {\n\t// Fix 2: Use a buffered channel\n\tch := make(chan int, 1) // Buffer of 1\n\t\n\tch <- 42  // Doesn't block (buffer has space)\n\tv := <-ch // Receives from buffer\n\tprintln(v)\n}",
-          "language": "go",
-          "filename": "deadlock_unbuffered_fix2.go"
-        },
-        {
-          "type": "output",
-          "output": "$ go run deadlock_unbuffered_fix2.go\n42"
-        },
-        {
-          "type": "text",
-          "text": "Both approaches work. The goroutine approach is more flexible and works with any channel. The buffered channel approach is simpler but only works when you know how many values will be sent before any receives."
         },
         {
           "type": "heading",
@@ -10523,63 +9928,7 @@
         },
         {
           "type": "heading",
-          "text": "Cause 3: Mutex Lock Order",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "When multiple goroutines need to hold multiple mutexes simultaneously, the order in which they acquire the locks becomes critical. If two goroutines acquire the same set of mutexes in different orders, they can deadlock: each holds one mutex while waiting for the other."
-        },
-        {
-          "type": "text",
-          "text": "Consider this scenario: Goroutine A locks mutex1, then tries to lock mutex2. Meanwhile, Goroutine B locks mutex2, then tries to lock mutex1. If A gets mutex1 and B gets mutex2 before either proceeds to their second lock, both are stuck. A is waiting for mutex2 (held by B), and B is waiting for mutex1 (held by A). Neither can release what they hold because they're blocked waiting."
-        },
-        {
-          "type": "code",
-          "code": "    Mutex Lock Order Deadlock\n\n    Time   Goroutine A             Goroutine B\n    ----   -----------             -----------\n     1     mu1.Lock()    OK        mu2.Lock()    OK\n           holds: mu1              holds: mu2\n\n     2     mu2.Lock()  BLOCKED     mu1.Lock()  BLOCKED\n           wants: mu2              wants: mu1\n           (held by B)             (held by A)\n\n    Both goroutines are now stuck:\n      - A holds mu1, waiting for mu2\n      - B holds mu2, waiting for mu1\n      - Neither can release what they hold\n\n    Result: DEADLOCK",
-          "language": "text",
-          "filename": "mutex_order_diagram.txt"
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"sync\"\n\t\"time\"\n)\n\nvar mu1, mu2 sync.Mutex\n\nfunc main() {\n\t// Goroutine A: lock mu1, then mu2\n\tgo func() {\n\t\tmu1.Lock()\n\t\ttime.Sleep(10 * time.Millisecond) // Increases chance of deadlock\n\t\tmu2.Lock()                         // Waits here if B has mu2\n\t\t// ... do work ...\n\t\tmu2.Unlock()\n\t\tmu1.Unlock()\n\t}()\n\t\n\t// Goroutine B: lock mu2, then mu1 (OPPOSITE ORDER!)\n\tgo func() {\n\t\tmu2.Lock()\n\t\ttime.Sleep(10 * time.Millisecond)\n\t\tmu1.Lock() // DEADLOCK: A holds mu1, wants mu2; B holds mu2, wants mu1\n\t\t// ... do work ...\n\t\tmu1.Unlock()\n\t\tmu2.Unlock()\n\t}()\n\t\n\ttime.Sleep(1 * time.Second)\n}",
-          "language": "go",
-          "filename": "deadlock_mutex_order.go"
-        },
-        {
-          "type": "output",
-          "output": "$ go run deadlock_mutex_order.go\n(program hangs for 1 second, then exits)\n# No output - the goroutines are deadlocked waiting for each other's locks.\n# Main exits after the Sleep, killing the stuck goroutines."
-        },
-        {
-          "type": "text",
-          "text": "This example doesn't show the runtime deadlock error because main exits after 1 second, terminating the stuck goroutines. In real code without the Sleep, the runtime would detect the deadlock. The silence is the clue: no output from the goroutines means they never completed their work."
-        },
-        {
-          "type": "text",
-          "text": "The fix is to establish a global lock ordering: always acquire mutexes in the same order throughout your program. If every goroutine that needs both mu1 and mu2 always locks mu1 first, then mu2, deadlock becomes impossible. One goroutine might wait for the other to release both locks, but circular waiting cannot occur."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nvar mu1, mu2 sync.Mutex\n\nfunc main() {\n\tvar wg sync.WaitGroup\n\t\n\t// Both goroutines lock in SAME order: mu1 first, then mu2\n\twg.Add(2)\n\t\n\tgo func() {\n\t\tdefer wg.Done()\n\t\tmu1.Lock()         // Always mu1 first\n\t\tmu2.Lock()         // Then mu2\n\t\tfmt.Println(\"Goroutine A: working\")\n\t\tmu2.Unlock()\n\t\tmu1.Unlock()\n\t}()\n\t\n\tgo func() {\n\t\tdefer wg.Done()\n\t\tmu1.Lock()         // Same order: mu1 first\n\t\tmu2.Lock()         // Then mu2\n\t\tfmt.Println(\"Goroutine B: working\")\n\t\tmu2.Unlock()\n\t\tmu1.Unlock()\n\t}()\n\t\n\twg.Wait()\n\tfmt.Println(\"Done - no deadlock!\")\n}",
-          "language": "go",
-          "filename": "deadlock_mutex_order_fix.go"
-        },
-        {
-          "type": "output",
-          "output": "$ go run deadlock_mutex_order_fix.go\nGoroutine A: working\nGoroutine B: working\nDone - no deadlock!"
-        },
-        {
-          "type": "text",
-          "text": "With consistent lock ordering, the goroutines execute sequentially through the critical section. One acquires both locks, does its work, releases both, and then the other proceeds. The order of goroutine execution may vary, but deadlock cannot occur."
-        },
-        {
-          "type": "tip",
-          "title": "Lock Ordering in Practice",
-          "message": "For complex systems with many mutexes, document the lock ordering in comments or design docs. Some teams assign numeric IDs to locks and always acquire in ascending order. Alternatively, consider redesigning to use fewer locks or channels instead."
-        },
-        {
-          "type": "heading",
-          "text": "Cause 4: Forgetting to Close Channels",
+          "text": "Cause 3: Forgetting to Close Channels",
           "level": 3
         },
         {
@@ -10636,14 +9985,6 @@
           ],
           "rows": [
             [
-              "Lock ordering",
-              "Always acquire mutexes in the same order"
-            ],
-            [
-              "Lock timeout",
-              "Use TryLock or context with deadline"
-            ],
-            [
               "Defer unlock",
               "mu.Lock(); defer mu.Unlock() prevents forgetting"
             ],
@@ -10663,137 +10004,6 @@
         },
         {
           "type": "heading",
-          "text": "Debugging Techniques: Finding Partial Deadlocks",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "Go's runtime can only detect a deadlock when ALL goroutines are blocked. In production, this rarely happens. More commonly, you encounter partial deadlocks where some goroutines are stuck while others continue running. The HTTP server still responds to health checks, the main loop still processes events, but a pool of worker goroutines has been blocked for hours waiting on a channel that will never receive data."
-        },
-        {
-          "type": "text",
-          "text": "Partial deadlocks are insidious because they don't crash your program. Instead, they cause symptoms like requests timing out, queues growing unbounded, or workers silently disappearing. You might notice CPU usage dropping while memory grows, or metrics showing tasks entering a queue but never leaving. The runtime won't help you here because from its perspective, the program is running fine."
-        },
-        {
-          "type": "code",
-          "code": "          Main goroutine      Worker pool (4 workers)\n               |                    |   |   |   |\n               v                    v   v   v   v\n        [HTTP Server]           [Blocked on channel]\n        [Still running]         [Blocked on channel]\n               |                [Blocked on channel]\n               v                [Blocked on channel]\n        Health check: OK              ^\n                                      |\n                              No one will ever send!\n\n        Runtime says: \"Program is fine\"\n        Reality: 4 workers are dead",
-          "language": "text",
-          "filename": "partial_deadlock_diagram.txt"
-        },
-        {
-          "type": "heading",
-          "text": "Technique 1: Stack Dumps with SIGQUIT",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "The fastest way to diagnose a stuck Go program is to send it a SIGQUIT signal. When Go receives SIGQUIT, it prints the stack trace of every goroutine to stderr and then exits. This gives you a complete snapshot of what every goroutine was doing at that moment. On Linux or macOS, press Ctrl+\\ in the terminal running the program, or use kill -SIGQUIT <pid> from another terminal."
-        },
-        {
-          "type": "text",
-          "text": "The stack dump shows each goroutine's state (running, runnable, waiting) and its call stack. Look for goroutines in a 'chan receive' or 'chan send' state that have been waiting for a long time. The stack trace tells you exactly which line of code is blocked and what function called it. If you see multiple goroutines all blocked on the same channel operation in the same function, that's your deadlock."
-        },
-        {
-          "type": "code",
-          "code": "# Send SIGQUIT to dump stacks (program will exit after dump)\nkill -SIGQUIT $(pgrep myapp)\n\n# Or press Ctrl+\\ in the terminal running the program\n\n# Example output:\ngoroutine 1 [running]:\nmain.main()\n\t/app/main.go:45 +0x1a4\n\ngoroutine 18 [chan receive, 3 minutes]:\nmain.worker(0x0)\n\t/app/worker.go:23 +0x89\ncreated by main.startWorkers\n\t/app/main.go:31 +0x65\n\ngoroutine 19 [chan receive, 3 minutes]:\nmain.worker(0x1)\n\t/app/worker.go:23 +0x89\ncreated by main.startWorkers\n\t/app/main.go:31 +0x65\n\n# The \"[chan receive, 3 minutes]\" tells you:\n# - Blocked on channel receive\n# - Has been waiting 3 minutes\n# - Look at worker.go:23 to find the problem",
-          "language": "bash",
-          "filename": "sigquit_example.sh"
-        },
-        {
-          "type": "heading",
-          "text": "Technique 2: Runtime Stack Dumps (Non-Destructive)",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "SIGQUIT terminates the program after dumping stacks, which is fine for debugging but not ideal for production. For a non-destructive approach, add a signal handler that dumps stacks without exiting. Listen for SIGUSR1 (a user-defined signal) and use runtime.Stack to capture all goroutine stacks. This lets you inspect a running production system multiple times without restarting it."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"os\"\n\t\"os/signal\"\n\t\"runtime\"\n\t\"syscall\"\n\t\"time\"\n)\n\nfunc main() {\n\t// Set up signal handler for stack dumps\n\tc := make(chan os.Signal, 1)\n\tsignal.Notify(c, syscall.SIGUSR1)\n\n\tgo func() {\n\t\tfor range c {\n\t\t\tbuf := make([]byte, 1024*1024) // 1MB buffer\n\t\t\tn := runtime.Stack(buf, true)  // true = all goroutines\n\t\t\tfmt.Fprintf(os.Stderr, \"=== Stack dump at %s ===\\n%s\\n\",\n\t\t\t\ttime.Now().Format(time.RFC3339), buf[:n])\n\t\t}\n\t}()\n\n\t// Simulate blocked workers\n\tch := make(chan int)\n\tfor i := 0; i < 3; i++ {\n\t\tgo func(id int) {\n\t\t\t<-ch // Will block forever\n\t\t}(i)\n\t}\n\n\t// Main keeps running - runtime won't detect deadlock\n\tselect {}\n}",
-          "language": "go",
-          "filename": "stack_dump_handler.go"
-        },
-        {
-          "type": "code",
-          "code": "# Run the program\ngo run stack_dump_handler.go &\n\n# Get its PID\npidof stack_dump_handler\n# or: pgrep -f stack_dump_handler\n\n# Send SIGUSR1 to dump stacks (program keeps running)\nkill -SIGUSR1 <pid>\n\n# Output shows blocked goroutines:\n# goroutine 6 [chan receive]:\n# main.main.func2(0x0)\n#     /app/main.go:28 +0x2c",
-          "language": "bash",
-          "filename": "sigusr1_usage.sh"
-        },
-        {
-          "type": "heading",
-          "text": "Technique 3: pprof Goroutine Profiles",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "For production services, the best approach is to enable the pprof HTTP endpoint. Import net/http/pprof as a blank import, and it registers handlers under /debug/pprof/. The goroutine endpoint at /debug/pprof/goroutine?debug=2 shows all goroutines with their full stack traces and how long they've been in their current state. Unlike SIGQUIT, this doesn't require shell access to the container and doesn't terminate the process."
-        },
-        {
-          "type": "text",
-          "text": "The debug=2 parameter gives human-readable output. You can also use debug=1 for a summary grouped by stack trace (useful when you have thousands of goroutines), or omit it to get a binary profile you can analyze with go tool pprof. In production, protect this endpoint behind authentication since it exposes internal state."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t_ \"net/http/pprof\" // Registers /debug/pprof/* handlers\n\t\"time\"\n)\n\nfunc worker(id int, jobs <-chan int) {\n\tfor job := range jobs {\n\t\tfmt.Printf(\"Worker %d processing job %d\\n\", id, job)\n\t\ttime.Sleep(time.Second)\n\t}\n}\n\nfunc main() {\n\t// Start pprof server on separate port\n\tgo func() {\n\t\tfmt.Println(\"pprof server: http://localhost:6060/debug/pprof/\")\n\t\thttp.ListenAndServe(\"localhost:6060\", nil)\n\t}()\n\n\t// Create workers that will block\n\tjobs := make(chan int)\n\tfor i := 0; i < 5; i++ {\n\t\tgo worker(i, jobs)\n\t}\n\n\t// Send some jobs, then \"forget\" to send more\n\tfor i := 0; i < 3; i++ {\n\t\tjobs <- i\n\t}\n\t// Bug: No more jobs sent, workers block forever\n\t// Channel never closed, workers can't exit\n\n\t// Main keeps running\n\tselect {}\n}",
-          "language": "go",
-          "filename": "pprof_debug.go"
-        },
-        {
-          "type": "code",
-          "code": "# Fetch goroutine profile (human-readable)\ncurl http://localhost:6060/debug/pprof/goroutine?debug=2\n\n# Example output:\ngoroutine 7 [chan receive, 45 minutes]:\nmain.worker(0x2, 0xc00006e060)\n\t/app/main.go:12 +0x7f\ncreated by main.main\n\t/app/main.go:25 +0xab\n\ngoroutine 8 [chan receive, 45 minutes]:\nmain.worker(0x3, 0xc00006e060)\n\t/app/main.go:12 +0x7f\ncreated by main.main\n\t/app/main.go:25 +0xab\n\n# Summary view (grouped by stack trace)\ncurl http://localhost:6060/debug/pprof/goroutine?debug=1\n\n# Output:\n5 @ 0x43e1c6 0x44e887 0x44e85b 0x46cbc5 0x4715e1\n#\t0x46cbc4\tmain.worker+0x7f\t/app/main.go:12\n# This means: 5 goroutines with the same stack (all blocked at line 12)",
-          "language": "bash",
-          "filename": "pprof_usage.sh"
-        },
-        {
-          "type": "heading",
-          "text": "Reading pprof Output: Finding the Deadlock",
-          "level": 4
-        },
-        {
-          "type": "text",
-          "text": "When analyzing pprof output, look for patterns. Multiple goroutines blocked on the same operation for a long time (minutes or hours) indicates a deadlock. The state description tells you exactly what they're waiting for: 'chan receive' means blocked on <-ch, 'chan send' means blocked on ch <- val, 'semacquire' means blocked on a mutex or wait group, 'select' means blocked in a select with no ready cases."
-        },
-        {
-          "type": "text",
-          "text": "The timestamps matter. A goroutine blocked for 2 seconds might just be doing its job. One blocked for 2 hours is stuck. Compare the blocked goroutines' stacks to your code: which channel are they waiting on? Who should be sending to or receiving from that channel? Why didn't that happen? The answer usually involves either a missing goroutine (the sender crashed or was never started), a logic bug (wrong channel), or a resource exhaustion (all senders are blocked on something else)."
-        },
-        {
-          "type": "code",
-          "code": "State descriptions in pprof output:\n\nGoroutine State        | Meaning                        | Look For\n-----------------------|--------------------------------|---------------------------\nchan receive           | Blocked on <-ch                | Who sends to this channel?\nchan send              | Blocked on ch <- val           | Who receives from this?\nsemacquire             | Blocked on mutex/waitgroup     | Who holds the lock?\nselect (no cases)      | Blocked in empty select{}      | Intentional? Or bug?\nIO wait                | Blocked on network/file        | Connection hung? Timeout?\nsleep                  | In time.Sleep                  | Usually intentional\n\nCommon partial deadlock patterns:\n\n1. Workers blocked, no sender:\n   - 10x goroutines: [chan receive, 2 hours] at worker.go:45\n   - Cause: Producer crashed or logic skipped sending\n\n2. Sender blocked, no receiver:\n   - 1x goroutine: [chan send, 30 min] at producer.go:23\n   - Cause: All consumers died, unbuffered channel\n\n3. Mutex contention:\n   - 50x goroutines: [semacquire, 10 min] at db.go:89\n   - Cause: One goroutine holds lock in infinite loop",
-          "language": "text",
-          "filename": "pprof_states.txt"
-        },
-        {
-          "type": "tip",
-          "title": "Production Best Practice",
-          "message": "Always enable pprof in production services. Protect it behind authentication or bind to localhost only. When debugging, capture multiple snapshots 30 seconds apart. If the same goroutines are blocked with growing wait times, you've found your deadlock."
-        },
-        {
-          "type": "heading",
-          "text": "Select with Timeout: Avoid Waiting Forever",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "Use select with a timeout or context to prevent operations from blocking indefinitely."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n\t\"context\"\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\tch := make(chan int)\n\t\n\t// Pattern 1: Timeout\n\tselect {\n\tcase v := <-ch:\n\t\tfmt.Println(\"Got:\", v)\n\tcase <-time.After(1 * time.Second):\n\t\tfmt.Println(\"Timeout: no data received\")\n\t}\n\t\n\t// Pattern 2: Context with deadline\n\tctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)\n\tdefer cancel()\n\t\n\tselect {\n\tcase v := <-ch:\n\t\tfmt.Println(\"Got:\", v)\n\tcase <-ctx.Done():\n\t\tfmt.Println(\"Context expired:\", ctx.Err())\n\t}\n\t\n\t// Pattern 3: Non-blocking check\n\tselect {\n\tcase v := <-ch:\n\t\tfmt.Println(\"Got:\", v)\n\tdefault:\n\t\tfmt.Println(\"Nothing available right now\")\n\t}\n}",
-          "language": "go",
-          "filename": "avoid_blocking.go"
-        },
-        {
-          "type": "output",
-          "output": "$ go run avoid_blocking.go\nTimeout: no data received\nContext expired: context deadline exceeded\nNothing available right now"
-        },
-        {
-          "type": "text",
-          "text": "All three patterns gracefully handle the case where no data arrives. The timeout pattern is simplest for single operations. Context is better when you need to cancel multiple operations. The default case is useful when you want to try without waiting at all."
-        },
-        {
-          "type": "heading",
           "text": "Quick Reference: Deadlock Causes and Fixes",
           "level": 3
         },
@@ -10809,23 +10019,15 @@
               "description": "Fix: Break the cycle, have one goroutine initiate"
             },
             {
-              "label": "Mutex lock order inconsistency",
-              "description": "Fix: Always acquire locks in the same order"
-            },
-            {
               "label": "Channel never closed",
               "description": "Fix: Producer closes channel; use defer close(ch)"
-            },
-            {
-              "label": "Blocking without timeout",
-              "description": "Fix: Use select with context or time.After"
             }
           ]
         },
         {
           "type": "warning",
           "title": "Partial Deadlocks Are Harder to Find",
-          "message": "Go only detects deadlocks when ALL goroutines are blocked. If main or any goroutine is still running, you won't see the fatal error. Use pprof and stack dumps to find partial deadlocks in production."
+          "message": "Go only detects deadlocks when ALL goroutines are blocked. If main or any goroutine is still running, you won't see the fatal error. Partial deadlocks cause silent hangs: requests time out, queues grow, workers stop making progress. Use goroutine stack dumps (Ctrl+\\ or SIGQUIT) to inspect which goroutines are blocked and why."
         },
         {
           "type": "text",
@@ -11634,33 +10836,6 @@
         {
           "type": "text",
           "text": "The JSON output shows three things: ID was renamed from \"ID\" to \"id\", FirstName was renamed to \"first_name\" (snake_case), and both Password and Email are missing. Password is excluded because of the \"-\" tag, while Email is omitted because it's empty and has the \"omitempty\" option."
-        },
-        {
-          "type": "heading",
-          "text": "Constructor Pattern: NewXxx Functions",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "Go doesn't have constructors like other languages, but there's a strong convention: create a function called NewTypeName that validates input and returns an initialized struct. This pattern ensures your structs are always created in a valid state."
-        },
-        {
-          "type": "text",
-          "text": "Constructor functions typically return a pointer to the struct and an error if validation fails. For structs that can't fail during creation, you might return just the struct (often by value for small structs, by pointer for large ones)."
-        },
-        {
-          "type": "code",
-          "code": "package main\n\nimport (\n    \"errors\"\n    \"fmt\"\n    \"time\"\n)\n\ntype Account struct {\n    ID        string\n    Balance   float64\n    CreatedAt time.Time\n}\n\n// NewAccount is a constructor that validates input\nfunc NewAccount(id string, initialBalance float64) (*Account, error) {\n    if id == \"\" {\n        return nil, errors.New(\"account ID is required\")\n    }\n    if initialBalance < 0 {\n        return nil, errors.New(\"initial balance cannot be negative\")\n    }\n    \n    return &Account{\n        ID:        id,\n        Balance:   initialBalance,\n        CreatedAt: time.Now(),\n    }, nil\n}\n\nfunc main() {\n    // Valid account\n    acc, err := NewAccount(\"ACC-001\", 100.0)\n    if err != nil {\n        fmt.Println(\"Error:\", err)\n        return\n    }\n    fmt.Printf(\"Created account %s with balance %.2f\\n\", acc.ID, acc.Balance)\n    \n    // Invalid account - empty ID\n    _, err = NewAccount(\"\", 50.0)\n    if err != nil {\n        fmt.Println(\"Error:\", err) // \"account ID is required\"\n    }\n}",
-          "language": "go",
-          "filename": "constructor.go"
-        },
-        {
-          "type": "output",
-          "output": "$ go run constructor.go\nCreated account ACC-001 with balance 100.00\nError: account ID is required"
-        },
-        {
-          "type": "text",
-          "text": "The first call succeeds because both inputs are valid. The second call returns an error because the ID is empty. By using a constructor function, we ensure no Account can be created with invalid data. The caller must handle the error, making invalid states impossible."
         },
         {
           "type": "heading",
@@ -12823,57 +11998,6 @@
           "type": "warning",
           "title": "Nil Pointer Embedding",
           "message": "If you embed a pointer and it's nil, accessing any promoted field or method will panic. Always initialize pointer embeddings or check for nil before use."
-        },
-        {
-          "type": "heading",
-          "text": "Method Shadowing",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "When the outer type defines a method with the same name as an embedded method, the outer method shadows the inner one. This lets you override behavior while still having access to the original through the embedded field name."
-        },
-        {
-          "type": "code",
-          "language": "go",
-          "filename": "shadowing_pattern.go",
-          "code": "package main\n\nimport \"fmt\"\n\ntype Base struct {\n    Value int\n}\n\nfunc (b Base) Display() {\n    fmt.Printf(\"Base: %d\\n\", b.Value)\n}\n\nfunc (b Base) Info() string {\n    return fmt.Sprintf(\"value=%d\", b.Value)\n}\n\ntype Extended struct {\n    Base\n    Extra string\n}\n\n// Shadows Base.Display - adds extra info\nfunc (e Extended) Display() {\n    fmt.Printf(\"Extended: %d (%s)\\n\", e.Value, e.Extra)\n}\n\n// Can call the original method inside\nfunc (e Extended) DisplayBoth() {\n    e.Base.Display()  // Call original\n    e.Display()       // Call shadowed\n}\n\nfunc main() {\n    ext := Extended{\n        Base:  Base{Value: 42},\n        Extra: \"bonus\",\n    }\n\n    ext.Display()      // Uses Extended.Display\n    ext.Base.Display() // Explicitly use Base.Display\n    \n    fmt.Println(ext.Info())  // Not shadowed, uses Base.Info\n    \n    fmt.Println(\"---\")\n    ext.DisplayBoth()\n}"
-        },
-        {
-          "type": "output",
-          "output": "$ go run shadowing_pattern.go\nExtended: 42 (bonus)\nBase: 42\nvalue=42\n---\nBase: 42\nExtended: 42 (bonus)"
-        },
-        {
-          "type": "text",
-          "text": "Extended.Display shadows Base.Display. When we call ext.Display(), we get the extended version. To access the original, we use ext.Base.Display() explicitly. Methods not shadowed, like Info(), are promoted normally."
-        },
-        {
-          "type": "heading",
-          "text": "Interface Embedding",
-          "level": 3
-        },
-        {
-          "type": "text",
-          "text": "Just as structs can embed structs, interfaces can embed interfaces. This combines method requirements. A type must implement all methods from all embedded interfaces to satisfy the composite interface."
-        },
-        {
-          "type": "code",
-          "language": "go",
-          "filename": "interface_compose.go",
-          "code": "package main\n\nimport \"fmt\"\n\n// Small, focused interfaces\ntype Reader interface {\n    Read() string\n}\n\ntype Writer interface {\n    Write(data string)\n}\n\ntype Closer interface {\n    Close() error\n}\n\n// Composed interfaces\ntype ReadWriter interface {\n    Reader\n    Writer\n}\n\ntype ReadWriteCloser interface {\n    Reader\n    Writer\n    Closer\n}\n\n// File implements all three\ntype File struct {\n    name   string\n    buffer string\n    open   bool\n}\n\nfunc (f *File) Read() string          { return f.buffer }\nfunc (f *File) Write(data string)     { f.buffer += data }\nfunc (f *File) Close() error          { f.open = false; return nil }\n\n// Functions accept minimal interface needed\nfunc CopyData(r Reader, w Writer) {\n    data := r.Read()\n    w.Write(data)\n}\n\nfunc main() {\n    src := &File{name: \"src.txt\", buffer: \"Hello, World!\", open: true}\n    dst := &File{name: \"dst.txt\", open: true}\n\n    // File satisfies Reader, Writer, and Closer\n    CopyData(src, dst)\n    fmt.Println(\"Copied:\", dst.Read())\n\n    // Can use as any of the interfaces\n    var rwc ReadWriteCloser = src\n    rwc.Close()\n    fmt.Println(\"Closed:\", !src.open)\n}"
-        },
-        {
-          "type": "output",
-          "output": "$ go run interface_compose.go\nCopied: Hello, World!\nClosed: true"
-        },
-        {
-          "type": "text",
-          "text": "File implements Read, Write, and Close, so it satisfies Reader, Writer, Closer, ReadWriter, and ReadWriteCloser. The CopyData function only requires what it needs: a Reader and a Writer. This is the power of small, composable interfaces."
-        },
-        {
-          "type": "tip",
-          "title": "Keep Interfaces Small",
-          "message": "The Go standard library's io.Reader has just one method: Read. This makes it incredibly reusable. When designing interfaces, ask: what's the minimum behavior I need? Start small, compose when needed."
         },
         {
           "type": "heading",

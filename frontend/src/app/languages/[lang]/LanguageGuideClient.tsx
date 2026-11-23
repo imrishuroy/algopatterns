@@ -295,8 +295,8 @@ export default function LanguageGuideClient({
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Header */}
         <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm flex-shrink-0">
-          <div className="px-4 py-4">
-            <div className="flex items-center gap-4 mb-4">
+          <div className="px-4 py-2 md:py-4">
+            <div className="flex items-center justify-between gap-4 mb-2 md:mb-4">
               <Link
                 href="/languages"
                 className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
@@ -316,12 +316,35 @@ export default function LanguageGuideClient({
                 </svg>
                 <span>Languages</span>
               </Link>
+              <button
+                onClick={() => setIsAIChatOpen(!isAIChatOpen)}
+                aria-label="Toggle AI assistant"
+                className={`md:hidden p-1.5 rounded-md transition-colors border ${
+                  isAIChatOpen
+                    ? "bg-indigo-600/20 border-indigo-500/50 text-indigo-400"
+                    : "bg-gray-800 border-gray-700 text-gray-400 hover:text-white hover:border-gray-600"
+                }`}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+              </button>
             </div>
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-white">
                     {guide.displayName}
                   </h1>
                   <span
@@ -334,12 +357,12 @@ export default function LanguageGuideClient({
                     v{guide.version}
                   </span>
                 </div>
-                <p className="text-sm text-gray-400">{guide.description}</p>
+                <p className="hidden md:block text-sm text-gray-400">{guide.description}</p>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-4">
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-white">
+                  <div className="text-xl md:text-2xl font-bold text-white">
                     {isProgressLoading ? (
                       <span className="inline-block w-12 h-6 bg-gray-800 animate-pulse rounded" />
                     ) : (
@@ -405,7 +428,25 @@ export default function LanguageGuideClient({
               </div>
             </div>
 
-            <div className="flex gap-1 mt-4 md:mt-6 -mb-px overflow-x-auto">
+            <div className="md:hidden mt-2 mb-1">
+              {isProgressLoading ? (
+                <div className="h-1.5 bg-gray-800 rounded-full animate-pulse" />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${progress}%`, background: accentColor }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-400 flex-shrink-0 tabular-nums">
+                    {completedSections.size}/{totalSections}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-1 mt-2 md:mt-6 -mb-px overflow-x-auto">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}

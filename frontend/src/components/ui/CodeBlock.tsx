@@ -42,6 +42,9 @@ const customStyle = {
     padding: "1rem",
     fontSize: "0.875rem",
     lineHeight: "1.6",
+    // The wrapper div handles horizontal scroll; overflow: visible here
+    // prevents a double scroll container that breaks touch-scroll on mobile.
+    overflow: "visible",
   },
   'code[class*="language-"]': {
     ...oneDark['code[class*="language-"]'],

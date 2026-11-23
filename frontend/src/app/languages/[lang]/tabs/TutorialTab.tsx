@@ -511,8 +511,10 @@ export default function TutorialTab({
   onAskAI,
 }: TutorialTabProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const mobileSidebarRef = useRef<HTMLDivElement>(null);
   const currentSection = guide.sections[currentSectionIndex];
   const isCompleted = completedSections.has(currentSectionIndex);
 
@@ -562,10 +564,37 @@ export default function TutorialTab({
         </div>
       )}
 
+      {/* Mobile Sections Drawer */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-40">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <div
+            ref={mobileSidebarRef}
+            className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-gray-900 border-r border-gray-800 overflow-y-auto"
+          >
+            <Sidebar
+              guide={guide}
+              categories={categories}
+              currentSectionIndex={currentSectionIndex}
+              completedSections={completedSections}
+              onSectionChange={(index) => {
+                onSectionChange(index);
+                setIsMobileMenuOpen(false);
+              }}
+              onCollapse={() => setIsMobileMenuOpen(false)}
+              containerRef={mobileSidebarRef}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Main Content - independent scroll */}
       <div
         ref={contentRef}
-        className={`flex-1 min-w-0 h-full overflow-y-auto transition-all duration-300 ease-in-out ${
+        className={`flex-1 min-w-0 h-full overflow-y-auto transition-all duration-300 ease-in-out pl-4 ${
           isSidebarCollapsed ? "lg:pl-4" : "lg:pl-8"
         } pr-4 lg:pr-8 py-4 md:py-8`}
       >
@@ -574,10 +603,24 @@ export default function TutorialTab({
           contentId={`${guide.id}-${currentSection.id}`}
           onAskAI={onAskAI}
         >
+          {/* Mobile section navigation button */}
+          <div className="lg:hidden mb-4 flex items-center justify-between">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800 border border-gray-700 text-sm text-gray-300 hover:text-white transition-colors"
+            >
+              <PanelLeft className="w-4 h-4" />
+              <span>Sections</span>
+            </button>
+            <span className="text-xs text-gray-500 uppercase tracking-wider">
+              {currentSection.category}
+            </span>
+          </div>
+
           {/* Section Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-2xl font-bold text-white">
+              <h2 className="text-xl md:text-2xl font-bold text-white">
                 {currentSection.title}
               </h2>
               <span

@@ -100,7 +100,7 @@ All leaf nodes = All subsets: [], [1], [2], [1,2]`}
         Difference 2: Where the Answer Appears
       </h2>
 
-      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8">
+      <div className="bg-gray-900 rounded-md border border-gray-800 p-6 mb-8 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-700">

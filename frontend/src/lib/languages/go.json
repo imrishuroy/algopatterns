@@ -684,6 +684,129 @@
       ]
     },
     {
+      "id": "getting-started-refresher",
+      "title": "Getting Started: Quick Refresher",
+      "category": "Getting Started",
+      "difficulty": "beginner",
+      "estimatedTime": "10 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "This refresher condenses everything from the Getting Started category into one place. Use it before an interview or when you want a quick reminder of Go basics."
+        },
+        {
+          "type": "heading",
+          "text": "Variables",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go has three ways to work with variables. Use var for package-level declarations or when you want an explicit zero value. Use := inside functions to create and initialize in one step (the most common form). Use = to reassign an existing variable. Every type has a zero value assigned automatically on declaration."
+        },
+        {
+          "type": "code",
+          "code": "// Package-level: must use var\nvar maxSize int     // 0\nvar name string     // \"\"\n\n// Function-level: use := to create + assign\ncount := 0\nfound := false\nprices := []float64{1.99, 2.49}\n\n// All zero values on declaration\nvar i int        // 0\nvar f float64    // 0.0\nvar b bool       // false\nvar s string     // \"\"\nvar sl []int     // nil, but append works immediately\nvar m map[string]int // nil, must make() before writing",
+          "language": "go",
+          "filename": "variables.go"
+        },
+        {
+          "type": "heading",
+          "text": "Multiple Return Values",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Functions can return multiple values. The pattern of returning (value, error) or (value, bool) is everywhere in Go and is the primary way the language signals failure without exceptions. Use _ to discard values you do not need."
+        },
+        {
+          "type": "code",
+          "code": "func divide(a, b int) (int, error) {\n    if b == 0 {\n        return 0, errors.New(\"division by zero\")\n    }\n    return a / b, nil\n}\n\nresult, err := divide(10, 2)\nif err != nil {\n    // handle error\n}\n_ = result  // discard if not needed\n\n// Map lookup returns value + ok bool\nval, ok := myMap[key]\nif ok {\n    fmt.Println(val)\n}",
+          "language": "go",
+          "filename": "multiple_returns.go"
+        },
+        {
+          "type": "heading",
+          "text": "Control Flow",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go has one loop keyword: for. It handles classic counting loops, while-style loops, and infinite loops. The range keyword iterates over slices, maps, strings, and channels. If statements can include an initialization before the condition, scoping the variable to that block. Switch cases do not fall through by default, so no break is needed."
+        },
+        {
+          "type": "code",
+          "code": "// Classic for loop\nfor i := 0; i < n; i++ {\n    // body\n}\n\n// While-style (just a condition)\nfor count < 5 {\n    count++\n}\n\n// Infinite loop\nfor {\n    if done {\n        break\n    }\n}\n\n// Range over slice (index + value)\nfor i, v := range nums {\n    fmt.Println(i, v)\n}\n\n// Range over map (key + value, random order)\nfor k, v := range myMap {\n    fmt.Println(k, v)\n}\n\n// If with initialization (val, ok scoped to this if block)\nif val, ok := myMap[key]; ok {\n    fmt.Println(val)\n}\n\n// Switch (no fall-through, multiple values per case)\nswitch day {\ncase \"Sat\", \"Sun\":\n    fmt.Println(\"weekend\")\ndefault:\n    fmt.Println(\"weekday\")\n}\n\n// Switch as a cleaner if-else chain\nswitch {\ncase score >= 90:\n    grade = \"A\"\ncase score >= 80:\n    grade = \"B\"\ndefault:\n    grade = \"C\"\n}",
+          "language": "go",
+          "filename": "control_flow.go"
+        },
+        {
+          "type": "heading",
+          "text": "Pointers",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "A pointer holds a memory address. Use & to get a pointer to a variable and * to read or write through it. In interview problems, you use pointers mainly for tree and linked list nodes, where nil means no child or no next node. Slices and maps already carry internal pointers, so you do not need *[]int or *map[K]V."
+        },
+        {
+          "type": "code",
+          "code": "x := 42\np := &x   // p is *int, holds the address of x\n*p = 100  // writes 100 to x through the pointer\nfmt.Println(x)  // 100\n\n// Tree node: nil pointer means no child\ntype TreeNode struct {\n    Val   int\n    Left  *TreeNode\n    Right *TreeNode\n}\n\nroot := &TreeNode{Val: 1}\nroot.Left = &TreeNode{Val: 2}\n\n// Function that modifies through pointer\nfunc increment(n *int) {\n    *n++\n}\nincrement(&x)",
+          "language": "go",
+          "filename": "pointers.go"
+        },
+        {
+          "type": "heading",
+          "text": "Blank Identifier",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The blank identifier _ tells Go to discard a value. Go requires every declared variable to be used, so _ is how you explicitly throw away unwanted return values or loop variables."
+        },
+        {
+          "type": "code",
+          "code": "// Ignore loop index when you only need the value\nfor _, v := range nums {\n    total += v\n}\n\n// Ignore the value when you only need the index\nfor i := range nums {\n    fmt.Println(\"Index:\", i)\n}\n\n// Ignore error (only when it truly cannot fail)\nresult, _ := strconv.Atoi(\"42\")\n_ = result\n\n// Check key existence without using the value\n_, ok := myMap[key]",
+          "language": "go",
+          "filename": "blank_identifier.go"
+        },
+        {
+          "type": "heading",
+          "text": "Type Conversions",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go never converts between types automatically. Every conversion is explicit. Numeric conversions between int and float64 may lose precision. Converting between string and []byte makes a copy. For string-to-number and back, use the strconv package, which also returns an error so you know if parsing failed."
+        },
+        {
+          "type": "code",
+          "code": "// Numeric conversions are explicit\ni := 42\nf := float64(i)\nu := uint(f)\n\n// string <-> []byte (a copy is made each time)\ns := \"hello\"\nb := []byte(s)\ns2 := string(b)\n\n// string <-> int via strconv (safe, returns error)\nn, err := strconv.Atoi(\"123\")  // string to int\nif err != nil { ... }\ns3 := strconv.Itoa(42)         // int to string\n\n// string <-> rune slice (preserves Unicode)\nrunes := []rune(\"hello\")\nback := string(runes)",
+          "language": "go",
+          "filename": "conversions.go"
+        },
+        {
+          "type": "heading",
+          "text": "Printing and Formatting",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The fmt package handles all output. Println is for quick, space-separated output with a newline. Printf writes formatted output using verbs like %d for integers and %s for strings. Sprintf builds a formatted string without printing it. Errorf creates a formatted error value."
+        },
+        {
+          "type": "code",
+          "code": "// Basic output\nfmt.Println(\"hello\", 42, true)  // adds spaces, newline\nfmt.Print(\"no newline\")           // no newline added\n\n// Formatted output with verbs\nfmt.Printf(\"%d items at $%.2f each\\n\", 3, 1.5)\nfmt.Printf(\"%v\\n\", someStruct)   // default format\nfmt.Printf(\"%+v\\n\", someStruct)  // with field names\nfmt.Printf(\"%T\\n\", someStruct)   // type name\nfmt.Printf(\"%p\\n\", &x)           // pointer address\n\n// Build a string without printing\ns := fmt.Sprintf(\"count: %d\", n)\n\n// Create an error with context\nerr := fmt.Errorf(\"open file: %w\", originalErr)",
+          "language": "go",
+          "filename": "printing.go"
+        },
+        {
+          "type": "tip",
+          "title": "Interview Quick Reference",
+          "message": "In interviews, prefer := inside functions. Use var only at package level or when you need an explicit zero value. Always check errors, and avoid ignoring them with _ unless you have a clear reason."
+        }
+      ]
+    },
+    {
       "id": "arrays-slices",
       "title": "Arrays and Slices",
       "category": "Data Structures",
@@ -2388,6 +2511,214 @@
           "time": "O(V + E) for DFS/BFS where V = vertices, E = edges",
           "space": "O(V) for visited set + O(V) for recursion stack (DFS) or queue (BFS)",
           "explanation": "Both DFS and BFS visit each vertex once and examine each edge once. For a grid with m×n cells, V = m×n and E = O(m×n) since each cell has at most 4 neighbors."
+        }
+      ]
+    },
+    {
+      "id": "data-structures-refresher",
+      "title": "Data Structures: Quick Refresher",
+      "category": "Data Structures",
+      "difficulty": "intermediate",
+      "estimatedTime": "15 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "A condensed reference covering every data structure from this category. Each entry explains what the structure is, shows the idiomatic Go pattern, and includes the complexity you need to know for interviews."
+        },
+        {
+          "type": "heading",
+          "text": "Arrays and Slices",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Arrays have a fixed size and are rarely used directly in Go. Slices are the workhorse: a dynamic, resizable view over an underlying array. You will use slices for almost everything. Append grows the slice automatically, doubling capacity when needed. Slicing (s[1:3]) shares the backing array, so copy when you need independence."
+        },
+        {
+          "type": "code",
+          "code": "// Array: fixed size, rarely used directly\nvar arr [5]int\narr2 := [3]string{\"a\", \"b\", \"c\"}\n\n// Slice: dynamic, the workhorse of Go collections\nnums := []int{1, 2, 3}\nnums = append(nums, 4, 5)   // O(1) amortized\n\n// Make with length and capacity\ns := make([]int, 5)        // len=5, cap=5, all zeros\ns2 := make([]int, 0, 10)  // len=0, cap=10 (pre-alloc)\n\n// Slicing creates a view (shares underlying array)\nsub := nums[1:3]  // elements at index 1 and 2\n\n// Copy creates an independent slice\ndst := make([]int, len(nums))\ncopy(dst, nums)\n\n// 2D slice (slice of slices)\nmatrix := make([][]int, rows)\nfor i := range matrix {\n    matrix[i] = make([]int, cols)\n}",
+          "language": "go",
+          "filename": "slices.go"
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Operation",
+            "Time",
+            "Notes"
+          ],
+          "rows": [
+            [
+              "Access by index",
+              "O(1)",
+              "nums[i]"
+            ],
+            [
+              "Append",
+              "O(1) amortized",
+              "may reallocate backing array"
+            ],
+            [
+              "Sub-slice",
+              "O(1)",
+              "shares memory with original"
+            ],
+            [
+              "Copy",
+              "O(n)",
+              "copy(dst, src)"
+            ],
+            [
+              "Delete element at i (order preserved)",
+              "O(n)",
+              "append(s[:i], s[i+1:]...)"
+            ]
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Strings and Runes",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Strings in Go are immutable sequences of bytes. When you iterate with range, Go gives you runes (Unicode code points), not bytes. This matters for non-ASCII text. Use the strings package for most string operations, and strings.Builder for efficient concatenation."
+        },
+        {
+          "type": "code",
+          "code": "s := \"hello\"\n\n// Rune iteration (Unicode-safe, most common)\nfor i, r := range s { _ = i; _ = r }  // r is a rune\n\n// Convert to []byte for mutation\nbs := []byte(s)\nbs[0] = 'H'\nresult := string(bs)  // \"Hello\"\n\n// Convert to []rune for multi-byte characters\nrunes := []rune(\"hello\")\nfmt.Println(len(runes))  // character count, not byte count\n\n// Common strings functions\nstrings.Contains(s, \"ell\")           // true\nstrings.HasPrefix(s, \"he\")           // true\nstrings.ToUpper(s)                   // \"HELLO\"\nstrings.TrimSpace(\"  hi  \")          // \"hi\"\nstrings.Split(\"a,b,c\", \",\")          // [\"a\",\"b\",\"c\"]\nstrings.Join([]string{\"a\",\"b\"}, \"-\") // \"a-b\"\nstrings.Count(s, \"l\")                // 2\nstrings.ReplaceAll(s, \"l\", \"r\")      // \"herro\"\n\n// Build strings efficiently (avoids repeated allocation)\nvar sb strings.Builder\nsb.WriteString(\"hello \")\nsb.WriteString(\"world\")\nfmt.Println(sb.String())",
+          "language": "go",
+          "filename": "strings.go"
+        },
+        {
+          "type": "heading",
+          "text": "Maps (Hash Maps)",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "A map is Go's built-in hash table. It is unordered: iteration order is random on purpose. Always initialize a map with make or a literal before writing to it. Reading from a nil map returns the zero value and does not panic, but writing panics. The comma-ok pattern tells you whether a key actually exists."
+        },
+        {
+          "type": "code",
+          "code": "// Initialize before use\nm := make(map[string]int)\nm2 := map[string]int{\"alice\": 30, \"bob\": 25}  // literal\n\n// CRUD\nm[\"charlie\"] = 35          // write\nage := m[\"alice\"]          // read (zero value if key missing)\ndelete(m, \"alice\")         // delete (safe even if key missing)\n\n// Comma-ok: check whether key exists\nif age, ok := m[\"alice\"]; ok {\n    fmt.Println(\"found:\", age)\n} else {\n    fmt.Println(\"not found\")\n}\n\n// Iterate (order is random, different each run)\nfor k, v := range m {\n    fmt.Println(k, v)\n}\n\n// Count character frequencies\nfreq := make(map[rune]int)\nfor _, ch := range \"hello\" {\n    freq[ch]++\n}",
+          "language": "go",
+          "filename": "maps.go"
+        },
+        {
+          "type": "warning",
+          "title": "Nil Map Panic",
+          "message": "Reading from a nil map returns the zero value and is safe. Writing to a nil map panics at runtime. Always initialize with make(map[K]V) or a map literal before any write."
+        },
+        {
+          "type": "heading",
+          "text": "Sets",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go has no built-in set type. The standard idiom is a map with an empty struct value, which costs zero bytes per entry. If you want simpler code and do not care about the small memory overhead, map[T]bool works too."
+        },
+        {
+          "type": "code",
+          "code": "// Set using map[T]struct{} (zero memory per entry)\nvisited := make(map[int]struct{})\nvisited[42] = struct{}{}           // add\n_, ok := visited[42]               // check\ndelete(visited, 42)                // remove\n\n// Set using map[T]bool (simpler syntax)\nseen := make(map[string]bool)\nseen[\"hello\"] = true\nif seen[\"hello\"] { ... }",
+          "language": "go",
+          "filename": "sets.go"
+        },
+        {
+          "type": "heading",
+          "text": "Stacks",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go has no built-in stack type. A slice works perfectly: append pushes to the end and re-slicing pops from the end. Both operations are O(1) amortized. This is the pattern you will use in most interview problems that need a stack."
+        },
+        {
+          "type": "code",
+          "code": "stack := []int{}\n\n// Push: append to the end\nstack = append(stack, 10)\nstack = append(stack, 20)\n\n// Peek: read the top without removing\ntop := stack[len(stack)-1]\n\n// Pop: read and remove the top\ntop, stack = stack[len(stack)-1], stack[:len(stack)-1]\n\n// Empty check\nif len(stack) == 0 { ... }",
+          "language": "go",
+          "filename": "stack.go"
+        },
+        {
+          "type": "heading",
+          "text": "Queues and Deques",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go has no built-in queue. For simple interview use, a slice works with append at the back and re-slicing at the front. The re-slice dequeue is O(n) due to shifting; for high-throughput production use, use container/list to get O(1) operations on both ends."
+        },
+        {
+          "type": "code",
+          "code": "// Simple queue using a slice\nqueue := []int{}\nqueue = append(queue, 10)  // enqueue\nqueue = append(queue, 20)\nfront := queue[0]          // peek\nqueue = queue[1:]          // dequeue (O(n))\n\n// Deque using container/list (O(1) on both ends)\nimport \"container/list\"\ndq := list.New()\ndq.PushBack(1)   // add to back\ndq.PushFront(0)  // add to front\nback := dq.Back()\ndq.Remove(back)  // remove from back\nfrt := dq.Front()\ndq.Remove(frt)   // remove from front",
+          "language": "go",
+          "filename": "queue.go"
+        },
+        {
+          "type": "heading",
+          "text": "Linked Lists",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Linked lists in Go are built from struct types with pointer fields. The *ListNode pattern appears in almost every interview list problem. Know reverse and find-middle by heart: they are building blocks for many harder problems."
+        },
+        {
+          "type": "code",
+          "code": "type ListNode struct {\n    Val  int\n    Next *ListNode\n}\n\n// Build: 1 -> 2 -> 3\nhead := &ListNode{Val: 1,\n    Next: &ListNode{Val: 2,\n        Next: &ListNode{Val: 3}}}\n\n// Traverse\nfor curr := head; curr != nil; curr = curr.Next {\n    fmt.Println(curr.Val)\n}\n\n// Reverse in place (classic 3-pointer technique)\nfunc reverse(head *ListNode) *ListNode {\n    var prev *ListNode\n    curr := head\n    for curr != nil {\n        next := curr.Next  // save next\n        curr.Next = prev   // reverse link\n        prev = curr        // advance prev\n        curr = next        // advance curr\n    }\n    return prev\n}\n\n// Find middle (slow/fast pointer)\nfunc middle(head *ListNode) *ListNode {\n    slow, fast := head, head\n    for fast != nil && fast.Next != nil {\n        slow = slow.Next\n        fast = fast.Next.Next\n    }\n    return slow  // at list length n: index n/2\n}",
+          "language": "go",
+          "filename": "linked_list.go"
+        },
+        {
+          "type": "heading",
+          "text": "Trees and Binary Trees",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Binary trees use a TreeNode struct with pointer fields for left and right children, where nil means no child. DFS (depth-first) is usually done with recursion. BFS (breadth-first) uses a queue to visit nodes level by level. Both are essential: DFS for tree shape problems, BFS for shortest path and level-order traversal."
+        },
+        {
+          "type": "code",
+          "code": "type TreeNode struct {\n    Val   int\n    Left  *TreeNode\n    Right *TreeNode\n}\n\n// Inorder DFS: left, root, right (sorted order for BST)\nfunc inorder(root *TreeNode) {\n    if root == nil {\n        return\n    }\n    inorder(root.Left)\n    fmt.Println(root.Val)\n    inorder(root.Right)\n}\n\n// BFS: level order using a slice as queue\nfunc bfs(root *TreeNode) {\n    if root == nil {\n        return\n    }\n    queue := []*TreeNode{root}\n    for len(queue) > 0 {\n        node := queue[0]\n        queue = queue[1:]\n        fmt.Println(node.Val)\n        if node.Left != nil {\n            queue = append(queue, node.Left)\n        }\n        if node.Right != nil {\n            queue = append(queue, node.Right)\n        }\n    }\n}\n\n// Tree height (max depth)\nfunc height(root *TreeNode) int {\n    if root == nil {\n        return 0\n    }\n    l, r := height(root.Left), height(root.Right)\n    if l > r {\n        return l + 1\n    }\n    return r + 1\n}",
+          "language": "go",
+          "filename": "tree.go"
+        },
+        {
+          "type": "heading",
+          "text": "Heaps (Priority Queues)",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go's container/heap package gives you a priority queue, but you have to implement five interface methods. By default it builds a min-heap (smallest element has priority). To get a max-heap, flip the Less comparison. Once set up, Push and Pop maintain the heap property automatically."
+        },
+        {
+          "type": "code",
+          "code": "import \"container/heap\"\n\n// Min-heap: implement heap.Interface (5 methods)\ntype MinHeap []int\n\nfunc (h MinHeap) Len() int {\n    return len(h)\n}\n\nfunc (h MinHeap) Less(i, j int) bool {\n    return h[i] < h[j]  // flip to h[i] > h[j] for max-heap\n}\n\nfunc (h MinHeap) Swap(i, j int) {\n    h[i], h[j] = h[j], h[i]\n}\n\nfunc (h *MinHeap) Push(x any) {\n    *h = append(*h, x.(int))\n}\n\nfunc (h *MinHeap) Pop() any {\n    old := *h\n    n := len(old)\n    x := old[n-1]\n    *h = old[:n-1]\n    return x\n}\n\nh := &MinHeap{3, 1, 4, 1, 5}\nheap.Init(h)              // build heap from existing slice\nheap.Push(h, 2)           // add an element\nmin := heap.Pop(h).(int)  // remove and return smallest",
+          "language": "go",
+          "filename": "heap.go"
+        },
+        {
+          "type": "heading",
+          "text": "Graphs",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "An adjacency list (map[int][]int) works for most interview graph problems. Always track visited nodes in a set to avoid revisiting. BFS gives the shortest path in an unweighted graph because it explores level by level. DFS is better for connectivity checks, cycle detection, and topological sort."
+        },
+        {
+          "type": "code",
+          "code": "// Build adjacency list\ngraph := make(map[int][]int)\ngraph[0] = append(graph[0], 1, 2)\ngraph[1] = append(graph[1], 3)\n\n// BFS: shortest path in unweighted graph\nfunc bfsGraph(graph map[int][]int, start int) {\n    visited := make(map[int]bool)\n    queue := []int{start}\n    visited[start] = true\n    for len(queue) > 0 {\n        node := queue[0]\n        queue = queue[1:]\n        fmt.Println(node)\n        for _, neighbor := range graph[node] {\n            if !visited[neighbor] {\n                visited[neighbor] = true\n                queue = append(queue, neighbor)\n            }\n        }\n    }\n}\n\n// DFS: connectivity, cycle detection\nfunc dfsGraph(graph map[int][]int, node int, visited map[int]bool) {\n    visited[node] = true\n    fmt.Println(node)\n    for _, neighbor := range graph[node] {\n        if !visited[neighbor] {\n            dfsGraph(graph, neighbor, visited)\n        }\n    }\n}",
+          "language": "go",
+          "filename": "graph.go"
+        },
+        {
+          "type": "tip",
+          "title": "Interview Pattern",
+          "message": "For most graph problems: start with an adjacency list, a visited set (map[int]bool), and pick BFS for shortest path or DFS for connectivity and cycle detection. Undirected graphs need edges in both directions."
         }
       ]
     },
@@ -5594,6 +5925,189 @@
         {
           "type": "text",
           "text": "The flag package covers most CLI needs without external dependencies. For complex tools with nested subcommands, shell completion, or man page generation, consider cobra or urfave/cli."
+        }
+      ]
+    },
+    {
+      "id": "go-lang-fundamentals-refresher",
+      "title": "Go Language Fundamentals: Quick Refresher",
+      "category": "Go Language Fundamentals",
+      "difficulty": "intermediate",
+      "estimatedTime": "15 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "A condensed reference for all the standard library and language features covered in this category. Use this before interviews or system design discussions where Go's stdlib will come up."
+        },
+        {
+          "type": "heading",
+          "text": "Error Handling",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go handles errors as return values, not exceptions. The convention is to check the error immediately after any call that can fail and return early if something went wrong. Wrapping with %w preserves the original error so callers can inspect it with errors.Is and errors.As without breaking encapsulation."
+        },
+        {
+          "type": "code",
+          "code": "// Sentinel errors: compare with errors.Is\nvar ErrNotFound = errors.New(\"not found\")\n\n// Custom error type: extract with errors.As\ntype ValidationError struct {\n    Field   string\n    Message string\n}\nfunc (e *ValidationError) Error() string {\n    return fmt.Sprintf(\"%s: %s\", e.Field, e.Message)\n}\n\n// Wrap with context using %w (preserves the chain)\nerr := fmt.Errorf(\"open config: %w\", originalErr)\n\n// Check for a specific error anywhere in the chain\nerrors.Is(err, ErrNotFound)  // true if ErrNotFound is wrapped\n\n// Extract a specific error type from the chain\nvar ve *ValidationError\nif errors.As(err, &ve) {\n    fmt.Println(\"invalid field:\", ve.Field)\n}\n\n// Idiomatic pattern: check early, return with context\nfunc process(path string) error {\n    f, err := os.Open(path)\n    if err != nil {\n        return fmt.Errorf(\"process %s: %w\", path, err)\n    }\n    defer f.Close()\n    return nil\n}",
+          "language": "go",
+          "filename": "errors.go"
+        },
+        {
+          "type": "heading",
+          "text": "Defer, Panic, and Recover",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "defer schedules a function call to run just before the surrounding function returns, whether by a normal return or a panic. Defers run in last-in first-out order, which is why they are perfect for cleanup (open/close, lock/unlock). panic stops normal execution; recover inside a deferred function catches it and lets you return a normal error."
+        },
+        {
+          "type": "code",
+          "code": "// Defer: guaranteed cleanup\nfunc readFile(path string) error {\n    f, err := os.Open(path)\n    if err != nil {\n        return err\n    }\n    defer f.Close()  // runs when readFile returns, always\n    // ...\n    return nil\n}\n\n// Multiple defers run LIFO (last in, first out)\nfunc multi() {\n    defer fmt.Println(\"3\")  // runs third\n    defer fmt.Println(\"2\")  // runs second\n    defer fmt.Println(\"1\")  // runs first\n}\n\n// Recover: catch a panic and convert it to an error\nfunc safeDiv(a, b int) (result int, err error) {\n    defer func() {\n        if r := recover(); r != nil {\n            err = fmt.Errorf(\"recovered from panic: %v\", r)\n        }\n    }()\n    return a / b, nil  // panics if b == 0\n}",
+          "language": "go",
+          "filename": "defer_recover.go"
+        },
+        {
+          "type": "heading",
+          "text": "Time",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The time package covers everything related to dates, durations, and formatting. The unusual part of Go's time API is its layout system: instead of strftime codes like %Y, Go uses a fixed reference time (Mon Jan 2 15:04:05 MST 2006) as the template. You format and parse by showing what that reference time would look like in your desired format."
+        },
+        {
+          "type": "code",
+          "code": "now := time.Now()                        // current time\nyesterday := now.Add(-24 * time.Hour)    // subtract 24 hours\nelapsed := time.Since(start)             // duration from start to now\n\n// Sleep pauses the current goroutine\ntime.Sleep(500 * time.Millisecond)\n\n// Format using the reference time as a template\nt := time.Now()\nfmt.Println(t.Format(\"2006-01-02\"))     // 2024-05-10\nfmt.Println(t.Format(\"15:04:05\"))       // 14:30:00\nfmt.Println(t.Format(time.RFC3339))     // ISO 8601\n\n// Parse a string into a time.Time\nparsed, err := time.Parse(\"2006-01-02\", \"2024-05-10\")\n_ = parsed; _ = err\n\n// Duration constants\n_ = time.Second\n_ = time.Minute\n_ = time.Hour",
+          "language": "go",
+          "filename": "time.go"
+        },
+        {
+          "type": "heading",
+          "text": "Regular Expressions",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The regexp package compiles a pattern into a Regexp object. Compile once and reuse across calls because compilation is expensive. MustCompile panics if the pattern is invalid, which is appropriate for hardcoded patterns that you control. Use FindString to get the first match, FindAllString to get all matches."
+        },
+        {
+          "type": "code",
+          "code": "re := regexp.MustCompile(`\\d+`)  // compile once at package level\n\nre.MatchString(\"abc123\")          // true: does it match anywhere?\nre.FindString(\"abc123\")           // \"123\": first match\nre.FindAllString(\"1 and 2\", -1)   // [\"1\", \"2\"]: all matches\nre.ReplaceAllString(\"a1b2\", \"X\")  // \"aXbX\"\n\n// Capture groups: use parentheses\nre2 := regexp.MustCompile(`(\\w+)@(\\w+)`)\nm := re2.FindStringSubmatch(\"user@example\")\n// m[0] = full match, m[1] = \"user\", m[2] = \"example\"",
+          "language": "go",
+          "filename": "regex.go"
+        },
+        {
+          "type": "heading",
+          "text": "Constants and Iota",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Constants are evaluated at compile time and cannot be changed at runtime. iota is a counter that starts at 0 within a const block and increments by one for each line. It is Go's way of defining enumerations. You can use it with bit-shifting to create flag values that can be combined with |."
+        },
+        {
+          "type": "code",
+          "code": "// Typed constant: locked to a specific type\nconst Pi float64 = 3.14159\n\n// Untyped constant: adapts to whatever context uses it\nconst Limit = 100\n\n// iota: sequential integer enum\ntype Direction int\nconst (\n    North Direction = iota  // 0\n    East                    // 1\n    South                   // 2\n    West                    // 3\n)\n\n// iota with bit-shifting: combine flags with |\ntype Permission uint\nconst (\n    Read    Permission = 1 << iota  // 1 (bit 0)\n    Write                           // 2 (bit 1)\n    Execute                         // 4 (bit 2)\n)\n\nperms := Read | Write      // 3\nif perms&Read != 0 {       // test a specific flag\n    fmt.Println(\"has read\")\n}",
+          "language": "go",
+          "filename": "constants.go"
+        },
+        {
+          "type": "heading",
+          "text": "File I/O",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "os.ReadFile and os.WriteFile handle entire files in a single call and are the right choice for small files. For large files or streaming (reading line by line), open with os.Open and wrap with bufio.Scanner. When writing incrementally, use bufio.Writer and call Flush before closing so the buffer is flushed to disk."
+        },
+        {
+          "type": "code",
+          "code": "// Read entire file at once\ndata, err := os.ReadFile(\"file.txt\")\nif err != nil {\n    // handle error\n}\nfmt.Println(string(data))\n\n// Write entire file at once (0644 = owner rw, others r)\nerr = os.WriteFile(\"out.txt\", []byte(\"hello\"), 0644)\n\n// Read line by line (good for large files)\nf, err := os.Open(\"file.txt\")\nif err != nil {\n    // handle error\n}\ndefer f.Close()\nscanner := bufio.NewScanner(f)\nfor scanner.Scan() {\n    line := scanner.Text()  // one line without newline\n    fmt.Println(line)\n}\n\n// Write with a buffered writer\nfw, err := os.Create(\"out.txt\")\nif err != nil {\n    // handle error\n}\ndefer fw.Close()\nw := bufio.NewWriter(fw)\nfmt.Fprintln(w, \"hello\")\nw.Flush()  // must flush before Close, otherwise data may be lost",
+          "language": "go",
+          "filename": "file_io.go"
+        },
+        {
+          "type": "heading",
+          "text": "JSON",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "json.Marshal converts a Go value to JSON bytes. json.Unmarshal parses JSON bytes into a Go value. Struct tags control the JSON field name. Only exported fields (starting with uppercase) are included. Use omitempty to skip a field when its value is the zero value for its type."
+        },
+        {
+          "type": "code",
+          "code": "type User struct {\n    Name  string `json:\"name\"`\n    Age   int    `json:\"age\"`\n    Email string `json:\"email,omitempty\"` // skipped when empty string\n}\n\n// Encode Go value to JSON bytes\nu := User{Name: \"Alice\", Age: 30}\ndata, err := json.Marshal(u)\n// data = []byte(`{\"name\":\"Alice\",\"age\":30}`)\n\n// Decode JSON bytes into a Go value\nvar u2 User\nerr = json.Unmarshal(data, &u2)\n\n// Stream encode/decode (efficient for HTTP bodies)\nenc := json.NewEncoder(w)  // w is any io.Writer\nenc.Encode(u)\ndec := json.NewDecoder(r)  // r is any io.Reader\ndec.Decode(&u2)",
+          "language": "go",
+          "filename": "json.go"
+        },
+        {
+          "type": "heading",
+          "text": "HTTP Client",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "http.Get is a convenience wrapper for simple GET requests. For anything beyond that (custom headers, auth tokens, timeouts), create an http.Client with a Timeout and build requests with http.NewRequest. Always close the response body with defer, even if you do not read it, to avoid connection leaks."
+        },
+        {
+          "type": "code",
+          "code": "// Simple GET\nresp, err := http.Get(\"https://api.example.com/data\")\nif err != nil {\n    // handle error\n}\ndefer resp.Body.Close()  // always close, even on error response\nbody, _ := io.ReadAll(resp.Body)\nfmt.Println(resp.StatusCode)\n_ = body\n\n// Custom request with headers and timeout\nclient := &http.Client{Timeout: 10 * time.Second}\nreq, err := http.NewRequest(\"GET\", url, nil)\nif err != nil {\n    // handle error\n}\nreq.Header.Set(\"Authorization\", \"Bearer token\")\nresp2, err := client.Do(req)\nif err != nil {\n    // handle error\n}\ndefer resp2.Body.Close()\n\n// POST with JSON body\npayload, _ := json.Marshal(map[string]string{\"key\": \"val\"})\nresp3, err := http.Post(url, \"application/json\", bytes.NewBuffer(payload))\nif err != nil {\n    // handle error\n}\ndefer resp3.Body.Close()",
+          "language": "go",
+          "filename": "http_client.go"
+        },
+        {
+          "type": "heading",
+          "text": "database/sql",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "sql.Open creates a connection pool, not a single connection. Use db.Query when you expect multiple rows and always close the rows when done. Use db.QueryRow for a single row. Use db.Exec for INSERT, UPDATE, and DELETE operations. Prepared statements (db.Prepare) improve performance and prevent SQL injection when running the same query many times."
+        },
+        {
+          "type": "code",
+          "code": "db, err := sql.Open(\"postgres\", dsn)\nif err != nil {\n    // handle error\n}\ndefer db.Close()\n\n// Multiple rows: always close rows to release the connection\nrows, err := db.Query(\"SELECT id, name FROM users WHERE age > $1\", 18)\nif err != nil {\n    // handle error\n}\ndefer rows.Close()\nfor rows.Next() {\n    var id int\n    var name string\n    if err := rows.Scan(&id, &name); err != nil {\n        // handle error\n    }\n    fmt.Println(id, name)\n}\n\n// Single row (no rows.Close needed)\nvar name string\nerr = db.QueryRow(\"SELECT name FROM users WHERE id=$1\", 1).Scan(&name)\n\n// Execute a write (INSERT/UPDATE/DELETE)\nresult, err := db.Exec(\"INSERT INTO users(name) VALUES($1)\", \"Alice\")\nid, _ := result.LastInsertId()",
+          "language": "go",
+          "filename": "db.go"
+        },
+        {
+          "type": "heading",
+          "text": "Testing",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Test functions must be named TestXxx and accept *testing.T. The table-driven pattern keeps many test cases organized in one function: define a slice of input/expected pairs and loop through them. t.Run creates named sub-tests you can run selectively. Use t.Errorf to report a failure without stopping the test, and t.Fatalf to stop immediately."
+        },
+        {
+          "type": "code",
+          "code": "// file: math_test.go\npackage math\n\nimport \"testing\"\n\nfunc TestAdd(t *testing.T) {\n    // Table-driven: each row is one case\n    cases := []struct {\n        a, b, want int\n    }{\n        {1, 2, 3},\n        {0, 0, 0},\n        {-1, 1, 0},\n    }\n    for _, tc := range cases {\n        got := Add(tc.a, tc.b)\n        if got != tc.want {\n            t.Errorf(\"Add(%d, %d) = %d, want %d\", tc.a, tc.b, got, tc.want)\n        }\n    }\n}\n\n// Sub-tests: run with go test -run TestMath/addition\nfunc TestMath(t *testing.T) {\n    t.Run(\"addition\", func(t *testing.T) {\n        // test addition\n    })\n    t.Run(\"subtraction\", func(t *testing.T) {\n        // test subtraction\n    })\n}\n\n// Run: go test ./...\n// Race detection: go test -race ./...\n// Coverage: go test -cover ./...",
+          "language": "go",
+          "filename": "math_test.go"
+        },
+        {
+          "type": "heading",
+          "text": "CLI Flags",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The flag package parses command-line arguments. Define all flags before calling flag.Parse. Each flag function returns a pointer to the value, so you dereference it to read the actual value. Non-flag arguments (everything after the flags) are available via flag.Args()."
+        },
+        {
+          "type": "code",
+          "code": "// Define flags with name, default value, and description\nport    := flag.Int(\"port\", 8080, \"server port\")\nverbose := flag.Bool(\"verbose\", false, \"enable verbose output\")\nhost    := flag.String(\"host\", \"localhost\", \"server host\")\n\n// Parse must be called once, after all flags are defined\nflag.Parse()\n\n// Dereference the pointer to get the actual value\nfmt.Printf(\"Starting on %s:%d (verbose: %v)\\n\", *host, *port, *verbose)\n\n// Non-flag arguments (e.g. file paths after the flags)\nargs := flag.Args()  // []string of remaining arguments",
+          "language": "go",
+          "filename": "cli.go"
+        },
+        {
+          "type": "tip",
+          "title": "Quick Recall: Error Wrapping",
+          "message": "Use fmt.Errorf(\"context: %w\", err) to wrap, errors.Is(err, target) to check for a specific error anywhere in the chain, and errors.As(err, &target) to extract a specific error type from the chain."
         }
       ]
     },
@@ -10627,6 +11141,200 @@
       ]
     },
     {
+      "id": "concurrency-refresher",
+      "title": "Concurrency: Quick Refresher",
+      "category": "Concurrency",
+      "difficulty": "advanced",
+      "estimatedTime": "15 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "A condensed reference for Go concurrency. These patterns come up in both coding interviews and system design discussions. Focus on understanding which tool solves which problem."
+        },
+        {
+          "type": "heading",
+          "text": "Goroutines",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "A goroutine is a lightweight, independently executing function managed by the Go runtime. Unlike OS threads, goroutines are very cheap to create: a typical Go program runs thousands at once without issue. The go keyword launches one immediately and returns without waiting for it to finish. A goroutine leak happens when a goroutine gets stuck — waiting on a channel that nobody ever sends to, or stuck inside a loop with no exit condition. Leaked goroutines accumulate invisibly, consuming memory and CPU over time. Always give every goroutine a clear exit path: either close its input channel when you are done sending, or pass it a context it can watch with ctx.Done()."
+        },
+        {
+          "type": "code",
+          "code": "// Start a goroutine\ngo func() {\n    doWork()\n}()\n\n// Avoid closure capture of loop variable (pre-Go 1.22)\n// In Go 1.22+, the loop variable is scoped per iteration, but\n// passing explicitly is still good practice for clarity\nfor _, item := range items {\n    go func(it Item) {\n        process(it)\n    }(item)\n}",
+          "language": "go",
+          "filename": "goroutines.go"
+        },
+        {
+          "type": "heading",
+          "text": "sync.WaitGroup",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "WaitGroup is a counter that lets one goroutine wait for a group of goroutines to finish. Call Add(n) with the number you are launching before the goroutines start. Each goroutine calls Done() when it finishes (use defer so it always runs). The main goroutine blocks at Wait() until the counter reaches zero."
+        },
+        {
+          "type": "code",
+          "code": "var wg sync.WaitGroup\n\nfor _, item := range items {\n    wg.Add(1)  // increment counter before launching\n    go func(it Item) {\n        defer wg.Done()  // decrement when this goroutine finishes\n        process(it)\n    }(item)\n}\n\nwg.Wait()  // block here until all goroutines have called Done()",
+          "language": "go",
+          "filename": "waitgroup.go"
+        },
+        {
+          "type": "heading",
+          "text": "Channels",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Channels are the primary way goroutines pass data to each other safely. An unbuffered channel forces sender and receiver to meet: the sender blocks until someone receives, and the receiver blocks until someone sends. A buffered channel lets the sender continue without waiting, up to the buffer size, after which it blocks just like an unbuffered one."
+        },
+        {
+          "type": "code",
+          "code": "// Unbuffered: sender and receiver must be ready at the same time\nch := make(chan int)\ngo func() {\n    ch <- 42  // send (blocks until someone receives)\n}()\nval := <-ch  // receive (blocks until value arrives)\n\n// Buffered: sender only blocks when buffer is full\nbch := make(chan int, 3)\nbch <- 1  // does not block (buffer has space)\nbch <- 2\nbch <- 3\n// bch <- 4  // would block: buffer is full\n\n// Channel directions in function signatures (enforced by compiler)\nfunc producer(out chan<- int) {\n    out <- 1\n}\n\nfunc consumer(in <-chan int) {\n    v := <-in\n    _ = v\n}\n\n// Range over a channel: reads until the channel is closed\nclose(ch)\nfor v := range ch {\n    fmt.Println(v)\n}\n\n// Check if closed with comma-ok\nv, ok := <-ch\nif !ok {\n    fmt.Println(\"channel closed\")\n}",
+          "language": "go",
+          "filename": "channels.go"
+        },
+        {
+          "type": "heading",
+          "text": "Select Statement",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "select waits on multiple channel operations and picks whichever is ready first. If more than one is ready at the same time, it picks one at random. A default case makes the entire select non-blocking: if no channel is ready, the default branch runs immediately instead of blocking. Use select for timeouts, polling, and toggling cases off at runtime by setting a channel to nil. A nil channel blocks forever on both send and receive, so its select case is never chosen, which lets you conditionally enable or disable a branch without restructuring the select."
+        },
+        {
+          "type": "code",
+          "code": "// Wait on whichever channel receives first\nselect {\ncase msg := <-ch1:\n    fmt.Println(\"ch1:\", msg)\ncase msg := <-ch2:\n    fmt.Println(\"ch2:\", msg)\n}\n\n// Non-blocking check: if nothing is ready, run default\nselect {\ncase v := <-ch:\n    fmt.Println(v)\ndefault:\n    fmt.Println(\"nothing ready right now\")\n}\n\n// Timeout: abort if nothing arrives within 1 second\nselect {\ncase result := <-workCh:\n    fmt.Println(result)\ncase <-time.After(1 * time.Second):\n    fmt.Println(\"timed out\")\n}\n\n// nil channel: a nil channel case is never selected\n// useful to disable a case without restructuring the select\nvar nilCh chan int\nselect {\ncase v := <-nilCh:    // never chosen\n    _ = v\ncase v := <-activeCh:\n    _ = v\n}",
+          "language": "go",
+          "filename": "select.go"
+        },
+        {
+          "type": "heading",
+          "text": "Mutex and RWMutex",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "sync.Mutex protects shared data from concurrent modification. Only one goroutine can hold the lock at a time. RWMutex is an optimization for read-heavy data: multiple goroutines can hold RLock simultaneously, but only one goroutine can hold the write Lock. Always unlock with defer so a panic does not leave the mutex permanently locked."
+        },
+        {
+          "type": "code",
+          "code": "type SafeCounter struct {\n    mu sync.Mutex\n    v  map[string]int\n}\n\nfunc (c *SafeCounter) Inc(key string) {\n    c.mu.Lock()\n    defer c.mu.Unlock()  // always use defer to avoid forgetting\n    c.v[key]++\n}\n\n// RWMutex: many concurrent readers OR one exclusive writer\ntype Cache struct {\n    mu   sync.RWMutex\n    data map[string]string\n}\n\nfunc (c *Cache) Get(key string) string {\n    c.mu.RLock()         // multiple goroutines can hold RLock\n    defer c.mu.RUnlock()\n    return c.data[key]\n}\n\nfunc (c *Cache) Set(key, val string) {\n    c.mu.Lock()          // exclusive: blocks all readers and writers\n    defer c.mu.Unlock()\n    c.data[key] = val\n}",
+          "language": "go",
+          "filename": "mutex.go"
+        },
+        {
+          "type": "heading",
+          "text": "context Package",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "context carries a cancellation signal, deadline, and request-scoped values across goroutine boundaries. Pass it as the first argument to any function that may block or do I/O. WithCancel returns a cancel function you must always call (use defer) to release resources, even if the operation completes normally. WithTimeout automatically cancels after the duration."
+        },
+        {
+          "type": "code",
+          "code": "// WithCancel: cancel manually\nctx, cancel := context.WithCancel(context.Background())\ndefer cancel()  // always call cancel, even on success\n\n// WithTimeout: auto-cancel after duration\nctx2, cancel2 := context.WithTimeout(context.Background(), 5*time.Second)\ndefer cancel2()\n\n// Listen for cancellation in a goroutine\ngo func(ctx context.Context) {\n    select {\n    case <-ctx.Done():  // fires when cancel() is called or timeout fires\n        fmt.Println(\"stopped:\", ctx.Err())\n        return\n    case result := <-work():\n        fmt.Println(result)\n    }\n}(ctx)\n\n// Poll for cancellation in a loop\nfor {\n    select {\n    case <-ctx.Done():\n        return  // context cancelled, stop working\n    default:\n        doStep()\n    }\n}",
+          "language": "go",
+          "filename": "context.go"
+        },
+        {
+          "type": "heading",
+          "text": "Atomic Operations",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "sync/atomic provides low-level, lock-free operations on primitive types like int64 and uint32. Use them when you need to increment a counter or read a flag from multiple goroutines and the overhead of a mutex is not justified. They operate on a single memory location; for anything more complex, use a mutex."
+        },
+        {
+          "type": "code",
+          "code": "import \"sync/atomic\"\n\nvar counter int64\n\n// Safe increment from multiple goroutines\natomic.AddInt64(&counter, 1)\n\n// Safe read (without Add or Store, a plain read is a data race)\nval := atomic.LoadInt64(&counter)\n\n// Safe write\natomic.StoreInt64(&counter, 0)\n\n// Compare-and-swap: only writes if current value matches old\nswapped := atomic.CompareAndSwapInt64(&counter, oldVal, newVal)\n_ = swapped",
+          "language": "go",
+          "filename": "atomic.go"
+        },
+        {
+          "type": "heading",
+          "text": "sync.Once, sync.Pool, sync.Map",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "sync.Once runs its function exactly once, no matter how many goroutines call it simultaneously. This makes it ideal for lazy, concurrent-safe initialization. sync.Pool reuses expensive objects to reduce garbage collection pressure. sync.Map is a concurrent map built for read-heavy workloads where writes are rare."
+        },
+        {
+          "type": "code",
+          "code": "// sync.Once: execute exactly once across all goroutines\nvar once sync.Once\nvar instance *Service\n\nfunc GetInstance() *Service {\n    once.Do(func() {\n        instance = &Service{}  // runs only once\n    })\n    return instance\n}\n\n// sync.Pool: reuse allocated objects, reducing GC pressure\npool := &sync.Pool{\n    New: func() any { return &bytes.Buffer{} },  // create new if pool empty\n}\nbuf := pool.Get().(*bytes.Buffer)  // get (or create)\nbuf.Reset()                        // clean before use\npool.Put(buf)                      // return to pool when done\n\n// sync.Map: concurrent map optimized for read-mostly workloads\nvar sm sync.Map\nsm.Store(\"key\", \"value\")  // write\nv, ok := sm.Load(\"key\")   // read\n_ = v; _ = ok\nsm.Delete(\"key\")          // delete\nsm.Range(func(k, v any) bool {\n    fmt.Println(k, v)\n    return true  // return false to stop ranging\n})",
+          "language": "go",
+          "filename": "sync_tools.go"
+        },
+        {
+          "type": "heading",
+          "text": "Worker Pool Pattern",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "A worker pool limits concurrency to n goroutines consuming from a shared jobs channel. This prevents spawning an unbounded number of goroutines when processing a large number of tasks. Close the jobs channel after all tasks are submitted so the workers' range loops exit cleanly. Wait for all workers to finish before closing the results channel."
+        },
+        {
+          "type": "code",
+          "code": "func workerPool(numWorkers int, jobs <-chan Job, results chan<- Result) {\n    var wg sync.WaitGroup\n    for i := 0; i < numWorkers; i++ {\n        wg.Add(1)\n        go func() {\n            defer wg.Done()\n            for job := range jobs {  // exits when jobs is closed\n                results <- process(job)\n            }\n        }()\n    }\n    go func() {\n        wg.Wait()      // wait for all workers\n        close(results) // then signal no more results\n    }()\n}",
+          "language": "go",
+          "filename": "worker_pool.go"
+        },
+        {
+          "type": "heading",
+          "text": "Race Conditions and Deadlocks",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "A race condition happens when two goroutines access shared data without synchronization and at least one is writing. Go's race detector (go run -race) catches them at runtime. A deadlock is when every goroutine is blocked waiting for something that will never happen. The Go runtime detects total deadlocks and panics with 'all goroutines are asleep'."
+        },
+        {
+          "type": "comparison",
+          "items": [
+            {
+              "label": "Race Condition",
+              "description": "Concurrent reads and writes without a mutex or channel. Fix: protect with sync.Mutex or communicate via channels. Detect: go run -race."
+            },
+            {
+              "label": "Deadlock",
+              "description": "Goroutine A waits for goroutine B, and B waits for A. Or a goroutine sends on a channel no one reads. The runtime panics when nothing can proceed."
+            },
+            {
+              "label": "Goroutine Leak",
+              "description": "A goroutine blocked forever because no one reads from or writes to its channel, or its context is never cancelled. Use ctx.Done() to give goroutines an exit path."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Graceful Shutdown",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Graceful shutdown means catching OS signals (SIGINT from Ctrl-C, SIGTERM from Docker/Kubernetes), stopping new work, letting in-flight requests finish, and cleaning up before exiting. signal.NotifyContext makes this straightforward: when the signal arrives, the context is cancelled, and anything watching ctx.Done() stops."
+        },
+        {
+          "type": "code",
+          "code": "func main() {\n    // Create a context that cancels on SIGINT or SIGTERM\n    ctx, stop := signal.NotifyContext(\n        context.Background(),\n        os.Interrupt, syscall.SIGTERM,\n    )\n    defer stop()\n\n    // Start server in background\n    srv := &http.Server{Addr: \":8080\"}\n    go srv.ListenAndServe()\n\n    // Block until signal received\n    <-ctx.Done()\n    fmt.Println(\"shutting down...\")\n\n    // Give in-flight requests 5 seconds to finish\n    shutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)\n    defer cancel()\n    srv.Shutdown(shutCtx)\n}",
+          "language": "go",
+          "filename": "shutdown.go"
+        },
+        {
+          "type": "tip",
+          "title": "Concurrency Quick Reference",
+          "message": "Communicate data with channels. Protect shared state with mutexes. Use WaitGroup to wait for goroutines. Use context to propagate cancellation. Always think about how every goroutine you launch will eventually exit."
+        }
+      ]
+    },
+    {
       "id": "structs-custom-types",
       "title": "Structs",
       "category": "Object-Oriented Design & LLD",
@@ -15342,6 +16050,227 @@
       ]
     },
     {
+      "id": "oop-lld-refresher",
+      "title": "Object-Oriented Design and LLD: Quick Refresher",
+      "category": "Object-Oriented Design & LLD",
+      "difficulty": "advanced",
+      "estimatedTime": "20 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "A condensed reference for Go's approach to OOP, design patterns, and Low-Level Design. This is what interviewers test when they ask you to design a system in Go."
+        },
+        {
+          "type": "heading",
+          "text": "Structs and Methods",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Structs group related fields. Methods associate behavior with a struct. The key decision is whether to use a value receiver or a pointer receiver. Use a pointer receiver when the method needs to modify the struct, when the struct is large (avoid copying), or when consistency with other methods requires it. Use a value receiver for small read-only operations."
+        },
+        {
+          "type": "code",
+          "code": "type Person struct {\n    Name string\n    Age  int\n}\n\n// Value receiver: operates on a copy, cannot modify the original\nfunc (p Person) Greet() string {\n    return \"Hi, I'm \" + p.Name\n}\n\n// Pointer receiver: can modify the original struct\nfunc (p *Person) Birthday() {\n    p.Age++\n}\n\np := &Person{Name: \"Alice\", Age: 30}\nfmt.Println(p.Greet())  // Go auto-dereferences: same as (*p).Greet()\np.Birthday()             // p.Age is now 31",
+          "language": "go",
+          "filename": "structs_methods.go"
+        },
+        {
+          "type": "heading",
+          "text": "Interfaces",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go interfaces are satisfied implicitly: a type implements an interface simply by having the right methods. There is no 'implements' keyword. This decouples code naturally: you can accept an interface in a function without the caller needing to change anything. Prefer accepting interfaces and returning concrete types. Keep interfaces small."
+        },
+        {
+          "type": "code",
+          "code": "// Define a small, focused interface\ntype Writer interface {\n    Write(p []byte) (n int, err error)\n}\n\n// FileWriter satisfies Writer implicitly (no declaration needed)\ntype FileWriter struct{ f *os.File }\nfunc (fw *FileWriter) Write(p []byte) (int, error) {\n    return fw.f.Write(p)\n}\n\n// Accept the interface, not the concrete type\nfunc save(w Writer, data []byte) error {\n    _, err := w.Write(data)\n    return err\n}\n\n// Type assertion: check and extract concrete type\nvar w Writer = &FileWriter{}\nif fw, ok := w.(*FileWriter); ok {\n    fmt.Println(fw.f.Name())\n}\n\n// Type switch: handle multiple concrete types\nswitch v := w.(type) {\ncase *FileWriter:\n    fmt.Println(\"file writer\", v.f.Name())\ndefault:\n    fmt.Println(\"other writer\")\n}",
+          "language": "go",
+          "filename": "interfaces.go"
+        },
+        {
+          "type": "heading",
+          "text": "Embedding and Composition",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go has no inheritance. Instead, you embed one struct inside another to promote its fields and methods. The outer type gains the inner type's behavior without declaring it explicitly. This is composition: build complex types by combining simpler ones. Interface embedding works the same way, combining multiple interfaces into one."
+        },
+        {
+          "type": "code",
+          "code": "// Embedding promotes fields and methods\ntype Animal struct {\n    Name string\n}\n\nfunc (a *Animal) Speak() {\n    fmt.Println(a.Name)\n}\n\ntype Dog struct {\n    Animal       // Dog inherits Name and Speak via promotion\n    Breed string\n}\n\nd := Dog{Animal: Animal{Name: \"Rex\"}, Breed: \"Labrador\"}\nd.Speak()      // calls Animal.Speak via promotion\n_ = d.Name     // direct access to Animal.Name\n_ = d.Animal.Name  // explicit access also works\n\n// Interface embedding: combine interfaces\ntype ReadWriter interface {\n    io.Reader\n    io.Writer\n}",
+          "language": "go",
+          "filename": "embedding.go"
+        },
+        {
+          "type": "heading",
+          "text": "Generics",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Generics (Go 1.18+) let you write one function or type that works with multiple types. The type parameter [T constraint] says T can be any type satisfying the constraint. any means no constraint. comparable means == and != work. Use generics for reusable data structures and utility functions, but avoid them when an interface already works cleanly."
+        },
+        {
+          "type": "code",
+          "code": "// Generic function: T must support < comparison\nfunc Min[T int | float64 | string](a, b T) T {\n    if a < b {\n        return a\n    }\n    return b\n}\n\n// Using constraints.Ordered for any ordered type\nimport \"golang.org/x/exp/constraints\"\nfunc Max[T constraints.Ordered](a, b T) T {\n    if a > b {\n        return a\n    }\n    return b\n}\n\n// Generic type: a type-safe stack that works with any element type\ntype Stack[T any] struct {\n    items []T\n}\n\nfunc (s *Stack[T]) Push(v T) {\n    s.items = append(s.items, v)\n}\n\nfunc (s *Stack[T]) Pop() T {\n    n := len(s.items) - 1\n    v := s.items[n]\n    s.items = s.items[:n]\n    return v\n}\n\nfunc (s *Stack[T]) Len() int {\n    return len(s.items)\n}\n\n// Usage: compiler enforces type consistency\nst := &Stack[int]{}\nst.Push(1)\nst.Push(2)\nfmt.Println(st.Pop())  // 2",
+          "language": "go",
+          "filename": "generics.go"
+        },
+        {
+          "type": "heading",
+          "text": "Functional Options Pattern",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The functional options pattern solves the problem of optional constructor arguments. Instead of a large config struct (which forces callers to know all fields) or many overloaded constructors (which Go does not have), you define a function type Option that modifies the config. Callers pass only the options they care about."
+        },
+        {
+          "type": "code",
+          "code": "type ServerConfig struct {\n    host    string\n    port    int\n    timeout time.Duration\n}\n\ntype Option func(*ServerConfig)\n\n// Each option is a function that sets one field\nfunc WithHost(h string) Option {\n    return func(c *ServerConfig) { c.host = h }\n}\nfunc WithPort(p int) Option {\n    return func(c *ServerConfig) { c.port = p }\n}\nfunc WithTimeout(d time.Duration) Option {\n    return func(c *ServerConfig) { c.timeout = d }\n}\n\nfunc NewServer(opts ...Option) *Server {\n    // Start with safe defaults\n    cfg := &ServerConfig{host: \"localhost\", port: 8080, timeout: 30 * time.Second}\n    for _, opt := range opts {\n        opt(cfg)  // apply only the options the caller provided\n    }\n    return &Server{cfg: cfg}\n}\n\n// Caller only specifies what they need\nsrv := NewServer(\n    WithHost(\"0.0.0.0\"),\n    WithPort(9090),\n)",
+          "language": "go",
+          "filename": "functional_options.go"
+        },
+        {
+          "type": "heading",
+          "text": "SOLID in Go",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "SOLID is a set of five design principles (Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, Dependency Inversion) that guide maintainable object-oriented design. They apply naturally to Go through its interface and composition model. Go's interfaces are implicit and small by default, which naturally pushes you toward the right design without extra boilerplate. The table below shows how each principle translates to Go."
+        },
+        {
+          "type": "comparison",
+          "items": [
+            {
+              "label": "SRP: Single Responsibility",
+              "description": "Each type does one thing. Separate DB access, business logic, and HTTP handling into distinct types. If a struct has too many methods, split it."
+            },
+            {
+              "label": "OCP: Open-Closed",
+              "description": "Add behavior via new types implementing an interface, without modifying existing code. A new PaymentMethod is a new struct, not a change to existing ones."
+            },
+            {
+              "label": "LSP: Liskov Substitution",
+              "description": "Any type implementing an interface must honor the full contract. Do not add methods that return errors the interface does not expect."
+            },
+            {
+              "label": "ISP: Interface Segregation",
+              "description": "Prefer many small interfaces over one large one. io.Reader and io.Writer over a combined io.ReadWriteCloser when you only need one capability."
+            },
+            {
+              "label": "DIP: Dependency Inversion",
+              "description": "Depend on interfaces, not concrete types. Inject dependencies through constructors. The Service should hold a Repository interface, not *PostgresDB."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Common Design Patterns",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "These patterns come up most in LLD interviews. Factory and Builder create objects with varying configurations. Singleton ensures one shared instance. Strategy and Observer drive runtime behavior changes. Decorator adds behavior to existing types without modifying them."
+        },
+        {
+          "type": "code",
+          "code": "// Factory: return interface, choose concrete type inside\nfunc NewPayment(method string) (Payment, error) {\n    switch method {\n    case \"card\":\n        return &CardPayment{}, nil\n    case \"wallet\":\n        return &WalletPayment{}, nil\n    default:\n        return nil, fmt.Errorf(\"unknown method: %s\", method)\n    }\n}\n\n// Singleton via sync.Once: safe for concurrent callers\nvar (\n    db     *sql.DB\n    dbOnce sync.Once\n)\n\nfunc GetDB() *sql.DB {\n    dbOnce.Do(func() {\n        db, _ = sql.Open(\"postgres\", dsn)\n    })\n    return db\n}\n\n// Strategy: inject behavior via interface\ntype Sorter interface {\n    Sort([]int)\n}\n\ntype Service struct {\n    sorter Sorter\n}\n\nfunc NewService(s Sorter) *Service {\n    return &Service{sorter: s}\n}\n\n// Decorator (middleware): wrap a handler to add behavior\ntype Handler func(http.ResponseWriter, *http.Request)\n\nfunc WithLogging(next Handler) Handler {\n    return func(w http.ResponseWriter, r *http.Request) {\n        log.Println(r.Method, r.URL.Path)\n        next(w, r)\n    }\n}\n\n// Observer: subscribers receive events via callbacks\ntype EventBus struct {\n    subs map[string][]func(any)\n}\n\nfunc (b *EventBus) Subscribe(event string, fn func(any)) {\n    b.subs[event] = append(b.subs[event], fn)\n}\n\nfunc (b *EventBus) Publish(event string, data any) {\n    for _, fn := range b.subs[event] {\n        fn(data)\n    }\n}",
+          "language": "go",
+          "filename": "patterns.go"
+        },
+        {
+          "type": "heading",
+          "text": "LLD: Common System Designs",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Low-Level Design (LLD) interviews ask you to implement a real system in working code, not just describe it at an architectural level. You are expected to define the types, interfaces, and data structures, and handle concurrency where the problem requires it. Each system below has a core data structure and a synchronization strategy. Know both for each one before your interview."
+        },
+        {
+          "type": "comparison",
+          "items": [
+            {
+              "label": "In-Memory Cache",
+              "description": "map[string]Entry with sync.RWMutex. Entry holds value + expiry. A background goroutine or lazy check on Get evicts expired entries. Use context for the cleanup goroutine."
+            },
+            {
+              "label": "Rate Limiter",
+              "description": "Token bucket: atomic counter refilled by a ticker goroutine. Fixed window: atomic counter reset every interval. Sliding window: circular buffer of request timestamps."
+            },
+            {
+              "label": "Parking Lot",
+              "description": "ParkingLot has []Level. Level has []*Spot. Spot has type (car/bike/truck) and availability bool. Park() finds the nearest available spot of the right type."
+            },
+            {
+              "label": "Logger",
+              "description": "Logger interface with Debug/Info/Error/Fatal methods. Implementations write to io.Writer. Wrap the writer in a mutex for concurrent safety. Support log levels."
+            },
+            {
+              "label": "Pub/Sub Message Bus",
+              "description": "Broker holds map[topic][]chan Message. Subscribe returns a channel. Publish sends to each subscriber's channel. Unsubscribe closes or removes the channel."
+            },
+            {
+              "label": "Circuit Breaker",
+              "description": "States: Closed (working), Open (reject calls), Half-Open (try one). Track failure count and timestamp. Transition on failure threshold or timeout."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Clean Architecture",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Clean architecture separates code into layers with strict dependency rules. Outer layers call inner layers, never the reverse. This keeps business logic independent of HTTP, databases, and other infrastructure so it can be tested without any external dependencies."
+        },
+        {
+          "type": "comparison",
+          "items": [
+            {
+              "label": "Handler (HTTP layer)",
+              "description": "Parse request, call a service method, write response. No business logic lives here. Depends on service interface."
+            },
+            {
+              "label": "Service (Business logic)",
+              "description": "Validate, transform, orchestrate. Calls repository interfaces. No HTTP or database code. This is what you unit test."
+            },
+            {
+              "label": "Repository (Data access)",
+              "description": "SQL queries, Redis calls, file reads. Returns domain models. No business logic. Swappable with a fake in tests."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Designing for Testability",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "The most important design choice for testability is depending on interfaces rather than concrete types. This lets tests substitute a fake implementation without hitting a real database or network. Manual stub structs (not generated mocks) are the Go convention."
+        },
+        {
+          "type": "code",
+          "code": "// Define an interface for the dependency\ntype UserRepository interface {\n    FindByID(ctx context.Context, id int) (*User, error)\n    Save(ctx context.Context, u *User) error\n}\n\n// Service depends on the interface, not *PostgresDB\ntype UserService struct {\n    repo UserRepository\n}\n\nfunc NewUserService(repo UserRepository) *UserService {\n    return &UserService{repo: repo}\n}\n\n// In tests: a manual fake that satisfies the interface\ntype fakeUserRepo struct {\n    users map[int]*User\n}\n\nfunc (r *fakeUserRepo) FindByID(_ context.Context, id int) (*User, error) {\n    u, ok := r.users[id]\n    if !ok {\n        return nil, ErrNotFound\n    }\n    return u, nil\n}\n\nfunc (r *fakeUserRepo) Save(_ context.Context, u *User) error {\n    r.users[u.ID] = u\n    return nil\n}\n\n// Test: inject the fake, no database needed\nfunc TestUserService(t *testing.T) {\n    repo := &fakeUserRepo{users: map[int]*User{1: {ID: 1, Name: \"Alice\"}}}\n    svc := NewUserService(repo)\n    u, err := svc.FindUser(context.Background(), 1)\n    _ = u; _ = err\n    // assert u.Name == \"Alice\"\n}",
+          "language": "go",
+          "filename": "testability.go"
+        },
+        {
+          "type": "tip",
+          "title": "LLD Interview Process",
+          "message": "When given a system design: (1) identify entities and relationships, (2) define interfaces first, (3) write concrete types, (4) wire them with constructors using dependency injection. Mention thread safety only where concurrent access is realistic."
+        }
+      ]
+    },
+    {
       "id": "sorting-in-go",
       "title": "Sorting in Go",
       "category": "Essential Algorithms",
@@ -16391,6 +17320,169 @@
       ]
     },
     {
+      "id": "essential-algorithms-refresher",
+      "title": "Essential Algorithms: Quick Refresher",
+      "category": "Essential Algorithms",
+      "difficulty": "intermediate",
+      "estimatedTime": "15 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "A condensed reference for the core algorithmic patterns. These five areas cover the vast majority of coding interview problems. Know the template for each so you can adapt it quickly under pressure."
+        },
+        {
+          "type": "heading",
+          "text": "Sorting in Go",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Go's sort package handles all sorting needs. sort.Ints, sort.Strings, and sort.Float64s sort slices of primitive types in ascending order. sort.Slice takes a custom less function so you can sort by any criteria. sort.Search does a binary search on any sorted slice, returning the first index where your condition is true."
+        },
+        {
+          "type": "code",
+          "code": "// Sort primitive slices (ascending, in-place)\nnums := []int{3, 1, 4, 1, 5}\nsort.Ints(nums)                                 // [1 1 3 4 5]\nsort.Sort(sort.Reverse(sort.IntSlice(nums)))     // [5 4 3 1 1]\n\nstrs := []string{\"banana\", \"apple\", \"cherry\"}\nsort.Strings(strs)  // [apple banana cherry]\n\n// sort.Slice: sort by any custom criteria\ntype Person struct {\n    Name string\n    Age  int\n}\npeople := []Person{{\"Bob\", 25}, {\"Alice\", 30}}\nsort.Slice(people, func(i, j int) bool {\n    return people[i].Age < people[j].Age  // ascending by age\n})\n\n// Multi-key sort (age asc, then name asc for ties)\nsort.Slice(people, func(i, j int) bool {\n    if people[i].Age != people[j].Age {\n        return people[i].Age < people[j].Age\n    }\n    return people[i].Name < people[j].Name\n})\n\n// sort.Search: binary search, O(log n)\n// Returns smallest index i where f(i) is true\ni := sort.Search(len(nums), func(i int) bool {\n    return nums[i] >= 3\n})",
+          "language": "go",
+          "filename": "sorting.go"
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Function",
+            "Time",
+            "Stable",
+            "Use when"
+          ],
+          "rows": [
+            [
+              "sort.Ints / sort.Strings",
+              "O(n log n)",
+              "No",
+              "Simple primitive slices"
+            ],
+            [
+              "sort.Slice",
+              "O(n log n)",
+              "No",
+              "Custom comparator needed"
+            ],
+            [
+              "sort.SliceStable",
+              "O(n log n)",
+              "Yes",
+              "Equal elements must keep original order"
+            ],
+            [
+              "sort.Search",
+              "O(log n)",
+              "N/A",
+              "Binary search on sorted slice"
+            ]
+          ]
+        },
+        {
+          "type": "heading",
+          "text": "Two Pointers",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Two pointers works by maintaining two indices that move through a collection, either toward each other (left and right) or in the same direction at different speeds (slow and fast). It is most effective on sorted arrays where you can decide which pointer to move based on the current sum or comparison. It reduces O(n^2) brute force solutions to O(n)."
+        },
+        {
+          "type": "code",
+          "code": "// Left/right pointers: two-sum on a sorted array\nfunc twoSum(nums []int, target int) (int, int) {\n    left, right := 0, len(nums)-1\n    for left < right {\n        sum := nums[left] + nums[right]\n        switch {\n        case sum == target:\n            return left, right\n        case sum < target:\n            left++   // need a larger value, move left pointer right\n        default:\n            right--  // need a smaller value, move right pointer left\n        }\n    }\n    return -1, -1\n}\n\n// Slow/fast pointers: detect cycle in a linked list\nfunc hasCycle(head *ListNode) bool {\n    slow, fast := head, head\n    for fast != nil && fast.Next != nil {\n        slow = slow.Next        // moves one step\n        fast = fast.Next.Next  // moves two steps\n        if slow == fast {\n            return true  // cycle: they meet\n        }\n    }\n    return false  // fast reached end: no cycle\n}\n\n// Remove duplicates from sorted slice in-place\nfunc removeDuplicates(nums []int) int {\n    if len(nums) == 0 {\n        return 0\n    }\n    slow := 0\n    for fast := 1; fast < len(nums); fast++ {\n        if nums[fast] != nums[slow] {\n            slow++\n            nums[slow] = nums[fast]\n        }\n    }\n    return slow + 1\n}",
+          "language": "go",
+          "filename": "two_pointers.go"
+        },
+        {
+          "type": "heading",
+          "text": "Sliding Window",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "A sliding window maintains a contiguous subarray or substring without using nested loops. A fixed-size window slides one step at a time by adding one element from the right and removing one from the left. A variable-size window expands from the right and shrinks from the left based on a condition, finding the optimal subarray that satisfies the constraint."
+        },
+        {
+          "type": "code",
+          "code": "// Fixed window: maximum sum of k consecutive elements\nfunc maxSumK(nums []int, k int) int {\n    // Build first window\n    windowSum := 0\n    for i := 0; i < k; i++ {\n        windowSum += nums[i]\n    }\n    maxSum := windowSum\n    // Slide: add right element, remove left element\n    for i := k; i < len(nums); i++ {\n        windowSum += nums[i] - nums[i-k]\n        if windowSum > maxSum {\n            maxSum = windowSum\n        }\n    }\n    return maxSum\n}\n\n// Variable window: shortest subarray with sum >= target\nfunc minLen(nums []int, target int) int {\n    left, windowSum := 0, 0\n    minLength := len(nums) + 1\n    for right := 0; right < len(nums); right++ {\n        windowSum += nums[right]  // expand right\n        for windowSum >= target { // shrink left while valid\n            length := right - left + 1\n            if length < minLength {\n                minLength = length\n            }\n            windowSum -= nums[left]\n            left++\n        }\n    }\n    if minLength == len(nums)+1 {\n        return 0\n    }\n    return minLength\n}",
+          "language": "go",
+          "filename": "sliding_window.go"
+        },
+        {
+          "type": "heading",
+          "text": "Recursion and Backtracking",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Recursion breaks a problem into a smaller version of itself, solving each sub-problem the same way. The base case stops the recursion. Backtracking is recursion with exploration: at each step you make a choice, recurse to explore its consequences, then undo the choice to try the next option. It is used for problems that require generating all possible combinations, permutations, or paths."
+        },
+        {
+          "type": "code",
+          "code": "// Recursion: always define the base case first\nfunc factorial(n int) int {\n    if n <= 1 {\n        return 1  // base case\n    }\n    return n * factorial(n-1)  // recursive case\n}\n\n// Backtracking template: generate all subsets\nfunc subsets(nums []int) [][]int {\n    result := [][]int{}\n    var backtrack func(start int, current []int)\n    backtrack = func(start int, current []int) {\n        // Record current state (copy, not alias)\n        snapshot := make([]int, len(current))\n        copy(snapshot, current)\n        result = append(result, snapshot)\n\n        for i := start; i < len(nums); i++ {\n            current = append(current, nums[i])  // choose\n            backtrack(i+1, current)              // explore\n            current = current[:len(current)-1]  // un-choose\n        }\n    }\n    backtrack(0, []int{})\n    return result\n}\n\n// Pruning: skip branches that cannot lead to a solution\n// Example: in a sum problem, stop if remaining sum goes negative\nfor i := start; i < len(nums); i++ {\n    if nums[i] > remaining {\n        break  // sorted, so no point continuing\n    }\n    // ... choose, explore, un-choose\n}",
+          "language": "go",
+          "filename": "backtracking.go"
+        },
+        {
+          "type": "heading",
+          "text": "Dynamic Programming",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Dynamic programming solves problems with two properties: overlapping subproblems (the same sub-calculation appears multiple times) and optimal substructure (the optimal answer to the full problem can be built from optimal answers to sub-problems). Top-down (memoization) adds a cache to a recursive solution. Bottom-up (tabulation) fills a table iteratively, usually with less overhead."
+        },
+        {
+          "type": "code",
+          "code": "// Top-down: memoize recursive calls to avoid re-computation\nfunc fib(n int, memo map[int]int) int {\n    if n <= 1 {\n        return n  // base case\n    }\n    if v, ok := memo[n]; ok {\n        return v  // return cached result\n    }\n    memo[n] = fib(n-1, memo) + fib(n-2, memo)\n    return memo[n]\n}\n\n// Bottom-up: fill a table from base cases upward\nfunc fibDP(n int) int {\n    if n <= 1 {\n        return n\n    }\n    dp := make([]int, n+1)\n    dp[0], dp[1] = 0, 1\n    for i := 2; i <= n; i++ {\n        dp[i] = dp[i-1] + dp[i-2]\n    }\n    return dp[n]\n}\n\n// Space-optimized: when you only need the previous two values\nfunc fibOpt(n int) int {\n    if n <= 1 {\n        return n\n    }\n    prev, curr := 0, 1\n    for i := 2; i <= n; i++ {\n        prev, curr = curr, prev+curr\n    }\n    return curr\n}\n\n// 0/1 Knapsack: pick items to maximize value within weight capacity\nfunc knapsack(weights, values []int, capacity int) int {\n    n := len(weights)\n    dp := make([][]int, n+1)\n    for i := range dp {\n        dp[i] = make([]int, capacity+1)\n    }\n    for i := 1; i <= n; i++ {\n        for w := 0; w <= capacity; w++ {\n            dp[i][w] = dp[i-1][w]  // option 1: skip item i\n            if weights[i-1] <= w { // option 2: take item i (if it fits)\n                take := values[i-1] + dp[i-1][w-weights[i-1]]\n                if take > dp[i][w] {\n                    dp[i][w] = take\n                }\n            }\n        }\n    }\n    return dp[n][capacity]\n}",
+          "language": "go",
+          "filename": "dp.go"
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Problem Type",
+            "DP Pattern",
+            "Recurrence"
+          ],
+          "rows": [
+            [
+              "Fibonacci / Climbing Stairs",
+              "1D DP",
+              "dp[i] = dp[i-1] + dp[i-2]"
+            ],
+            [
+              "Coin Change (min coins)",
+              "1D DP",
+              "dp[amount] = min(dp[amount - coin] + 1)"
+            ],
+            [
+              "0/1 Knapsack",
+              "2D DP",
+              "dp[i][w] = max(skip, take)"
+            ],
+            [
+              "Longest Common Subsequence",
+              "2D DP",
+              "dp[i][j] = dp[i-1][j-1]+1 or max(dp[i-1][j], dp[i][j-1])"
+            ],
+            [
+              "Longest Increasing Subsequence",
+              "1D DP",
+              "dp[i] = max(dp[j]+1) for j<i where nums[j]<nums[i]"
+            ]
+          ]
+        },
+        {
+          "type": "tip",
+          "title": "DP Signal",
+          "message": "If your recursive solution recomputes the same (input, state) pair multiple times, that is the signal to add memoization. Draw the recursion tree and look for repeated nodes. If you see them, DP applies."
+        }
+      ]
+    },
+    {
       "id": "slice-tricks",
       "title": "Slice Tricks and Idioms",
       "category": "Go-Specific Techniques",
@@ -16956,6 +18048,74 @@
       ]
     },
     {
+      "id": "go-techniques-refresher",
+      "title": "Go-Specific Techniques: Quick Refresher",
+      "category": "Go-Specific Techniques",
+      "difficulty": "intermediate",
+      "estimatedTime": "10 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "A condensed reference for Go-specific idioms that appear frequently in interview solutions. These are patterns that do not exist in other languages in the same form."
+        },
+        {
+          "type": "heading",
+          "text": "Slice Tricks",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Because slices underlie almost every data structure in Go, knowing a handful of slice manipulation idioms will save you time in interviews. The operations below are O(1) when you only change the slice header (adjusting length or capacity without touching elements), and O(n) when elements need to shift to fill a gap left by a deletion or insertion."
+        },
+        {
+          "type": "code",
+          "code": "// Delete element at index i (order not preserved, O(1))\n// Swap with last, then shrink\ns[i] = s[len(s)-1]\ns = s[:len(s)-1]\n\n// Delete element at index i (order preserved, O(n))\ns = append(s[:i], s[i+1:]...)\n\n// Insert value v at index i\ns = append(s, 0)       // grow by one\ncopy(s[i+1:], s[i:])   // shift right\ns[i] = v\n\n// Reverse a slice in place\nfunc reverse(s []int) {\n    for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {\n        s[i], s[j] = s[j], s[i]\n    }\n}\n\n// Deduplicate a sorted slice (keep unique values)\nfunc dedup(s []int) []int {\n    if len(s) == 0 {\n        return s\n    }\n    out := s[:1]\n    for _, v := range s[1:] {\n        if v != out[len(out)-1] {\n            out = append(out, v)\n        }\n    }\n    return out\n}\n\n// Filter in place (reuses backing array, no extra allocation)\nout := s[:0]\nfor _, v := range s {\n    if keep(v) {\n        out = append(out, v)\n    }\n}\ns = out\n\n// Copy to avoid mutating the original\nclone := make([]int, len(original))\ncopy(clone, original)",
+          "language": "go",
+          "filename": "slice_tricks.go"
+        },
+        {
+          "type": "warning",
+          "title": "Sub-slice Shares Memory",
+          "message": "sub := s[1:3] does not copy the data. sub and s share the same backing array. Modifying sub[0] also modifies s[1]. Use copy() when you need an independent slice."
+        },
+        {
+          "type": "heading",
+          "text": "Custom Sorting",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "sort.Slice is the go-to for custom sorting in interviews. You provide a less function that returns true if element i should come before element j. For multi-key sorting, check fields in priority order inside less. Use sort.SliceStable when the original order of equal elements must be preserved."
+        },
+        {
+          "type": "code",
+          "code": "type Person struct {\n    Name string\n    Age  int\n}\npeople := []Person{{\"Charlie\", 35}, {\"Alice\", 30}, {\"Bob\", 30}}\n\n// Single-field sort: ascending by age\nsort.Slice(people, func(i, j int) bool {\n    return people[i].Age < people[j].Age\n})\n\n// Multi-field: age ascending, then name ascending for equal ages\nsort.Slice(people, func(i, j int) bool {\n    if people[i].Age != people[j].Age {\n        return people[i].Age < people[j].Age\n    }\n    return people[i].Name < people[j].Name\n})\n\n// sort.Interface: implement for a reusable named type\ntype ByLength []string\n\nfunc (s ByLength) Len() int {\n    return len(s)\n}\n\nfunc (s ByLength) Less(i, j int) bool {\n    return len(s[i]) < len(s[j])\n}\n\nfunc (s ByLength) Swap(i, j int) {\n    s[i], s[j] = s[j], s[i]\n}\n\nwords := []string{\"banana\", \"kiwi\", \"pear\"}\nsort.Sort(ByLength(words))               // [kiwi pear banana]\nsort.Sort(sort.Reverse(ByLength(words))) // [banana pear kiwi]\n\n// Stable sort: equal elements keep their original relative order\nsort.SliceStable(people, func(i, j int) bool {\n    return people[i].Age < people[j].Age\n})",
+          "language": "go",
+          "filename": "custom_sort.go"
+        },
+        {
+          "type": "heading",
+          "text": "Generics for Algorithms",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Generics let you write algorithm helpers (Min, Max, Contains, Map, Filter) once and use them with any compatible type. The comparable constraint means the type supports == and !=. The constraints.Ordered constraint (from golang.org/x/exp) means the type supports <, >, etc. For interview problems, a small set of generic helpers can reduce repetitive code."
+        },
+        {
+          "type": "code",
+          "code": "// Generic min/max: works with any numeric or string type\nfunc Min[T int | int64 | float64 | string](a, b T) T {\n    if a < b {\n        return a\n    }\n    return b\n}\n\nfunc Max[T int | int64 | float64 | string](a, b T) T {\n    if a > b {\n        return a\n    }\n    return b\n}\n\n// Generic contains check: T must support == comparison\nfunc Contains[T comparable](s []T, v T) bool {\n    for _, item := range s {\n        if item == v {\n            return true\n        }\n    }\n    return false\n}\n\n// Generic type-safe stack\ntype Stack[T any] struct {\n    items []T\n}\n\nfunc (s *Stack[T]) Push(v T) {\n    s.items = append(s.items, v)\n}\n\nfunc (s *Stack[T]) Pop() (T, bool) {\n    var zero T  // zero value of T (returned when stack is empty)\n    if len(s.items) == 0 {\n        return zero, false\n    }\n    n := len(s.items) - 1\n    v := s.items[n]\n    s.items = s.items[:n]\n    return v, true\n}\n\nfunc (s *Stack[T]) Len() int {\n    return len(s.items)\n}\n\n// Usage: compiler catches type mistakes\nst := &Stack[string]{}\nst.Push(\"hello\")\nv, ok := st.Pop()  // \"hello\", true\n_ = v; _ = ok",
+          "language": "go",
+          "filename": "generics.go"
+        },
+        {
+          "type": "tip",
+          "title": "When to Use Generics",
+          "message": "Reach for generics when you are writing the same function body for multiple types (Min, Max, Contains). Skip them when an interface already solves the problem or when the generic version is harder to read than a type-specific one."
+        }
+      ]
+    },
+    {
       "id": "go-interview-style",
       "title": "Go Code Style in Interviews",
       "category": "Interview Preparation",
@@ -17421,6 +18581,132 @@
           "type": "warning",
           "title": "Testing Checklist",
           "message": "Before submitting, mentally run your solution through: empty input, single element, two elements, all same values, already sorted (both directions), negative numbers, zeros, and maximum values. Most bugs hide in these cases."
+        }
+      ]
+    },
+    {
+      "id": "interview-prep-refresher",
+      "title": "Interview Preparation: Quick Refresher",
+      "category": "Interview Preparation",
+      "difficulty": "intermediate",
+      "estimatedTime": "10 min",
+      "content": [
+        {
+          "type": "text",
+          "text": "A condensed reference of Go interview style and the most common mistakes. Read this right before an interview to make sure good habits are fresh in your mind."
+        },
+        {
+          "type": "heading",
+          "text": "Go Code Style in Interviews",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Idiomatic Go is concise, readable, and consistent. These are the style points interviewers notice. Getting them right signals fluency with the language, not just knowledge of its syntax."
+        },
+        {
+          "type": "comparison",
+          "items": [
+            {
+              "label": "Variable names",
+              "description": "Short and clear: i, j, k for loop indices, err for errors, ok for boolean checks. Avoid overly long names for local variables. Acronyms all-caps: URL, HTTP, ID."
+            },
+            {
+              "label": "Declarations",
+              "description": "Use := inside functions. Avoid verbose var x Type = value unless you need an explicit zero value or package-level declaration."
+            },
+            {
+              "label": "Error handling",
+              "description": "Check errors immediately after the call. Return early on failure. Never ignore an error return with _ without a written reason."
+            },
+            {
+              "label": "Comma-ok idiom",
+              "description": "Use if val, ok := myMap[key]; ok when checking map keys. Same for type assertions and channel receives."
+            },
+            {
+              "label": "Function length",
+              "description": "Keep functions short. If a function does two distinct things, it should probably be two functions."
+            },
+            {
+              "label": "Comments",
+              "description": "Comment the why, not the what. If the code is clear, skip the comment. Never narrate what the next line obviously does."
+            }
+          ]
+        },
+        {
+          "type": "code",
+          "code": "// Good: idiomatic, concise\nfunc twoSum(nums []int, target int) []int {\n    seen := make(map[int]int)  // value -> index\n    for i, n := range nums {\n        if j, ok := seen[target-n]; ok {\n            return []int{j, i}\n        }\n        seen[n] = i\n    }\n    return nil\n}\n\n// Not idiomatic: verbose, unnecessary else, long names\nfunc TwoSum(numbers []int, t int) []int {\n    var theMap map[int]int = make(map[int]int)\n    for index := 0; index < len(numbers); index++ {\n        complement := t - numbers[index]\n        if val, found := theMap[complement]; found == true {\n            return []int{val, index}\n        } else {\n            theMap[numbers[index]] = index\n        }\n    }\n    return nil\n}",
+          "language": "go",
+          "filename": "style.go"
+        },
+        {
+          "type": "heading",
+          "text": "Common Mistakes to Avoid",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "These are the bugs that trip up Go developers most often in interviews. Each one has a clear fix. Know them so you avoid them instinctively under pressure."
+        },
+        {
+          "type": "warning",
+          "title": "Nil Map Write",
+          "message": "var m map[string]int; m[\"key\"] = 1 panics at runtime. Reading returns zero value and is safe, but writing is not. Always initialize: m := make(map[string]int)."
+        },
+        {
+          "type": "code",
+          "code": "// Mistake 1: writing to a nil map\nvar m map[string]int\n// m[\"key\"] = 1  // panic: assignment to entry in nil map\n// Fix: initialize first\nm = make(map[string]int)\nm[\"key\"] = 1  // safe\n\n// Mistake 2: goroutine captures loop variable (pre-Go 1.22)\nfor _, item := range items {\n    go func() {\n        process(item)  // all goroutines may see the last value of item\n    }()\n}\n// Fix: pass by value\nfor _, item := range items {\n    go func(it Item) {\n        process(it)\n    }(item)\n}\n\n// Mistake 3: comparing slices with ==\na := []int{1, 2, 3}\nb := []int{1, 2, 3}\n// a == b  // compile error: slices are not comparable\n// Fix: use reflect.DeepEqual or write a loop\nreflect.DeepEqual(a, b)  // true (but slow for large slices)\n_ = a; _ = b",
+          "language": "go",
+          "filename": "mistakes1.go"
+        },
+        {
+          "type": "code",
+          "code": "// Mistake 4: not checking comma-ok on map lookup\nage := m[\"alice\"]     // 0 if missing, no error or panic\n// Fix: use comma-ok when absence matters\nage, ok := m[\"alice\"]\nif !ok {\n    // key was not present\n}\n_ = age\n\n// Mistake 5: sub-slice mutates the original\ns := []int{1, 2, 3, 4}\nsub := s[1:3]  // shares backing array\nsub[0] = 99    // also changes s[1] to 99\nfmt.Println(s) // [1 99 3 4] -- surprise!\n// Fix: copy when you need independence\nsub = make([]int, 2)\ncopy(sub, s[1:3])\n\n// Mistake 6: range copies struct values, so mutation is lost\ntype Item struct {\n    Price float64\n}\nitems := []Item{{1.5}, {0.5}}\nfor _, item := range items {\n    item.Price *= 1.1  // modifies the copy, not the slice element\n}\n// Fix: use the index to modify in place\nfor i := range items {\n    items[i].Price *= 1.1\n}\n\n// Mistake 7: variable shadowing with :=\nval := 1\nif condition {\n    val := 2  // new variable scoped to this block; outer val unchanged\n    _ = val\n}\nfmt.Println(val)  // 1, not 2\n// Fix: use = for existing variable\nif condition {\n    val = 2  // correct: assigns to outer val\n}",
+          "language": "go",
+          "filename": "mistakes2.go"
+        },
+        {
+          "type": "heading",
+          "text": "Interview Checklist",
+          "level": 3
+        },
+        {
+          "type": "text",
+          "text": "Before declaring your solution done, run through this list. Many interview mistakes come from skipping one of these steps."
+        },
+        {
+          "type": "comparison",
+          "items": [
+            {
+              "label": "Confirm the problem",
+              "description": "Restate the input constraints, edge cases (empty, single element, negatives), and expected output format before writing code."
+            },
+            {
+              "label": "State your approach",
+              "description": "Explain your algorithm and its time and space complexity before you start coding. Ask if the interviewer agrees."
+            },
+            {
+              "label": "Start with brute force",
+              "description": "Mention the O(n^2) or naive solution first, then optimize. This shows systematic thinking."
+            },
+            {
+              "label": "Walk through examples",
+              "description": "Trace through the given examples by hand before claiming correctness."
+            },
+            {
+              "label": "Check edge cases",
+              "description": "Empty slice or string, nil input, single element, all identical values, sorted or reverse-sorted input."
+            },
+            {
+              "label": "State Big-O at the end",
+              "description": "Always close with time complexity and space complexity."
+            }
+          ]
+        },
+        {
+          "type": "tip",
+          "title": "Go-Specific Interview Tips",
+          "message": "Mention goroutines only when the problem truly calls for concurrency. For most algorithmic problems, single-threaded Go with slices and maps is exactly right. Interviewers value clarity and correctness over clever use of language features."
         }
       ]
     },
